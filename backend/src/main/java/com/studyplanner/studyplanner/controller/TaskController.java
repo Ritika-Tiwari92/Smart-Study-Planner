@@ -1,48 +1,38 @@
-package com.studyplanner.studyplanner.controller; // Ab ye 'controller' folder ke andar hai
+package com.studyplanner.studyplanner.controller;
 
 import com.studyplanner.studyplanner.model.Task;
 import com.studyplanner.studyplanner.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*") // Isse kisi bhi frontend se request allow ho jayegi
-
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
+@CrossOrigin("*")
 public class TaskController {
 
      @Autowired
      private TaskService taskService;
 
-     @PostMapping("/add")
-     public Task addTask(@Valid @RequestBody Task task) {
-          // Direct save karne ki jagah service ko bola save karne
-          return taskService.saveTask(task);
+     @PostMapping
+     public Task addTask(@RequestBody Task task) {
+          return taskService.addTask(task);
      }
 
-     @GetMapping("/all")
+     @GetMapping
      public List<Task> getAllTasks() {
           return taskService.getAllTasks();
      }
 
-     @DeleteMapping("/delete/{id}")
+     @PutMapping("/{id}/status")
+     public Task updateTaskStatus(@PathVariable Long id, @RequestParam String status) {
+          return taskService.updateTaskStatus(id, status);
+     }
+
+     @DeleteMapping("/{id}")
      public String deleteTask(@PathVariable Long id) {
           taskService.deleteTask(id);
-          return "Task with ID " + id + " deleted successfully!";
-     }
-
-     // GET single task
-     @GetMapping("/{id}")
-     public Task getTaskById(@PathVariable Long id) {
-          return taskService.getTaskById(id);
-     }
-
-     // UPDATE task
-     @PutMapping("/update/{id}")
-     public Task updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
-          return taskService.updateTask(id, task);
+          return "Task deleted successfully";
      }
 }
