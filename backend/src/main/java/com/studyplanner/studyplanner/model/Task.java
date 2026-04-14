@@ -2,6 +2,9 @@ package com.studyplanner.studyplanner.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tasks")
@@ -11,11 +14,26 @@ public class Task {
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Long id;
 
+     @NotBlank(message = "Title is required")
      private String title;
+
+     @NotBlank(message = "Description is required")
      private String description;
-     private LocalDate dueDate;
-     private String priority;
+
+     @NotBlank(message = "Status is required")
      private String status;
+
+     @NotNull(message = "Due date is required")
+     private LocalDate dueDate;
+
+     @NotBlank(message = "Priority is required")
+     private String priority;
+
+     @NotNull(message = "Subject is required")
+     @JsonIgnoreProperties("tasks")
+     @ManyToOne
+     @JoinColumn(name = "subject_id")
+     private Subject subject;
 
      public Task() {
      }
@@ -75,5 +93,13 @@ public class Task {
 
      public void setStatus(String status) {
           this.status = status;
+     }
+
+     public Subject getSubject() {
+          return subject;
+     }
+
+     public void setSubject(Subject subject) {
+          this.subject = subject;
      }
 }

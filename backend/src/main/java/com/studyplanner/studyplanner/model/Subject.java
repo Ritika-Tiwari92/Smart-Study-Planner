@@ -1,16 +1,25 @@
 package com.studyplanner.studyplanner.model;
 
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "subjects")
 public class Subject {
 
+     @JsonIgnoreProperties("subject")
+     @OneToMany(mappedBy = "subject")
+     private List<Task> tasks;
+
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Long id;
-
+     @NotBlank(message = "Subject name is required")
      private String subjectName;
+     @NotBlank(message = "Difficulty level is required")
      private String difficultyLevel;
 
      public Subject() {
@@ -44,5 +53,13 @@ public class Subject {
 
      public void setDifficultyLevel(String difficultyLevel) {
           this.difficultyLevel = difficultyLevel;
+     }
+
+     public List<Task> getTasks() {
+          return tasks;
+     }
+
+     public void setTasks(List<Task> tasks) {
+          this.tasks = tasks;
      }
 }
