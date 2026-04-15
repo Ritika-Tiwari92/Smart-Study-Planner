@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Subjects | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/subjects.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item active">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>My Subjects</h1>
+                              <p>Manage your study subjects and track progress easily.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="add-subject-btn" id="openSubjectModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Add Subject</span>
+                         </button>
+
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="subjects-content">
+                    <div class="subjects-summary-grid">
+                         <div class="summary-card">
+                              <h3 id="totalSubjectsCount">05</h3>
+                              <p>Total Subjects</p>
+                         </div>
+
+                         <div class="summary-card">
+                              <h3 id="completedSubjectsCount">01</h3>
+                              <p>Completed</p>
+                         </div>
+
+                         <div class="summary-card">
+                              <h3 id="inProgressSubjectsCount">04</h3>
+                              <p>In Progress</p>
+                         </div>
+
+                         <div class="summary-card">
+                              <h3 id="averageProgressCount">68%</h3>
+                              <p>Average Progress</p>
+                         </div>
+                    </div>
+
+                    <div class="subjects-toolbar">
+                         <div class="subjects-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="subjectSearchInput" placeholder="Search subjects...">
+                         </div>
+
+                         <div class="subjects-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="subjectFilterSelect">
+                                   <option>All Subjects</option>
+                                   <option>Completed</option>
+                                   <option>In Progress</option>
+                                   <option>Pending</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="subjects-grid" id="subjectsGrid">
+                         <div class="subject-card">
+                              <div class="subject-card-top">
+                                   <div class="subject-icon">
+                                        <i class="fa-solid fa-code"></i>
+                                   </div>
+
+                                   <div class="subject-actions">
+                                        <button class="subject-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="subject-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <h3>Java Programming</h3>
+                              <p>OOP concepts, collections, exception handling, and practice.</p>
+                              <div class="subject-meta">
+                                   <span>12 Chapters</span>
+                                   <span>80% Done</span>
+                              </div>
+                              <div class="subject-progress-bar">
+                                   <div class="subject-progress-fill" style="width: 80%;"></div>
+                              </div>
+                         </div>
+
+                         <div class="subject-card">
+                              <div class="subject-card-top">
+                                   <div class="subject-icon">
+                                        <i class="fa-solid fa-database"></i>
+                                   </div>
+
+                                   <div class="subject-actions">
+                                        <button class="subject-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="subject-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <h3>DBMS</h3>
+                              <p>ER model, normalization, SQL queries, and transactions.</p>
+                              <div class="subject-meta">
+                                   <span>10 Chapters</span>
+                                   <span>65% Done</span>
+                              </div>
+                              <div class="subject-progress-bar">
+                                   <div class="subject-progress-fill" style="width: 65%;"></div>
+                              </div>
+                         </div>
+
+                         <div class="subject-card">
+                              <div class="subject-card-top">
+                                   <div class="subject-icon">
+                                        <i class="fa-solid fa-network-wired"></i>
+                                   </div>
+
+                                   <div class="subject-actions">
+                                        <button class="subject-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="subject-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <h3>Computer Networks</h3>
+                              <p>OSI model, IP addressing, protocols, and network basics.</p>
+                              <div class="subject-meta">
+                                   <span>9 Chapters</span>
+                                   <span>55% Done</span>
+                              </div>
+                              <div class="subject-progress-bar">
+                                   <div class="subject-progress-fill" style="width: 55%;"></div>
+                              </div>
+                         </div>
+
+                         <div class="subject-card">
+                              <div class="subject-card-top">
+                                   <div class="subject-icon">
+                                        <i class="fa-solid fa-desktop"></i>
+                                   </div>
+
+                                   <div class="subject-actions">
+                                        <button class="subject-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="subject-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <h3>Operating System</h3>
+                              <p>Process management, memory, scheduling, and file systems.</p>
+                              <div class="subject-meta">
+                                   <span>11 Chapters</span>
+                                   <span>72% Done</span>
+                              </div>
+                              <div class="subject-progress-bar">
+                                   <div class="subject-progress-fill" style="width: 72%;"></div>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="subjects-empty-state hidden" id="subjectsEmptyState">
+                         <i class="fa-regular fa-folder-open"></i>
+                         <h3>No subjects found</h3>
+                         <p>Try changing your search text or filter option.</p>
+                    </div>
+               </section>
+               <div class="subject-modal-overlay hidden" id="subjectModalOverlay">
+                    <div class="subject-modal">
+                         <div class="subject-modal-header">
+                              <div>
+                                   <h2 id="subjectModalTitle">Add New Subject</h2>
+                                   <p>Create a new subject with chapters, progress, and description.</p>
+                              </div>
+
+                              <button class="subject-modal-close" type="button" id="closeSubjectModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="subject-modal-form" id="subjectModalForm">
+                              <div class="subject-form-grid">
+                                   <div class="subject-form-group full-width">
+                                        <label for="subjectName">Subject Name</label>
+                                        <input type="text" id="subjectName" placeholder="Enter subject name">
+                                   </div>
+
+                                   <div class="subject-form-group">
+                                        <label for="subjectCode">Subject Code</label>
+                                        <input type="text" id="subjectCode" placeholder="e.g. BCA-601">
+                                   </div>
+
+                                   <div class="subject-form-group">
+                                        <label for="subjectChapters">Total Chapters</label>
+                                        <input type="number" id="subjectChapters" placeholder="Enter total chapters">
+                                   </div>
+
+                                   <div class="subject-form-group">
+                                        <label for="subjectProgress">Progress (%)</label>
+                                        <input type="number" id="subjectProgress"
+                                             placeholder="Enter progress percentage">
+                                   </div>
+
+                                   <div class="subject-form-group">
+                                        <label for="subjectIcon">Subject Icon</label>
+                                        <select id="subjectIcon">
+                                             <option value="fa-code">Code</option>
+                                             <option value="fa-database">Database</option>
+                                             <option value="fa-network-wired">Network</option>
+                                             <option value="fa-desktop">Computer</option>
+                                             <option value="fa-book">Book</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="subject-form-group full-width">
+                                        <label for="subjectDescription">Description</label>
+                                        <textarea id="subjectDescription" rows="4"
+                                             placeholder="Write subject details..."></textarea>
+                                   </div>
+                              </div>
+
+                              <div class="subject-modal-actions">
+                                   <button type="button" class="subject-cancel-btn"
+                                        id="cancelSubjectModalBtn">Cancel</button>
+                                   <button type="submit" class="subject-save-btn" id="subjectSaveBtn">Save
+                                        Subject</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+     <script src="../assets/js/subjects.js"></script>
+</body>
+
+</html>

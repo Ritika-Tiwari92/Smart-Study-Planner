@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Dashboard | EduMind AI</title>
+
+     <!-- Google Font -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <!-- Font Awesome -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <!-- CSS Files -->
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item active">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Hello, Ritika 👋</h1>
+                              <p>Let’s make today productive and well planned.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-search">
+                         <i class="fa-solid fa-magnifying-glass"></i>
+                         <input type="text" placeholder="Search subjects, tasks, planner...">
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="icon-btn">
+                              <i class="fa-solid fa-bell"></i>
+                         </button>
+
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+               <section class="dashboard-content">
+                    <div class="welcome-banner">
+                         <div class="welcome-text">
+                              <h2>Smart Study Planning Dashboard</h2>
+                              <p>Track your subjects, tasks, and study progress from one place.</p>
+                         </div>
+
+                         <div class="welcome-image">
+                              <img src="../assets/images/dashboard-hero.svg" alt="Dashboard Illustration">
+                         </div>
+                    </div>
+
+                    <div class="stats-grid">
+                         <div class="stat-card">
+                              <h3>05</h3>
+                              <p>Total Subjects</p>
+                         </div>
+
+                         <div class="stat-card">
+                              <h3>12</h3>
+                              <p>Pending Tasks</p>
+                         </div>
+
+                         <div class="stat-card">
+                              <h3>08</h3>
+                              <p>Completed Tasks</p>
+                         </div>
+
+                         <div class="stat-card">
+                              <h3>76%</h3>
+                              <p>Study Progress</p>
+                         </div>
+                    </div>
+
+                    <div class="dashboard-lower-grid">
+                         <div class="quick-actions-card">
+                              <div class="section-title">
+                                   <h3>Quick Actions</h3>
+                                   <p>Access your most-used features quickly.</p>
+                              </div>
+
+                              <div class="quick-actions-grid">
+                                   <a href="subjects.html" class="quick-action-btn">
+                                        <i class="fa-solid fa-book"></i>
+                                        <span>Add Subject</span>
+                                   </a>
+
+                                   <a href="tasks.html" class="quick-action-btn">
+                                        <i class="fa-solid fa-square-plus"></i>
+                                        <span>Add Task</span>
+                                   </a>
+
+                                   <a href="planner.html" class="quick-action-btn">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                        <span>Open Planner</span>
+                                   </a>
+
+                                   <a href="analytics.html" class="quick-action-btn">
+                                        <i class="fa-solid fa-chart-pie"></i>
+                                        <span>View Analytics</span>
+                                   </a>
+                              </div>
+                         </div>
+                         <div class="dashboard-bottom-grid">
+                              <div class="subject-progress-card">
+                                   <div class="section-title">
+                                        <h3>Subject Progress</h3>
+                                        <p>Track how much you have covered in each subject.</p>
+                                   </div>
+
+                                   <div class="subject-progress-list">
+                                        <div class="subject-progress-item">
+                                             <div class="subject-row">
+                                                  <span>Java Programming</span>
+                                                  <span>80%</span>
+                                             </div>
+                                             <div class="progress-bar">
+                                                  <div class="progress-fill" style="width: 80%;"></div>
+                                             </div>
+                                        </div>
+
+                                        <div class="subject-progress-item">
+                                             <div class="subject-row">
+                                                  <span>DBMS</span>
+                                                  <span>65%</span>
+                                             </div>
+                                             <div class="progress-bar">
+                                                  <div class="progress-fill" style="width: 65%;"></div>
+                                             </div>
+                                        </div>
+
+                                        <div class="subject-progress-item">
+                                             <div class="subject-row">
+                                                  <span>Computer Networks</span>
+                                                  <span>55%</span>
+                                             </div>
+                                             <div class="progress-bar">
+                                                  <div class="progress-fill" style="width: 55%;"></div>
+                                             </div>
+                                        </div>
+
+                                        <div class="subject-progress-item">
+                                             <div class="subject-row">
+                                                  <span>Operating System</span>
+                                                  <span>72%</span>
+                                             </div>
+                                             <div class="progress-bar">
+                                                  <div class="progress-fill" style="width: 72%;"></div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="upcoming-card">
+                                   <div class="section-title">
+                                        <h3>Upcoming Schedule</h3>
+                                        <p>Your next important study activities.</p>
+                                   </div>
+
+                                   <div class="upcoming-list">
+                                        <div class="upcoming-item">
+                                             <div class="upcoming-icon">
+                                                  <i class="fa-solid fa-book-open"></i>
+                                             </div>
+                                             <div class="upcoming-info">
+                                                  <h4>Java Revision Session</h4>
+                                                  <p>Today • 6:00 PM to 7:00 PM</p>
+                                             </div>
+                                        </div>
+
+                                        <div class="upcoming-item">
+                                             <div class="upcoming-icon">
+                                                  <i class="fa-solid fa-file-pen"></i>
+                                             </div>
+                                             <div class="upcoming-info">
+                                                  <h4>DBMS Assignment Submission</h4>
+                                                  <p>Tomorrow • 11:00 AM</p>
+                                             </div>
+                                        </div>
+
+                                        <div class="upcoming-item">
+                                             <div class="upcoming-icon">
+                                                  <i class="fa-solid fa-laptop-code"></i>
+                                             </div>
+                                             <div class="upcoming-info">
+                                                  <h4>Coding Practice</h4>
+                                                  <p>Tomorrow • 8:00 PM</p>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                         <div class="today-tasks-card">
+                              <div class="section-title">
+                                   <h3>Today’s Tasks</h3>
+                                   <p>Your important tasks for today.</p>
+                              </div>
+
+                              <div class="task-list">
+                                   <div class="task-item">
+                                        <div class="task-info">
+                                             <h4>Complete Java Assignment</h4>
+                                             <p>Due today • High Priority</p>
+                                        </div>
+                                        <span class="task-badge pending">Pending</span>
+                                   </div>
+
+                                   <div class="task-item">
+                                        <div class="task-info">
+                                             <h4>Revise DBMS Notes</h4>
+                                             <p>2 chapters • Evening session</p>
+                                        </div>
+                                        <span class="task-badge progress">In Progress</span>
+                                   </div>
+
+                                   <div class="task-item">
+                                        <div class="task-info">
+                                             <h4>Practice Aptitude Questions</h4>
+                                             <p>30 questions • Night practice</p>
+                                        </div>
+                                        <span class="task-badge done">Done</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="overview-chart-card">
+                         <div class="section-title">
+                              <h3>Weekly Study Overview</h3>
+                              <p>Your study activity for the last 7 days.</p>
+                         </div>
+
+                         <div class="chart-area">
+                              <div class="chart-bars">
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 70%;"></div>
+                                        <span>Mon</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 55%;"></div>
+                                        <span>Tue</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 82%;"></div>
+                                        <span>Wed</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 60%;"></div>
+                                        <span>Thu</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 90%;"></div>
+                                        <span>Fri</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 68%;"></div>
+                                        <span>Sat</span>
+                                   </div>
+                                   <div class="chart-bar-group">
+                                        <div class="chart-bar" style="height: 76%;"></div>
+                                        <span>Sun</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+          </main>
+     </div>
+</body>
+
+</html>

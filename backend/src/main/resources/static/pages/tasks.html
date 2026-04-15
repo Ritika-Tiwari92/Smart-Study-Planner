@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Tasks | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/tasks.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item active">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>My Tasks</h1>
+                              <p>Organize, track, and complete your study tasks on time.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="add-task-btn" id="openTaskModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Add Task</span>
+                         </button>
+
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="tasks-content">
+                    <div class="tasks-summary-grid">
+                         <div class="task-summary-card">
+                              <h3 id="totalTasksCount">20</h3>
+                              <p>Total Tasks</p>
+                         </div>
+
+                         <div class="task-summary-card">
+                              <h3 id="pendingTasksCount">08</h3>
+                              <p>Pending</p>
+                         </div>
+
+                         <div class="task-summary-card">
+                              <h3 id="completedTasksCount">10</h3>
+                              <p>Completed</p>
+                         </div>
+
+                         <div class="task-summary-card">
+                              <h3 id="overdueTasksCount">02</h3>
+                              <p>Overdue</p>
+                         </div>
+                    </div>
+
+                    <div class="tasks-toolbar">
+                         <div class="tasks-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="taskSearchInput" placeholder="Search tasks...">
+                         </div>
+
+                         <div class="tasks-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="taskFilterSelect">
+                                   <option>All Tasks</option>
+                                   <option>Pending</option>
+                                   <option>Completed</option>
+                                   <option>High Priority</option>
+                                   <option>Overdue</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="tasks-list" id="tasksList">
+                         <div class="task-card">
+                              <div class="task-card-top">
+                                   <div class="task-main-info">
+                                        <h3>Complete Java Assignment</h3>
+                                        <p>Subject: Java Programming</p>
+                                   </div>
+
+                                   <div class="task-actions">
+                                        <button class="task-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="task-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <div class="task-card-meta">
+                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Today</span>
+                                   <span class="task-priority high">High Priority</span>
+                                   <span class="task-status pending">Pending</span>
+                              </div>
+                         </div>
+
+                         <div class="task-card">
+                              <div class="task-card-top">
+                                   <div class="task-main-info">
+                                        <h3>Revise DBMS Notes</h3>
+                                        <p>Subject: DBMS</p>
+                                   </div>
+
+                                   <div class="task-actions">
+                                        <button class="task-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="task-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <div class="task-card-meta">
+                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Tomorrow</span>
+                                   <span class="task-priority medium">Medium Priority</span>
+                                   <span class="task-status progress">In Progress</span>
+                              </div>
+                         </div>
+
+                         <div class="task-card">
+                              <div class="task-card-top">
+                                   <div class="task-main-info">
+                                        <h3>Practice Aptitude Questions</h3>
+                                        <p>Subject: Placement Preparation</p>
+                                   </div>
+
+                                   <div class="task-actions">
+                                        <button class="task-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="task-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <div class="task-card-meta">
+                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: 18 Apr</span>
+                                   <span class="task-priority low">Low Priority</span>
+                                   <span class="task-status done">Completed</span>
+                              </div>
+                         </div>
+
+                         <div class="task-card">
+                              <div class="task-card-top">
+                                   <div class="task-main-info">
+                                        <h3>Prepare CN Short Notes</h3>
+                                        <p>Subject: Computer Networks</p>
+                                   </div>
+
+                                   <div class="task-actions">
+                                        <button class="task-action-btn" title="Edit">
+                                             <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="task-action-btn delete" title="Delete">
+                                             <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <div class="task-card-meta">
+                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Yesterday</span>
+                                   <span class="task-priority high">High Priority</span>
+                                   <span class="task-status overdue">Overdue</span>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="tasks-empty-state hidden" id="tasksEmptyState">
+                         <i class="fa-regular fa-folder-open"></i>
+                         <h3>No tasks found</h3>
+                         <p>Try changing your search text or filter option.</p>
+                    </div>
+               </section>
+
+               <div class="task-modal-overlay hidden" id="taskModalOverlay">
+                    <div class="task-modal">
+                         <div class="task-modal-header">
+                              <div>
+                                   <h2 id="taskModalTitle">Add New Task</h2>
+                                   <p>Create a new study task with subject, deadline, and priority.</p>
+                              </div>
+
+                              <button class="task-modal-close" type="button" id="closeTaskModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="task-modal-form" id="taskModalForm">
+                              <div class="task-form-grid">
+                                   <div class="task-form-group full-width">
+                                        <label for="taskTitle">Task Title</label>
+                                        <input type="text" id="taskTitle" placeholder="Enter task title">
+                                   </div>
+
+                                   <div class="task-form-group">
+                                        <label for="taskSubject">Subject</label>
+                                        <select id="taskSubject">
+                                             <option>Select subject</option>
+                                             <option>Java Programming</option>
+                                             <option>DBMS</option>
+                                             <option>Computer Networks</option>
+                                             <option>Operating System</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="task-form-group">
+                                        <label for="taskDate">Due Date</label>
+                                        <input type="date" id="taskDate">
+                                   </div>
+
+                                   <div class="task-form-group">
+                                        <label for="taskPriority">Priority</label>
+                                        <select id="taskPriority">
+                                             <option>High</option>
+                                             <option>Medium</option>
+                                             <option>Low</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="task-form-group">
+                                        <label for="taskStatus">Status</label>
+                                        <select id="taskStatus">
+                                             <option>Pending</option>
+                                             <option>In Progress</option>
+                                             <option>Completed</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="task-form-group full-width">
+                                        <label for="taskDescription">Description</label>
+                                        <textarea id="taskDescription" rows="4"
+                                             placeholder="Write task details..."></textarea>
+                                   </div>
+                              </div>
+
+                              <div class="task-modal-actions">
+                                   <button type="button" class="task-cancel-btn" id="cancelTaskModalBtn">Cancel</button>
+                                   <button type="submit" class="task-save-btn" id="taskSaveBtn">Save Task</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+
+     <script src="../assets/js/tasks.js"></script>
+</body>
+
+</html>

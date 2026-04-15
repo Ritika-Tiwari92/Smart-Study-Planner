@@ -1,0 +1,12 @@
+:root {
+  --primary-color: #6c63ff;
+  --primary-dark: #574bdb;
+  --bg-color: #f5f7fb;
+  --white: #ffffff;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --border-color: #dbe3ef;
+  --input-bg: #f9fafb;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+}

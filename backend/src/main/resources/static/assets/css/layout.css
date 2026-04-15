@@ -1,0 +1,94 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+}
+
+.login-left,
+.login-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.login-left {
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+}
+
+.login-right {
+  position: relative;
+  background: linear-gradient(135deg, #eef2ff, #f7f9ff);
+  overflow: hidden;
+}
+
+.login-right::before,
+.login-right::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(108, 99, 255, 0.08);
+  filter: blur(10px);
+}
+
+.login-right::before {
+  width: 220px;
+  height: 220px;
+  top: 60px;
+  left: 80px;
+}
+
+.login-right::after {
+  width: 280px;
+  height: 280px;
+  bottom: 40px;
+  right: 60px;
+}
+
+.login-right img {
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+  animation: floatImage 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.login-right img:hover {
+  transform: scale(1.02);
+}
+
+@keyframes floatImage {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 992px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-right {
+    display: none;
+  }
+
+  .login-left {
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-left {
+    padding: 20px 16px;
+  }
+}
