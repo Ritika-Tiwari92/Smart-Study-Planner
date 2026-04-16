@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Assistant | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/assistant.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item active">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>AI Study Assistant</h1>
+                              <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="new-chat-btn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="assistant-content">
+                    <div class="assistant-intro-card">
+                         <div class="assistant-intro-left">
+                              <div class="assistant-avatar">
+                                   <i class="fa-solid fa-robot"></i>
+                              </div>
+                              <div>
+                                   <h3>Hello, I’m your AI Assistant</h3>
+                                   <p>I can help you with study plans, explanations, revision help, coding doubts, and
+                                        smart suggestions.</p>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="assistant-quick-actions">
+                         <button class="assistant-chip">Make a study plan</button>
+                         <button class="assistant-chip">Explain a topic</button>
+                         <button class="assistant-chip">Generate revision questions</button>
+                         <button class="assistant-chip">Help with coding</button>
+                         <button class="assistant-chip">Summarize notes</button>
+                    </div>
+
+                    <div class="assistant-main-grid">
+                         <div class="assistant-chat-card">
+                              <div class="section-title">
+                                   <h3>Chat Window</h3>
+                                   <p>Ask anything related to your learning.</p>
+                              </div>
+
+                              <div class="chat-messages">
+                                   <div class="chat-message assistant">
+                                        <div class="chat-bubble">
+                                             Hi Ritika! I can help you with study planning, revision, coding, and test
+                                             preparation. What would you like to do today?
+                                        </div>
+                                   </div>
+
+                                   <div class="chat-message user">
+                                        <div class="chat-bubble">
+                                             Help me prepare for my Java mock test.
+                                        </div>
+                                   </div>
+
+                                   <div class="chat-message assistant">
+                                        <div class="chat-bubble">
+                                             Sure! I can create a Java mock test plan, important topics list, and quick
+                                             revision strategy for you.
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="chat-input-box">
+                                   <i class="fa-regular fa-message"></i>
+                                   <input type="text" placeholder="Type your message here...">
+                                   <button class="send-chat-btn">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                   </button>
+                              </div>
+                         </div>
+
+                         <div class="assistant-side-card">
+                              <div class="section-title">
+                                   <h3>Suggested Help</h3>
+                                   <p>Quick things you can ask right now.</p>
+                              </div>
+
+                              <div class="assistant-help-list">
+                                   <div class="assistant-help-item">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Create a one-day exam revision plan</span>
+                                   </div>
+                                   <div class="assistant-help-item">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Explain DBMS normalization in easy words</span>
+                                   </div>
+                                   <div class="assistant-help-item">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Generate Java interview questions</span>
+                                   </div>
+                                   <div class="assistant-help-item">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Make short notes for Operating System</span>
+                                   </div>
+                                   <div class="assistant-help-item">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Give me aptitude practice questions</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+          </main>
+     </div>
+     <script src="../assets/js/theme.js"></script>
+</body>
+
+</html>

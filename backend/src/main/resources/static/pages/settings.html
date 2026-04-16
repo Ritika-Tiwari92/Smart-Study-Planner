@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Settings | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/settings.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item active">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Settings</h1>
+                              <p>Manage your profile, preferences, notifications, and account options.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="save-settings-btn" id="saveSettingsBtn">
+                              <i class="fa-solid fa-floppy-disk"></i>
+                              <span>Save Changes</span>
+                         </button>
+                         <p class="settings-save-status" id="settingsSaveStatus"></p>
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="settings-content">
+                    <div class="settings-main-grid">
+                         <div class="settings-left-column">
+                              <div class="settings-card profile-settings-card">
+                                   <div class="section-title">
+                                        <h3>Profile Settings</h3>
+                                        <p>Update your basic profile details.</p>
+                                   </div>
+
+                                   <div class="profile-settings-layout">
+                                        <div class="settings-avatar-box">
+                                             <img src="../assets/avatar/default-user.png" alt="Profile">
+                                             <button class="change-photo-btn">Change Photo</button>
+                                        </div>
+
+                                        <div class="settings-form-grid">
+                                             <div class="settings-form-group">
+                                                  <label>Full Name</label>
+                                                  <input type="text" value="Ritika Tiwari">
+                                             </div>
+
+                                             <div class="settings-form-group">
+                                                  <label>Email</label>
+                                                  <input type="email" value="ritika@example.com">
+                                             </div>
+
+                                             <div class="settings-form-group">
+                                                  <label>Course</label>
+                                                  <input type="text" value="BCA Final Year">
+                                             </div>
+
+                                             <div class="settings-form-group">
+                                                  <label>College</label>
+                                                  <input type="text" value="ITM College of Science and Management">
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="settings-card preferences-card">
+                                   <div class="section-title">
+                                        <h3>Study Preferences</h3>
+                                        <p>Customize your learning environment and habits.</p>
+                                   </div>
+
+                                   <div class="settings-form-grid">
+                                        <div class="settings-form-group">
+                                             <label>Preferred Study Time</label>
+                                             <select>
+                                                  <option>Morning</option>
+                                                  <option>Afternoon</option>
+                                                  <option>Evening</option>
+                                                  <option>Night</option>
+                                             </select>
+                                        </div>
+
+                                        <div class="settings-form-group">
+                                             <label>Daily Study Goal</label>
+                                             <select>
+                                                  <option>2 Hours</option>
+                                                  <option>4 Hours</option>
+                                                  <option>6 Hours</option>
+                                                  <option>8 Hours</option>
+                                             </select>
+                                        </div>
+
+                                        <div class="settings-form-group full-width">
+                                             <label>Preferred Subjects Focus</label>
+                                             <input type="text" value="Java, DBMS, Aptitude">
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="settings-right-column">
+                              <div class="settings-card notification-card">
+                                   <div class="section-title">
+                                        <h3>Notifications</h3>
+                                        <p>Choose what reminders and alerts you want.</p>
+                                   </div>
+
+                                   <div class="settings-toggle-list">
+                                        <div class="settings-toggle-item">
+                                             <div>
+                                                  <h4>Task Reminders</h4>
+                                                  <p>Get reminders for pending study tasks.</p>
+                                             </div>
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
+                                        </div>
+
+                                        <div class="settings-toggle-item">
+                                             <div>
+                                                  <h4>Revision Alerts</h4>
+                                                  <p>Receive reminders for revision topics.</p>
+                                             </div>
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
+                                        </div>
+
+                                        <div class="settings-toggle-item">
+                                             <div>
+                                                  <h4>Test Notifications</h4>
+                                                  <p>Get alerts for upcoming tests and mock exams.</p>
+                                             </div>
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
+                                        </div>
+
+                                        <div class="settings-toggle-item">
+                                             <div>
+                                                  <h4>Assistant Suggestions</h4>
+                                                  <p>Show smart recommendations from AI assistant.</p>
+                                             </div>
+                                             <label class="switch">
+                                                  <input type="checkbox">
+                                                  <span class="slider"></span>
+                                             </label>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="settings-card appearance-card">
+                                   <div class="section-title">
+                                        <h3>Appearance</h3>
+                                        <p>Customize your dashboard look and feel.</p>
+                                   </div>
+
+                                   <div class="appearance-options">
+                                        <button class="appearance-option active" id="lightModeOption">
+                                             <i class="fa-solid fa-sun"></i>
+                                             <span>Light Mode</span>
+                                        </button>
+
+                                        <button class="appearance-option" id="darkModeOption">
+                                             <i class="fa-solid fa-moon"></i>
+                                             <span>Dark Mode</span>
+                                        </button>
+                                   </div>
+                              </div>
+
+                              <div class="settings-card security-card">
+                                   <div class="section-title">
+                                        <h3>Security & Account</h3>
+                                        <p>Manage account security settings.</p>
+                                   </div>
+
+                                   <div class="security-action-list">
+                                        <button class="security-action-btn">
+                                             <i class="fa-solid fa-key"></i>
+                                             <span>Change Password</span>
+                                        </button>
+
+                                        <button class="security-action-btn">
+                                             <i class="fa-solid fa-shield-halved"></i>
+                                             <span>Enable Two-Factor Auth</span>
+                                        </button>
+
+                                        <button class="security-action-btn danger">
+                                             <i class="fa-solid fa-trash"></i>
+                                             <span>Delete Account</span>
+                                        </button>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+          </main>
+     </div>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/settings.js"></script>
+</body>
+
+</html>

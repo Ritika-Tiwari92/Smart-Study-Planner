@@ -94,13 +94,14 @@
                               <p>Plan your day, week, and study sessions in a smart way.</p>
                          </div>
                     </div>
-
                     <div class="header-actions">
-                         <button class="add-plan-btn">
+                         <button class="add-plan-btn" id="openPlanModalBtn">
                               <i class="fa-solid fa-plus"></i>
                               <span>Create Plan</span>
                          </button>
-
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
                          <div class="profile-mini">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
@@ -108,20 +109,7 @@
                                    <p>Student</p>
                               </div>
                          </div>
-                         <div class="header-actions">
-                              <button class="add-plan-btn" id="openPlanModalBtn">
-                                   <i class="fa-solid fa-plus"></i>
-                                   <span>Create Plan</span>
-                              </button>
-
-                              <div class="profile-mini">
-                                   <img src="../assets/avatar/default-user.png" alt="User">
-                                   <div>
-                                        <h4>Ritika</h4>
-                                        <p>Student</p>
-                                   </div>
-                              </div>
-                         </div>
+                    </div>
                </header>
 
                <section class="planner-content">
@@ -180,14 +168,15 @@
                                              <p>Arrays, OOP revision, and coding exercises</p>
                                         </div>
                                         <span class="session-badge done">Done</span>
-                                   </div>
-                                   <div class="session-actions">
-                                        <button class="session-action-btn edit" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="session-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
+
+                                        <div class="session-actions">
+                                             <button class="session-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="session-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
                                    </div>
                                    <div class="planner-empty-state hidden" id="plannerEmptyState">
                                         <i class="fa-regular fa-folder-open"></i>
@@ -430,6 +419,7 @@
                </div>
           </main>
      </div>
+     <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/planner.js"></script>
 </body>
 

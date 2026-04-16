@@ -24,7 +24,9 @@ const planDateInput = document.getElementById("planDate");
 const planStatusInput = document.getElementById("planStatus");
 const planDescriptionInput = document.getElementById("planDescription");
 
-let editingPlanItem = null;
+const PLANS_STORAGE_KEY = "edumind_plans";
+
+let editingPlanId = null;
 
 function openPlanModal() {
     if (!planModalOverlay) return;
@@ -39,7 +41,7 @@ function closePlanModal() {
 }
 
 function setAddPlanMode() {
-    editingPlanItem = null;
+    editingPlanId = null;
     if (planModalTitle) planModalTitle.textContent = "Create Study Plan";
     if (planSaveBtn) planSaveBtn.textContent = "Save Plan";
 }
@@ -62,6 +64,10 @@ function clearPlanModalState() {
     setAddPlanMode();
 }
 
+function generatePlanId() {
+    return `plan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function formatTime(value) {
     if (!value) return "No Time";
 
@@ -76,7 +82,7 @@ function formatTime(value) {
 }
 
 function getSessionStatusClass(status) {
-    const value = status.toLowerCase();
+    const value = (status || "").toLowerCase();
 
     if (value === "done") return "done";
     if (value === "in progress") return "progress";
@@ -150,9 +156,10 @@ function updatePlannerCounts() {
     }
 }
 
-function createStudySessionItem({ title, subject, time, date, status, description }) {
+function createStudySessionItem({ id, title, subject, time, date, status, description }) {
     const sessionItem = document.createElement("div");
     sessionItem.className = "study-session-item";
+    sessionItem.dataset.planId = id;
     sessionItem.dataset.date = date || "";
     sessionItem.dataset.subject = subject || "";
     sessionItem.dataset.status = status || "Pending";
@@ -182,45 +189,130 @@ function createStudySessionItem({ title, subject, time, date, status, descriptio
     return sessionItem;
 }
 
-function updateStudySessionItem(sessionItem, { title, subject, time, date, status, description }) {
-    const timeEl = sessionItem.querySelector(".session-time");
-    const titleEl = sessionItem.querySelector(".session-info h4");
-    const descEl = sessionItem.querySelector(".session-info p");
-    const badgeEl = sessionItem.querySelector(".session-badge");
+function renderPlans(plans) {
+    studySessionList.innerHTML = "";
+    plans.forEach((plan) => {
+        const sessionItem = createStudySessionItem(plan);
+        studySessionList.appendChild(sessionItem);
+    });
+    updatePlannerCounts();
+    applyPlanFilters();
+}
 
-    sessionItem.dataset.date = date || "";
-    sessionItem.dataset.subject = subject || "";
-    sessionItem.dataset.status = status || "Pending";
-    sessionItem.dataset.time = time || "";
-    sessionItem.dataset.description = description || "";
+function getPlansFromStorage() {
+    const saved = localStorage.getItem(PLANS_STORAGE_KEY);
+    if (!saved) return null;
 
-    if (timeEl) {
-        timeEl.textContent = formatTime(time);
-    }
-
-    if (titleEl) {
-        titleEl.textContent = title;
-    }
-
-    if (descEl) {
-        descEl.textContent = `${subject} • ${description}`;
-    }
-
-    if (badgeEl) {
-        badgeEl.className = `session-badge ${getSessionStatusClass(status)}`;
-        badgeEl.textContent = status;
+    try {
+        return JSON.parse(saved);
+    } catch (error) {
+        console.error("Failed to parse plans from localStorage:", error);
+        return null;
     }
 }
 
-function extractDateFromSessionItem(sessionItem) {
-    return sessionItem.dataset.date || "";
+function savePlansToStorage(plans) {
+    localStorage.setItem(PLANS_STORAGE_KEY, JSON.stringify(plans));
+}
+
+function parseTimeTo24Hour(timeText) {
+    if (!timeText) return "";
+
+    const match = timeText.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return "";
+
+    let hour = parseInt(match[1], 10);
+    const minute = match[2];
+    const ampm = match[3].toUpperCase();
+
+    if (ampm === "PM" && hour !== 12) hour += 12;
+    if (ampm === "AM" && hour === 12) hour = 0;
+
+    return `${String(hour).padStart(2, "0")}:${minute}`;
+}
+
+function extractPlansFromDOM() {
+    const sessionItems = studySessionList.querySelectorAll(".study-session-item");
+    const plans = [];
+
+    sessionItems.forEach((sessionItem) => {
+        const title = sessionItem.querySelector(".session-info h4")?.textContent.trim() || "";
+        const descriptionText = sessionItem.querySelector(".session-info p")?.textContent.trim() || "";
+        const timeText = sessionItem.querySelector(".session-time")?.textContent.trim() || "";
+        const statusText = sessionItem.querySelector(".session-badge")?.textContent.trim() || "Pending";
+
+        let subject = "";
+        let description = descriptionText;
+
+        if (descriptionText.includes("•")) {
+            const parts = descriptionText.split("•");
+            subject = parts[0]?.trim() || "";
+            description = parts.slice(1).join("•").trim() || "";
+        }
+
+        plans.push({
+            id: generatePlanId(),
+            title,
+            subject,
+            time: parseTimeTo24Hour(timeText),
+            date: getTodayString(),
+            status: statusText,
+            description
+        });
+    });
+
+    return plans;
+}
+
+function loadPlans() {
+    const storedPlans = getPlansFromStorage();
+
+    if (storedPlans && Array.isArray(storedPlans)) {
+        renderPlans(storedPlans);
+        return;
+    }
+
+    const initialPlans = extractPlansFromDOM();
+    savePlansToStorage(initialPlans);
+    renderPlans(initialPlans);
+}
+
+function getCurrentPlans() {
+    return getPlansFromStorage() || [];
+}
+
+function addPlan(planData) {
+    const plans = getCurrentPlans();
+    const newPlan = {
+        id: generatePlanId(),
+        ...planData
+    };
+
+    plans.unshift(newPlan);
+    savePlansToStorage(plans);
+    renderPlans(plans);
+}
+
+function updatePlan(planId, updatedData) {
+    const plans = getCurrentPlans().map((plan) =>
+        plan.id === planId ? { ...plan, ...updatedData } : plan
+    );
+
+    savePlansToStorage(plans);
+    renderPlans(plans);
+}
+
+function deletePlan(planId) {
+    const plans = getCurrentPlans().filter((plan) => plan.id !== planId);
+    savePlansToStorage(plans);
+    renderPlans(plans);
 }
 
 function matchesPlanFilter(sessionItem, filterValue) {
     if (!filterValue || filterValue === "All Plans") return true;
 
     const status = (sessionItem.dataset.status || "").toLowerCase();
-    const dateValue = extractDateFromSessionItem(sessionItem);
+    const dateValue = sessionItem.dataset.date || "";
     const today = getTodayString();
 
     if (filterValue === "Today") return dateValue === today;
@@ -269,7 +361,7 @@ function applyPlanFilters() {
 }
 
 function fillPlanFormForEdit(sessionItem) {
-    editingPlanItem = sessionItem;
+    editingPlanId = sessionItem.dataset.planId || null;
 
     const title = sessionItem.querySelector(".session-info h4")?.textContent.trim() || "";
     const subject = sessionItem.dataset.subject || "";
@@ -359,17 +451,14 @@ if (
             description: finalDescription
         };
 
-        if (editingPlanItem) {
-            updateStudySessionItem(editingPlanItem, planData);
+        if (editingPlanId) {
+            updatePlan(editingPlanId, planData);
         } else {
-            const newSessionItem = createStudySessionItem(planData);
-            studySessionList.prepend(newSessionItem);
+            addPlan(planData);
         }
 
-        updatePlannerCounts();
         closePlanModal();
         clearPlanModalState();
-        applyPlanFilters();
     });
 
     studySessionList.addEventListener("click", function (event) {
@@ -378,14 +467,14 @@ if (
 
         if (deleteButton) {
             const sessionItem = deleteButton.closest(".study-session-item");
-            if (!sessionItem) return;
+            const planId = sessionItem?.dataset.planId;
+
+            if (!planId) return;
 
             const shouldDelete = confirm("Do you want to delete this study plan?");
             if (!shouldDelete) return;
 
-            sessionItem.remove();
-            updatePlannerCounts();
-            applyPlanFilters();
+            deletePlan(planId);
             return;
         }
 
@@ -407,7 +496,6 @@ if (
         planFilterSelect.addEventListener("change", applyPlanFilters);
     }
 
-    updatePlannerCounts();
+    loadPlans();
     setAddPlanMode();
-    applyPlanFilters();
 }

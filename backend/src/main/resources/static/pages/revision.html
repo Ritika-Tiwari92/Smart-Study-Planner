@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Revision | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/revision.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item active">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Revision Tracker</h1>
+                              <p>Manage revision topics, weak areas, and upcoming review sessions.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="add-revision-btn" id="openRevisionModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Add Revision</span>
+                         </button>
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="revision-content">
+                    <div class="revision-summary-grid">
+                         <div class="revision-summary-card">
+                              <h3 id="totalRevisionCount">12</h3>
+                              <p>Total Revision Topics</p>
+                         </div>
+
+                         <div class="revision-summary-card">
+                              <h3 id="revisionDueTodayCount">05</h3>
+                              <p>Due Today</p>
+                         </div>
+
+                         <div class="revision-summary-card">
+                              <h3 id="revisionCompletedTodayCount">03</h3>
+                              <p>Completed Today</p>
+                         </div>
+
+                         <div class="revision-summary-card">
+                              <h3 id="revisionProgressCount">68%</h3>
+                              <p>Revision Progress</p>
+                         </div>
+                    </div>
+
+                    <div class="revision-toolbar">
+                         <div class="revision-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="revisionSearchInput" placeholder="Search revision topics...">
+                         </div>
+
+                         <div class="revision-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="revisionFilterSelect">
+                                   <option>All Topics</option>
+                                   <option>Due Today</option>
+                                   <option>Completed</option>
+                                   <option>Pending</option>
+                                   <option>Weak Topics</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="revision-main-grid">
+                         <div class="revision-topics-card">
+                              <div class="section-title">
+                                   <h3>Revision Topics</h3>
+                                   <p>Track your current and upcoming revision subjects.</p>
+                              </div>
+
+                              <div class="revision-topic-list" id="revisionTopicList">
+                                   <div class="revision-topic-item">
+                                        <div class="revision-topic-info">
+                                             <h4>Java OOP Concepts</h4>
+                                             <p>Subject: Java Programming • Classes, Objects, Inheritance</p>
+                                        </div>
+                                        <span class="revision-topic-badge weak">Weak Topic</span>
+                                        <div class="revision-topic-actions">
+                                             <button class="revision-topic-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="revision-topic-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+                                   <div class="revision-empty-state hidden" id="revisionEmptyState">
+                                        <i class="fa-regular fa-folder-open"></i>
+                                        <h3>No revision topics found</h3>
+                                        <p>Try changing your search text or filter option.</p>
+                                   </div>
+
+                                   <div class="revision-topic-item">
+                                        <div class="revision-topic-info">
+                                             <h4>Normalization & SQL Joins</h4>
+                                             <p>Subject: DBMS • Due today for revision</p>
+                                        </div>
+                                        <span class="revision-topic-badge pending">Pending</span>
+                                        <div class="revision-topic-actions">
+                                             <button class="revision-topic-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="revision-topic-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+
+                                   <div class="revision-topic-item">
+                                        <div class="revision-topic-info">
+                                             <h4>OSI Model</h4>
+                                             <p>Subject: Computer Networks • Layer-wise concepts</p>
+                                        </div>
+                                        <span class="revision-topic-badge done">Completed</span>
+                                        <div class="revision-topic-actions">
+                                             <button class="revision-topic-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="revision-topic-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+
+                                   <div class="revision-topic-item">
+                                        <div class="revision-topic-info">
+                                             <h4>CPU Scheduling</h4>
+                                             <p>Subject: Operating System • Algorithms and comparison</p>
+                                        </div>
+                                        <span class="revision-topic-badge pending">Pending</span>
+                                        <div class="revision-topic-actions">
+                                             <button class="revision-topic-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="revision-topic-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="revision-schedule-card">
+                              <div class="section-title">
+                                   <h3>Revision Schedule</h3>
+                                   <p>Your next revision sessions and priorities.</p>
+                              </div>
+
+                              <div class="revision-schedule-list">
+                                   <div class="revision-schedule-item">
+                                        <div class="revision-schedule-time">10:00 AM</div>
+                                        <div class="revision-schedule-info">
+                                             <h4>DBMS Quick Review</h4>
+                                             <p>Normalization and joins practice</p>
+                                        </div>
+                                   </div>
+
+                                   <div class="revision-schedule-item">
+                                        <div class="revision-schedule-time">02:00 PM</div>
+                                        <div class="revision-schedule-info">
+                                             <h4>Java Revision Test</h4>
+                                             <p>OOP and exception handling recap</p>
+                                        </div>
+                                   </div>
+
+                                   <div class="revision-schedule-item">
+                                        <div class="revision-schedule-time">07:00 PM</div>
+                                        <div class="revision-schedule-info">
+                                             <h4>OS Formula Sheet Review</h4>
+                                             <p>Scheduling and deadlock points</p>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="revision-bottom-grid">
+                         <div class="weak-areas-card">
+                              <div class="section-title">
+                                   <h3>Weak Areas</h3>
+                                   <p>Topics that need more revision and attention.</p>
+                              </div>
+
+                              <div class="weak-area-list">
+                                   <div class="weak-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>Java inheritance and polymorphism</span>
+                                   </div>
+                                   <div class="weak-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>DBMS normalization rules</span>
+                                   </div>
+                                   <div class="weak-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>OSI model layer functions</span>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="revision-tips-card">
+                              <div class="section-title">
+                                   <h3>Revision Tips</h3>
+                                   <p>Improve your retention with simple revision methods.</p>
+                              </div>
+
+                              <div class="revision-tip-list">
+                                   <div class="revision-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Revise weak topics first when your focus is highest.</span>
+                                   </div>
+                                   <div class="revision-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Use short notes for quick daily recap.</span>
+                                   </div>
+                                   <div class="revision-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Practice one revision test after every two sessions.</span>
+                                   </div>
+                                   <div class="revision-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Repeat difficult topics at spaced intervals.</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+               <div class="revision-modal-overlay hidden" id="revisionModalOverlay">
+                    <div class="revision-modal">
+                         <div class="revision-modal-header">
+                              <div>
+                                   <h2 id="revisionModalTitle">Add Revision Topic</h2>
+                                   <p>Create a revision entry with subject, topic, priority, and status.</p>
+                              </div>
+
+                              <button class="revision-modal-close" type="button" id="closeRevisionModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="revision-modal-form" id="revisionModalForm">
+                              <div class="revision-form-grid">
+                                   <div class="revision-form-group full-width">
+                                        <label for="revisionTopicTitle">Topic Title</label>
+                                        <input type="text" id="revisionTopicTitle"
+                                             placeholder="Enter revision topic title">
+                                   </div>
+
+                                   <div class="revision-form-group">
+                                        <label for="revisionSubject">Subject</label>
+                                        <select id="revisionSubject">
+                                             <option>Java Programming</option>
+                                             <option>DBMS</option>
+                                             <option>Computer Networks</option>
+                                             <option>Operating System</option>
+                                             <option>Aptitude</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="revision-form-group">
+                                        <label for="revisionPriority">Priority</label>
+                                        <select id="revisionPriority">
+                                             <option>Weak Topic</option>
+                                             <option>Pending</option>
+                                             <option>Completed</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="revision-form-group">
+                                        <label for="revisionDate">Revision Date</label>
+                                        <input type="date" id="revisionDate">
+                                   </div>
+
+                                   <div class="revision-form-group">
+                                        <label for="revisionStatus">Status</label>
+                                        <select id="revisionStatus">
+                                             <option>Pending</option>
+                                             <option>Completed</option>
+                                             <option>Weak Topic</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="revision-form-group full-width">
+                                        <label for="revisionDescription">Description</label>
+                                        <textarea id="revisionDescription" rows="4"
+                                             placeholder="Write revision details..."></textarea>
+                                   </div>
+                              </div>
+
+                              <div class="revision-modal-actions">
+                                   <button type="button" class="revision-cancel-btn"
+                                        id="cancelRevisionModalBtn">Cancel</button>
+                                   <button type="submit" class="revision-save-btn" id="revisionSaveBtn">Save
+                                        Revision</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/revision.js"></script>
+</body>
+
+</html>

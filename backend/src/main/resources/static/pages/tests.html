@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Tests | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/tests.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item active">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Tests & Exams</h1>
+                              <p>Manage your upcoming tests, mock exams, and recent performance.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="add-test-btn" id="openTestModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Add Test</span>
+                         </button>
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+
+                         <div class="profile-mini">
+                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4>Ritika</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="tests-content">
+                    <div class="tests-summary-grid">
+                         <div class="tests-summary-card">
+                              <h3 id="upcomingTestsCount">08</h3>
+                              <p>Upcoming Tests</p>
+                         </div>
+
+                         <div class="tests-summary-card">
+                              <h3 id="thisWeekTestsCount">03</h3>
+                              <p>This Week</p>
+                         </div>
+
+                         <div class="tests-summary-card">
+                              <h3 id="completedTestsCount">05</h3>
+                              <p>Completed Tests</p>
+                         </div>
+
+                         <div class="tests-summary-card">
+                              <h3 id="averageScoreCount">76%</h3>
+                              <p>Average Score</p>
+                         </div>
+                    </div>
+
+                    <div class="tests-toolbar">
+                         <div class="tests-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="testSearchInput" placeholder="Search tests...">
+                         </div>
+
+                         <div class="tests-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="testFilterSelect">
+                                   <option>All Tests</option>
+                                   <option>Upcoming</option>
+                                   <option>Completed</option>
+                                   <option>This Week</option>
+                                   <option>Mock Tests</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="tests-main-grid">
+                         <div class="upcoming-tests-card">
+                              <div class="section-title">
+                                   <h3>Upcoming Tests</h3>
+                                   <p>Your next scheduled exams and mock tests.</p>
+                              </div>
+
+                              <div class="test-list" id="testList">
+                                   <div class="test-item">
+                                        <div class="test-date-box">
+                                             <span>18</span>
+                                             <small>APR</small>
+                                        </div>
+                                        <div class="test-info">
+                                             <h4>Java Mock Test</h4>
+                                             <p>Subject: Java Programming • Duration: 60 mins</p>
+                                        </div>
+                                        <span class="test-badge upcoming">Upcoming</span>
+                                        <div class="test-actions">
+                                             <button class="test-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="test-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+
+                                   <div class="test-item">
+                                        <div class="test-date-box">
+                                             <span>19</span>
+                                             <small>APR</small>
+                                        </div>
+                                        <div class="test-info">
+                                             <h4>DBMS Unit Test</h4>
+                                             <p>Subject: DBMS • SQL and normalization focus</p>
+                                        </div>
+                                        <span class="test-badge upcoming">Upcoming</span>
+                                        <div class="test-actions">
+                                             <button class="test-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="test-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+
+                                   <div class="test-item">
+                                        <div class="test-date-box">
+                                             <span>21</span>
+                                             <small>APR</small>
+                                        </div>
+                                        <div class="test-info">
+                                             <h4>Computer Networks Quiz</h4>
+                                             <p>Subject: CN • OSI model and protocols</p>
+                                        </div>
+                                        <span class="test-badge week">This Week</span>
+                                        <div class="test-actions">
+                                             <button class="test-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="test-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+
+                                   <div class="test-item">
+                                        <div class="test-date-box">
+                                             <span>24</span>
+                                             <small>APR</small>
+                                        </div>
+                                        <div class="test-info">
+                                             <h4>Aptitude Practice Test</h4>
+                                             <p>Subject: Aptitude • Quantitative reasoning</p>
+                                        </div>
+                                        <span class="test-badge mock">Mock Test</span>
+                                        <div class="test-actions">
+                                             <button class="test-action-btn edit" title="Edit">
+                                                  <i class="fa-solid fa-pen"></i>
+                                             </button>
+                                             <button class="test-action-btn delete" title="Delete">
+                                                  <i class="fa-solid fa-trash"></i>
+                                             </button>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div class="tests-empty-state hidden" id="testsEmptyState">
+                                   <i class="fa-regular fa-folder-open"></i>
+                                   <h3>No tests found</h3>
+                                   <p>Try changing your search text or filter option.</p>
+                              </div>
+                         </div>
+
+                         <div class="recent-results-card">
+                              <div class="section-title">
+                                   <h3>Recent Results</h3>
+                                   <p>Your last completed test performances.</p>
+                              </div>
+
+                              <div class="result-list">
+                                   <div class="result-item">
+                                        <div class="result-info">
+                                             <h4>Operating System Test</h4>
+                                             <p>Completed on 15 Apr</p>
+                                        </div>
+                                        <span class="result-score">82%</span>
+                                   </div>
+
+                                   <div class="result-item">
+                                        <div class="result-info">
+                                             <h4>DBMS Practice Test</h4>
+                                             <p>Completed on 13 Apr</p>
+                                        </div>
+                                        <span class="result-score">74%</span>
+                                   </div>
+
+                                   <div class="result-item">
+                                        <div class="result-info">
+                                             <h4>Java OOP Test</h4>
+                                             <p>Completed on 11 Apr</p>
+                                        </div>
+                                        <span class="result-score">79%</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="tests-bottom-grid">
+                         <div class="syllabus-focus-card">
+                              <div class="section-title">
+                                   <h3>Focus Areas Before Test</h3>
+                                   <p>Topics you should revise before upcoming exams.</p>
+                              </div>
+
+                              <div class="focus-area-list">
+                                   <div class="focus-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>Java inheritance, interfaces, and exception handling</span>
+                                   </div>
+                                   <div class="focus-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>DBMS joins, normalization, and transactions</span>
+                                   </div>
+                                   <div class="focus-area-item">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span>Computer Networks protocol layering concepts</span>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="test-tips-card">
+                              <div class="section-title">
+                                   <h3>Test Tips</h3>
+                                   <p>Small strategies to improve your test performance.</p>
+                              </div>
+
+                              <div class="test-tip-list">
+                                   <div class="test-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Attempt easy questions first to build confidence.</span>
+                                   </div>
+                                   <div class="test-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Revise formulas and short notes before starting.</span>
+                                   </div>
+                                   <div class="test-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Keep 5–10 minutes for final review at the end.</span>
+                                   </div>
+                                   <div class="test-tip-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Analyze mistakes after every mock test.</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </section>
+               <div class="test-modal-overlay hidden" id="testModalOverlay">
+                    <div class="test-modal">
+                         <div class="test-modal-header">
+                              <div>
+                                   <h2 id="testModalTitle">Add Test</h2>
+                                   <p>Create a new test entry with subject, date, type, and status.</p>
+                              </div>
+
+                              <button class="test-modal-close" type="button" id="closeTestModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="test-modal-form" id="testModalForm">
+                              <div class="test-form-grid">
+                                   <div class="test-form-group full-width">
+                                        <label for="testTitle">Test Title</label>
+                                        <input type="text" id="testTitle" placeholder="Enter test title">
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="testSubject">Subject</label>
+                                        <select id="testSubject">
+                                             <option>Java Programming</option>
+                                             <option>DBMS</option>
+                                             <option>Computer Networks</option>
+                                             <option>Operating System</option>
+                                             <option>Aptitude</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="testDate">Test Date</label>
+                                        <input type="date" id="testDate">
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="testType">Test Type</label>
+                                        <select id="testType">
+                                             <option>Upcoming</option>
+                                             <option>This Week</option>
+                                             <option>Mock Test</option>
+                                             <option>Completed</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="testDuration">Duration</label>
+                                        <input type="text" id="testDuration" placeholder="e.g. 60 mins">
+                                   </div>
+
+                                   <div class="test-form-group full-width">
+                                        <label for="testDescription">Description</label>
+                                        <textarea id="testDescription" rows="4"
+                                             placeholder="Write test details..."></textarea>
+                                   </div>
+                              </div>
+
+                              <div class="test-modal-actions">
+                                   <button type="button" class="test-cancel-btn" id="cancelTestModalBtn">Cancel</button>
+                                   <button type="submit" class="test-save-btn" id="testSaveBtn">Save Test</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/tests.js"></script>
+</body>
+
+</html>
