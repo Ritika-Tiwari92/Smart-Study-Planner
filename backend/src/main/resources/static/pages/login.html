@@ -6,70 +6,81 @@
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Login | EduMind AI</title>
 
-     <!-- Google Font -->
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
-     <!-- Font Awesome -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-     <!-- CSS Files -->
      <link rel="stylesheet" href="../assets/css/variables.css">
      <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
      <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
 
 <body>
-     <div class="login-page">
-          <div class="login-left">
-               <div class="login-brand">
-                    <h1><i class="fa-solid fa-graduation-cap"></i> EduMind AI</h1>
-                    <p>Smart Study Planning System</p>
-               </div>
+     <div class="auth-page">
+          <div class="auth-left">
+               <div class="auth-brand">
+                    <div class="auth-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </div>
 
-               <div class="login-box">
-                    <h2>Welcome Back</h2>
-                    <p class="login-subtext">Login to manage your study plans, tasks, and progress in one place.</p>
+                    <h1>Welcome Back to EduMind AI</h1>
+                    <p>
+                         Sign in to continue managing your study plans, tasks, revision schedules,
+                         tests, and learning progress in one smart place.
+                    </p>
 
-                    <form class="login-form">
-                         <div class="form-group">
-                              <label for="email">Email</label>
-                              <div class="input-box">
-                                   <i class="fa-solid fa-envelope"></i>
-                                   <input type="email" id="email" placeholder="Enter your email">
-                              </div>
+                    <div class="auth-feature-list">
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-book"></i>
+                              <span>Access your subjects and study plans</span>
                          </div>
-
-                         <div class="form-group">
-                              <label for="password">Password</label>
-                              <div class="input-box">
-                                   <i class="fa-solid fa-lock"></i>
-                                   <input type="password" id="password" placeholder="Enter your password">
-                              </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-list-check"></i>
+                              <span>Track pending tasks and revision topics</span>
                          </div>
-
-                         <div class="login-options">
-                              <label class="remember-me">
-                                   <input type="checkbox">
-                                   <span>Remember me</span>
-                              </label>
-                              <a href="#">Forgot Password?</a>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-chart-line"></i>
+                              <span>Continue from your saved progress</span>
                          </div>
-
-                         <button type="submit" class="login-btn">Sign In</button>
-                    </form>
-
-                    <p class="login-footer-text">Stay organized, stay focused, and study smarter.</p>
+                    </div>
                </div>
           </div>
 
-          <div class="login-right">
-               <img src="../assets/images/login-illustration.svg" alt="Login Illustration">
+          <div class="auth-right">
+               <div class="auth-card" style="max-width: 520px;">
+                    <div class="auth-card-top">
+                         <h2>Sign In</h2>
+                         <p>Login with your registered email and password.</p>
+                    </div>
+
+                    <form class="auth-form" id="loginForm">
+                         <div class="auth-form-group">
+                              <label for="loginEmail">Email Address</label>
+                              <input type="email" id="loginEmail" placeholder="Enter your email">
+                         </div>
+
+                         <div class="auth-form-group">
+                              <label for="loginPassword">Password</label>
+                              <input type="password" id="loginPassword" placeholder="Enter your password">
+                         </div>
+
+                         <button type="submit" class="auth-submit-btn">Sign In</button>
+
+                         <p class="auth-bottom-text">
+                              Don’t have an account?
+                              <a href="register.html">Create Account</a>
+                         </p>
+                    </form>
+               </div>
           </div>
      </div>
+
+     <script src="../assets/js/login.js"></script>
 </body>
 
 </html>

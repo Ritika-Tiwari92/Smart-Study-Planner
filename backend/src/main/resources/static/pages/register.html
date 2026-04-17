@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Create Account | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+
+<body>
+     <div class="auth-page">
+          <div class="auth-left">
+               <div class="auth-brand">
+                    <div class="auth-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </div>
+
+                    <h1>Create Your Study Space</h1>
+                    <p>
+                         Join EduMind AI and manage your subjects, tasks, revision plans, tests, and study progress
+                         in one smart dashboard.
+                    </p>
+
+                    <div class="auth-feature-list">
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-book"></i>
+                              <span>Track your subjects and study goals</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-list-check"></i>
+                              <span>Manage tasks and revision easily</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-chart-line"></i>
+                              <span>See your learning progress clearly</span>
+                         </div>
+                    </div>
+               </div>
+          </div>
+
+          <div class="auth-right">
+               <div class="auth-card">
+                    <div class="auth-card-top">
+                         <h2>Create Account</h2>
+                         <p>Fill in your details to get started.</p>
+                    </div>
+
+                    <form class="auth-form" id="registerForm">
+                         <div class="auth-form-grid">
+                              <div class="auth-form-group">
+                                   <label for="registerFullName">Full Name</label>
+                                   <input type="text" id="registerFullName" placeholder="Enter your full name">
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerEmail">Email Address</label>
+                                   <input type="email" id="registerEmail" placeholder="Enter your email">
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerPassword">Password</label>
+                                   <input type="password" id="registerPassword" placeholder="Create a password">
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerConfirmPassword">Confirm Password</label>
+                                   <input type="password" id="registerConfirmPassword"
+                                        placeholder="Confirm your password">
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerCourse">Course</label>
+                                   <input type="text" id="registerCourse" placeholder="e.g. BCA Final Year">
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerCollege">College Name</label>
+                                   <input type="text" id="registerCollege" placeholder="Enter your college name">
+                              </div>
+                         </div>
+
+                         <button type="submit" class="auth-submit-btn">Create Account</button>
+
+                         <p class="auth-bottom-text">
+                              Already have an account?
+                              <a href="login.html">Sign In</a>
+                         </p>
+                    </form>
+               </div>
+          </div>
+     </div>
+     <script src="../assets/js/register.js"></script>
+</body>
+
+</html>

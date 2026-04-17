@@ -94,6 +94,18 @@ profileMenuLinks.forEach((link) => {
         window.location.href = targetUrl;
     });
 });
+const logoutLinks = document.querySelectorAll('a[href="login.html"], .profile-menu-item.logout');
+
+logoutLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+        event.preventDefault();
+
+        localStorage.removeItem("edumind_logged_in_user");
+        localStorage.removeItem("edumind_is_logged_in");
+
+        window.location.href = "login.html";
+    });
+});
 
     loadTheme();
 });
