@@ -817,3 +817,240 @@ body.preview-dark .task-badge.done {
   background: rgba(34, 197, 94, 0.18);
   color: #4ade80;
 }
+/* ==============================
+   DASHBOARD INTERACTIVE DROPDOWNS
+   ============================== */
+
+.header-search {
+  position: relative;
+}
+
+.dashboard-search-results {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 18px 35px rgba(17, 24, 39, 0.1);
+  padding: 10px;
+  z-index: 50;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.search-result-item:hover {
+  background: #f8faff;
+}
+
+.search-result-item i {
+  color: #6c63ff;
+  margin-top: 4px;
+}
+
+.search-result-item h4 {
+  font-size: 14px;
+  color: #111827;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.search-result-item p {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.header-actions {
+  position: relative;
+}
+
+.dashboard-notification-dropdown,
+.dashboard-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 18px 35px rgba(17, 24, 39, 0.1);
+  padding: 10px;
+  z-index: 60;
+  min-width: 280px;
+}
+
+.dashboard-notification-dropdown {
+  right: 74px;
+}
+
+.dashboard-profile-dropdown {
+  right: 0;
+  min-width: 230px;
+}
+
+.notification-item {
+  padding: 12px 14px;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+  background: #f8faff;
+}
+
+.notification-item h4 {
+  font-size: 14px;
+  color: #111827;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.notification-item p {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: #111827;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.profile-menu-item:hover {
+  background: #f8faff;
+}
+
+.profile-menu-item i {
+  color: #6c63ff;
+}
+
+.profile-menu-item.logout {
+  color: #dc2626;
+}
+
+.profile-menu-item.logout i {
+  color: #dc2626;
+}
+
+/* Dark theme support */
+body.preview-dark .dashboard-search-results,
+body.preview-dark .dashboard-notification-dropdown,
+body.preview-dark .dashboard-profile-dropdown {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .search-result-item:hover,
+body.preview-dark .notification-item:hover,
+body.preview-dark .profile-menu-item:hover {
+  background: #162033 !important;
+}
+
+body.preview-dark .search-result-item h4,
+body.preview-dark .notification-item h4,
+body.preview-dark .profile-menu-item {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .search-result-item p,
+body.preview-dark .notification-item p {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .profile-menu-item.logout,
+body.preview-dark .profile-menu-item.logout i {
+  color: #f87171 !important;
+}
+
+@media (max-width: 900px) {
+  .dashboard-notification-dropdown,
+  .dashboard-profile-dropdown {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .dashboard-notification-dropdown {
+    right: auto;
+  }
+
+  .dashboard-profile-dropdown {
+    right: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-search-results {
+    width: 100%;
+  }
+}
+/* ==============================
+   COMMON PROFILE HOVER DROPDOWN
+   ============================== */
+
+.header-actions {
+  position: relative;
+}
+
+#profileMenuToggle {
+  cursor: pointer;
+  position: relative;
+}
+
+.dashboard-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 230px;
+  z-index: 80;
+}
+
+/* Hover on profile or dropdown = show */
+#profileMenuToggle:hover + .dashboard-profile-dropdown,
+.dashboard-profile-dropdown:hover {
+  display: block !important;
+}
+
+/* When hidden class is present, keep it hidden normally */
+.dashboard-profile-dropdown.hidden {
+  display: none;
+}
+
+/* But on hover, force show even if hidden class exists */
+#profileMenuToggle:hover + .dashboard-profile-dropdown.hidden,
+.dashboard-profile-dropdown.hidden:hover {
+  display: block !important;
+}
+
+/* Dark theme support */
+body.preview-dark .dashboard-profile-dropdown {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .profile-menu-item {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .profile-menu-item:hover {
+  background: #162033 !important;
+}
+
+body.preview-dark .profile-menu-item.logout,
+body.preview-dark .profile-menu-item.logout i {
+  color: #f87171 !important;
+}

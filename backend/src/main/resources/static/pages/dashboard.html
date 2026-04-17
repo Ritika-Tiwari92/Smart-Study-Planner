@@ -97,24 +97,79 @@
                          </div>
                     </div>
 
-                    <div class="header-search">
+                    <div class="header-search" id="dashboardSearchBox">
                          <i class="fa-solid fa-magnifying-glass"></i>
-                         <input type="text" placeholder="Search subjects, tasks, planner...">
+                         <input type="text" id="dashboardSearchInput" placeholder="Search subjects, tasks, planner...">
+                         <div class="dashboard-search-results hidden" id="dashboardSearchResults">
+                              <div class="search-result-item">
+                                   <i class="fa-solid fa-book"></i>
+                                   <div>
+                                        <h4>Java Programming</h4>
+                                        <p>Subject</p>
+                                   </div>
+                              </div>
+                              <div class="search-result-item">
+                                   <i class="fa-solid fa-list-check"></i>
+                                   <div>
+                                        <h4>Complete Java Assignment</h4>
+                                        <p>Task</p>
+                                   </div>
+                              </div>
+                              <div class="search-result-item">
+                                   <i class="fa-solid fa-calendar-days"></i>
+                                   <div>
+                                        <h4>Evening Revision Session</h4>
+                                        <p>Planner</p>
+                                   </div>
+                              </div>
+                         </div>
                     </div>
 
                     <div class="header-actions">
-                         <button class="icon-btn">
+                         <button class="icon-btn" id="notificationToggleBtn">
                               <i class="fa-solid fa-bell"></i>
                          </button>
+
+                         <div class="dashboard-notification-dropdown hidden" id="dashboardNotificationDropdown">
+                              <div class="notification-item">
+                                   <h4>Task Reminder</h4>
+                                   <p>Complete Java Assignment before 6 PM.</p>
+                              </div>
+                              <div class="notification-item">
+                                   <h4>Revision Alert</h4>
+                                   <p>DBMS revision session is scheduled for tonight.</p>
+                              </div>
+                              <div class="notification-item">
+                                   <h4>Upcoming Test</h4>
+                                   <p>You have a Java mock test tomorrow.</p>
+                              </div>
+                         </div>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
-                         <div class="profile-mini">
+
+                         <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
                                    <h4>Ritika</h4>
                                    <p>Student</p>
                               </div>
+                         </div>
+
+                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <a href="settings.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
+                              </a>
+                              <a href="analytics.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-chart-line"></i>
+                                   <span>View Analytics</span>
+                              </a>
+                              <a href="login.html" class="profile-menu-item logout">
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
+                              </a>
                          </div>
                     </div>
                </header>
@@ -345,6 +400,7 @@
                </section>
           </main>
      </div>
+     <script src="../assets/js/dashboard.js"></script>
      <script src="../assets/js/theme.js"></script>
 </body>
 
