@@ -654,3 +654,110 @@
   color: #e11d48;
   border-color: #fecdd3;
 }
+/* ==============================
+   DARK THEME FIX - PLANNER
+   ============================== */
+
+body.preview-dark .planner-summary-card,
+body.preview-dark .today-plan-card,
+body.preview-dark .weekly-overview-card,
+body.preview-dark .upcoming-plan-card,
+body.preview-dark .focus-tips-card,
+body.preview-dark .planner-empty-state {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.preview-dark .planner-summary-card h3,
+body.preview-dark .section-title h3,
+body.preview-dark .study-session-item h4,
+body.preview-dark .weekly-subject-row span,
+body.preview-dark .upcoming-plan-item h4,
+body.preview-dark .focus-tip-item h4 {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .planner-summary-card p,
+body.preview-dark .section-title p,
+body.preview-dark .study-session-item p,
+body.preview-dark .upcoming-plan-item p,
+body.preview-dark .focus-tip-item p {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .planner-search,
+body.preview-dark .planner-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .planner-search input,
+body.preview-dark .planner-filter select {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .planner-search input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .study-session-item,
+body.preview-dark .upcoming-plan-item,
+body.preview-dark .focus-tip-item {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .study-session-item:hover,
+body.preview-dark .upcoming-plan-item:hover,
+body.preview-dark .focus-tip-item:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.preview-dark .session-time {
+  color: #8b7cff !important;
+  font-weight: 700 !important;
+}
+
+body.preview-dark .weekly-progress-bar {
+  background: #0f172a !important;
+}
+
+body.preview-dark .session-action-btn {
+  background: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .session-action-btn i {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .session-action-btn:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+}
+
+body.preview-dark .session-action-btn.delete:hover {
+  background: #3f1d24 !important;
+  border-color: #ef4444 !important;
+}
+
+body.preview-dark .session-badge.pending {
+  background: rgba(251, 191, 36, 0.18) !important;
+  color: #facc15 !important;
+}
+
+body.preview-dark .session-badge.progress {
+  background: rgba(59, 130, 246, 0.18) !important;
+  color: #60a5fa !important;
+}
+
+body.preview-dark .session-badge.done {
+  background: rgba(34, 197, 94, 0.18) !important;
+  color: #4ade80 !important;
+}

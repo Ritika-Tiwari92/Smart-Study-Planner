@@ -352,3 +352,26 @@
 .appearance-option.active {
   transform: translateY(-1px);
 }
+/* ==============================
+   DARK THEME FIX - CHANGE PHOTO
+   ============================== */
+
+body.preview-dark .change-photo-btn {
+  background: #111827 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+body.preview-dark .change-photo-btn:hover {
+  background: #162033 !important;
+  color: #ffffff !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+}
+
+body.preview-dark .change-photo-btn,
+body.preview-dark .change-photo-btn * {
+  color: #f8fafc !important;
+  opacity: 1 !important;
+}

@@ -555,3 +555,184 @@
   font-size: 14px;
   line-height: 1.7;
 }
+/* ==============================
+   DARK THEME FIX - TASKS
+   ============================== */
+
+body.preview-dark .task-summary-card,
+body.preview-dark .tasks-list-card,
+body.preview-dark .tasks-empty-state {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.preview-dark .task-summary-card h3,
+body.preview-dark .section-title h3,
+body.preview-dark .task-card h4,
+body.preview-dark .task-title {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .task-summary-card p,
+body.preview-dark .section-title p,
+body.preview-dark .task-card p,
+body.preview-dark .task-subject,
+body.preview-dark .task-meta {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .tasks-search,
+body.preview-dark .tasks-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .tasks-search input,
+body.preview-dark .tasks-filter select {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .tasks-search input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .task-card {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .task-card:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.preview-dark .task-action-btn {
+  background: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .task-action-btn i {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .task-action-btn:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+}
+
+body.preview-dark .task-action-btn.delete:hover {
+  background: #3f1d24 !important;
+  border-color: #ef4444 !important;
+}
+
+body.preview-dark .task-badge,
+body.preview-dark .priority-badge,
+body.preview-dark .status-badge {
+  border: none !important;
+}
+
+body.preview-dark .task-badge.pending,
+body.preview-dark .status-badge.pending {
+  background: rgba(251, 191, 36, 0.18) !important;
+  color: #facc15 !important;
+}
+
+body.preview-dark .task-badge.completed,
+body.preview-dark .status-badge.completed {
+  background: rgba(34, 197, 94, 0.18) !important;
+  color: #4ade80 !important;
+}
+
+body.preview-dark .task-badge.overdue,
+body.preview-dark .status-badge.overdue {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
+}
+
+body.preview-dark .priority-badge.high,
+body.preview-dark .task-priority.high {
+  background: rgba(244, 63, 94, 0.18) !important;
+  color: #fb7185 !important;
+}
+
+body.preview-dark .priority-badge.medium,
+body.preview-dark .task-priority.medium {
+  background: rgba(251, 191, 36, 0.18) !important;
+  color: #facc15 !important;
+}
+
+body.preview-dark .priority-badge.low,
+body.preview-dark .task-priority.low {
+  background: rgba(59, 130, 246, 0.18) !important;
+  color: #60a5fa !important;
+}
+/* ==============================
+   DARK THEME FIX - TASK META PILLS
+   ============================== */
+
+body.preview-dark .status-badge,
+body.preview-dark .task-status,
+body.preview-dark .task-badge {
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+body.preview-dark .status-badge.pending,
+body.preview-dark .task-status.pending,
+body.preview-dark .task-badge.pending {
+  background: rgba(251, 191, 36, 0.18) !important;
+  color: #facc15 !important;
+}
+
+body.preview-dark .status-badge.progress,
+body.preview-dark .task-status.progress,
+body.preview-dark .task-badge.progress,
+body.preview-dark .status-badge.in-progress,
+body.preview-dark .task-status.in-progress,
+body.preview-dark .task-badge.in-progress {
+  background: rgba(59, 130, 246, 0.18) !important;
+  color: #60a5fa !important;
+}
+
+body.preview-dark .status-badge.completed,
+body.preview-dark .task-status.completed,
+body.preview-dark .task-badge.completed,
+body.preview-dark .status-badge.done,
+body.preview-dark .task-status.done,
+body.preview-dark .task-badge.done {
+  background: rgba(34, 197, 94, 0.18) !important;
+  color: #4ade80 !important;
+}
+
+body.preview-dark .status-badge.overdue,
+body.preview-dark .task-status.overdue,
+body.preview-dark .task-badge.overdue {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
+}
+/* ==============================
+   DARK THEME FIX - TASK DATE PILL
+   ============================== */
+
+body.preview-dark .task-card-meta .task-date {
+  background: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e5e7eb !important;
+  opacity: 1 !important;
+}
+
+body.preview-dark .task-card-meta .task-date i {
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+body.preview-dark .task-card-meta .task-date,
+body.preview-dark .task-card-meta .task-date * {
+  color: #e5e7eb !important;
+  opacity: 1 !important;
+}

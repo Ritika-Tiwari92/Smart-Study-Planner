@@ -388,3 +388,38 @@
     min-height: 180px;
   }
 }
+/* =========================================
+   DARK THEME FIX — Analytics Score Overview
+   ========================================= */
+
+/* ==============================
+   DARK THEME FIX - SCORE OVERVIEW
+   ============================== */
+
+body.preview-dark .score-stat-item {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .score-stat-item:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.35) !important;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.preview-dark .score-stat-info h4 {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .score-stat-info p {
+  color: #cbd5e1 !important;
+}
+
+/* right side percentage pill */
+body.preview-dark .score-stat-item > span {
+  background: #111827 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
