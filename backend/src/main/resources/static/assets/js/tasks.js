@@ -24,33 +24,73 @@ const taskPriorityInput = document.getElementById("taskPriority");
 const taskStatusInput = document.getElementById("taskStatus");
 const taskDescriptionInput = document.getElementById("taskDescription");
 
-const TASKS_STORAGE_KEY = "edumind_tasks";
+/*
+  Same-origin case:
+  "/tasks" and "/subjects" work if frontend is served by Spring Boot itself.
+
+  If frontend runs separately on another port,
+  use full backend URLs like below.
+*/
+const TASKS_API_BASE = "http://localhost:8080/tasks";
+const SUBJECTS_API_BASE = "http://localhost:8080/subjects";
 
 let editingTaskId = null;
 
 function openTaskModal() {
+    if (!taskModalOverlay) return;
     taskModalOverlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 }
 
 function closeTaskModal() {
+    if (!taskModalOverlay) return;
     taskModalOverlay.classList.add("hidden");
     document.body.style.overflow = "";
 }
 
 function setAddMode() {
     editingTaskId = null;
-    taskModalTitle.textContent = "Add New Task";
-    taskSaveBtn.textContent = "Save Task";
+
+    if (taskModalTitle) {
+        taskModalTitle.textContent = "Add New Task";
+    }
+
+    if (taskSaveBtn) {
+        taskSaveBtn.textContent = "Save Task";
+    }
 }
 
 function setEditMode() {
-    taskModalTitle.textContent = "Edit Task";
-    taskSaveBtn.textContent = "Update Task";
+    if (taskModalTitle) {
+        taskModalTitle.textContent = "Edit Task";
+    }
+
+    if (taskSaveBtn) {
+        taskSaveBtn.textContent = "Update Task";
+    }
 }
 
-function generateTaskId() {
-    return `task_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function resetTaskForm() {
+    if (!taskModalForm) return;
+
+    taskModalForm.reset();
+
+    if (taskPriorityInput) {
+        taskPriorityInput.value = "High";
+    }
+
+    if (taskStatusInput) {
+        taskStatusInput.value = "Pending";
+    }
+
+    if (taskSubjectInput) {
+        taskSubjectInput.value = "";
+    }
+}
+
+function clearModalState() {
+    resetTaskForm();
+    setAddMode();
 }
 
 function formatDueDate(dateValue) {
@@ -75,15 +115,28 @@ function formatDueDate(dateValue) {
     });
 }
 
+function isPastDate(dateValue) {
+    if (!dateValue) return false;
+
+    const selectedDate = new Date(dateValue);
+    const today = new Date();
+
+    selectedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return selectedDate.getTime() < today.getTime();
+}
+
 function getPriorityClass(priority) {
-    const value = priority.toLowerCase();
+    const value = (priority || "").toLowerCase();
+
     if (value === "high") return "high";
     if (value === "medium") return "medium";
     return "low";
 }
 
 function getStatusClass(status) {
-    const value = status.toLowerCase();
+    const value = (status || "").toLowerCase();
 
     if (value === "pending") return "pending";
     if (value === "completed") return "done";
@@ -112,7 +165,170 @@ function normalizeStatus(text) {
     return "Pending";
 }
 
+function getDisplayStatus(rawStatus, dueDate) {
+    const normalized = normalizeStatus(rawStatus);
+
+    if (normalized === "Completed") {
+        return "Completed";
+    }
+
+    if (normalized === "Overdue") {
+        return "Overdue";
+    }
+
+    if (dueDate && isPastDate(dueDate)) {
+        return "Overdue";
+    }
+
+    if (normalized === "In Progress") {
+        return "In Progress";
+    }
+
+    return "Pending";
+}
+
+function getSubjectName(subject) {
+    if (!subject || typeof subject !== "object") return "";
+    return subject.name || subject.subjectName || "";
+}
+
+function mapBackendTaskToFrontend(task) {
+    const subject = task.subject || {};
+    const rawStatus = normalizeStatus(task.status || "Pending");
+    const displayStatus = getDisplayStatus(rawStatus, task.dueDate);
+
+    return {
+        id: task.id,
+        title: task.title || "",
+        description: task.description || "",
+        dueDate: task.dueDate || "",
+        priority: normalizePriority(task.priority || "High"),
+        status: rawStatus,
+        displayStatus,
+        subjectId: subject.id || "",
+        subjectName: getSubjectName(subject)
+    };
+}
+
+function buildTaskPayload(taskData) {
+    return {
+        title: taskData.title,
+        description: taskData.description,
+        dueDate: taskData.dueDate,
+        priority: normalizePriority(taskData.priority),
+        status: normalizeStatus(taskData.status),
+        subjectId: Number(taskData.subjectId)
+    };
+}
+
+function createSubjectOption(subject) {
+    const option = document.createElement("option");
+    option.value = String(subject.id);
+    option.textContent = subject.name || subject.subjectName || "Unnamed Subject";
+    return option;
+}
+
+function populateSubjectDropdown(subjects) {
+    if (!taskSubjectInput) return;
+
+    taskSubjectInput.innerHTML = "";
+
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select subject";
+    taskSubjectInput.appendChild(placeholderOption);
+
+    subjects.forEach((subject) => {
+        taskSubjectInput.appendChild(createSubjectOption(subject));
+    });
+}
+
+async function handleApiResponse(response) {
+    if (!response.ok) {
+        let message = `Request failed with status ${response.status}`;
+
+        try {
+            const errorText = await response.text();
+            if (errorText) {
+                message = errorText;
+            }
+        } catch (error) {
+            console.error("Failed to read error response:", error);
+        }
+
+        throw new Error(message);
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return response.text();
+}
+
+async function fetchSubjectsFromApi() {
+    const response = await fetch(SUBJECTS_API_BASE);
+    const data = await handleApiResponse(response);
+
+    if (!Array.isArray(data)) {
+        return [];
+    }
+
+    return data;
+}
+
+async function fetchTasksFromApi() {
+    const response = await fetch(TASKS_API_BASE);
+    const data = await handleApiResponse(response);
+
+    if (!Array.isArray(data)) {
+        return [];
+    }
+
+    return data.map(mapBackendTaskToFrontend);
+}
+
+async function createTaskInApi(taskData) {
+    const response = await fetch(TASKS_API_BASE, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(buildTaskPayload(taskData))
+    });
+
+    return handleApiResponse(response);
+}
+
+async function updateTaskInApi(taskId, taskData) {
+    const response = await fetch(`${TASKS_API_BASE}/${taskId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(buildTaskPayload(taskData))
+    });
+
+    return handleApiResponse(response);
+}
+
+async function deleteTaskFromApi(taskId) {
+    const response = await fetch(`${TASKS_API_BASE}/${taskId}`, {
+        method: "DELETE"
+    });
+
+    return handleApiResponse(response);
+}
+
 function updateTaskCounts() {
+    if (!tasksList) return;
+
     const allTaskCards = tasksList.querySelectorAll(".task-card");
     const allStatuses = tasksList.querySelectorAll(".task-status");
 
@@ -126,26 +342,40 @@ function updateTaskCounts() {
         if (statusBadge.classList.contains("overdue")) overdue++;
     });
 
-    totalTasksCount.textContent = String(allTaskCards.length).padStart(2, "0");
-    pendingTasksCount.textContent = String(pending).padStart(2, "0");
-    completedTasksCount.textContent = String(completed).padStart(2, "0");
-    overdueTasksCount.textContent = String(overdue).padStart(2, "0");
+    if (totalTasksCount) {
+        totalTasksCount.textContent = String(allTaskCards.length).padStart(2, "0");
+    }
+
+    if (pendingTasksCount) {
+        pendingTasksCount.textContent = String(pending).padStart(2, "0");
+    }
+
+    if (completedTasksCount) {
+        completedTasksCount.textContent = String(completed).padStart(2, "0");
+    }
+
+    if (overdueTasksCount) {
+        overdueTasksCount.textContent = String(overdue).padStart(2, "0");
+    }
 }
 
 function createTaskCard(task) {
     const taskCard = document.createElement("div");
     taskCard.className = "task-card";
     taskCard.dataset.taskId = task.id;
+    taskCard.dataset.subjectId = String(task.subjectId || "");
+    taskCard.dataset.description = task.description || "";
+    taskCard.dataset.rawStatus = task.status || "Pending";
 
     const priorityClass = getPriorityClass(task.priority);
-    const statusClass = getStatusClass(task.status);
+    const statusClass = getStatusClass(task.displayStatus);
     const formattedDate = formatDueDate(task.dueDate);
 
     taskCard.innerHTML = `
         <div class="task-card-top">
             <div class="task-main-info">
                 <h3>${task.title}</h3>
-                <p>Subject: ${task.subject}</p>
+                <p>Subject: ${task.subjectName || "No Subject"}</p>
             </div>
 
             <div class="task-actions">
@@ -163,7 +393,7 @@ function createTaskCard(task) {
                 <i class="fa-regular fa-calendar"></i> Due: ${formattedDate}
             </span>
             <span class="task-priority ${priorityClass}">${task.priority} Priority</span>
-            <span class="task-status ${statusClass}">${task.status}</span>
+            <span class="task-status ${statusClass}">${task.displayStatus}</span>
         </div>
     `;
 
@@ -171,113 +401,61 @@ function createTaskCard(task) {
 }
 
 function renderTasks(tasks) {
+    if (!tasksList) return;
+
     tasksList.innerHTML = "";
+
     tasks.forEach((task) => {
         const taskCard = createTaskCard(task);
         tasksList.appendChild(taskCard);
     });
+
     updateTaskCounts();
     applyTaskFilters();
 }
 
-function getTasksFromStorage() {
-    const saved = localStorage.getItem(TASKS_STORAGE_KEY);
-    if (!saved) return null;
-
+async function loadSubjectsForTaskForm() {
     try {
-        return JSON.parse(saved);
+        const subjects = await fetchSubjectsFromApi();
+        populateSubjectDropdown(subjects);
     } catch (error) {
-        console.error("Failed to parse tasks from localStorage:", error);
-        return null;
+        console.error("Failed to load subjects for task form:", error);
+        populateSubjectDropdown([]);
+        alert("Failed to load subjects for task form.");
     }
 }
 
-function saveTasksToStorage(tasks) {
-    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
-}
+async function loadTasks() {
+    try {
+        const tasks = await fetchTasksFromApi();
+        renderTasks(tasks);
+        updateEmptyState(tasks.length);
+    } catch (error) {
+        console.error("Failed to load tasks:", error);
 
-function extractTasksFromDOM() {
-    const taskCards = tasksList.querySelectorAll(".task-card");
-    const tasks = [];
+        if (tasksList) {
+            tasksList.innerHTML = "";
+        }
 
-    taskCards.forEach((taskCard) => {
-        const title = taskCard.querySelector(".task-main-info h3")?.textContent.trim() || "";
-        const subjectText = taskCard.querySelector(".task-main-info p")?.textContent.trim() || "";
-        const subject = subjectText.replace("Subject: ", "").trim();
-
-        const dateEl = taskCard.querySelector(".task-date");
-        const dueDate = dateEl?.getAttribute("data-date-value") || "";
-
-        const priorityText = taskCard.querySelector(".task-priority")?.textContent.trim() || "";
-        const statusText = taskCard.querySelector(".task-status")?.textContent.trim() || "";
-
-        tasks.push({
-            id: generateTaskId(),
-            title,
-            subject,
-            dueDate,
-            priority: normalizePriority(priorityText),
-            status: normalizeStatus(statusText)
-        });
-    });
-
-    return tasks;
-}
-
-function loadTasks() {
-    const storedTasks = getTasksFromStorage();
-
-    if (storedTasks && Array.isArray(storedTasks)) {
-        renderTasks(storedTasks);
-        return;
+        updateTaskCounts();
+        updateEmptyState(0);
+        alert("Failed to load tasks from backend.");
     }
-
-    const initialTasks = extractTasksFromDOM();
-    saveTasksToStorage(initialTasks);
-    renderTasks(initialTasks);
 }
 
-function getCurrentTasks() {
-    return getTasksFromStorage() || [];
+async function addTask(taskData) {
+    await createTaskInApi(taskData);
+    await loadTasks();
 }
 
-function addTask(taskData) {
-    const tasks = getCurrentTasks();
-    const newTask = {
-        id: generateTaskId(),
-        ...taskData
-    };
-
-    tasks.unshift(newTask);
-    saveTasksToStorage(tasks);
-    renderTasks(tasks);
+async function updateTask(taskId, updatedData) {
+    await updateTaskInApi(taskId, updatedData);
+    await loadTasks();
 }
 
-function updateTask(taskId, updatedData) {
-    const tasks = getCurrentTasks().map((task) =>
-        task.id === taskId ? { ...task, ...updatedData } : task
-    );
-
-    saveTasksToStorage(tasks);
-    renderTasks(tasks);
-}
-
-function deleteTask(taskId) {
-    const tasks = getCurrentTasks().filter((task) => task.id !== taskId);
-    saveTasksToStorage(tasks);
-    renderTasks(tasks);
-}
-
-function resetTaskForm() {
-    taskModalForm.reset();
-    taskSubjectInput.selectedIndex = 0;
-    taskPriorityInput.value = "High";
-    taskStatusInput.value = "Pending";
-}
-
-function clearModalState() {
-    resetTaskForm();
-    setAddMode();
+async function deleteTask(taskId) {
+    await deleteTaskFromApi(taskId);
+    await loadTasks();
 }
 
 function matchesFilter(taskCard, filterValue) {
@@ -308,6 +486,8 @@ function updateEmptyState(visibleCount) {
 }
 
 function applyTaskFilters() {
+    if (!tasksList) return;
+
     const allTaskCards = tasksList.querySelectorAll(".task-card");
     const searchText = taskSearchInput ? taskSearchInput.value.toLowerCase().trim() : "";
     const filterValue = taskFilterSelect ? taskFilterSelect.value : "All Tasks";
@@ -335,24 +515,25 @@ function applyTaskFilters() {
 function fillFormForEdit(taskCard) {
     const taskId = taskCard.dataset.taskId || "";
     const title = taskCard.querySelector(".task-main-info h3")?.textContent.trim() || "";
-    const subjectText = taskCard.querySelector(".task-main-info p")?.textContent.trim() || "";
-    const subject = subjectText.replace("Subject: ", "").trim();
-
-    const dateEl = taskCard.querySelector(".task-date");
-    const dueDateValue = dateEl?.getAttribute("data-date-value") || "";
-
+    const dueDateValue = taskCard.querySelector(".task-date")?.getAttribute("data-date-value") || "";
     const priorityText = taskCard.querySelector(".task-priority")?.textContent.trim() || "";
-    const statusText = taskCard.querySelector(".task-status")?.textContent.trim() || "";
-
-    const priority = priorityText.replace(" Priority", "").trim();
+    const rawStatus = taskCard.dataset.rawStatus || "Pending";
+    const description = taskCard.dataset.description || "";
+    const subjectId = taskCard.dataset.subjectId || "";
 
     editingTaskId = taskId;
     taskTitleInput.value = title;
-    taskSubjectInput.value = subject;
+    taskSubjectInput.value = subjectId;
     taskDateInput.value = dueDateValue;
-    taskPriorityInput.value = priority;
-    taskStatusInput.value = statusText;
-    taskDescriptionInput.value = "";
+    taskPriorityInput.value = priorityText.replace(" Priority", "").trim();
+    taskStatusInput.value = rawStatus;
+    taskDescriptionInput.value = description;
+}
+
+async function initializeTaskPage() {
+    await loadSubjectsForTaskForm();
+    await loadTasks();
+    setAddMode();
 }
 
 if (
@@ -392,44 +573,61 @@ if (
         }
     });
 
-    taskModalForm.addEventListener("submit", function (event) {
+    taskModalForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const title = taskTitleInput.value.trim();
-        const subject = taskSubjectInput.value;
+        const subjectId = taskSubjectInput.value;
         const dueDate = taskDateInput.value;
         const priority = taskPriorityInput.value;
         const status = taskStatusInput.value;
+        const description = taskDescriptionInput.value.trim();
 
         if (!title) {
             alert("Please enter a task title.");
             return;
         }
 
-        if (subject === "Select subject") {
+        if (!subjectId) {
             alert("Please select a subject.");
+            return;
+        }
+
+        if (!dueDate) {
+            alert("Please select a due date.");
+            return;
+        }
+
+        if (!description) {
+            alert("Please enter task description.");
             return;
         }
 
         const taskData = {
             title,
-            subject,
+            subjectId,
             dueDate,
             priority,
-            status
+            status,
+            description
         };
 
-        if (editingTaskId) {
-            updateTask(editingTaskId, taskData);
-        } else {
-            addTask(taskData);
-        }
+        try {
+            if (editingTaskId) {
+                await updateTask(editingTaskId, taskData);
+            } else {
+                await addTask(taskData);
+            }
 
-        closeTaskModal();
-        clearModalState();
+            closeTaskModal();
+            clearModalState();
+        } catch (error) {
+            console.error("Failed to save task:", error);
+            alert("Failed to save task.");
+        }
     });
 
-    tasksList.addEventListener("click", function (event) {
+    tasksList.addEventListener("click", async function (event) {
         const deleteButton = event.target.closest(".task-action-btn.delete");
         const editButton = event.target.closest(".task-action-btn.edit, .task-action-btn:not(.delete)");
 
@@ -442,7 +640,13 @@ if (
             const shouldDelete = confirm("Do you want to delete this task?");
             if (!shouldDelete) return;
 
-            deleteTask(taskId);
+            try {
+                await deleteTask(taskId);
+            } catch (error) {
+                console.error("Failed to delete task:", error);
+                alert("Failed to delete task.");
+            }
+
             return;
         }
 
@@ -464,5 +668,5 @@ if (
         taskFilterSelect.addEventListener("change", applyTaskFilters);
     }
 
-    loadTasks();
+    initializeTaskPage();
 }

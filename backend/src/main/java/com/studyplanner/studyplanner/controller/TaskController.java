@@ -1,10 +1,9 @@
 package com.studyplanner.studyplanner.controller;
 
+import com.studyplanner.studyplanner.dto.TaskRequestDto;
 import com.studyplanner.studyplanner.model.Task;
 import com.studyplanner.studyplanner.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,12 +13,15 @@ import java.util.List;
 @CrossOrigin("*")
 public class TaskController {
 
-     @Autowired
-     private TaskService taskService;
+     private final TaskService taskService;
+
+     public TaskController(TaskService taskService) {
+          this.taskService = taskService;
+     }
 
      @PostMapping
-     public Task addTask(@Valid @RequestBody Task task) {
-          return taskService.addTask(task);
+     public Task addTask(@Valid @RequestBody TaskRequestDto taskRequestDto) {
+          return taskService.addTask(taskRequestDto);
      }
 
      @GetMapping
@@ -28,43 +30,43 @@ public class TaskController {
      }
 
      @GetMapping("/{id}")
-     public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-          return ResponseEntity.ok(taskService.getTaskById(id));
+     public Task getTaskById(@PathVariable Long id) {
+          return taskService.getTaskById(id);
      }
 
      @PutMapping("/{id}")
-     public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
-          return ResponseEntity.ok(taskService.updateTask(id, task));
+     public Task updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequestDto taskRequestDto) {
+          return taskService.updateTask(id, taskRequestDto);
      }
 
      @DeleteMapping("/{id}")
-     public ResponseEntity<String> deleteTask(@PathVariable Long id) {
+     public String deleteTask(@PathVariable Long id) {
           taskService.deleteTask(id);
-          return ResponseEntity.ok("Task deleted successfully");
+          return "Task deleted successfully";
      }
 
      @GetMapping("/subject/{subjectId}")
-     public ResponseEntity<List<Task>> getTasksBySubjectId(@PathVariable Long subjectId) {
-          return ResponseEntity.ok(taskService.getTasksBySubjectId(subjectId));
+     public List<Task> getTasksBySubjectId(@PathVariable Long subjectId) {
+          return taskService.getTasksBySubjectId(subjectId);
      }
 
      @GetMapping("/status/{status}")
-     public ResponseEntity<List<Task>> getTasksByStatus(@PathVariable String status) {
-          return ResponseEntity.ok(taskService.getTasksByStatus(status));
+     public List<Task> getTasksByStatus(@PathVariable String status) {
+          return taskService.getTasksByStatus(status);
      }
 
      @PutMapping("/{id}/status")
-     public ResponseEntity<Task> updateTaskStatus(@PathVariable Long id, @RequestParam String status) {
-          return ResponseEntity.ok(taskService.updateTaskStatus(id, status));
+     public Task updateTaskStatus(@PathVariable Long id, @RequestParam String status) {
+          return taskService.updateTaskStatus(id, status);
      }
 
      @GetMapping("/today")
-     public ResponseEntity<List<Task>> getTodayTasks() {
-          return ResponseEntity.ok(taskService.getTodayTasks());
+     public List<Task> getTodayTasks() {
+          return taskService.getTodayTasks();
      }
 
      @GetMapping("/upcoming")
-     public ResponseEntity<List<Task>> getUpcomingTasks() {
-          return ResponseEntity.ok(taskService.getUpcomingTasks());
+     public List<Task> getUpcomingTasks() {
+          return taskService.getUpcomingTasks();
      }
 }

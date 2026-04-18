@@ -24,7 +24,15 @@ const subjectProgressInput = document.getElementById("subjectProgress");
 const subjectIconInput = document.getElementById("subjectIcon");
 const subjectDescriptionInput = document.getElementById("subjectDescription");
 
-const SUBJECTS_STORAGE_KEY = "edumind_subjects";
+/*
+  Same-origin case:
+  "/subjects" works if frontend is served by Spring Boot itself.
+
+  If your frontend runs separately on another port,
+  replace this with something like:
+  "http://localhost:8080/subjects"
+*/
+const SUBJECTS_API_BASE = "http://localhost:8080/subjects";
 
 let editingSubjectId = null;
 
@@ -54,18 +62,19 @@ function setEditMode() {
 function resetSubjectForm() {
     if (!subjectModalForm) return;
     subjectModalForm.reset();
+
     if (subjectIconInput) {
         subjectIconInput.value = "fa-code";
+    }
+
+    if (subjectProgressInput) {
+        subjectProgressInput.value = "0";
     }
 }
 
 function clearSubjectModalState() {
     resetSubjectForm();
     setAddMode();
-}
-
-function generateSubjectId() {
-    return `subject_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function getSubjectStatus(progress) {
@@ -78,6 +87,109 @@ function getSafeProgress(progress) {
     const value = Number(progress);
     if (Number.isNaN(value)) return 0;
     return Math.max(0, Math.min(100, value));
+}
+
+function getDefaultDescription(code) {
+    return `Subject code: ${code || "N/A"} • Manage chapters and track study progress.`;
+}
+
+function mapBackendSubjectToFrontend(subject) {
+    const code = subject.code || "";
+    const description = subject.description || getDefaultDescription(code);
+
+    return {
+        id: subject.id,
+        name: subject.name || subject.subjectName || "",
+        code,
+        chapters: Number(subject.chapters) || 0,
+        progress: getSafeProgress(subject.progress),
+        iconClass: subject.iconClass || "fa-code",
+        description,
+        difficultyLevel: subject.difficultyLevel || ""
+    };
+}
+
+function buildBackendPayload(subjectData) {
+    return {
+        name: subjectData.name,
+        code: subjectData.code || "",
+        chapters: Number(subjectData.chapters) || 0,
+        progress: getSafeProgress(subjectData.progress),
+        iconClass: subjectData.iconClass || "fa-code",
+        description: subjectData.description || getDefaultDescription(subjectData.code),
+        difficultyLevel: subjectData.difficultyLevel || ""
+    };
+}
+
+async function handleApiResponse(response) {
+    if (!response.ok) {
+        let message = `Request failed with status ${response.status}`;
+
+        try {
+            const errorText = await response.text();
+            if (errorText) {
+                message = errorText;
+            }
+        } catch (error) {
+            console.error("Failed to read error response:", error);
+        }
+
+        throw new Error(message);
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return response.text();
+}
+
+async function fetchSubjectsFromApi() {
+    const response = await fetch(SUBJECTS_API_BASE);
+    const data = await handleApiResponse(response);
+
+    if (!Array.isArray(data)) {
+        return [];
+    }
+
+    return data.map(mapBackendSubjectToFrontend);
+}
+
+async function createSubjectInApi(subjectData) {
+    const response = await fetch(SUBJECTS_API_BASE, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(buildBackendPayload(subjectData))
+    });
+
+    return handleApiResponse(response);
+}
+
+async function updateSubjectInApi(subjectId, subjectData) {
+    const response = await fetch(`${SUBJECTS_API_BASE}/${subjectId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(buildBackendPayload(subjectData))
+    });
+
+    return handleApiResponse(response);
+}
+
+async function deleteSubjectFromApi(subjectId) {
+    const response = await fetch(`${SUBJECTS_API_BASE}/${subjectId}`, {
+        method: "DELETE"
+    });
+
+    return handleApiResponse(response);
 }
 
 function createSubjectCard({ id, name, chapters, progress, iconClass, description, code = "" }) {
@@ -125,103 +237,50 @@ function createSubjectCard({ id, name, chapters, progress, iconClass, descriptio
 }
 
 function renderSubjects(subjects) {
+    if (!subjectsGrid) return;
+
     subjectsGrid.innerHTML = "";
+
     subjects.forEach((subject) => {
         const subjectCard = createSubjectCard(subject);
         subjectsGrid.appendChild(subjectCard);
     });
+
     updateSubjectCounts();
     applySubjectFilters();
 }
 
-function getSubjectsFromStorage() {
-    const saved = localStorage.getItem(SUBJECTS_STORAGE_KEY);
-    if (!saved) return null;
-
+async function loadSubjects() {
     try {
-        return JSON.parse(saved);
+        const subjects = await fetchSubjectsFromApi();
+        renderSubjects(subjects);
+        updateSubjectsEmptyState(subjects.length);
     } catch (error) {
-        console.error("Failed to parse subjects from localStorage:", error);
-        return null;
+        console.error("Failed to load subjects:", error);
+
+        if (subjectsGrid) {
+            subjectsGrid.innerHTML = "";
+        }
+
+        updateSubjectCounts();
+        updateSubjectsEmptyState(0);
+        alert("Failed to load subjects from backend.");
     }
 }
 
-function saveSubjectsToStorage(subjects) {
-    localStorage.setItem(SUBJECTS_STORAGE_KEY, JSON.stringify(subjects));
+async function addSubject(subjectData) {
+    await createSubjectInApi(subjectData);
+    await loadSubjects();
 }
 
-function extractSubjectsFromDOM() {
-    const subjectCards = subjectsGrid.querySelectorAll(".subject-card");
-    const subjects = [];
-
-    subjectCards.forEach((subjectCard) => {
-        const name = subjectCard.querySelector("h3")?.textContent.trim() || "";
-        const description = subjectCard.querySelector("p")?.textContent.trim() || "";
-        const metaEls = subjectCard.querySelectorAll(".subject-meta span");
-
-        const chaptersText = metaEls[0]?.textContent.trim() || "0 Chapters";
-        const progressText = metaEls[1]?.textContent.trim() || "0% Done";
-        const iconClass = subjectCard.querySelector(".subject-icon i")?.className.split(" ").pop() || "fa-code";
-
-        const chapters = parseInt(chaptersText, 10) || 0;
-        const progress = parseInt(progressText, 10) || 0;
-
-        subjects.push({
-            id: generateSubjectId(),
-            name,
-            chapters,
-            progress,
-            iconClass,
-            description,
-            code: ""
-        });
-    });
-
-    return subjects;
+async function updateSubject(subjectId, updatedData) {
+    await updateSubjectInApi(subjectId, updatedData);
+    await loadSubjects();
 }
 
-function loadSubjects() {
-    const storedSubjects = getSubjectsFromStorage();
-
-    if (storedSubjects && Array.isArray(storedSubjects)) {
-        renderSubjects(storedSubjects);
-        return;
-    }
-
-    const initialSubjects = extractSubjectsFromDOM();
-    saveSubjectsToStorage(initialSubjects);
-    renderSubjects(initialSubjects);
-}
-
-function getCurrentSubjects() {
-    return getSubjectsFromStorage() || [];
-}
-
-function addSubject(subjectData) {
-    const subjects = getCurrentSubjects();
-    const newSubject = {
-        id: generateSubjectId(),
-        ...subjectData
-    };
-
-    subjects.unshift(newSubject);
-    saveSubjectsToStorage(subjects);
-    renderSubjects(subjects);
-}
-
-function updateSubject(subjectId, updatedData) {
-    const subjects = getCurrentSubjects().map((subject) =>
-        subject.id === subjectId ? { ...subject, ...updatedData } : subject
-    );
-
-    saveSubjectsToStorage(subjects);
-    renderSubjects(subjects);
-}
-
-function deleteSubject(subjectId) {
-    const subjects = getCurrentSubjects().filter((subject) => subject.id !== subjectId);
-    saveSubjectsToStorage(subjects);
-    renderSubjects(subjects);
+async function deleteSubject(subjectId) {
+    await deleteSubjectFromApi(subjectId);
+    await loadSubjects();
 }
 
 function updateSubjectCounts() {
@@ -364,14 +423,14 @@ if (
         }
     });
 
-    subjectModalForm.addEventListener("submit", function (event) {
+    subjectModalForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const name = subjectNameInput.value.trim();
         const code = subjectCodeInput.value.trim();
         const chapters = subjectChaptersInput.value.trim();
         const progress = getSafeProgress(subjectProgressInput.value);
-        const iconClass = subjectIconInput.value;
+        const iconClass = subjectIconInput.value.trim();
         const description = subjectDescriptionInput.value.trim();
 
         if (!name) {
@@ -385,8 +444,7 @@ if (
         }
 
         const finalDescription =
-            description ||
-            `Subject code: ${code || "N/A"} • Manage chapters and track study progress.`;
+            description || getDefaultDescription(code);
 
         const subjectData = {
             name,
@@ -394,20 +452,26 @@ if (
             progress,
             iconClass,
             description: finalDescription,
-            code
+            code,
+            difficultyLevel: ""
         };
 
-        if (editingSubjectId) {
-            updateSubject(editingSubjectId, subjectData);
-        } else {
-            addSubject(subjectData);
-        }
+        try {
+            if (editingSubjectId) {
+                await updateSubject(editingSubjectId, subjectData);
+            } else {
+                await addSubject(subjectData);
+            }
 
-        closeSubjectModal();
-        clearSubjectModalState();
+            closeSubjectModal();
+            clearSubjectModalState();
+        } catch (error) {
+            console.error("Failed to save subject:", error);
+            alert("Failed to save subject.");
+        }
     });
 
-    subjectsGrid.addEventListener("click", function (event) {
+    subjectsGrid.addEventListener("click", async function (event) {
         const deleteButton = event.target.closest(".subject-action-btn.delete");
         const editButton = event.target.closest(".subject-action-btn.edit, .subject-action-btn:not(.delete)");
 
@@ -420,7 +484,12 @@ if (
             const shouldDelete = confirm("Do you want to delete this subject?");
             if (!shouldDelete) return;
 
-            deleteSubject(subjectId);
+            try {
+                await deleteSubject(subjectId);
+            } catch (error) {
+                console.error("Failed to delete subject:", error);
+                alert("Failed to delete subject.");
+            }
             return;
         }
 
