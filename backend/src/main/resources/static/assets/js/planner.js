@@ -9,6 +9,9 @@ const planSaveBtn = document.getElementById("planSaveBtn");
 
 const studySessionList = document.getElementById("studySessionList");
 const plannerEmptyState = document.getElementById("plannerEmptyState");
+const weeklyTargetList = document.getElementById("weeklyTargetList");
+const upcomingPlanList = document.getElementById("upcomingPlanList");
+
 const planSearchInput = document.getElementById("planSearchInput");
 const planFilterSelect = document.getElementById("planFilterSelect");
 
@@ -24,9 +27,18 @@ const planDateInput = document.getElementById("planDate");
 const planStatusInput = document.getElementById("planStatus");
 const planDescriptionInput = document.getElementById("planDescription");
 
-const PLANS_STORAGE_KEY = "edumind_plans";
+const PLANNER_API_BASE_URL =
+    window.location.port === "8080"
+        ? "/api/plans"
+        : "http://localhost:8080/api/plans";
+
+const SUBJECTS_API_BASE_URL =
+    window.location.port === "8080"
+        ? "/subjects"
+        : "http://localhost:8080/subjects";
 
 let editingPlanId = null;
+let allPlans = [];
 
 function openPlanModal() {
     if (!planModalOverlay) return;
@@ -54,8 +66,13 @@ function setEditPlanMode() {
 function resetPlanForm() {
     if (!planModalForm) return;
     planModalForm.reset();
+
     if (planStatusInput) {
         planStatusInput.value = "Pending";
+    }
+
+    if (planSubjectInput) {
+        planSubjectInput.value = "";
     }
 }
 
@@ -64,14 +81,64 @@ function clearPlanModalState() {
     setAddPlanMode();
 }
 
-function generatePlanId() {
-    return `plan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function formatDateToYMD(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function getTodayString() {
+    return formatDateToYMD(new Date());
+}
+
+function getTomorrowString() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return formatDateToYMD(tomorrow);
+}
+
+function parseDateOnly(dateValue) {
+    if (!dateValue) return null;
+    return new Date(`${dateValue}T00:00:00`);
+}
+
+function getCurrentMinutes() {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+}
+
+function timeToMinutes(timeValue) {
+    if (!timeValue) return 0;
+    const normalized = timeValue.slice(0, 5);
+    const [hour, minute] = normalized.split(":").map(Number);
+    return (hour || 0) * 60 + (minute || 0);
+}
+
+function comparePlansAsc(a, b) {
+    const dateCompare = (a.date || "").localeCompare(b.date || "");
+    if (dateCompare !== 0) return dateCompare;
+
+    const timeCompare = timeToMinutes(a.time) - timeToMinutes(b.time);
+    if (timeCompare !== 0) return timeCompare;
+
+    return (a.id || 0) - (b.id || 0);
 }
 
 function formatTime(value) {
     if (!value) return "No Time";
 
-    const [hourStr, minute] = value.split(":");
+    const normalized = value.slice(0, 5);
+    const [hourStr, minute] = normalized.split(":");
     let hour = parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
 
@@ -79,6 +146,19 @@ function formatTime(value) {
     if (hour === 0) hour = 12;
 
     return `${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+}
+
+function normalizeTimeForBackend(value) {
+    if (!value) return "";
+    if (value.length === 5) {
+        return `${value}:00`;
+    }
+    return value;
+}
+
+function normalizeTimeForInput(value) {
+    if (!value) return "";
+    return value.slice(0, 5);
 }
 
 function getSessionStatusClass(status) {
@@ -89,16 +169,13 @@ function getSessionStatusClass(status) {
     return "pending";
 }
 
-function getTodayString() {
-    return new Date().toISOString().split("T")[0];
-}
-
 function isThisWeek(dateValue) {
     if (!dateValue) return false;
 
-    const target = new Date(dateValue);
-    const today = new Date();
+    const target = parseDateOnly(dateValue);
+    if (!target) return false;
 
+    const today = new Date();
     const day = today.getDay();
     const diffToMonday = day === 0 ? -6 : 1 - day;
 
@@ -113,42 +190,81 @@ function isThisWeek(dateValue) {
     return target >= startOfWeek && target <= endOfWeek;
 }
 
-function updatePlannerCounts() {
-    if (!studySessionList) return;
+function isUpcomingPlan(plan) {
+    if (!plan?.date) return false;
 
-    const sessionItems = studySessionList.querySelectorAll(".study-session-item");
-    const sessionBadges = studySessionList.querySelectorAll(".session-badge");
+    const today = getTodayString();
 
-    const totalSessions = sessionItems.length;
-    let completed = 0;
-    let todayCount = 0;
+    if (plan.date > today) return true;
+    if (plan.date < today) return false;
 
-    sessionItems.forEach((item) => {
-        const dateValue = item.dataset.date || "";
-        if (dateValue === getTodayString()) {
-            todayCount++;
-        }
-    });
+    return timeToMinutes(plan.time) >= getCurrentMinutes();
+}
 
-    sessionBadges.forEach((badge) => {
-        if (badge.classList.contains("done")) {
-            completed++;
-        }
-    });
+function getRelativeDateLabel(dateValue) {
+    if (!dateValue) return "Scheduled";
 
-    const weeklyCount = totalSessions;
-    const focusPercent = totalSessions > 0 ? Math.round((completed / totalSessions) * 100) : 0;
+    if (dateValue === getTodayString()) return "Today";
+    if (dateValue === getTomorrowString()) return "Tomorrow";
+
+    const date = parseDateOnly(dateValue);
+    if (!date) return dateValue;
+
+    return date.toLocaleDateString("en-US", { weekday: "long" });
+}
+
+function getPlanIconClass(subject, title) {
+    const text = `${subject || ""} ${title || ""}`.toLowerCase();
+
+    if (text.includes("java") || text.includes("coding") || text.includes("code")) {
+        return "fa-solid fa-laptop-code";
+    }
+
+    if (text.includes("dbms") || text.includes("sql") || text.includes("database")) {
+        return "fa-solid fa-database";
+    }
+
+    if (text.includes("network")) {
+        return "fa-solid fa-globe";
+    }
+
+    if (text.includes("operating") || text.includes("os") || text.includes("system")) {
+        return "fa-solid fa-desktop";
+    }
+
+    if (text.includes("test") || text.includes("exam")) {
+        return "fa-solid fa-file-lines";
+    }
+
+    return "fa-solid fa-book-open";
+}
+
+function updateSummaryCards(plans) {
+    const today = getTodayString();
+    const weeklyPlans = plans.filter((plan) => isThisWeek(plan.date));
+    const todayPlans = plans.filter((plan) => plan.date === today);
+    const completedTodayPlans = todayPlans.filter(
+        (plan) => (plan.status || "").toLowerCase() === "done"
+    );
+    const completedWeeklyPlans = weeklyPlans.filter(
+        (plan) => (plan.status || "").toLowerCase() === "done"
+    );
+
+    const focusPercent =
+        weeklyPlans.length > 0
+            ? Math.round((completedWeeklyPlans.length / weeklyPlans.length) * 100)
+            : 0;
 
     if (weeklyPlansCount) {
-        weeklyPlansCount.textContent = String(weeklyCount).padStart(2, "0");
+        weeklyPlansCount.textContent = String(weeklyPlans.length).padStart(2, "0");
     }
 
     if (todaySessionsCount) {
-        todaySessionsCount.textContent = String(todayCount).padStart(2, "0");
+        todaySessionsCount.textContent = String(todayPlans.length).padStart(2, "0");
     }
 
     if (completedTodayCount) {
-        completedTodayCount.textContent = String(completed).padStart(2, "0");
+        completedTodayCount.textContent = String(completedTodayPlans.length).padStart(2, "0");
     }
 
     if (weeklyFocusRate) {
@@ -156,26 +272,29 @@ function updatePlannerCounts() {
     }
 }
 
-function createStudySessionItem({ id, title, subject, time, date, status, description }) {
+function createStudySessionItem(plan) {
     const sessionItem = document.createElement("div");
     sessionItem.className = "study-session-item";
-    sessionItem.dataset.planId = id;
-    sessionItem.dataset.date = date || "";
-    sessionItem.dataset.subject = subject || "";
-    sessionItem.dataset.status = status || "Pending";
-    sessionItem.dataset.time = time || "";
-    sessionItem.dataset.description = description || "";
+    sessionItem.dataset.planId = plan.id;
+    sessionItem.dataset.date = plan.date || "";
+    sessionItem.dataset.subject = plan.subject || "";
+    sessionItem.dataset.status = plan.status || "Pending";
+    sessionItem.dataset.time = plan.time || "";
+    sessionItem.dataset.description = plan.description || "";
 
-    const statusClass = getSessionStatusClass(status);
-    const formattedTime = formatTime(time);
+    const statusClass = getSessionStatusClass(plan.status);
+    const formattedTime = formatTime(plan.time);
+    const descriptionText = plan.subject
+        ? `${escapeHtml(plan.subject)} • ${escapeHtml(plan.description || "No details added")}`
+        : escapeHtml(plan.description || "No details added");
 
     sessionItem.innerHTML = `
         <div class="session-time">${formattedTime}</div>
         <div class="session-info">
-            <h4>${title}</h4>
-            <p>${subject} • ${description}</p>
+            <h4>${escapeHtml(plan.title || "Untitled Plan")}</h4>
+            <p>${descriptionText}</p>
         </div>
-        <span class="session-badge ${statusClass}">${status}</span>
+        <span class="session-badge ${statusClass}">${escapeHtml(plan.status || "Pending")}</span>
         <div class="session-actions">
             <button class="session-action-btn edit" title="Edit">
                 <i class="fa-solid fa-pen"></i>
@@ -189,130 +308,126 @@ function createStudySessionItem({ id, title, subject, time, date, status, descri
     return sessionItem;
 }
 
-function renderPlans(plans) {
+function renderStudySessionList(plans) {
+    if (!studySessionList) return;
+
     studySessionList.innerHTML = "";
+
     plans.forEach((plan) => {
         const sessionItem = createStudySessionItem(plan);
         studySessionList.appendChild(sessionItem);
     });
-    updatePlannerCounts();
-    applyPlanFilters();
-}
 
-function getPlansFromStorage() {
-    const saved = localStorage.getItem(PLANS_STORAGE_KEY);
-    if (!saved) return null;
-
-    try {
-        return JSON.parse(saved);
-    } catch (error) {
-        console.error("Failed to parse plans from localStorage:", error);
-        return null;
+    if (plannerEmptyState) {
+        plannerEmptyState.classList.toggle("hidden", plans.length > 0);
+        studySessionList.appendChild(plannerEmptyState);
     }
 }
 
-function savePlansToStorage(plans) {
-    localStorage.setItem(PLANS_STORAGE_KEY, JSON.stringify(plans));
-}
+function renderWeeklyOverview(plans) {
+    if (!weeklyTargetList) return;
 
-function parseTimeTo24Hour(timeText) {
-    if (!timeText) return "";
+    const weeklyPlans = plans.filter((plan) => isThisWeek(plan.date));
+    const subjectMap = {};
 
-    const match = timeText.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-    if (!match) return "";
+    weeklyPlans.forEach((plan) => {
+        const subjectName = (plan.subject || "General").trim() || "General";
+        const normalizedStatus = (plan.status || "").toLowerCase();
 
-    let hour = parseInt(match[1], 10);
-    const minute = match[2];
-    const ampm = match[3].toUpperCase();
-
-    if (ampm === "PM" && hour !== 12) hour += 12;
-    if (ampm === "AM" && hour === 12) hour = 0;
-
-    return `${String(hour).padStart(2, "0")}:${minute}`;
-}
-
-function extractPlansFromDOM() {
-    const sessionItems = studySessionList.querySelectorAll(".study-session-item");
-    const plans = [];
-
-    sessionItems.forEach((sessionItem) => {
-        const title = sessionItem.querySelector(".session-info h4")?.textContent.trim() || "";
-        const descriptionText = sessionItem.querySelector(".session-info p")?.textContent.trim() || "";
-        const timeText = sessionItem.querySelector(".session-time")?.textContent.trim() || "";
-        const statusText = sessionItem.querySelector(".session-badge")?.textContent.trim() || "Pending";
-
-        let subject = "";
-        let description = descriptionText;
-
-        if (descriptionText.includes("•")) {
-            const parts = descriptionText.split("•");
-            subject = parts[0]?.trim() || "";
-            description = parts.slice(1).join("•").trim() || "";
+        if (!subjectMap[subjectName]) {
+            subjectMap[subjectName] = {
+                subject: subjectName,
+                total: 0,
+                completed: 0
+            };
         }
 
-        plans.push({
-            id: generatePlanId(),
-            title,
-            subject,
-            time: parseTimeTo24Hour(timeText),
-            date: getTodayString(),
-            status: statusText,
-            description
-        });
+        subjectMap[subjectName].total += 1;
+
+        if (normalizedStatus === "done") {
+            subjectMap[subjectName].completed += 1;
+        }
     });
 
-    return plans;
-}
+    const subjectStats = Object.values(subjectMap).sort((a, b) => b.total - a.total);
 
-function loadPlans() {
-    const storedPlans = getPlansFromStorage();
-
-    if (storedPlans && Array.isArray(storedPlans)) {
-        renderPlans(storedPlans);
+    if (subjectStats.length === 0) {
+        weeklyTargetList.innerHTML = `
+            <div class="planner-empty-state">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No weekly data</h3>
+                <p>Create study plans for this week to see subject progress.</p>
+            </div>
+        `;
         return;
     }
 
-    const initialPlans = extractPlansFromDOM();
-    savePlansToStorage(initialPlans);
-    renderPlans(initialPlans);
+    weeklyTargetList.innerHTML = subjectStats
+        .map((item) => {
+            const percent = item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
+
+            return `
+                <div class="weekly-target-item">
+                    <div class="weekly-target-top">
+                        <h4>${escapeHtml(item.subject)}</h4>
+                        <span>${item.completed} / ${item.total} sessions</span>
+                    </div>
+                    <div class="weekly-progress-bar">
+                        <div class="weekly-progress-fill" style="width: ${percent}%;"></div>
+                    </div>
+                </div>
+            `;
+        })
+        .join("");
 }
 
-function getCurrentPlans() {
-    return getPlansFromStorage() || [];
+function createUpcomingPlanItem(plan) {
+    const iconClass = getPlanIconClass(plan.subject, plan.title);
+    const relativeDate = getRelativeDateLabel(plan.date);
+    const formattedTime = formatTime(plan.time);
+
+    return `
+        <div class="upcoming-plan-item">
+            <div class="upcoming-plan-icon">
+                <i class="${iconClass}"></i>
+            </div>
+            <div class="upcoming-plan-info">
+                <h4>${escapeHtml(plan.title || "Untitled Plan")}</h4>
+                <p>${escapeHtml(relativeDate)} • ${formattedTime}</p>
+            </div>
+        </div>
+    `;
 }
 
-function addPlan(planData) {
-    const plans = getCurrentPlans();
-    const newPlan = {
-        id: generatePlanId(),
-        ...planData
-    };
+function renderUpcomingPlans(plans) {
+    if (!upcomingPlanList) return;
 
-    plans.unshift(newPlan);
-    savePlansToStorage(plans);
-    renderPlans(plans);
+    const upcomingPlans = [...plans]
+        .filter((plan) => isUpcomingPlan(plan))
+        .sort(comparePlansAsc)
+        .slice(0, 3);
+
+    if (upcomingPlans.length === 0) {
+        upcomingPlanList.innerHTML = `
+            <div class="planner-empty-state">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No upcoming plans</h3>
+                <p>Your future study plans will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+
+    upcomingPlanList.innerHTML = upcomingPlans
+        .map((plan) => createUpcomingPlanItem(plan))
+        .join("");
 }
 
-function updatePlan(planId, updatedData) {
-    const plans = getCurrentPlans().map((plan) =>
-        plan.id === planId ? { ...plan, ...updatedData } : plan
-    );
-
-    savePlansToStorage(plans);
-    renderPlans(plans);
-}
-
-function deletePlan(planId) {
-    const plans = getCurrentPlans().filter((plan) => plan.id !== planId);
-    savePlansToStorage(plans);
-    renderPlans(plans);
-}
-
-function matchesPlanFilter(sessionItem, filterValue) {
+function matchesPlanFilter(plan, filterValue) {
     if (!filterValue || filterValue === "All Plans") return true;
 
-    const status = (sessionItem.dataset.status || "").toLowerCase();
-    const dateValue = sessionItem.dataset.date || "";
+    const status = (plan.status || "").toLowerCase();
+    const dateValue = plan.date || "";
     const today = getTodayString();
 
     if (filterValue === "Today") return dateValue === today;
@@ -323,41 +438,30 @@ function matchesPlanFilter(sessionItem, filterValue) {
     return true;
 }
 
-function updatePlannerEmptyState(visibleCount) {
-    if (!plannerEmptyState) return;
-
-    if (visibleCount === 0) {
-        plannerEmptyState.classList.remove("hidden");
-    } else {
-        plannerEmptyState.classList.add("hidden");
-    }
-}
-
 function applyPlanFilters() {
-    if (!studySessionList) return;
-
-    const sessionItems = studySessionList.querySelectorAll(".study-session-item");
     const searchText = planSearchInput ? planSearchInput.value.toLowerCase().trim() : "";
     const filterValue = planFilterSelect ? planFilterSelect.value : "All Plans";
 
-    let visibleCount = 0;
+    const filteredPlans = [...allPlans]
+        .filter((plan) => {
+            const title = (plan.title || "").toLowerCase();
+            const subject = (plan.subject || "").toLowerCase();
+            const description = (plan.description || "").toLowerCase();
+            const status = (plan.status || "").toLowerCase();
 
-    sessionItems.forEach((sessionItem) => {
-        const title = sessionItem.querySelector(".session-info h4")?.textContent.toLowerCase() || "";
-        const description = sessionItem.querySelector(".session-info p")?.textContent.toLowerCase() || "";
+            const matchesSearch =
+                title.includes(searchText) ||
+                subject.includes(searchText) ||
+                description.includes(searchText) ||
+                status.includes(searchText);
 
-        const matchesSearch = title.includes(searchText) || description.includes(searchText);
-        const passesFilter = matchesPlanFilter(sessionItem, filterValue);
+            const passesFilter = matchesPlanFilter(plan, filterValue);
 
-        if (matchesSearch && passesFilter) {
-            sessionItem.style.display = "";
-            visibleCount++;
-        } else {
-            sessionItem.style.display = "none";
-        }
-    });
+            return matchesSearch && passesFilter;
+        })
+        .sort(comparePlansAsc);
 
-    updatePlannerEmptyState(visibleCount);
+    renderStudySessionList(filteredPlans);
 }
 
 function fillPlanFormForEdit(sessionItem) {
@@ -372,10 +476,157 @@ function fillPlanFormForEdit(sessionItem) {
 
     planTitleInput.value = title;
     planSubjectInput.value = subject;
-    planTimeInput.value = time;
+    planTimeInput.value = normalizeTimeForInput(time);
     planDateInput.value = date;
     planStatusInput.value = status;
     planDescriptionInput.value = description;
+}
+
+async function fetchAllPlans() {
+    const response = await fetch(PLANNER_API_BASE_URL);
+
+    if (!response.ok) {
+        throw new Error("Failed to load plans");
+    }
+
+    return response.json();
+}
+
+async function createPlanApi(planData) {
+    const response = await fetch(PLANNER_API_BASE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(planData)
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to create plan");
+    }
+
+    return response.json();
+}
+
+async function updatePlanApi(planId, planData) {
+    const response = await fetch(`${PLANNER_API_BASE_URL}/${planId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(planData)
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update plan");
+    }
+
+    return response.json();
+}
+
+async function deletePlanApi(planId) {
+    const response = await fetch(`${PLANNER_API_BASE_URL}/${planId}`, {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to delete plan");
+    }
+
+    return response.text();
+}
+
+async function fetchAllSubjects() {
+    const response = await fetch(SUBJECTS_API_BASE_URL);
+
+    if (!response.ok) {
+        throw new Error("Failed to load subjects");
+    }
+
+    return response.json();
+}
+
+function getSubjectDisplayName(subject) {
+    return (
+        subject?.name ||
+        subject?.subjectName ||
+        subject?.title ||
+        ""
+    ).trim();
+}
+
+async function loadSubjectOptions(selectedValue = "") {
+    if (!planSubjectInput) return;
+
+    try {
+        const subjects = await fetchAllSubjects();
+
+        planSubjectInput.innerHTML = `<option value="">Select Subject</option>`;
+
+        subjects.forEach((subject) => {
+            const subjectName = getSubjectDisplayName(subject);
+            if (!subjectName) return;
+
+            const option = document.createElement("option");
+            option.value = subjectName;
+            option.textContent = subjectName;
+
+            if (subjectName === selectedValue) {
+                option.selected = true;
+            }
+
+            planSubjectInput.appendChild(option);
+        });
+
+        if (
+            selectedValue &&
+            !Array.from(planSubjectInput.options).some(
+                (option) => option.value === selectedValue
+            )
+        ) {
+            const fallbackOption = document.createElement("option");
+            fallbackOption.value = selectedValue;
+            fallbackOption.textContent = selectedValue;
+            fallbackOption.selected = true;
+            planSubjectInput.appendChild(fallbackOption);
+        }
+    } catch (error) {
+        console.error("Error loading subjects:", error);
+    }
+}
+
+async function loadPlans() {
+    try {
+        const plans = await fetchAllPlans();
+        allPlans = Array.isArray(plans) ? plans : [];
+
+        updateSummaryCards(allPlans);
+        renderWeeklyOverview(allPlans);
+        renderUpcomingPlans(allPlans);
+        applyPlanFilters();
+    } catch (error) {
+        console.error("Error loading plans:", error);
+        allPlans = [];
+        updateSummaryCards(allPlans);
+        renderWeeklyOverview(allPlans);
+        renderUpcomingPlans(allPlans);
+        applyPlanFilters();
+    }
+}
+
+async function addPlan(planData) {
+    await createPlanApi(planData);
+    await loadPlans();
+}
+
+async function updatePlan(planId, updatedData) {
+    await updatePlanApi(planId, updatedData);
+    await loadPlans();
+}
+
+async function deletePlan(planId) {
+    await deletePlanApi(planId);
+    await loadPlans();
 }
 
 if (
@@ -386,8 +637,9 @@ if (
     planModalForm &&
     studySessionList
 ) {
-    openPlanModalBtn.addEventListener("click", function () {
+    openPlanModalBtn.addEventListener("click", async function () {
         clearPlanModalState();
+        await loadSubjectOptions();
         openPlanModal();
     });
 
@@ -415,11 +667,11 @@ if (
         }
     });
 
-    planModalForm.addEventListener("submit", function (event) {
+    planModalForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const title = planTitleInput.value.trim();
-        const subject = planSubjectInput.value;
+        const subject = planSubjectInput.value.trim();
         const time = planTimeInput.value;
         const date = planDateInput.value;
         const status = planStatusInput.value;
@@ -427,6 +679,11 @@ if (
 
         if (!title) {
             alert("Please enter a plan title.");
+            return;
+        }
+
+        if (!subject) {
+            alert("Please select a subject.");
             return;
         }
 
@@ -445,23 +702,36 @@ if (
         const planData = {
             title,
             subject,
-            time,
+            time: normalizeTimeForBackend(time),
             date,
             status,
             description: finalDescription
         };
 
-        if (editingPlanId) {
-            updatePlan(editingPlanId, planData);
-        } else {
-            addPlan(planData);
-        }
+        try {
+            if (planSaveBtn) {
+                planSaveBtn.disabled = true;
+            }
 
-        closePlanModal();
-        clearPlanModalState();
+            if (editingPlanId) {
+                await updatePlan(editingPlanId, planData);
+            } else {
+                await addPlan(planData);
+            }
+
+            closePlanModal();
+            clearPlanModalState();
+        } catch (error) {
+            console.error("Error saving plan:", error);
+            alert("Plan save/update nahi ho paaya. Backend API aur console check karo.");
+        } finally {
+            if (planSaveBtn) {
+                planSaveBtn.disabled = false;
+            }
+        }
     });
 
-    studySessionList.addEventListener("click", function (event) {
+    studySessionList.addEventListener("click", async function (event) {
         const deleteButton = event.target.closest(".session-action-btn.delete");
         const editButton = event.target.closest(".session-action-btn.edit");
 
@@ -474,7 +744,13 @@ if (
             const shouldDelete = confirm("Do you want to delete this study plan?");
             if (!shouldDelete) return;
 
-            deletePlan(planId);
+            try {
+                await deletePlan(planId);
+            } catch (error) {
+                console.error("Error deleting plan:", error);
+                alert("Plan delete nahi ho paaya. Backend API check karo.");
+            }
+
             return;
         }
 
@@ -483,6 +759,10 @@ if (
             if (!sessionItem) return;
 
             setEditPlanMode();
+
+            const selectedSubject = sessionItem.dataset.subject || "";
+            await loadSubjectOptions(selectedSubject);
+
             fillPlanFormForEdit(sessionItem);
             openPlanModal();
         }
@@ -497,5 +777,6 @@ if (
     }
 
     loadPlans();
+    loadSubjectOptions();
     setAddPlanMode();
 }

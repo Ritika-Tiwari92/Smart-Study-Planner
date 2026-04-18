@@ -94,14 +94,17 @@
                               <p>Plan your day, week, and study sessions in a smart way.</p>
                          </div>
                     </div>
+
                     <div class="header-actions">
                          <button class="add-plan-btn" id="openPlanModalBtn">
                               <i class="fa-solid fa-plus"></i>
                               <span>Create Plan</span>
                          </button>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
+
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
@@ -130,22 +133,22 @@
                <section class="planner-content">
                     <div class="planner-summary-grid">
                          <div class="planner-summary-card">
-                              <h3 id="weeklyPlansCount">07</h3>
+                              <h3 id="weeklyPlansCount">00</h3>
                               <p>This Week Plans</p>
                          </div>
 
                          <div class="planner-summary-card">
-                              <h3 id="todaySessionsCount">04</h3>
+                              <h3 id="todaySessionsCount">00</h3>
                               <p>Today Sessions</p>
                          </div>
 
                          <div class="planner-summary-card">
-                              <h3 id="completedTodayCount">02</h3>
+                              <h3 id="completedTodayCount">00</h3>
                               <p>Completed Today</p>
                          </div>
 
                          <div class="planner-summary-card">
-                              <h3 id="weeklyFocusRate">78%</h3>
+                              <h3 id="weeklyFocusRate">0%</h3>
                               <p>Weekly Focus Rate</p>
                          </div>
                     </div>
@@ -176,77 +179,10 @@
                               </div>
 
                               <div class="study-session-list" id="studySessionList">
-                                   <div class="study-session-item">
-                                        <div class="session-time">09:00 AM</div>
-                                        <div class="session-info">
-                                             <h4>Java Practice Session</h4>
-                                             <p>Arrays, OOP revision, and coding exercises</p>
-                                        </div>
-                                        <span class="session-badge done">Done</span>
-
-                                        <div class="session-actions">
-                                             <button class="session-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="session-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
                                    <div class="planner-empty-state hidden" id="plannerEmptyState">
                                         <i class="fa-regular fa-folder-open"></i>
                                         <h3>No plans found</h3>
                                         <p>Try changing your search text or filter option.</p>
-                                   </div>
-
-                                   <div class="study-session-item">
-                                        <div class="session-time">12:00 PM</div>
-                                        <div class="session-info">
-                                             <h4>DBMS Notes Revision</h4>
-                                             <p>Normalization, joins, and SQL queries</p>
-                                        </div>
-                                        <span class="session-badge pending">Pending</span>
-                                   </div>
-                                   <div class="session-actions">
-                                        <button class="session-action-btn edit" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="session-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                                   <div class="study-session-item">
-                                        <div class="session-time">04:00 PM</div>
-                                        <div class="session-info">
-                                             <h4>Computer Networks Reading</h4>
-                                             <p>OSI model and protocol stack concepts</p>
-                                        </div>
-                                        <span class="session-badge progress">In Progress</span>
-                                   </div>
-                                   <div class="session-actions">
-                                        <button class="session-action-btn edit" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="session-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-
-                                   <div class="study-session-item">
-                                        <div class="session-time">09:00 AM</div>
-                                        <div class="session-info">
-                                             <h4>Java Practice Session</h4>
-                                             <p>Arrays, OOP revision, and coding exercises</p>
-                                        </div>
-                                        <span class="session-badge done">Done</span>
-                                        <div class="session-actions">
-                                             <button class="session-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="session-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
                                    </div>
                               </div>
                          </div>
@@ -257,47 +193,7 @@
                                    <p>Your subject-wise study targets this week.</p>
                               </div>
 
-                              <div class="weekly-target-list">
-                                   <div class="weekly-target-item">
-                                        <div class="weekly-target-top">
-                                             <h4>Java Programming</h4>
-                                             <span>3 / 4 sessions</span>
-                                        </div>
-                                        <div class="weekly-progress-bar">
-                                             <div class="weekly-progress-fill" style="width: 75%;"></div>
-                                        </div>
-                                   </div>
-
-                                   <div class="weekly-target-item">
-                                        <div class="weekly-target-top">
-                                             <h4>DBMS</h4>
-                                             <span>2 / 3 sessions</span>
-                                        </div>
-                                        <div class="weekly-progress-bar">
-                                             <div class="weekly-progress-fill" style="width: 66%;"></div>
-                                        </div>
-                                   </div>
-
-                                   <div class="weekly-target-item">
-                                        <div class="weekly-target-top">
-                                             <h4>Computer Networks</h4>
-                                             <span>1 / 3 sessions</span>
-                                        </div>
-                                        <div class="weekly-progress-bar">
-                                             <div class="weekly-progress-fill" style="width: 33%;"></div>
-                                        </div>
-                                   </div>
-
-                                   <div class="weekly-target-item">
-                                        <div class="weekly-target-top">
-                                             <h4>Operating System</h4>
-                                             <span>2 / 2 sessions</span>
-                                        </div>
-                                        <div class="weekly-progress-bar">
-                                             <div class="weekly-progress-fill" style="width: 100%;"></div>
-                                        </div>
-                                   </div>
-                              </div>
+                              <div class="weekly-target-list" id="weeklyTargetList"></div>
                          </div>
                     </div>
 
@@ -308,37 +204,7 @@
                                    <p>Your next scheduled study activities.</p>
                               </div>
 
-                              <div class="upcoming-plan-list">
-                                   <div class="upcoming-plan-item">
-                                        <div class="upcoming-plan-icon">
-                                             <i class="fa-solid fa-book-open"></i>
-                                        </div>
-                                        <div class="upcoming-plan-info">
-                                             <h4>OS Revision Session</h4>
-                                             <p>Tomorrow • 10:00 AM</p>
-                                        </div>
-                                   </div>
-
-                                   <div class="upcoming-plan-item">
-                                        <div class="upcoming-plan-icon">
-                                             <i class="fa-solid fa-laptop-code"></i>
-                                        </div>
-                                        <div class="upcoming-plan-info">
-                                             <h4>Java Coding Practice</h4>
-                                             <p>Tomorrow • 06:00 PM</p>
-                                        </div>
-                                   </div>
-
-                                   <div class="upcoming-plan-item">
-                                        <div class="upcoming-plan-icon">
-                                             <i class="fa-solid fa-file-pen"></i>
-                                        </div>
-                                        <div class="upcoming-plan-info">
-                                             <h4>DBMS Assignment Draft</h4>
-                                             <p>Friday • 04:00 PM</p>
-                                        </div>
-                                   </div>
-                              </div>
+                              <div class="upcoming-plan-list" id="upcomingPlanList"></div>
                          </div>
 
                          <div class="focus-tips-card">
@@ -368,6 +234,7 @@
                          </div>
                     </div>
                </section>
+
                <div class="plan-modal-overlay hidden" id="planModalOverlay">
                     <div class="plan-modal">
                          <div class="plan-modal-header">
@@ -391,11 +258,7 @@
                                    <div class="plan-form-group">
                                         <label for="planSubject">Subject</label>
                                         <select id="planSubject">
-                                             <option>Java Programming</option>
-                                             <option>DBMS</option>
-                                             <option>Computer Networks</option>
-                                             <option>Operating System</option>
-                                             <option>Aptitude</option>
+                                             <option value="">Select Subject</option>
                                         </select>
                                    </div>
 
@@ -434,6 +297,7 @@
                </div>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/planner.js"></script>
