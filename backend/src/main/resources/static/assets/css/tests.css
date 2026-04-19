@@ -794,3 +794,68 @@ body.preview-dark .result-score {
   opacity: 1 !important;
   border: none !important;
 }
+/* ===== Final Test Modal Scroll Fix ===== */
+.test-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 24px 20px !important;
+  overflow-y: auto !important;
+  z-index: 1000 !important;
+}
+
+.test-modal {
+  width: 100% !important;
+  max-width: 760px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.test-modal-header {
+  position: static !important;
+  background: #ffffff !important;
+  padding-bottom: 0 !important;
+}
+
+.test-modal-actions {
+  position: static !important;
+  background: transparent !important;
+  padding-top: 0 !important;
+}
+
+#testDescription {
+  min-height: 100px !important;
+}
+
+#testFocusArea,
+#testTip {
+  min-height: 90px !important;
+}
+
+@media (max-width: 768px) {
+  .test-modal-overlay {
+    padding: 12px !important;
+  }
+
+  .test-modal {
+    width: 100% !important;
+    padding: 22px 18px !important;
+    border-radius: 20px !important;
+  }
+
+  #testDescription {
+    min-height: 90px !important;
+  }
+
+  #testFocusArea,
+  #testTip {
+    min-height: 80px !important;
+  }
+}
+.test-modal-overlay.hidden {
+  display: none !important;
+}
