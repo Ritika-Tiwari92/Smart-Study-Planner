@@ -22,8 +22,9 @@ const testSubjectInput = document.getElementById("testSubject");
 const testDateInput = document.getElementById("testDate");
 const testTypeInput = document.getElementById("testType");
 const testDurationInput = document.getElementById("testDuration");
+const testScoreInput = document.getElementById("testScore");
+const testScoreGroup = testScoreInput ? testScoreInput.closest(".test-form-group") : null;
 const testDescriptionInput = document.getElementById("testDescription");
-
 const testFocusAreaInput = document.getElementById("testFocusArea");
 const testTipInput = document.getElementById("testTip");
 
@@ -56,27 +57,59 @@ function closeTestModal() {
 
 function setAddTestMode() {
     editingTestId = null;
-    if (testModalTitle) testModalTitle.textContent = "Add Test";
-    if (testSaveBtn) testSaveBtn.textContent = "Save Test";
+
+    if (testModalTitle) {
+        testModalTitle.textContent = "Add Test";
+    }
+
+    if (testSaveBtn) {
+        testSaveBtn.textContent = "Save Test";
+    }
 }
 
 function setEditTestMode() {
-    if (testModalTitle) testModalTitle.textContent = "Edit Test";
-    if (testSaveBtn) testSaveBtn.textContent = "Update Test";
+    if (testModalTitle) {
+        testModalTitle.textContent = "Edit Test";
+    }
+
+    if (testSaveBtn) {
+        testSaveBtn.textContent = "Update Test";
+    }
 }
 
 function resetTestForm() {
     if (!testModalForm) return;
+
     testModalForm.reset();
 
     if (testTypeInput) {
         testTypeInput.value = "Upcoming";
     }
+
+    if (testScoreInput) {
+        testScoreInput.value = "";
+    }
+    updateScoreFieldVisibility();
+    
 }
 
 function clearTestModalState() {
     resetTestForm();
     setAddTestMode();
+}
+function updateScoreFieldVisibility() {
+    if (!testTypeInput || !testScoreGroup || !testScoreInput) return;
+
+    const isCompleted = normalizeTestType(testTypeInput.value) === "Completed";
+
+    if (isCompleted) {
+        testScoreGroup.style.display = "";
+        testScoreInput.disabled = false;
+    } else {
+        testScoreGroup.style.display = "none";
+        testScoreInput.disabled = true;
+        testScoreInput.value = "";
+    }
 }
 
 function normalizeTestType(typeText) {
@@ -96,7 +129,7 @@ function getTestBadgeClass(type) {
     if (value === "upcoming") return "upcoming";
     if (value === "this week") return "week";
     if (value === "mock test" || value === "mock tests") return "mock";
-    if (value === "completed") return "upcoming";
+    if (value === "completed") return "completed";
 
     return "upcoming";
 }
@@ -171,7 +204,21 @@ function mapBackendTestToFrontend(test) {
     };
 }
 
-function buildBackendPayload(testData, existingTest = null) {
+function normalizeScoreValue(rawValue) {
+    if (rawValue === null || rawValue === undefined || rawValue === "") {
+        return null;
+    }
+
+    const numericValue = Number(rawValue);
+
+    if (!Number.isFinite(numericValue)) {
+        return null;
+    }
+
+    return Math.max(0, Math.min(100, Math.round(numericValue)));
+}
+
+function buildBackendPayload(testData) {
     return {
         title: testData.title,
         subject: testData.subject,
@@ -179,7 +226,7 @@ function buildBackendPayload(testData, existingTest = null) {
         testType: normalizeTestType(testData.type),
         duration: testData.duration,
         description: testData.description,
-        score: existingTest?.score ?? null,
+        score: normalizeScoreValue(testData.score),
         focusArea: testData.focusArea || null,
         testTip: testData.testTip || null
     };
@@ -311,7 +358,15 @@ function renderRecentResults() {
     if (!resultList) return;
 
     const completedTests = [...allTests]
-        .filter((test) => normalizeTestType(test.type) === "Completed")
+        .filter((test) => {
+            const isCompleted = normalizeTestType(test.type) === "Completed";
+            const hasValidScore =
+                test.score !== null &&
+                test.score !== undefined &&
+                !Number.isNaN(Number(test.score));
+
+            return isCompleted && hasValidScore;
+        })
         .sort((a, b) => {
             const aTime = a.date ? new Date(a.date).getTime() : 0;
             const bTime = b.date ? new Date(b.date).getTime() : 0;
@@ -325,12 +380,7 @@ function renderRecentResults() {
     }
 
     resultList.innerHTML = completedTests.map((test) => {
-        const scoreText =
-            test.score !== null &&
-            test.score !== undefined &&
-            !Number.isNaN(Number(test.score))
-                ? `${Math.round(Number(test.score))}%`
-                : "--%";
+        const scoreText = `${Math.round(Number(test.score))}%`;
 
         const completedDateText = test.date
             ? `Completed on ${formatShortDate(test.date)}`
@@ -347,7 +397,6 @@ function renderRecentResults() {
         `;
     }).join("");
 }
-
 function renderFocusAreas() {
     if (!focusAreaList) return;
 
@@ -443,14 +492,12 @@ async function addTest(testData) {
 }
 
 async function updateTest(testId, testData) {
-    const existingTest = allTests.find((test) => String(test.id) === String(testId)) || null;
-
     await fetchJson(`${TESTS_API_URL}/${testId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(buildBackendPayload(testData, existingTest))
+        body: JSON.stringify(buildBackendPayload(testData))
     });
 
     await loadTests();
@@ -539,6 +586,13 @@ function fillTestFormForEdit(testItem) {
         testDurationInput.value = testItem.dataset.duration || "";
     }
 
+    if (testScoreInput) {
+        testScoreInput.value =
+            testData?.score !== null && testData?.score !== undefined
+                ? String(testData.score)
+                : "";
+    }
+
     if (testDescriptionInput) {
         testDescriptionInput.value = testItem.dataset.description || "";
     }
@@ -550,6 +604,7 @@ function fillTestFormForEdit(testItem) {
     if (testTipInput) {
         testTipInput.value = testData?.testTip || "";
     }
+    updateScoreFieldVisibility();
 }
 
 function extractSubjectName(subjectItem) {
@@ -613,11 +668,12 @@ async function handleFormSubmit(event) {
     const subject = testSubjectInput ? testSubjectInput.value : "";
     const date = testDateInput ? testDateInput.value : "";
     const type = testTypeInput ? testTypeInput.value : "Upcoming";
+    const normalizedType = normalizeTestType(type);
     const duration = testDurationInput ? testDurationInput.value.trim() : "";
+    const scoreRaw = testScoreInput ? testScoreInput.value.trim() : "";
     const description = testDescriptionInput
         ? (testDescriptionInput.value.trim() || "Scheduled test for practice and performance review.")
         : "Scheduled test for practice and performance review.";
-
     const focusArea = testFocusAreaInput ? testFocusAreaInput.value.trim() : "";
     const testTip = testTipInput ? testTipInput.value.trim() : "";
 
@@ -631,12 +687,27 @@ async function handleFormSubmit(event) {
         return;
     }
 
+    if (normalizedType === "Completed" && scoreRaw === "") {
+    alert("Please enter score for a completed test.");
+    return;
+}
+
+if (scoreRaw !== "") {
+    const numericScore = Number(scoreRaw);
+
+    if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 100) {
+        alert("Please enter a valid score between 0 and 100.");
+        return;
+    }
+}
+
     const testData = {
         title,
         subject,
         date,
         type,
         duration,
+    score: normalizedType === "Completed" ? Number(scoreRaw) : null,
         description,
         focusArea,
         testTip
@@ -748,6 +819,9 @@ function initializeTestsPage() {
 
     testModalForm.addEventListener("submit", handleFormSubmit);
     testList.addEventListener("click", handleTestListClick);
+    if (testTypeInput) {
+    testTypeInput.addEventListener("change", updateScoreFieldVisibility);
+}
 
     if (testSearchInput) {
         testSearchInput.addEventListener("input", applyTestFilters);
@@ -759,6 +833,7 @@ function initializeTestsPage() {
 
     setAddTestMode();
     loadSubjectOptions();
+    updateScoreFieldVisibility();
     loadTests();
 }
 
