@@ -177,73 +177,10 @@
                               </div>
 
                               <div class="revision-topic-list" id="revisionTopicList">
-                                   <div class="revision-topic-item">
-                                        <div class="revision-topic-info">
-                                             <h4>Java OOP Concepts</h4>
-                                             <p>Subject: Java Programming • Classes, Objects, Inheritance</p>
-                                        </div>
-                                        <span class="revision-topic-badge weak">Weak Topic</span>
-                                        <div class="revision-topic-actions">
-                                             <button class="revision-topic-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="revision-topic-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
                                    <div class="revision-empty-state hidden" id="revisionEmptyState">
                                         <i class="fa-regular fa-folder-open"></i>
                                         <h3>No revision topics found</h3>
                                         <p>Try changing your search text or filter option.</p>
-                                   </div>
-
-                                   <div class="revision-topic-item">
-                                        <div class="revision-topic-info">
-                                             <h4>Normalization & SQL Joins</h4>
-                                             <p>Subject: DBMS • Due today for revision</p>
-                                        </div>
-                                        <span class="revision-topic-badge pending">Pending</span>
-                                        <div class="revision-topic-actions">
-                                             <button class="revision-topic-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="revision-topic-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
-
-                                   <div class="revision-topic-item">
-                                        <div class="revision-topic-info">
-                                             <h4>OSI Model</h4>
-                                             <p>Subject: Computer Networks • Layer-wise concepts</p>
-                                        </div>
-                                        <span class="revision-topic-badge done">Completed</span>
-                                        <div class="revision-topic-actions">
-                                             <button class="revision-topic-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="revision-topic-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
-
-                                   <div class="revision-topic-item">
-                                        <div class="revision-topic-info">
-                                             <h4>CPU Scheduling</h4>
-                                             <p>Subject: Operating System • Algorithms and comparison</p>
-                                        </div>
-                                        <span class="revision-topic-badge pending">Pending</span>
-                                        <div class="revision-topic-actions">
-                                             <button class="revision-topic-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="revision-topic-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
                                    </div>
                               </div>
                          </div>
@@ -254,30 +191,12 @@
                                    <p>Your next revision sessions and priorities.</p>
                               </div>
 
-                              <div class="revision-schedule-list">
-                                   <div class="revision-schedule-item">
-                                        <div class="revision-schedule-time">10:00 AM</div>
-                                        <div class="revision-schedule-info">
-                                             <h4>DBMS Quick Review</h4>
-                                             <p>Normalization and joins practice</p>
-                                        </div>
-                                   </div>
+                              <div class="revision-schedule-list" id="revisionScheduleList"></div>
 
-                                   <div class="revision-schedule-item">
-                                        <div class="revision-schedule-time">02:00 PM</div>
-                                        <div class="revision-schedule-info">
-                                             <h4>Java Revision Test</h4>
-                                             <p>OOP and exception handling recap</p>
-                                        </div>
-                                   </div>
-
-                                   <div class="revision-schedule-item">
-                                        <div class="revision-schedule-time">07:00 PM</div>
-                                        <div class="revision-schedule-info">
-                                             <h4>OS Formula Sheet Review</h4>
-                                             <p>Scheduling and deadlock points</p>
-                                        </div>
-                                   </div>
+                              <div class="revision-empty-state hidden" id="revisionScheduleEmptyState">
+                                   <i class="fa-regular fa-calendar-xmark"></i>
+                                   <h3>No upcoming revision schedule</h3>
+                                   <p>Add revision topics with dates to see upcoming schedule here.</p>
                               </div>
                          </div>
                     </div>
@@ -289,19 +208,12 @@
                                    <p>Topics that need more revision and attention.</p>
                               </div>
 
-                              <div class="weak-area-list">
-                                   <div class="weak-area-item">
-                                        <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>Java inheritance and polymorphism</span>
-                                   </div>
-                                   <div class="weak-area-item">
-                                        <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>DBMS normalization rules</span>
-                                   </div>
-                                   <div class="weak-area-item">
-                                        <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>OSI model layer functions</span>
-                                   </div>
+                              <div class="weak-area-list" id="weakAreaList"></div>
+
+                              <div class="revision-empty-state hidden" id="weakAreaEmptyState">
+                                   <i class="fa-regular fa-face-smile"></i>
+                                   <h3>No weak areas right now</h3>
+                                   <p>Weak topics will appear here automatically.</p>
                               </div>
                          </div>
 
@@ -311,23 +223,12 @@
                                    <p>Improve your retention with simple revision methods.</p>
                               </div>
 
-                              <div class="revision-tip-list">
-                                   <div class="revision-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Revise weak topics first when your focus is highest.</span>
-                                   </div>
-                                   <div class="revision-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Use short notes for quick daily recap.</span>
-                                   </div>
-                                   <div class="revision-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Practice one revision test after every two sessions.</span>
-                                   </div>
-                                   <div class="revision-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Repeat difficult topics at spaced intervals.</span>
-                                   </div>
+                              <div class="revision-tip-list" id="revisionTipList"></div>
+
+                              <div class="revision-empty-state hidden" id="revisionTipEmptyState">
+                                   <i class="fa-regular fa-lightbulb"></i>
+                                   <h3>No revision tips available</h3>
+                                   <p>Tips will be generated based on your current revision data.</p>
                               </div>
                          </div>
                     </div>
@@ -356,20 +257,16 @@
                                    <div class="revision-form-group">
                                         <label for="revisionSubject">Subject</label>
                                         <select id="revisionSubject">
-                                             <option>Java Programming</option>
-                                             <option>DBMS</option>
-                                             <option>Computer Networks</option>
-                                             <option>Operating System</option>
-                                             <option>Aptitude</option>
+                                             <option value="">Select Subject</option>
                                         </select>
                                    </div>
 
                                    <div class="revision-form-group">
                                         <label for="revisionPriority">Priority</label>
                                         <select id="revisionPriority">
-                                             <option>Weak Topic</option>
-                                             <option>Pending</option>
-                                             <option>Completed</option>
+                                             <option value="Weak Topic">Weak Topic</option>
+                                             <option value="Pending">Pending</option>
+                                             <option value="Completed">Completed</option>
                                         </select>
                                    </div>
 
@@ -381,9 +278,9 @@
                                    <div class="revision-form-group">
                                         <label for="revisionStatus">Status</label>
                                         <select id="revisionStatus">
-                                             <option>Pending</option>
-                                             <option>Completed</option>
-                                             <option>Weak Topic</option>
+                                             <option value="Pending">Pending</option>
+                                             <option value="Completed">Completed</option>
+                                             <option value="Weak Topic">Weak Topic</option>
                                         </select>
                                    </div>
 

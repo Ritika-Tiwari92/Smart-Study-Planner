@@ -14,8 +14,17 @@ const revisionFilterSelect = document.getElementById("revisionFilterSelect");
 
 const totalRevisionCount = document.getElementById("totalRevisionCount");
 const revisionDueTodayCount = document.getElementById("revisionDueTodayCount");
-const revisionCompletedCount = document.getElementById("revisionCompletedCount");
+const revisionCompletedTodayCount = document.getElementById("revisionCompletedTodayCount");
 const revisionProgressCount = document.getElementById("revisionProgressCount");
+
+const revisionScheduleList = document.getElementById("revisionScheduleList");
+const revisionScheduleEmptyState = document.getElementById("revisionScheduleEmptyState");
+
+const weakAreaList = document.getElementById("weakAreaList");
+const weakAreaEmptyState = document.getElementById("weakAreaEmptyState");
+
+const revisionTipList = document.getElementById("revisionTipList");
+const revisionTipEmptyState = document.getElementById("revisionTipEmptyState");
 
 const revisionTopicTitleInput = document.getElementById("revisionTopicTitle");
 const revisionSubjectInput = document.getElementById("revisionSubject");
@@ -24,9 +33,12 @@ const revisionDateInput = document.getElementById("revisionDate");
 const revisionStatusInput = document.getElementById("revisionStatus");
 const revisionDescriptionInput = document.getElementById("revisionDescription");
 
-const REVISION_STORAGE_KEY = "edumind_revision_topics";
+const REVISION_API_URL = "/api/revisions";
+const SUBJECTS_API_URL = "/subjects";
 
 let editingRevisionId = null;
+let allRevisionTopics = [];
+let allSubjects = [];
 
 function openRevisionModal() {
     if (!revisionModalOverlay) return;
@@ -54,9 +66,11 @@ function setEditRevisionMode() {
 function resetRevisionForm() {
     if (!revisionModalForm) return;
     revisionModalForm.reset();
+
     if (revisionPriorityInput) {
         revisionPriorityInput.value = "Weak Topic";
     }
+
     if (revisionStatusInput) {
         revisionStatusInput.value = "Pending";
     }
@@ -67,48 +81,115 @@ function clearRevisionModalState() {
     setAddRevisionMode();
 }
 
-function generateRevisionId() {
-    return `revision_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
 function getTodayString() {
     return new Date().toISOString().split("T")[0];
 }
 
-function getRevisionBadgeClass(statusOrPriority) {
-    const value = (statusOrPriority || "").toLowerCase();
+function getTomorrowString() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+}
 
-    if (value === "completed") return "done";
-    if (value === "pending") return "pending";
-    if (value === "weak topic") return "weak";
+function normalizeRevisionTopic(topic) {
+    return {
+        id: topic?.id ?? null,
+        title: String(topic?.title || "").trim(),
+        subject: String(topic?.subject || "").trim(),
+        priority: String(topic?.priority || "Pending").trim(),
+        date: String(topic?.date || topic?.revisionDate || "").trim(),
+        status: String(topic?.status || "Pending").trim(),
+        description: String(topic?.description || "").trim()
+    };
+}
 
+function convertToRequestBody(topic) {
+    const normalized = normalizeRevisionTopic(topic);
+
+    return {
+        title: normalized.title,
+        subject: normalized.subject,
+        priority: normalized.priority,
+        revisionDate: normalized.date,
+        status: normalized.status,
+        description: normalized.description
+    };
+}
+
+function isCompletedTopic(topic) {
+    const status = (topic?.status || "").toLowerCase();
+    const priority = (topic?.priority || "").toLowerCase();
+    return status === "completed" || priority === "completed";
+}
+
+function isWeakTopic(topic) {
+    const status = (topic?.status || "").toLowerCase();
+    const priority = (topic?.priority || "").toLowerCase();
+    return status === "weak topic" || priority === "weak topic";
+}
+
+function isPendingTopic(topic) {
+    return !isCompletedTopic(topic) && !isWeakTopic(topic);
+}
+
+function getEffectiveBadgeText(topic) {
+    if (isCompletedTopic(topic)) return "Completed";
+    if (isWeakTopic(topic)) return "Weak Topic";
+    return "Pending";
+}
+
+function getRevisionBadgeClass(topic) {
+    if (isCompletedTopic(topic)) return "done";
+    if (isWeakTopic(topic)) return "weak";
     return "pending";
 }
 
-function updateRevisionCounts() {
-    if (!revisionTopicList) return;
+function formatDateLabel(dateString) {
+    if (!dateString) return "No Date";
 
-    const topicItems = revisionTopicList.querySelectorAll(".revision-topic-item");
-    const topicBadges = revisionTopicList.querySelectorAll(".revision-topic-badge");
+    if (dateString === getTodayString()) return "Today";
+    if (dateString === getTomorrowString()) return "Tomorrow";
 
-    const totalTopics = topicItems.length;
-    let dueToday = 0;
-    let completed = 0;
+    const parsedDate = new Date(dateString);
+    if (Number.isNaN(parsedDate.getTime())) return dateString;
 
-    topicItems.forEach((item) => {
-        const dateValue = item.dataset.date || "";
-        if (dateValue === getTodayString()) {
-            dueToday++;
-        }
+    return parsedDate.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short"
     });
+}
 
-    topicBadges.forEach((badge) => {
-        if (badge.classList.contains("done")) {
-            completed++;
-        }
-    });
+function resetDynamicContainer(container, emptyState) {
+    if (!container) return;
+    container.innerHTML = "";
 
-    const progress = totalTopics > 0 ? Math.round((completed / totalTopics) * 100) : 0;
+    if (emptyState) {
+        emptyState.classList.add("hidden");
+        container.appendChild(emptyState);
+    }
+}
+
+function showEmptyState(emptyState, shouldShow) {
+    if (!emptyState) return;
+
+    if (shouldShow) {
+        emptyState.classList.remove("hidden");
+    } else {
+        emptyState.classList.add("hidden");
+    }
+}
+
+function updateRevisionCounts(topics = allRevisionTopics) {
+    const today = getTodayString();
+
+    const totalTopics = topics.length;
+    const dueToday = topics.filter((topic) => topic.date === today).length;
+    const completedToday = topics.filter(
+        (topic) => topic.date === today && isCompletedTopic(topic)
+    ).length;
+    const totalCompleted = topics.filter((topic) => isCompletedTopic(topic)).length;
+
+    const progress = totalTopics > 0 ? Math.round((totalCompleted / totalTopics) * 100) : 0;
 
     if (totalRevisionCount) {
         totalRevisionCount.textContent = String(totalTopics).padStart(2, "0");
@@ -118,8 +199,8 @@ function updateRevisionCounts() {
         revisionDueTodayCount.textContent = String(dueToday).padStart(2, "0");
     }
 
-    if (revisionCompletedCount) {
-        revisionCompletedCount.textContent = String(completed).padStart(2, "0");
+    if (revisionCompletedTodayCount) {
+        revisionCompletedTodayCount.textContent = String(completedToday).padStart(2, "0");
     }
 
     if (revisionProgressCount) {
@@ -127,32 +208,37 @@ function updateRevisionCounts() {
     }
 }
 
-function createRevisionTopicItem({ id, title, subject, priority, date, status, description }) {
+function createRevisionTopicItem(topicData) {
+    const topic = normalizeRevisionTopic(topicData);
+
     const topicItem = document.createElement("div");
     topicItem.className = "revision-topic-item";
-    topicItem.dataset.revisionId = id;
-    topicItem.dataset.date = date || "";
-    topicItem.dataset.subject = subject || "";
-    topicItem.dataset.priority = priority || "";
-    topicItem.dataset.status = status || "Pending";
-    topicItem.dataset.description = description || "";
+    topicItem.dataset.revisionId = topic.id;
+    topicItem.dataset.date = topic.date;
+    topicItem.dataset.subject = topic.subject;
+    topicItem.dataset.priority = topic.priority;
+    topicItem.dataset.status = topic.status;
+    topicItem.dataset.description = topic.description;
 
-    const badgeClass = getRevisionBadgeClass(status === "Completed" ? status : priority);
+    const badgeClass = getRevisionBadgeClass(topic);
+    const badgeText = getEffectiveBadgeText(topic);
 
-    let subText = `Subject: ${subject}`;
-    if (description) {
-        subText += ` • ${description}`;
+    let subText = `Subject: ${topic.subject || "No Subject"}`;
+
+    if (topic.description) {
+        subText += ` • ${topic.description}`;
     }
-    if (date) {
-        subText += ` • Revision date: ${date}`;
+
+    if (topic.date) {
+        subText += ` • Revision date: ${topic.date}`;
     }
 
     topicItem.innerHTML = `
         <div class="revision-topic-info">
-            <h4>${title}</h4>
+            <h4>${topic.title || "Untitled Topic"}</h4>
             <p>${subText}</p>
         </div>
-        <span class="revision-topic-badge ${badgeClass}">${status === "Completed" ? "Completed" : priority}</span>
+        <span class="revision-topic-badge ${badgeClass}">${badgeText}</span>
         <div class="revision-topic-actions">
             <button class="revision-topic-action-btn edit" title="Edit">
                 <i class="fa-solid fa-pen"></i>
@@ -167,142 +253,351 @@ function createRevisionTopicItem({ id, title, subject, priority, date, status, d
 }
 
 function renderRevisionTopics(topics) {
-    revisionTopicList.innerHTML = "";
+    if (!revisionTopicList) return;
+
+    resetDynamicContainer(revisionTopicList, revisionEmptyState);
+
     topics.forEach((topic) => {
         const topicItem = createRevisionTopicItem(topic);
-        revisionTopicList.appendChild(topicItem);
+
+        if (revisionEmptyState) {
+            revisionTopicList.insertBefore(topicItem, revisionEmptyState);
+        } else {
+            revisionTopicList.appendChild(topicItem);
+        }
     });
-    updateRevisionCounts();
+
     applyRevisionFilters();
+    updateRevisionCounts(allRevisionTopics);
 }
 
-function getRevisionTopicsFromStorage() {
-    const saved = localStorage.getItem(REVISION_STORAGE_KEY);
-    if (!saved) return null;
+function createRevisionScheduleItem(topic) {
+    const item = document.createElement("div");
+    item.className = "revision-schedule-item";
 
-    try {
-        return JSON.parse(saved);
-    } catch (error) {
-        console.error("Failed to parse revision topics from localStorage:", error);
-        return null;
+    const detailTextParts = [];
+
+    if (topic.subject) {
+        detailTextParts.push(topic.subject);
     }
+
+    if (topic.description) {
+        detailTextParts.push(topic.description);
+    } else {
+        detailTextParts.push(getEffectiveBadgeText(topic));
+    }
+
+    item.innerHTML = `
+        <div class="revision-schedule-time">${formatDateLabel(topic.date)}</div>
+        <div class="revision-schedule-info">
+            <h4>${topic.title || "Untitled Topic"}</h4>
+            <p>${detailTextParts.join(" • ")}</p>
+        </div>
+    `;
+
+    return item;
 }
 
-function saveRevisionTopicsToStorage(topics) {
-    localStorage.setItem(REVISION_STORAGE_KEY, JSON.stringify(topics));
+function renderRevisionSchedule(topics = allRevisionTopics) {
+    if (!revisionScheduleList) return;
+
+    resetDynamicContainer(revisionScheduleList, revisionScheduleEmptyState);
+
+    const scheduleTopics = [...topics]
+        .filter((topic) => topic.date && !isCompletedTopic(topic))
+        .sort((a, b) => (a.date || "").localeCompare(b.date || ""))
+        .slice(0, 5);
+
+    scheduleTopics.forEach((topic) => {
+        const item = createRevisionScheduleItem(topic);
+
+        if (revisionScheduleEmptyState) {
+            revisionScheduleList.insertBefore(item, revisionScheduleEmptyState);
+        } else {
+            revisionScheduleList.appendChild(item);
+        }
+    });
+
+    showEmptyState(revisionScheduleEmptyState, scheduleTopics.length === 0);
 }
 
-function extractTopicsFromDOM() {
-    const topicItems = revisionTopicList.querySelectorAll(".revision-topic-item");
-    const topics = [];
+function createWeakAreaItem(topic) {
+    const item = document.createElement("div");
+    item.className = "weak-area-item";
 
-    topicItems.forEach((topicItem) => {
-        const title = topicItem.querySelector(".revision-topic-info h4")?.textContent.trim() || "";
-        const fullText = topicItem.querySelector(".revision-topic-info p")?.textContent.trim() || "";
-        const badgeText = topicItem.querySelector(".revision-topic-badge")?.textContent.trim() || "Pending";
+    const subjectText = topic.subject ? ` • ${topic.subject}` : "";
 
-        let subject = "";
-        let description = "";
-        let date = "";
+    item.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>${topic.title || "Untitled Topic"}${subjectText}</span>
+    `;
 
-        const parts = fullText.split("•").map((part) => part.trim()).filter(Boolean);
+    return item;
+}
 
-        if (parts.length > 0 && parts[0].startsWith("Subject:")) {
-            subject = parts[0].replace("Subject:", "").trim();
+function renderWeakAreas(topics = allRevisionTopics) {
+    if (!weakAreaList) return;
+
+    resetDynamicContainer(weakAreaList, weakAreaEmptyState);
+
+    const weakTopics = topics.filter((topic) => isWeakTopic(topic)).slice(0, 6);
+
+    weakTopics.forEach((topic) => {
+        const item = createWeakAreaItem(topic);
+
+        if (weakAreaEmptyState) {
+            weakAreaList.insertBefore(item, weakAreaEmptyState);
+        } else {
+            weakAreaList.appendChild(item);
+        }
+    });
+
+    showEmptyState(weakAreaEmptyState, weakTopics.length === 0);
+}
+
+function generateDynamicRevisionTips(topics = allRevisionTopics) {
+    const tips = [];
+    const totalTopics = topics.length;
+    const weakTopics = topics.filter((topic) => isWeakTopic(topic));
+    const dueTodayTopics = topics.filter((topic) => topic.date === getTodayString());
+    const completedTopics = topics.filter((topic) => isCompletedTopic(topic));
+    const pendingTopics = topics.filter((topic) => isPendingTopic(topic));
+
+    const uniqueSubjects = [...new Set(
+        topics
+            .map((topic) => topic.subject)
+            .filter((subject) => subject && subject.trim())
+    )];
+
+    if (weakTopics.length > 0) {
+        tips.push(`You have ${weakTopics.length} weak topic(s). Revise them first while your focus is highest.`);
+    }
+
+    if (dueTodayTopics.length > 0) {
+        tips.push(`You have ${dueTodayTopics.length} revision topic(s) due today. Finish today's list before adding new topics.`);
+    }
+
+    if (pendingTopics.length > 0) {
+        tips.push(`There are ${pendingTopics.length} pending revision topic(s). Try closing at least one pending topic in each session.`);
+    }
+
+    if (completedTopics.length > 0 && totalTopics > 0) {
+        const progress = Math.round((completedTopics.length / totalTopics) * 100);
+        tips.push(`Your current revision progress is ${progress}%. Keep consistency to improve retention.`);
+    }
+
+    if (uniqueSubjects.length >= 2) {
+        tips.push(`You are revising ${uniqueSubjects.length} subjects. Alternate tough and easy subjects to avoid mental fatigue.`);
+    }
+
+    if (totalTopics >= 5) {
+        tips.push("Break long revision into short sessions of 25 to 30 minutes for better recall.");
+    }
+
+    if (tips.length === 0) {
+        tips.push("Add revision topics with dates and status to get personalized revision tips here.");
+    }
+
+    return tips.slice(0, 4);
+}
+
+function createRevisionTipItem(text) {
+    const item = document.createElement("div");
+    item.className = "revision-tip-item";
+
+    item.innerHTML = `
+        <i class="fa-solid fa-circle-check"></i>
+        <span>${text}</span>
+    `;
+
+    return item;
+}
+
+function renderRevisionTips(topics = allRevisionTopics) {
+    if (!revisionTipList) return;
+
+    resetDynamicContainer(revisionTipList, revisionTipEmptyState);
+
+    const tips = generateDynamicRevisionTips(topics);
+
+    tips.forEach((tip) => {
+        const item = createRevisionTipItem(tip);
+
+        if (revisionTipEmptyState) {
+            revisionTipList.insertBefore(item, revisionTipEmptyState);
+        } else {
+            revisionTipList.appendChild(item);
+        }
+    });
+
+    showEmptyState(revisionTipEmptyState, tips.length === 0);
+}
+
+function renderAllRealtimeSections(topics = allRevisionTopics) {
+    renderRevisionTopics(topics);
+    renderRevisionSchedule(topics);
+    renderWeakAreas(topics);
+    renderRevisionTips(topics);
+    updateRevisionCounts(topics);
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        ...options
+    });
+
+    if (!response.ok) {
+        let errorMessage = "Request failed.";
+
+        try {
+            const errorText = await response.text();
+            if (errorText) {
+                errorMessage = errorText;
+            }
+        } catch (error) {
+            console.error("Failed to read error response:", error);
         }
 
-        parts.slice(1).forEach((part) => {
-            if (part.startsWith("Revision date:")) {
-                date = part.replace("Revision date:", "").trim();
-            } else {
-                description = description ? `${description} • ${part}` : part;
-            }
-        });
-
-        const status = badgeText === "Completed" ? "Completed" : "Pending";
-        const priority = badgeText === "Completed" ? "Pending" : badgeText;
-
-        topics.push({
-            id: generateRevisionId(),
-            title,
-            subject,
-            priority,
-            date,
-            status,
-            description
-        });
-    });
-
-    return topics;
-}
-
-function loadRevisionTopics() {
-    const storedTopics = getRevisionTopicsFromStorage();
-
-    if (storedTopics && Array.isArray(storedTopics)) {
-        renderRevisionTopics(storedTopics);
-        return;
+        throw new Error(errorMessage);
     }
 
-    const initialTopics = extractTopicsFromDOM();
-    saveRevisionTopicsToStorage(initialTopics);
-    renderRevisionTopics(initialTopics);
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return response.text();
 }
 
-function getCurrentRevisionTopics() {
-    return getRevisionTopicsFromStorage() || [];
+async function fetchAllRevisionTopics() {
+    const data = await apiRequest(REVISION_API_URL, {
+        method: "GET"
+    });
+
+    return Array.isArray(data) ? data.map(normalizeRevisionTopic) : [];
 }
 
-function addRevisionTopic(topicData) {
-    const topics = getCurrentRevisionTopics();
-    const newTopic = {
-        id: generateRevisionId(),
-        ...topicData
-    };
+async function createRevisionTopicApi(topicData) {
+    const createdTopic = await apiRequest(REVISION_API_URL, {
+        method: "POST",
+        body: JSON.stringify(convertToRequestBody(topicData))
+    });
 
-    topics.unshift(newTopic);
-    saveRevisionTopicsToStorage(topics);
-    renderRevisionTopics(topics);
+    return normalizeRevisionTopic(createdTopic);
 }
 
-function updateRevisionTopic(topicId, updatedData) {
-    const topics = getCurrentRevisionTopics().map((topic) =>
-        topic.id === topicId ? { ...topic, ...updatedData } : topic
-    );
+async function updateRevisionTopicApi(topicId, topicData) {
+    const updatedTopic = await apiRequest(`${REVISION_API_URL}/${topicId}`, {
+        method: "PUT",
+        body: JSON.stringify(convertToRequestBody(topicData))
+    });
 
-    saveRevisionTopicsToStorage(topics);
-    renderRevisionTopics(topics);
+    return normalizeRevisionTopic(updatedTopic);
 }
 
-function deleteRevisionTopic(topicId) {
-    const topics = getCurrentRevisionTopics().filter((topic) => topic.id !== topicId);
-    saveRevisionTopicsToStorage(topics);
-    renderRevisionTopics(topics);
+async function deleteRevisionTopicApi(topicId) {
+    await apiRequest(`${REVISION_API_URL}/${topicId}`, {
+        method: "DELETE"
+    });
+}
+
+function extractSubjectName(subject) {
+    if (typeof subject === "string" && subject.trim()) {
+        return subject.trim();
+    }
+
+    const possibleKeys = [
+        "name",
+        "subjectName",
+        "title",
+        "subject",
+        "subjectTitle"
+    ];
+
+    for (const key of possibleKeys) {
+        const value = subject?.[key];
+        if (typeof value === "string" && value.trim()) {
+            return value.trim();
+        }
+    }
+
+    return "";
+}
+
+function populateSubjectDropdown(subjects, selectedValue = "") {
+    if (!revisionSubjectInput) return;
+
+    const currentValue = selectedValue || revisionSubjectInput.value || "";
+    const subjectNames = [...new Set(
+        (subjects || [])
+            .map(extractSubjectName)
+            .filter((name) => name && name.trim())
+    )];
+
+    revisionSubjectInput.innerHTML = "";
+
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select Subject";
+    revisionSubjectInput.appendChild(placeholderOption);
+
+    subjectNames.forEach((subjectName) => {
+        const option = document.createElement("option");
+        option.value = subjectName;
+        option.textContent = subjectName;
+        revisionSubjectInput.appendChild(option);
+    });
+
+    if (currentValue && !subjectNames.includes(currentValue)) {
+        const customOption = document.createElement("option");
+        customOption.value = currentValue;
+        customOption.textContent = currentValue;
+        revisionSubjectInput.appendChild(customOption);
+    }
+
+    revisionSubjectInput.value = currentValue || "";
+}
+
+async function loadRevisionSubjects(selectedValue = "") {
+    try {
+        const data = await apiRequest(SUBJECTS_API_URL, {
+            method: "GET"
+        });
+
+        allSubjects = Array.isArray(data) ? data : [];
+        populateSubjectDropdown(allSubjects, selectedValue);
+    } catch (error) {
+        console.error("Failed to load subjects:", error);
+        populateSubjectDropdown([], selectedValue);
+    }
 }
 
 function matchesRevisionFilter(topicItem, filterValue) {
     if (!filterValue || filterValue === "All Topics") return true;
 
-    const dateValue = topicItem.dataset.date || "";
-    const status = (topicItem.dataset.status || "").toLowerCase();
-    const priority = (topicItem.dataset.priority || "").toLowerCase();
+    const topic = {
+        date: topicItem.dataset.date || "",
+        status: topicItem.dataset.status || "",
+        priority: topicItem.dataset.priority || ""
+    };
 
-    if (filterValue === "Due Today") return dateValue === getTodayString();
-    if (filterValue === "Completed") return status === "completed";
-    if (filterValue === "Pending") return status === "pending";
-    if (filterValue === "Weak Topics") return priority === "weak topic";
+    if (filterValue === "Due Today") return topic.date === getTodayString();
+    if (filterValue === "Completed") return isCompletedTopic(topic);
+    if (filterValue === "Pending") return isPendingTopic(topic);
+    if (filterValue === "Weak Topics") return isWeakTopic(topic);
 
     return true;
 }
 
 function updateRevisionEmptyState(visibleCount) {
-    if (!revisionEmptyState) return;
-
-    if (visibleCount === 0) {
-        revisionEmptyState.classList.remove("hidden");
-    } else {
-        revisionEmptyState.classList.add("hidden");
-    }
+    showEmptyState(revisionEmptyState, visibleCount === 0);
 }
 
 function applyRevisionFilters() {
@@ -343,11 +638,24 @@ function fillRevisionFormForEdit(topicItem) {
     const description = topicItem.dataset.description || "";
 
     revisionTopicTitleInput.value = title;
-    revisionSubjectInput.value = subject;
     revisionPriorityInput.value = priority;
     revisionDateInput.value = date;
     revisionStatusInput.value = status;
     revisionDescriptionInput.value = description;
+
+    populateSubjectDropdown(allSubjects, subject);
+}
+
+async function loadRevisionTopics() {
+    try {
+        allRevisionTopics = await fetchAllRevisionTopics();
+        renderAllRealtimeSections(allRevisionTopics);
+    } catch (error) {
+        console.error("Failed to load revision topics:", error);
+        allRevisionTopics = [];
+        renderAllRealtimeSections([]);
+        alert("Revision data load nahi ho pa raha. Backend connection check karo.");
+    }
 }
 
 if (
@@ -358,8 +666,9 @@ if (
     revisionModalForm &&
     revisionTopicList
 ) {
-    openRevisionModalBtn.addEventListener("click", function () {
+    openRevisionModalBtn.addEventListener("click", async function () {
         clearRevisionModalState();
+        await loadRevisionSubjects();
         openRevisionModal();
     });
 
@@ -387,7 +696,7 @@ if (
         }
     });
 
-    revisionModalForm.addEventListener("submit", function (event) {
+    revisionModalForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const title = revisionTopicTitleInput.value.trim();
@@ -402,33 +711,46 @@ if (
             return;
         }
 
+        if (!subject) {
+            alert("Please select a subject.");
+            return;
+        }
+
         if (!date) {
             alert("Please select a revision date.");
             return;
         }
 
-        const finalDescription = description || "Scheduled revision topic for better retention.";
-
-        const revisionData = {
+        const revisionData = normalizeRevisionTopic({
             title,
             subject,
             priority,
             date,
             status,
-            description: finalDescription
-        };
+            description: description || "Scheduled revision topic for better retention."
+        });
 
-        if (editingRevisionId) {
-            updateRevisionTopic(editingRevisionId, revisionData);
-        } else {
-            addRevisionTopic(revisionData);
+        try {
+            revisionSaveBtn.disabled = true;
+
+            if (editingRevisionId) {
+                await updateRevisionTopicApi(editingRevisionId, revisionData);
+            } else {
+                await createRevisionTopicApi(revisionData);
+            }
+
+            await loadRevisionTopics();
+            closeRevisionModal();
+            clearRevisionModalState();
+        } catch (error) {
+            console.error("Failed to save revision topic:", error);
+            alert("Revision save/update nahi ho pa raha. Backend API check karo.");
+        } finally {
+            revisionSaveBtn.disabled = false;
         }
-
-        closeRevisionModal();
-        clearRevisionModalState();
     });
 
-    revisionTopicList.addEventListener("click", function (event) {
+    revisionTopicList.addEventListener("click", async function (event) {
         const deleteButton = event.target.closest(".revision-topic-action-btn.delete");
         const editButton = event.target.closest(".revision-topic-action-btn.edit");
 
@@ -441,7 +763,14 @@ if (
             const shouldDelete = confirm("Do you want to delete this revision topic?");
             if (!shouldDelete) return;
 
-            deleteRevisionTopic(topicId);
+            try {
+                await deleteRevisionTopicApi(topicId);
+                await loadRevisionTopics();
+            } catch (error) {
+                console.error("Failed to delete revision topic:", error);
+                alert("Revision delete nahi ho pa raha. Backend API check karo.");
+            }
+
             return;
         }
 
@@ -450,6 +779,7 @@ if (
             if (!topicItem) return;
 
             setEditRevisionMode();
+            await loadRevisionSubjects(topicItem.dataset.subject || "");
             fillRevisionFormForEdit(topicItem);
             openRevisionModal();
         }
@@ -463,6 +793,12 @@ if (
         revisionFilterSelect.addEventListener("change", applyRevisionFilters);
     }
 
-    loadRevisionTopics();
+    Promise.all([
+        loadRevisionSubjects(),
+        loadRevisionTopics()
+    ]).catch((error) => {
+        console.error("Initial load failed:", error);
+    });
+
     setAddRevisionMode();
 }
