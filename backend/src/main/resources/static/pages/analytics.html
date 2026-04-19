@@ -131,32 +131,27 @@
                <section class="analytics-content">
                     <div class="analytics-summary-grid">
                          <div class="analytics-summary-card">
-                              <h3>84%</h3>
+                              <h3 id="overallStudyProgressValue">0%</h3>
                               <p>Overall Study Progress</p>
                          </div>
 
                          <div class="analytics-summary-card">
-                              <h3>76%</h3>
+                              <h3 id="averageTestScoreValue">0%</h3>
                               <p>Average Test Score</p>
                          </div>
 
                          <div class="analytics-summary-card">
-                              <h3>21</h3>
+                              <h3 id="completedSessionsValue">0</h3>
                               <p>Completed Sessions</p>
                          </div>
 
                          <div class="analytics-summary-card">
-                              <h3>6 Days</h3>
+                              <h3 id="weeklyConsistencyValue">0 Days</h3>
                               <p>Weekly Consistency</p>
                          </div>
                     </div>
 
                     <div class="analytics-toolbar">
-                         <div class="analytics-search">
-                              <i class="fa-solid fa-magnifying-glass"></i>
-                              <input type="text" placeholder="Search analytics...">
-                         </div>
-
                          <div class="analytics-filter">
                               <i class="fa-solid fa-filter"></i>
                               <select>
@@ -176,7 +171,7 @@
                               </div>
 
                               <div class="chart-placeholder large">
-                                   <div class="chart-bars">
+                                   <div class="chart-bars" id="chartBars">
                                         <div class="chart-bar" style="height: 55%;"></div>
                                         <div class="chart-bar" style="height: 72%;"></div>
                                         <div class="chart-bar" style="height: 68%;"></div>
@@ -185,7 +180,7 @@
                                         <div class="chart-bar" style="height: 88%;"></div>
                                         <div class="chart-bar" style="height: 79%;"></div>
                                    </div>
-                                   <div class="chart-labels">
+                                   <div class="chart-labels" id="chartLabels">
                                         <span>Mon</span>
                                         <span>Tue</span>
                                         <span>Wed</span>
@@ -209,7 +204,7 @@
                                              <h4>Mock Tests</h4>
                                              <p>Average performance in practice tests</p>
                                         </div>
-                                        <span>79%</span>
+                                        <span id="mockTestsValue">0%</span>
                                    </div>
 
                                    <div class="score-stat-item">
@@ -217,7 +212,7 @@
                                              <h4>Revision Accuracy</h4>
                                              <p>Retention level after revision sessions</p>
                                         </div>
-                                        <span>74%</span>
+                                        <span id="revisionAccuracyValue">0%</span>
                                    </div>
 
                                    <div class="score-stat-item">
@@ -225,7 +220,7 @@
                                              <h4>Task Completion</h4>
                                              <p>Completed study tasks on time</p>
                                         </div>
-                                        <span>86%</span>
+                                        <span id="taskCompletionValue">0%</span>
                                    </div>
 
                                    <div class="score-stat-item">
@@ -233,7 +228,7 @@
                                              <h4>Focus Efficiency</h4>
                                              <p>Consistency during study blocks</p>
                                         </div>
-                                        <span>81%</span>
+                                        <span id="focusEfficiencyValue">0%</span>
                                    </div>
                               </div>
                          </div>
@@ -246,7 +241,7 @@
                                    <p>Compare subject-wise study and performance progress.</p>
                               </div>
 
-                              <div class="subject-insight-list">
+                              <div class="subject-insight-list" id="subjectInsightList">
                                    <div class="subject-insight-item">
                                         <div class="subject-insight-top">
                                              <h4>Java Programming</h4>
@@ -295,7 +290,7 @@
                                    <p>Smart suggestions based on your recent performance.</p>
                               </div>
 
-                              <div class="recommendation-list">
+                              <div class="recommendation-list" id="recommendationList">
                                    <div class="recommendation-item">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Increase DBMS revision frequency this week.</span>
@@ -320,6 +315,8 @@
      </div>
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/analytics.js"></script>
+     <script src="../assets/js/analytics.js"></script>
 </body>
 
 </html>
