@@ -10,7 +10,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!registerForm) return;
 
-    registerForm.addEventListener("submit", function (event) {
+    async function parseResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            return await response.json();
+        }
+
+        return await response.text();
+    }
+
+    registerForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const fullName = fullNameInput.value.trim();
@@ -40,13 +50,50 @@ document.addEventListener("DOMContentLoaded", function () {
             email: email,
             password: password,
             course: course,
-            college: college,
-            createdAt: new Date().toISOString()
+            college: college
         };
 
-        localStorage.setItem("edumind_registered_user", JSON.stringify(userData));
+        try {
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userData)
+            });
 
-        alert("Account created successfully. Please sign in.");
-        window.location.href = "login.html";
+            const result = await parseResponse(response);
+
+            if (!response.ok) {
+                const errorMessage =
+                    typeof result === "string"
+                        ? result
+                        : result.message || "Registration failed.";
+
+                alert(errorMessage);
+                return;
+            }
+
+            // Temporary compatibility:
+            // current login.js abhi localStorage-based hai,
+            // isliye next step me login.js update hone tak ye save rehne do.
+            localStorage.setItem(
+                "edumind_registered_user",
+                JSON.stringify({
+                    fullName: fullName,
+                    email: email,
+                    password: password,
+                    course: course,
+                    college: college,
+                    createdAt: new Date().toISOString()
+                })
+            );
+
+            alert(result.message || "Account created successfully. Please sign in.");
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error("Registration error:", error);
+            alert("Something went wrong while creating the account.");
+        }
     });
 });

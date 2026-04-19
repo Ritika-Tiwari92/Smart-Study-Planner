@@ -5,7 +5,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!loginForm) return;
 
-    loginForm.addEventListener("submit", function (event) {
+    async function parseResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            return await response.json();
+        }
+
+        return await response.text();
+    }
+
+    loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const email = emailInput.value.trim();
@@ -16,24 +26,38 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const savedUser = localStorage.getItem("edumind_registered_user");
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
 
-        if (!savedUser) {
-            alert("No account found. Please create an account first.");
-            window.location.href = "register.html";
-            return;
-        }
+            const result = await parseResponse(response);
 
-        const parsedUser = JSON.parse(savedUser);
+            if (!response.ok) {
+                const errorMessage =
+                    typeof result === "string"
+                        ? result
+                        : result.message || "Invalid email or password.";
 
-        if (email === parsedUser.email && password === parsedUser.password) {
-            localStorage.setItem("edumind_logged_in_user", JSON.stringify(parsedUser));
+                alert(errorMessage);
+                return;
+            }
+
+            localStorage.setItem("edumind_logged_in_user", JSON.stringify(result));
             localStorage.setItem("edumind_is_logged_in", "true");
 
-            alert("Login successful.");
+            alert(result.message || "Login successful.");
             window.location.href = "dashboard.html";
-        } else {
-            alert("Invalid email or password.");
+        } catch (error) {
+            console.error("Login error:", error);
+            alert("Something went wrong while signing in.");
         }
     });
 });

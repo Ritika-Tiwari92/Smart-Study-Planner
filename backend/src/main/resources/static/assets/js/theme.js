@@ -32,13 +32,39 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!dashboardProfileDropdown) return;
         dashboardProfileDropdown.classList.toggle("hidden");
     }
-    profileMenuToggle.addEventListener("click", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
 
-    document.dispatchEvent(new CustomEvent("dashboard:closeOtherDropdowns"));
-    toggleProfileDropdown();
-});
+    function getLoggedInUser() {
+        const rawUser = localStorage.getItem("edumind_logged_in_user");
+        if (!rawUser) return null;
+
+        try {
+            return JSON.parse(rawUser);
+        } catch (error) {
+            console.error("Failed to parse logged in user:", error);
+            return null;
+        }
+    }
+
+    function populateProfileMini() {
+        const loggedInUser = getLoggedInUser();
+        if (!loggedInUser || !profileMenuToggle) return;
+
+        const nameElement = profileMenuToggle.querySelector("h4");
+        const subtitleElement = profileMenuToggle.querySelector("p");
+        const imageElement = profileMenuToggle.querySelector("img");
+
+        if (nameElement) {
+            nameElement.textContent = loggedInUser.fullName || "Student";
+        }
+
+        if (subtitleElement) {
+            subtitleElement.textContent = loggedInUser.course || "Student";
+        }
+
+        if (imageElement && !imageElement.getAttribute("src")) {
+            imageElement.setAttribute("src", "../assets/avatar/default-user.png");
+        }
+    }
 
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener("click", function (event) {
@@ -82,30 +108,32 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
     const profileMenuLinks = document.querySelectorAll(".dashboard-profile-dropdown .profile-menu-item");
 
-profileMenuLinks.forEach((link) => {
-    link.addEventListener("click", function (event) {
-        const targetUrl = link.getAttribute("href");
+    profileMenuLinks.forEach((link) => {
+        link.addEventListener("click", function (event) {
+            const targetUrl = link.getAttribute("href");
+            if (!targetUrl) return;
 
-        if (!targetUrl) return;
-
-        event.preventDefault();
-        window.location.href = targetUrl;
+            event.preventDefault();
+            window.location.href = targetUrl;
+        });
     });
-});
-const logoutLinks = document.querySelectorAll('a[href="login.html"], .profile-menu-item.logout');
 
-logoutLinks.forEach((link) => {
-    link.addEventListener("click", function (event) {
-        event.preventDefault();
+    const logoutLinks = document.querySelectorAll('a[href="login.html"], .profile-menu-item.logout');
 
-        localStorage.removeItem("edumind_logged_in_user");
-        localStorage.removeItem("edumind_is_logged_in");
+    logoutLinks.forEach((link) => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
 
-        window.location.href = "login.html";
+            localStorage.removeItem("edumind_logged_in_user");
+            localStorage.removeItem("edumind_is_logged_in");
+
+            window.location.href = "login.html";
+        });
     });
-});
 
+    populateProfileMini();
     loadTheme();
 });

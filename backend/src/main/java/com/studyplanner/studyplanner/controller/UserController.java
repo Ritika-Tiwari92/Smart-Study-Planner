@@ -1,4 +1,4 @@
-package com.studyplanner.studyplanner.controller;
+/*package com.studyplanner.studyplanner.controller;
 
 import com.studyplanner.studyplanner.dto.LoginRequest;
 import com.studyplanner.studyplanner.model.User;
@@ -38,4 +38,4 @@ public class UserController {
      public List<User> getAllUsers() {
           return userService.getAllUsers();
      }
-}
+}*/
