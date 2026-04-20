@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dashboardProfileDropdown = document.getElementById("dashboardProfileDropdown");
 
     const DEFAULT_PROFILE_IMAGE = "../assets/avatar/default-user.png";
-    const PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
+    const LEGACY_PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
 
     function applyTheme(theme) {
         if (theme === "dark") {
@@ -48,21 +48,47 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function getSavedProfilePhoto() {
-        return localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY);
+    function getProfilePhotoStorageKey(user = getLoggedInUser()) {
+        if (user && user.id) {
+            return `edumind_profile_photo_${user.id}`;
+        }
+        return LEGACY_PROFILE_PHOTO_STORAGE_KEY;
+    }
+
+    function getSavedProfilePhoto(user = getLoggedInUser()) {
+        const userSpecificKey = getProfilePhotoStorageKey(user);
+        const userSpecificPhoto = localStorage.getItem(userSpecificKey);
+
+        if (userSpecificPhoto && userSpecificPhoto.trim() !== "") {
+            return userSpecificPhoto;
+        }
+
+        const legacyPhoto = localStorage.getItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
+        if (legacyPhoto && legacyPhoto.trim() !== "") {
+            return legacyPhoto;
+        }
+
+        return "";
     }
 
     function applyProfilePhoto() {
-        const savedPhoto = getSavedProfilePhoto() || DEFAULT_PROFILE_IMAGE;
+        const loggedInUser = getLoggedInUser();
+        const savedPhoto = getSavedProfilePhoto(loggedInUser) || DEFAULT_PROFILE_IMAGE;
 
         const headerImageById = document.getElementById("headerProfileImage");
         if (headerImageById) {
             headerImageById.src = savedPhoto;
+            headerImageById.onerror = function () {
+                headerImageById.src = DEFAULT_PROFILE_IMAGE;
+            };
         }
 
         const profileToggleImage = profileMenuToggle?.querySelector("img");
         if (profileToggleImage) {
             profileToggleImage.src = savedPhoto;
+            profileToggleImage.onerror = function () {
+                profileToggleImage.src = DEFAULT_PROFILE_IMAGE;
+            };
         }
     }
 

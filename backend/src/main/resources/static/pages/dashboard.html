@@ -92,8 +92,8 @@
                <header class="dashboard-header">
                     <div class="header-left">
                          <div>
-                              <h1>Hello, Ritika 👋</h1>
-                              <p>Let’s make today productive and well planned.</p>
+                              <h1 id="dashboardGreetingTitle">Hello, Ritika 👋</h1>
+                              <p id="dashboardGreetingSubtitle">Let’s make today productive and well planned.</p>
                          </div>
                     </div>
 
@@ -150,10 +150,10 @@
                          </button>
 
                          <div class="profile-mini" id="profileMenuToggle">
-                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <img src="../assets/avatar/default-user.png" alt="User" id="dashboardProfileAvatar">
                               <div>
-                                   <h4>Ritika</h4>
-                                   <p>Student</p>
+                                   <h4 id="dashboardProfileName">Ritika</h4>
+                                   <p id="dashboardProfileRole">Student</p>
                               </div>
                          </div>
 
@@ -173,6 +173,7 @@
                          </div>
                     </div>
                </header>
+
                <section class="dashboard-content">
                     <div class="welcome-banner">
                          <div class="welcome-text">
@@ -187,22 +188,22 @@
 
                     <div class="stats-grid">
                          <div class="stat-card">
-                              <h3>05</h3>
+                              <h3 id="totalSubjectsCount">05</h3>
                               <p>Total Subjects</p>
                          </div>
 
                          <div class="stat-card">
-                              <h3>12</h3>
+                              <h3 id="pendingTasksCount">12</h3>
                               <p>Pending Tasks</p>
                          </div>
 
                          <div class="stat-card">
-                              <h3>08</h3>
+                              <h3 id="completedTasksCount">08</h3>
                               <p>Completed Tasks</p>
                          </div>
 
                          <div class="stat-card">
-                              <h3>76%</h3>
+                              <h3 id="studyProgressCount">76%</h3>
                               <p>Study Progress</p>
                          </div>
                     </div>
@@ -236,6 +237,7 @@
                                    </a>
                               </div>
                          </div>
+
                          <div class="dashboard-bottom-grid">
                               <div class="subject-progress-card">
                                    <div class="section-title">
@@ -243,7 +245,7 @@
                                         <p>Track how much you have covered in each subject.</p>
                                    </div>
 
-                                   <div class="subject-progress-list">
+                                   <div class="subject-progress-list" id="subjectProgressList">
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
                                                   <span>Java Programming</span>
@@ -292,7 +294,7 @@
                                         <p>Your next important study activities.</p>
                                    </div>
 
-                                   <div class="upcoming-list">
+                                   <div class="upcoming-list" id="upcomingScheduleList">
                                         <div class="upcoming-item">
                                              <div class="upcoming-icon">
                                                   <i class="fa-solid fa-book-open"></i>
@@ -325,13 +327,14 @@
                                    </div>
                               </div>
                          </div>
+
                          <div class="today-tasks-card">
                               <div class="section-title">
                                    <h3>Today’s Tasks</h3>
                                    <p>Your important tasks for today.</p>
                               </div>
 
-                              <div class="task-list">
+                              <div class="task-list" id="todayTasksList">
                                    <div class="task-item">
                                         <div class="task-info">
                                              <h4>Complete Java Assignment</h4>
@@ -358,6 +361,7 @@
                               </div>
                          </div>
                     </div>
+
                     <div class="overview-chart-card">
                          <div class="section-title">
                               <h3>Weekly Study Overview</h3>
@@ -365,7 +369,7 @@
                          </div>
 
                          <div class="chart-area">
-                              <div class="chart-bars">
+                              <div class="chart-bars" id="weeklyOverviewChartBars">
                                    <div class="chart-bar-group">
                                         <div class="chart-bar" style="height: 70%;"></div>
                                         <span>Mon</span>
@@ -400,6 +404,7 @@
                </section>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/dashboard.js"></script>
      <script src="../assets/js/theme.js"></script>

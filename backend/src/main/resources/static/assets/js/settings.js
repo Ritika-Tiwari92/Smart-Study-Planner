@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 
     const DEFAULT_PROFILE_IMAGE = "../assets/avatar/default-user.png";
-    const PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
+    const LEGACY_PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
 
     function showSaveStatus(message, isSuccess = true) {
         if (!settingsSaveStatus) return;
@@ -67,8 +67,32 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem("edumind_is_logged_in");
     }
 
-    function getSavedProfilePhoto() {
-        return localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY);
+    function getProfilePhotoStorageKey(user = getLoggedInUser()) {
+        if (user && user.id) {
+            return `edumind_profile_photo_${user.id}`;
+        }
+        return LEGACY_PROFILE_PHOTO_STORAGE_KEY;
+    }
+
+    function getSavedProfilePhoto(user = getLoggedInUser()) {
+        const userSpecificKey = getProfilePhotoStorageKey(user);
+        const userSpecificPhoto = localStorage.getItem(userSpecificKey);
+
+        if (userSpecificPhoto) {
+            return userSpecificPhoto;
+        }
+
+        return localStorage.getItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
+    }
+
+    function saveProfilePhoto(photoUrl, user = getLoggedInUser()) {
+        const userSpecificKey = getProfilePhotoStorageKey(user);
+        localStorage.setItem(userSpecificKey, photoUrl);
+    }
+
+    function removeSavedProfilePhoto(user = getLoggedInUser()) {
+        const userSpecificKey = getProfilePhotoStorageKey(user);
+        localStorage.removeItem(userSpecificKey);
     }
 
     function applyProfilePhoto(photoUrl) {
@@ -84,7 +108,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadSavedProfilePhoto() {
-        const savedPhoto = getSavedProfilePhoto();
+        const loggedInUser = getLoggedInUser();
+        const savedPhoto = getSavedProfilePhoto(loggedInUser);
         applyProfilePhoto(savedPhoto);
     }
 
@@ -222,7 +247,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            localStorage.setItem(PROFILE_PHOTO_STORAGE_KEY, photoDataUrl);
+            const loggedInUser = getLoggedInUser();
+            saveProfilePhoto(photoDataUrl, loggedInUser);
             applyProfilePhoto(photoDataUrl);
             showSaveStatus("Profile photo updated successfully.");
         };
@@ -267,6 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fillNotificationToggleFields(latestUser);
             updateHeaderProfileMini(latestUser);
             updateTwoFactorUI(latestUser);
+            loadSavedProfilePhoto();
         } catch (error) {
             console.error("Profile load error:", error);
             showSaveStatus("Something went wrong while loading profile.", false);
@@ -334,6 +361,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fillNotificationToggleFields(updatedUser);
             updateHeaderProfileMini(updatedUser);
             updateTwoFactorUI(updatedUser);
+            loadSavedProfilePhoto();
 
             return true;
         } catch (error) {
@@ -495,8 +523,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 return false;
             }
 
+            removeSavedProfilePhoto(loggedInUser);
+            localStorage.removeItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
             clearAuthStorage();
-            localStorage.removeItem(PROFILE_PHOTO_STORAGE_KEY);
 
             alert(typeof result === "string" ? result : "Account deleted successfully.");
             window.location.href = "login.html";
