@@ -101,9 +101,11 @@
                               <span>Save Changes</span>
                          </button>
                          <p class="settings-save-status" id="settingsSaveStatus"></p>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
+
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
@@ -141,28 +143,30 @@
                                    <div class="profile-settings-layout">
                                         <div class="settings-avatar-box">
                                              <img src="../assets/avatar/default-user.png" alt="Profile">
-                                             <button class="change-photo-btn">Change Photo</button>
+                                             <button class="change-photo-btn" id="changePhotoBtn" type="button">Change
+                                                  Photo</button>
                                         </div>
 
                                         <div class="settings-form-grid">
                                              <div class="settings-form-group">
-                                                  <label>Full Name</label>
-                                                  <input type="text" value="Ritika Tiwari">
+                                                  <label for="settingsFullName">Full Name</label>
+                                                  <input type="text" id="settingsFullName" value="Ritika Tiwari">
                                              </div>
 
                                              <div class="settings-form-group">
-                                                  <label>Email</label>
-                                                  <input type="email" value="ritika@example.com">
+                                                  <label for="settingsEmail">Email</label>
+                                                  <input type="email" id="settingsEmail" value="ritika@example.com">
                                              </div>
 
                                              <div class="settings-form-group">
-                                                  <label>Course</label>
-                                                  <input type="text" value="BCA Final Year">
+                                                  <label for="settingsCourse">Course</label>
+                                                  <input type="text" id="settingsCourse" value="BCA Final Year">
                                              </div>
 
                                              <div class="settings-form-group">
-                                                  <label>College</label>
-                                                  <input type="text" value="ITM College of Science and Management">
+                                                  <label for="settingsCollege">College</label>
+                                                  <input type="text" id="settingsCollege"
+                                                       value="ITM College of Science and Management">
                                              </div>
                                         </div>
                                    </div>
@@ -176,28 +180,28 @@
 
                                    <div class="settings-form-grid">
                                         <div class="settings-form-group">
-                                             <label>Preferred Study Time</label>
-                                             <select>
-                                                  <option>Morning</option>
-                                                  <option>Afternoon</option>
-                                                  <option>Evening</option>
-                                                  <option>Night</option>
+                                             <label for="settingsStudyTime">Preferred Study Time</label>
+                                             <select id="settingsStudyTime">
+                                                  <option value="Morning">Morning</option>
+                                                  <option value="Afternoon">Afternoon</option>
+                                                  <option value="Evening">Evening</option>
+                                                  <option value="Night">Night</option>
                                              </select>
                                         </div>
 
                                         <div class="settings-form-group">
-                                             <label>Daily Study Goal</label>
-                                             <select>
-                                                  <option>2 Hours</option>
-                                                  <option>4 Hours</option>
-                                                  <option>6 Hours</option>
-                                                  <option>8 Hours</option>
+                                             <label for="settingsStudyGoal">Daily Study Goal</label>
+                                             <select id="settingsStudyGoal">
+                                                  <option value="2 Hours">2 Hours</option>
+                                                  <option value="4 Hours">4 Hours</option>
+                                                  <option value="6 Hours">6 Hours</option>
+                                                  <option value="8 Hours">8 Hours</option>
                                              </select>
                                         </div>
 
                                         <div class="settings-form-group full-width">
-                                             <label>Preferred Subjects Focus</label>
-                                             <input type="text" value="Java, DBMS, Aptitude">
+                                             <label for="settingsSubjectFocus">Preferred Subjects Focus</label>
+                                             <input type="text" id="settingsSubjectFocus" value="Java, DBMS, Aptitude">
                                         </div>
                                    </div>
                               </div>
@@ -257,25 +261,6 @@
                                    </div>
                               </div>
 
-                              <div class="settings-card appearance-card">
-                                   <div class="section-title">
-                                        <h3>Appearance</h3>
-                                        <p>Customize your dashboard look and feel.</p>
-                                   </div>
-
-                                   <div class="appearance-options">
-                                        <button class="appearance-option active" id="lightModeOption">
-                                             <i class="fa-solid fa-sun"></i>
-                                             <span>Light Mode</span>
-                                        </button>
-
-                                        <button class="appearance-option" id="darkModeOption">
-                                             <i class="fa-solid fa-moon"></i>
-                                             <span>Dark Mode</span>
-                                        </button>
-                                   </div>
-                              </div>
-
                               <div class="settings-card security-card">
                                    <div class="section-title">
                                         <h3>Security & Account</h3>
@@ -283,20 +268,59 @@
                                    </div>
 
                                    <div class="security-action-list">
-                                        <button class="security-action-btn">
+                                        <button class="security-action-btn" id="changePasswordBtn" type="button">
                                              <i class="fa-solid fa-key"></i>
                                              <span>Change Password</span>
                                         </button>
 
-                                        <button class="security-action-btn">
+                                        <button class="security-action-btn" id="twoFactorBtn" type="button">
                                              <i class="fa-solid fa-shield-halved"></i>
                                              <span>Enable Two-Factor Auth</span>
                                         </button>
 
-                                        <button class="security-action-btn danger">
+                                        <button class="security-action-btn danger" id="deleteAccountBtn" type="button">
                                              <i class="fa-solid fa-trash"></i>
                                              <span>Delete Account</span>
                                         </button>
+                                   </div>
+
+                                   <p id="twoFactorStatusText"
+                                        style="margin-top: 12px; font-size: 0.95rem; color: #64748b;">
+                                        Two-factor authentication status: Disabled
+                                   </p>
+
+                                   <div id="changePasswordForm" style="display: none; margin-top: 18px;">
+                                        <div class="settings-form-grid">
+                                             <div class="settings-form-group full-width">
+                                                  <label for="currentPassword">Current Password</label>
+                                                  <input type="password" id="currentPassword"
+                                                       placeholder="Enter current password">
+                                             </div>
+
+                                             <div class="settings-form-group">
+                                                  <label for="newPassword">New Password</label>
+                                                  <input type="password" id="newPassword"
+                                                       placeholder="Enter new password">
+                                             </div>
+
+                                             <div class="settings-form-group">
+                                                  <label for="confirmNewPassword">Confirm New Password</label>
+                                                  <input type="password" id="confirmNewPassword"
+                                                       placeholder="Confirm new password">
+                                             </div>
+                                        </div>
+
+                                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+                                             <button class="save-settings-btn" id="updatePasswordBtn" type="button">
+                                                  <i class="fa-solid fa-lock"></i>
+                                                  <span>Update Password</span>
+                                             </button>
+
+                                             <button class="security-action-btn" id="cancelPasswordBtn" type="button">
+                                                  <i class="fa-solid fa-xmark"></i>
+                                                  <span>Cancel</span>
+                                             </button>
+                                        </div>
                                    </div>
                               </div>
                          </div>
@@ -304,6 +328,7 @@
                </section>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/settings.js"></script>

@@ -26,6 +26,30 @@ public class User {
      @Column(nullable = false)
      private String college;
 
+     @Column(nullable = false)
+     private boolean twoFactorEnabled = false;
+
+     @Column(nullable = false)
+     private String preferredStudyTime = "Morning";
+
+     @Column(nullable = false)
+     private String dailyStudyGoal = "2 Hours";
+
+     @Column(length = 1000)
+     private String preferredSubjectsFocus;
+
+     @Column(nullable = false)
+     private boolean taskRemindersEnabled = true;
+
+     @Column(nullable = false)
+     private boolean revisionAlertsEnabled = true;
+
+     @Column(nullable = false)
+     private boolean testNotificationsEnabled = true;
+
+     @Column(nullable = false)
+     private boolean assistantSuggestionsEnabled = false;
+
      @Column(nullable = false, updatable = false)
      private LocalDateTime createdAt;
 
@@ -83,6 +107,70 @@ public class User {
 
      public void setCollege(String college) {
           this.college = college;
+     }
+
+     public boolean isTwoFactorEnabled() {
+          return twoFactorEnabled;
+     }
+
+     public void setTwoFactorEnabled(boolean twoFactorEnabled) {
+          this.twoFactorEnabled = twoFactorEnabled;
+     }
+
+     public String getPreferredStudyTime() {
+          return preferredStudyTime;
+     }
+
+     public void setPreferredStudyTime(String preferredStudyTime) {
+          this.preferredStudyTime = preferredStudyTime;
+     }
+
+     public String getDailyStudyGoal() {
+          return dailyStudyGoal;
+     }
+
+     public void setDailyStudyGoal(String dailyStudyGoal) {
+          this.dailyStudyGoal = dailyStudyGoal;
+     }
+
+     public String getPreferredSubjectsFocus() {
+          return preferredSubjectsFocus;
+     }
+
+     public void setPreferredSubjectsFocus(String preferredSubjectsFocus) {
+          this.preferredSubjectsFocus = preferredSubjectsFocus;
+     }
+
+     public boolean isTaskRemindersEnabled() {
+          return taskRemindersEnabled;
+     }
+
+     public void setTaskRemindersEnabled(boolean taskRemindersEnabled) {
+          this.taskRemindersEnabled = taskRemindersEnabled;
+     }
+
+     public boolean isRevisionAlertsEnabled() {
+          return revisionAlertsEnabled;
+     }
+
+     public void setRevisionAlertsEnabled(boolean revisionAlertsEnabled) {
+          this.revisionAlertsEnabled = revisionAlertsEnabled;
+     }
+
+     public boolean isTestNotificationsEnabled() {
+          return testNotificationsEnabled;
+     }
+
+     public void setTestNotificationsEnabled(boolean testNotificationsEnabled) {
+          this.testNotificationsEnabled = testNotificationsEnabled;
+     }
+
+     public boolean isAssistantSuggestionsEnabled() {
+          return assistantSuggestionsEnabled;
+     }
+
+     public void setAssistantSuggestionsEnabled(boolean assistantSuggestionsEnabled) {
+          this.assistantSuggestionsEnabled = assistantSuggestionsEnabled;
      }
 
      public LocalDateTime getCreatedAt() {
