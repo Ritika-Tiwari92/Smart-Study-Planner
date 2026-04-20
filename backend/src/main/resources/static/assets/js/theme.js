@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const profileMenuToggle = document.getElementById("profileMenuToggle");
     const dashboardProfileDropdown = document.getElementById("dashboardProfileDropdown");
 
+    const DEFAULT_PROFILE_IMAGE = "../assets/avatar/default-user.png";
+    const PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
+
     function applyTheme(theme) {
         if (theme === "dark") {
             document.body.classList.add("preview-dark");
@@ -45,13 +48,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function getSavedProfilePhoto() {
+        return localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY);
+    }
+
+    function applyProfilePhoto() {
+        const savedPhoto = getSavedProfilePhoto() || DEFAULT_PROFILE_IMAGE;
+
+        const headerImageById = document.getElementById("headerProfileImage");
+        if (headerImageById) {
+            headerImageById.src = savedPhoto;
+        }
+
+        const profileToggleImage = profileMenuToggle?.querySelector("img");
+        if (profileToggleImage) {
+            profileToggleImage.src = savedPhoto;
+        }
+    }
+
     function populateProfileMini() {
         const loggedInUser = getLoggedInUser();
-        if (!loggedInUser || !profileMenuToggle) return;
+        if (!loggedInUser || !profileMenuToggle) {
+            applyProfilePhoto();
+            return;
+        }
 
         const nameElement = profileMenuToggle.querySelector("h4");
         const subtitleElement = profileMenuToggle.querySelector("p");
-        const imageElement = profileMenuToggle.querySelector("img");
 
         if (nameElement) {
             nameElement.textContent = loggedInUser.fullName || "Student";
@@ -61,9 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
             subtitleElement.textContent = loggedInUser.course || "Student";
         }
 
-        if (imageElement && !imageElement.getAttribute("src")) {
-            imageElement.setAttribute("src", "../assets/avatar/default-user.png");
-        }
+        applyProfilePhoto();
     }
 
     if (themeToggleBtn) {

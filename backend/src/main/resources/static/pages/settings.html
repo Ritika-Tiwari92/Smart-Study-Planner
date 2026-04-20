@@ -107,7 +107,7 @@
                          </button>
 
                          <div class="profile-mini" id="profileMenuToggle">
-                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <img src="../assets/avatar/default-user.png" alt="User" id="headerProfileImage">
                               <div>
                                    <h4>Ritika</h4>
                                    <p>Student</p>
@@ -142,9 +142,13 @@
 
                                    <div class="profile-settings-layout">
                                         <div class="settings-avatar-box">
-                                             <img src="../assets/avatar/default-user.png" alt="Profile">
-                                             <button class="change-photo-btn" id="changePhotoBtn" type="button">Change
-                                                  Photo</button>
+                                             <img src="../assets/avatar/default-user.png" alt="Profile"
+                                                  id="settingsProfileImage">
+                                             <input type="file" id="profilePhotoInput" accept="image/*"
+                                                  style="display: none;">
+                                             <button class="change-photo-btn" id="changePhotoBtn" type="button">
+                                                  Change Photo
+                                             </button>
                                         </div>
 
                                         <div class="settings-form-grid">

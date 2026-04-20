@@ -13,6 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const settingsToggles = document.querySelectorAll(".settings-toggle-item input[type='checkbox']");
 
+    const changePhotoBtn = document.getElementById("changePhotoBtn");
+    const profilePhotoInput = document.getElementById("profilePhotoInput");
+    const settingsProfileImage = document.getElementById("settingsProfileImage");
+    const headerProfileImage = document.getElementById("headerProfileImage");
+
     const changePasswordBtn = document.getElementById("changePasswordBtn");
     const twoFactorBtn = document.getElementById("twoFactorBtn");
     const twoFactorStatusText = document.getElementById("twoFactorStatusText");
@@ -24,6 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
     const updatePasswordBtn = document.getElementById("updatePasswordBtn");
     const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+
+    const DEFAULT_PROFILE_IMAGE = "../assets/avatar/default-user.png";
+    const PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
 
     function showSaveStatus(message, isSuccess = true) {
         if (!settingsSaveStatus) return;
@@ -57,6 +65,27 @@ document.addEventListener("DOMContentLoaded", function () {
     function clearAuthStorage() {
         localStorage.removeItem("edumind_logged_in_user");
         localStorage.removeItem("edumind_is_logged_in");
+    }
+
+    function getSavedProfilePhoto() {
+        return localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY);
+    }
+
+    function applyProfilePhoto(photoUrl) {
+        const finalPhoto = photoUrl || DEFAULT_PROFILE_IMAGE;
+
+        if (settingsProfileImage) {
+            settingsProfileImage.src = finalPhoto;
+        }
+
+        if (headerProfileImage) {
+            headerProfileImage.src = finalPhoto;
+        }
+    }
+
+    function loadSavedProfilePhoto() {
+        const savedPhoto = getSavedProfilePhoto();
+        applyProfilePhoto(savedPhoto);
     }
 
     function fillProfileFields(user) {
@@ -168,6 +197,41 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!changePasswordForm) return;
         changePasswordForm.style.display = "none";
         clearPasswordFields();
+    }
+
+    function handleProfilePhotoSelection(file) {
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            showSaveStatus("Please select a valid image file.", false);
+            return;
+        }
+
+        const maxSizeInBytes = 2 * 1024 * 1024;
+        if (file.size > maxSizeInBytes) {
+            showSaveStatus("Image size should be less than 2 MB.", false);
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            const photoDataUrl = event.target?.result;
+            if (!photoDataUrl) {
+                showSaveStatus("Failed to load selected image.", false);
+                return;
+            }
+
+            localStorage.setItem(PROFILE_PHOTO_STORAGE_KEY, photoDataUrl);
+            applyProfilePhoto(photoDataUrl);
+            showSaveStatus("Profile photo updated successfully.");
+        };
+
+        reader.onerror = function () {
+            showSaveStatus("Failed to read selected image.", false);
+        };
+
+        reader.readAsDataURL(file);
     }
 
     async function loadProfileFromBackend() {
@@ -432,6 +496,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             clearAuthStorage();
+            localStorage.removeItem(PROFILE_PHOTO_STORAGE_KEY);
+
             alert(typeof result === "string" ? result : "Account deleted successfully.");
             window.location.href = "login.html";
             return true;
@@ -440,6 +506,19 @@ document.addEventListener("DOMContentLoaded", function () {
             showSaveStatus("Something went wrong while deleting account.", false);
             return false;
         }
+    }
+
+    if (changePhotoBtn && profilePhotoInput) {
+        changePhotoBtn.addEventListener("click", function () {
+            profilePhotoInput.click();
+        });
+
+        profilePhotoInput.addEventListener("change", function (event) {
+            const file = event.target.files?.[0];
+            handleProfilePhotoSelection(file);
+
+            profilePhotoInput.value = "";
+        });
     }
 
     if (changePasswordBtn) {
@@ -494,5 +573,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    loadSavedProfilePhoto();
     loadProfileFromBackend();
 });
