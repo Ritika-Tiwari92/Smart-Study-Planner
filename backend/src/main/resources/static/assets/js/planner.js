@@ -40,6 +40,71 @@ const SUBJECTS_API_BASE_URL =
 let editingPlanId = null;
 let allPlans = [];
 
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+
+function buildPlannerApiUrl(planId = "") {
+    const userId = getCurrentUserId();
+    const normalizedPath = planId ? `/${planId}` : "";
+    return `${PLANNER_API_BASE_URL}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+}
+
+function buildSubjectsApiUrl() {
+    const userId = getCurrentUserId();
+    return `${SUBJECTS_API_BASE_URL}?userId=${encodeURIComponent(userId)}`;
+}
+
+async function handleApiResponse(response) {
+    if (!response.ok) {
+        let message = `Request failed with status ${response.status}`;
+
+        try {
+            const errorText = await response.text();
+            if (errorText) {
+                message = errorText;
+            }
+        } catch (error) {
+            console.error("Failed to read error response:", error);
+        }
+
+        throw new Error(message);
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return response.text();
+}
+
 function openPlanModal() {
     if (!planModalOverlay) return;
     planModalOverlay.classList.remove("hidden");
@@ -483,17 +548,13 @@ function fillPlanFormForEdit(sessionItem) {
 }
 
 async function fetchAllPlans() {
-    const response = await fetch(PLANNER_API_BASE_URL);
-
-    if (!response.ok) {
-        throw new Error("Failed to load plans");
-    }
-
-    return response.json();
+    const response = await fetch(buildPlannerApiUrl());
+    const data = await handleApiResponse(response);
+    return Array.isArray(data) ? data : [];
 }
 
 async function createPlanApi(planData) {
-    const response = await fetch(PLANNER_API_BASE_URL, {
+    const response = await fetch(buildPlannerApiUrl(), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -501,15 +562,11 @@ async function createPlanApi(planData) {
         body: JSON.stringify(planData)
     });
 
-    if (!response.ok) {
-        throw new Error("Failed to create plan");
-    }
-
-    return response.json();
+    return handleApiResponse(response);
 }
 
 async function updatePlanApi(planId, planData) {
-    const response = await fetch(`${PLANNER_API_BASE_URL}/${planId}`, {
+    const response = await fetch(buildPlannerApiUrl(planId), {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -517,33 +574,21 @@ async function updatePlanApi(planId, planData) {
         body: JSON.stringify(planData)
     });
 
-    if (!response.ok) {
-        throw new Error("Failed to update plan");
-    }
-
-    return response.json();
+    return handleApiResponse(response);
 }
 
 async function deletePlanApi(planId) {
-    const response = await fetch(`${PLANNER_API_BASE_URL}/${planId}`, {
+    const response = await fetch(buildPlannerApiUrl(planId), {
         method: "DELETE"
     });
 
-    if (!response.ok) {
-        throw new Error("Failed to delete plan");
-    }
-
-    return response.text();
+    return handleApiResponse(response);
 }
 
 async function fetchAllSubjects() {
-    const response = await fetch(SUBJECTS_API_BASE_URL);
-
-    if (!response.ok) {
-        throw new Error("Failed to load subjects");
-    }
-
-    return response.json();
+    const response = await fetch(buildSubjectsApiUrl());
+    const data = await handleApiResponse(response);
+    return Array.isArray(data) ? data : [];
 }
 
 function getSubjectDisplayName(subject) {
@@ -592,6 +637,7 @@ async function loadSubjectOptions(selectedValue = "") {
         }
     } catch (error) {
         console.error("Error loading subjects:", error);
+        alert(`Failed to load subjects: ${error.message}`);
     }
 }
 
@@ -611,6 +657,7 @@ async function loadPlans() {
         renderWeeklyOverview(allPlans);
         renderUpcomingPlans(allPlans);
         applyPlanFilters();
+        alert(`Failed to load plans: ${error.message}`);
     }
 }
 
@@ -723,7 +770,7 @@ if (
             clearPlanModalState();
         } catch (error) {
             console.error("Error saving plan:", error);
-            alert("Plan save/update nahi ho paaya. Backend API aur console check karo.");
+            alert(`Failed to save plan: ${error.message}`);
         } finally {
             if (planSaveBtn) {
                 planSaveBtn.disabled = false;
@@ -748,7 +795,7 @@ if (
                 await deletePlan(planId);
             } catch (error) {
                 console.error("Error deleting plan:", error);
-                alert("Plan delete nahi ho paaya. Backend API check karo.");
+                alert(`Failed to delete plan: ${error.message}`);
             }
 
             return;

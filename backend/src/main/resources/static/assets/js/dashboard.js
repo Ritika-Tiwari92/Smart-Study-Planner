@@ -22,12 +22,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const todayTasksList = document.getElementById("todayTasksList");
     const weeklyOverviewChartBars = document.getElementById("weeklyOverviewChartBars");
 
+    const API_BASE_URL =
+        window.location.port === "8080"
+            ? ""
+            : "http://localhost:8080";
+
     const ENDPOINTS = {
-        subjects: "/subjects",
-        tasks: "/tasks",
-        plans: "/api/plans",
-        revisions: "/api/revisions",
-        tests: "/api/tests"
+        subjects: `${API_BASE_URL}/subjects`,
+        tasks: `${API_BASE_URL}/tasks`,
+        plans: `${API_BASE_URL}/api/plans`,
+        revisions: `${API_BASE_URL}/api/revisions`,
+        tests: `${API_BASE_URL}/api/tests`
     };
 
     const state = {
@@ -115,38 +120,55 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getStoredUser() {
-    const possibleKeys = [
-        "edumind_logged_in_user",
-        "edumind_registered_user",
-        "loggedInUser",
-        "currentUser",
-        "user",
-        "authUser",
-        "studyPlannerUser"
-    ];
+        const possibleKeys = [
+            "edumind_logged_in_user",
+            "edumind_registered_user",
+            "loggedInUser",
+            "currentUser",
+            "user",
+            "authUser",
+            "studyPlannerUser"
+        ];
 
-    for (const key of possibleKeys) {
-        const rawValue = localStorage.getItem(key);
-        if (!rawValue) continue;
+        for (const key of possibleKeys) {
+            const rawValue = localStorage.getItem(key);
+            if (!rawValue) continue;
 
-        const parsed = parseStoredJson(rawValue);
-        if (parsed && typeof parsed === "object") {
-            return parsed;
+            const parsed = parseStoredJson(rawValue);
+            if (parsed && typeof parsed === "object") {
+                return parsed;
+            }
         }
+
+        return null;
     }
 
-    return null;
-}
-    function getUserDisplayName(user) {
-    const fullName = getFirstAvailableValue(user, [
-        "fullName",
-        "name",
-        "displayName",
-        "username"
-    ], "Student");
+    function getCurrentUserId() {
+        const user = state.user || getStoredUser();
 
-    return fullName || "Student";
-}
+        if (user && user.id != null && user.id !== "") {
+            return Number(user.id);
+        }
+
+        throw new Error("Logged-in user id not found in localStorage.");
+    }
+
+    function buildEndpointUrl(baseUrl) {
+        const userId = getCurrentUserId();
+        const separator = baseUrl.includes("?") ? "&" : "?";
+        return `${baseUrl}${separator}userId=${encodeURIComponent(userId)}`;
+    }
+
+    function getUserDisplayName(user) {
+        const fullName = getFirstAvailableValue(user, [
+            "fullName",
+            "name",
+            "displayName",
+            "username"
+        ], "Student");
+
+        return fullName || "Student";
+    }
 
     function getUserFirstName(user) {
         const name = getUserDisplayName(user);
@@ -154,38 +176,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getUserRole(user) {
-    const role = getFirstAvailableValue(user, ["role", "userRole"], "");
-    if (role) return role;
+        const role = getFirstAvailableValue(user, ["role", "userRole"], "");
+        if (role) return role;
 
-    const course = getFirstAvailableValue(user, ["course"], "");
-    if (course) return course;
+        const course = getFirstAvailableValue(user, ["course"], "");
+        if (course) return course;
 
-    return "Student";
-}
+        return "Student";
+    }
 
     function getUserAvatar(user) {
-    const userId = user && user.id ? user.id : null;
+        const userId = user && user.id ? user.id : null;
 
-    if (userId) {
-        const userSpecificPhoto = localStorage.getItem(`edumind_profile_photo_${userId}`);
-        if (userSpecificPhoto && userSpecificPhoto.trim() !== "") {
-            return userSpecificPhoto;
+        if (userId) {
+            const userSpecificPhoto = localStorage.getItem(`edumind_profile_photo_${userId}`);
+            if (userSpecificPhoto && userSpecificPhoto.trim() !== "") {
+                return userSpecificPhoto;
+            }
         }
-    }
 
-    const legacyPhoto = localStorage.getItem("edumind_profile_photo");
-    if (legacyPhoto && legacyPhoto.trim() !== "") {
-        return legacyPhoto;
-    }
+        const legacyPhoto = localStorage.getItem("edumind_profile_photo");
+        if (legacyPhoto && legacyPhoto.trim() !== "") {
+            return legacyPhoto;
+        }
 
-    return getFirstAvailableValue(user, [
-        "profilePhoto",
-        "profileImage",
-        "avatar",
-        "imageUrl",
-        "photoUrl"
-    ], "../assets/avatar/default-user.png");
-}
+        return getFirstAvailableValue(user, [
+            "profilePhoto",
+            "profileImage",
+            "avatar",
+            "imageUrl",
+            "photoUrl"
+        ], "../assets/avatar/default-user.png");
+    }
 
     function renderUserInfo() {
         const user = state.user || getStoredUser();
@@ -233,9 +255,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
     }
 
-    async function fetchArray(url, label) {
+    async function fetchArray(baseUrl, label) {
         try {
-            const response = await fetchJson(url);
+            const response = await fetchJson(buildEndpointUrl(baseUrl));
             return getArrayFromResponse(response);
         } catch (error) {
             console.error(`Failed to load ${label}:`, error);
@@ -558,6 +580,24 @@ document.addEventListener("DOMContentLoaded", function () {
         subjectProgressList.innerHTML = subjectItems;
     }
 
+    function formatUpcomingSubtitle(item, date) {
+        const dayLabel = getRelativeDayLabel(date);
+        const timeText = getTimeText(item);
+        const subjectName = getFirstAvailableValue(item, ["subjectName", "subject"], "");
+
+        let subtitle = dayLabel;
+
+        if (timeText) {
+            subtitle += ` • ${timeText}`;
+        }
+
+        if (subjectName) {
+            subtitle += ` • ${subjectName}`;
+        }
+
+        return subtitle;
+    }
+
     function buildCombinedUpcomingItems() {
         const items = [];
 
@@ -607,7 +647,10 @@ document.addEventListener("DOMContentLoaded", function () {
             items.push({
                 type: "Task",
                 title: getTaskTitle(task),
-                subtitle: formatUpcomingSubtitle(task, date),
+                subtitle: formatUpcomingSubtitle(
+                    { ...task, subjectName: getTaskSubjectName(task) },
+                    date
+                ),
                 icon: "fa-list-check",
                 timestamp: date.getTime()
             });
@@ -615,24 +658,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         items.sort((a, b) => a.timestamp - b.timestamp);
         return items.slice(0, 4);
-    }
-
-    function formatUpcomingSubtitle(item, date) {
-        const dayLabel = getRelativeDayLabel(date);
-        const timeText = getTimeText(item);
-        const subjectName = getFirstAvailableValue(item, ["subjectName"], "");
-
-        let subtitle = dayLabel;
-
-        if (timeText) {
-            subtitle += ` • ${timeText}`;
-        }
-
-        if (subjectName) {
-            subtitle += ` • ${subjectName}`;
-        }
-
-        return subtitle;
     }
 
     function renderUpcomingSchedule() {
@@ -1055,6 +1080,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function loadDashboardData() {
+        state.user = getStoredUser();
         renderUserInfo();
 
         const [subjects, tasks, plans, revisions, tests] = await Promise.all([
@@ -1065,7 +1091,6 @@ document.addEventListener("DOMContentLoaded", function () {
             fetchArray(ENDPOINTS.tests, "tests")
         ]);
 
-        state.user = getStoredUser();
         state.subjects = subjects;
         state.tasks = tasks;
         state.plans = plans;
@@ -1091,4 +1116,4 @@ document.addEventListener("DOMContentLoaded", function () {
     attachNotificationEvents();
     attachSharedDropdownEvents();
     loadDashboardData();
-});
+})

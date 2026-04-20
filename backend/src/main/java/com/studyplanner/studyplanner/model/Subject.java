@@ -3,6 +3,7 @@ package com.studyplanner.studyplanner.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -49,6 +50,11 @@ public class Subject {
 
      @Column(name = "difficulty_level")
      private String difficultyLevel;
+
+     @JsonIgnore
+     @ManyToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "user_id")
+     private User user;
 
      public Subject() {
      }
@@ -135,5 +141,13 @@ public class Subject {
 
      public void setTasks(List<Task> tasks) {
           this.tasks = tasks;
+     }
+
+     public User getUser() {
+          return user;
+     }
+
+     public void setUser(User user) {
+          this.user = user;
      }
 }

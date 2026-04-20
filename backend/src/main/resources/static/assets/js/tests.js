@@ -43,6 +43,42 @@ const SUBJECTS_API_URL = `${API_BASE_URL}/subjects`;
 let editingTestId = null;
 let allTests = [];
 
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+
+function buildTestsApiUrl(testId = "") {
+    const userId = getCurrentUserId();
+    const normalizedPath = testId ? `/${testId}` : "";
+    return `${TESTS_API_URL}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+}
+
+function buildSubjectsApiUrl() {
+    const userId = getCurrentUserId();
+    return `${SUBJECTS_API_URL}?userId=${encodeURIComponent(userId)}`;
+}
+
 function openTestModal() {
     if (!testModalOverlay) return;
     testModalOverlay.classList.remove("hidden");
@@ -89,14 +125,15 @@ function resetTestForm() {
     if (testScoreInput) {
         testScoreInput.value = "";
     }
+
     updateScoreFieldVisibility();
-    
 }
 
 function clearTestModalState() {
     resetTestForm();
     setAddTestMode();
 }
+
 function updateScoreFieldVisibility() {
     if (!testTypeInput || !testScoreGroup || !testScoreInput) return;
 
@@ -397,6 +434,7 @@ function renderRecentResults() {
         `;
     }).join("");
 }
+
 function renderFocusAreas() {
     if (!focusAreaList) return;
 
@@ -466,7 +504,7 @@ function renderTests(tests) {
 
 async function loadTests() {
     try {
-        const backendTests = await fetchJson(TESTS_API_URL);
+        const backendTests = await fetchJson(buildTestsApiUrl());
 
         allTests = Array.isArray(backendTests)
             ? sortTestsByDate(backendTests.map(mapBackendTestToFrontend))
@@ -475,12 +513,12 @@ async function loadTests() {
         renderTests(allTests);
     } catch (error) {
         console.error("Failed to load tests:", error);
-        alert("Tests load nahi ho pa rahe. Console check karo.");
+        alert(`Tests load nahi ho pa rahe: ${error.message}`);
     }
 }
 
 async function addTest(testData) {
-    await fetchJson(TESTS_API_URL, {
+    await fetchJson(buildTestsApiUrl(), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -492,7 +530,7 @@ async function addTest(testData) {
 }
 
 async function updateTest(testId, testData) {
-    await fetchJson(`${TESTS_API_URL}/${testId}`, {
+    await fetchJson(buildTestsApiUrl(testId), {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -504,7 +542,7 @@ async function updateTest(testId, testData) {
 }
 
 async function deleteTest(testId) {
-    await fetchJson(`${TESTS_API_URL}/${testId}`, {
+    await fetchJson(buildTestsApiUrl(testId), {
         method: "DELETE"
     });
 
@@ -604,6 +642,7 @@ function fillTestFormForEdit(testItem) {
     if (testTipInput) {
         testTipInput.value = testData?.testTip || "";
     }
+
     updateScoreFieldVisibility();
 }
 
@@ -629,7 +668,7 @@ async function loadSubjectOptions() {
     if (!testSubjectInput) return;
 
     try {
-        const subjects = await fetchJson(SUBJECTS_API_URL);
+        const subjects = await fetchJson(buildSubjectsApiUrl());
 
         if (!Array.isArray(subjects) || subjects.length === 0) {
             return;
@@ -657,7 +696,8 @@ async function loadSubjectOptions() {
             testSubjectInput.value = subjectNames[0];
         }
     } catch (error) {
-        console.warn("Subjects dropdown backend se load nahi hua. Static options use honge.", error);
+        console.warn("Subjects dropdown backend se load nahi hua.", error);
+        alert(`Subjects load nahi ho pa rahe: ${error.message}`);
     }
 }
 
@@ -682,24 +722,29 @@ async function handleFormSubmit(event) {
         return;
     }
 
+    if (!subject) {
+        alert("Please select a subject.");
+        return;
+    }
+
     if (!date) {
         alert("Please select a test date.");
         return;
     }
 
     if (normalizedType === "Completed" && scoreRaw === "") {
-    alert("Please enter score for a completed test.");
-    return;
-}
-
-if (scoreRaw !== "") {
-    const numericScore = Number(scoreRaw);
-
-    if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 100) {
-        alert("Please enter a valid score between 0 and 100.");
+        alert("Please enter score for a completed test.");
         return;
     }
-}
+
+    if (scoreRaw !== "") {
+        const numericScore = Number(scoreRaw);
+
+        if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 100) {
+            alert("Please enter a valid score between 0 and 100.");
+            return;
+        }
+    }
 
     const testData = {
         title,
@@ -707,7 +752,7 @@ if (scoreRaw !== "") {
         date,
         type,
         duration,
-    score: normalizedType === "Completed" ? Number(scoreRaw) : null,
+        score: normalizedType === "Completed" ? Number(scoreRaw) : null,
         description,
         focusArea,
         testTip
@@ -729,7 +774,7 @@ if (scoreRaw !== "") {
         clearTestModalState();
     } catch (error) {
         console.error("Save failed:", error);
-        alert("Save nahi hua. Console check karo.");
+        alert(`Save nahi hua: ${error.message}`);
     } finally {
         if (testSaveBtn) {
             testSaveBtn.disabled = false;
@@ -760,7 +805,7 @@ async function handleTestListClick(event) {
             await deleteTest(testId);
         } catch (error) {
             console.error("Delete failed:", error);
-            alert("Delete nahi hua. Console check karo.");
+            alert(`Delete nahi hua: ${error.message}`);
         }
 
         return;
@@ -819,9 +864,10 @@ function initializeTestsPage() {
 
     testModalForm.addEventListener("submit", handleFormSubmit);
     testList.addEventListener("click", handleTestListClick);
+
     if (testTypeInput) {
-    testTypeInput.addEventListener("change", updateScoreFieldVisibility);
-}
+        testTypeInput.addEventListener("change", updateScoreFieldVisibility);
+    }
 
     if (testSearchInput) {
         testSearchInput.addEventListener("input", applyTestFilters);

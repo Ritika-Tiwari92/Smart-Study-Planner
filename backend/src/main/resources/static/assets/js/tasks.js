@@ -24,17 +24,46 @@ const taskPriorityInput = document.getElementById("taskPriority");
 const taskStatusInput = document.getElementById("taskStatus");
 const taskDescriptionInput = document.getElementById("taskDescription");
 
-/*
-  Same-origin case:
-  "/tasks" and "/subjects" work if frontend is served by Spring Boot itself.
-
-  If frontend runs separately on another port,
-  use full backend URLs like below.
-*/
 const TASKS_API_BASE = "http://localhost:8080/tasks";
 const SUBJECTS_API_BASE = "http://localhost:8080/subjects";
 
 let editingTaskId = null;
+
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+
+function buildTasksApiUrl(taskId = "") {
+    const userId = getCurrentUserId();
+    const normalizedPath = taskId ? `/${taskId}` : "";
+    return `${TASKS_API_BASE}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+}
+
+function buildSubjectsApiUrl() {
+    const userId = getCurrentUserId();
+    return `${SUBJECTS_API_BASE}?userId=${encodeURIComponent(userId)}`;
+}
 
 function openTaskModal() {
     if (!taskModalOverlay) return;
@@ -273,7 +302,7 @@ async function handleApiResponse(response) {
 }
 
 async function fetchSubjectsFromApi() {
-    const response = await fetch(SUBJECTS_API_BASE);
+    const response = await fetch(buildSubjectsApiUrl());
     const data = await handleApiResponse(response);
 
     if (!Array.isArray(data)) {
@@ -284,7 +313,7 @@ async function fetchSubjectsFromApi() {
 }
 
 async function fetchTasksFromApi() {
-    const response = await fetch(TASKS_API_BASE);
+    const response = await fetch(buildTasksApiUrl());
     const data = await handleApiResponse(response);
 
     if (!Array.isArray(data)) {
@@ -295,7 +324,7 @@ async function fetchTasksFromApi() {
 }
 
 async function createTaskInApi(taskData) {
-    const response = await fetch(TASKS_API_BASE, {
+    const response = await fetch(buildTasksApiUrl(), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -307,7 +336,7 @@ async function createTaskInApi(taskData) {
 }
 
 async function updateTaskInApi(taskId, taskData) {
-    const response = await fetch(`${TASKS_API_BASE}/${taskId}`, {
+    const response = await fetch(buildTasksApiUrl(taskId), {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -319,7 +348,7 @@ async function updateTaskInApi(taskId, taskData) {
 }
 
 async function deleteTaskFromApi(taskId) {
-    const response = await fetch(`${TASKS_API_BASE}/${taskId}`, {
+    const response = await fetch(buildTasksApiUrl(taskId), {
         method: "DELETE"
     });
 
@@ -421,7 +450,7 @@ async function loadSubjectsForTaskForm() {
     } catch (error) {
         console.error("Failed to load subjects for task form:", error);
         populateSubjectDropdown([]);
-        alert("Failed to load subjects for task form.");
+        alert(`Failed to load subjects for task form: ${error.message}`);
     }
 }
 
@@ -439,7 +468,7 @@ async function loadTasks() {
 
         updateTaskCounts();
         updateEmptyState(0);
-        alert("Failed to load tasks from backend.");
+        alert(`Failed to load tasks from backend: ${error.message}`);
     }
 }
 
@@ -623,7 +652,7 @@ if (
             clearModalState();
         } catch (error) {
             console.error("Failed to save task:", error);
-            alert("Failed to save task.");
+            alert(`Failed to save task: ${error.message}`);
         }
     });
 
@@ -644,7 +673,7 @@ if (
                 await deleteTask(taskId);
             } catch (error) {
                 console.error("Failed to delete task:", error);
-                alert("Failed to delete task.");
+                alert(`Failed to delete task: ${error.message}`);
             }
 
             return;

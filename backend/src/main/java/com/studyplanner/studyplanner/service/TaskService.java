@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -22,23 +23,23 @@ public class TaskService {
           this.subjectRepository = subjectRepository;
      }
 
-     public Task addTask(Task task) {
+     public Task addTask(Long userId, Task task) {
           if (task.getSubject() == null || task.getSubject().getId() == null) {
                throw new IllegalArgumentException("Subject is required");
           }
 
-          Subject subject = getSubjectById(task.getSubject().getId());
+          Subject subject = getSubjectByIdForUser(task.getSubject().getId(), userId);
           task.setSubject(subject);
 
           return taskRepository.save(task);
      }
 
-     public Task addTask(TaskRequestDto dto) {
+     public Task addTask(Long userId, TaskRequestDto dto) {
           if (dto.getSubjectId() == null) {
                throw new IllegalArgumentException("Subject is required");
           }
 
-          Subject subject = getSubjectById(dto.getSubjectId());
+          Subject subject = getSubjectByIdForUser(dto.getSubjectId(), userId);
 
           Task task = new Task();
           task.setTitle(dto.getTitle());
@@ -51,39 +52,54 @@ public class TaskService {
           return taskRepository.save(task);
      }
 
-     public List<Task> getAllTasks() {
-          return taskRepository.findAll();
+     public List<Task> getAllTasks(Long userId) {
+          return taskRepository.findBySubjectUserId(userId);
      }
 
-     public Task getTaskById(Long id) {
-          return taskRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+     public Task getTaskById(Long userId, Long id) {
+          return taskRepository.findByIdAndSubjectUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Task not found with id: " + id + " for userId: " + userId));
      }
 
-     public List<Task> getTasksBySubjectId(Long subjectId) {
+     public List<Task> getTasksBySubjectId(Long userId, Long subjectId) {
+          getSubjectByIdForUser(subjectId, userId);
           return taskRepository.findBySubjectId(subjectId);
      }
 
-     public List<Task> getTasksByStatus(String status) {
-          return taskRepository.findByStatus(status);
+     public List<Task> getTasksByStatus(Long userId, String status) {
+          return taskRepository.findBySubjectUserId(userId)
+                    .stream()
+                    .filter(task -> task.getStatus() != null && task.getStatus().equalsIgnoreCase(status))
+                    .collect(Collectors.toList());
      }
 
-     public List<Task> getTodayTasks() {
-          return taskRepository.findByDueDate(LocalDate.now());
+     public List<Task> getTodayTasks(Long userId) {
+          LocalDate today = LocalDate.now();
+
+          return taskRepository.findBySubjectUserId(userId)
+                    .stream()
+                    .filter(task -> today.equals(task.getDueDate()))
+                    .collect(Collectors.toList());
      }
 
-     public List<Task> getUpcomingTasks() {
-          return taskRepository.findByDueDateAfter(LocalDate.now());
+     public List<Task> getUpcomingTasks(Long userId) {
+          LocalDate today = LocalDate.now();
+
+          return taskRepository.findBySubjectUserId(userId)
+                    .stream()
+                    .filter(task -> task.getDueDate() != null && task.getDueDate().isAfter(today))
+                    .collect(Collectors.toList());
      }
 
-     public Task updateTask(Long id, Task updatedTask) {
-          Task existingTask = getTaskById(id);
+     public Task updateTask(Long userId, Long id, Task updatedTask) {
+          Task existingTask = getTaskById(userId, id);
 
           if (updatedTask.getSubject() == null || updatedTask.getSubject().getId() == null) {
                throw new IllegalArgumentException("Subject is required");
           }
 
-          Subject subject = getSubjectById(updatedTask.getSubject().getId());
+          Subject subject = getSubjectByIdForUser(updatedTask.getSubject().getId(), userId);
 
           existingTask.setTitle(updatedTask.getTitle());
           existingTask.setDescription(updatedTask.getDescription());
@@ -95,14 +111,14 @@ public class TaskService {
           return taskRepository.save(existingTask);
      }
 
-     public Task updateTask(Long id, TaskRequestDto dto) {
-          Task existingTask = getTaskById(id);
+     public Task updateTask(Long userId, Long id, TaskRequestDto dto) {
+          Task existingTask = getTaskById(userId, id);
 
           if (dto.getSubjectId() == null) {
                throw new IllegalArgumentException("Subject is required");
           }
 
-          Subject subject = getSubjectById(dto.getSubjectId());
+          Subject subject = getSubjectByIdForUser(dto.getSubjectId(), userId);
 
           existingTask.setTitle(dto.getTitle());
           existingTask.setDescription(dto.getDescription());
@@ -114,21 +130,20 @@ public class TaskService {
           return taskRepository.save(existingTask);
      }
 
-     public Task updateTaskStatus(Long id, String status) {
-          Task existingTask = getTaskById(id);
+     public Task updateTaskStatus(Long userId, Long id, String status) {
+          Task existingTask = getTaskById(userId, id);
           existingTask.setStatus(status);
           return taskRepository.save(existingTask);
      }
 
-     public void deleteTask(Long id) {
-          if (!taskRepository.existsById(id)) {
-               throw new ResourceNotFoundException("Task not found with id: " + id);
-          }
-          taskRepository.deleteById(id);
+     public void deleteTask(Long userId, Long id) {
+          Task existingTask = getTaskById(userId, id);
+          taskRepository.delete(existingTask);
      }
 
-     private Subject getSubjectById(Long subjectId) {
-          return subjectRepository.findById(subjectId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
+     private Subject getSubjectByIdForUser(Long subjectId, Long userId) {
+          return subjectRepository.findByIdAndUserId(subjectId, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Subject not found with id: " + subjectId + " for userId: " + userId));
      }
 }

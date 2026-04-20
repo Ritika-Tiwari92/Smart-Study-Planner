@@ -2,7 +2,9 @@ package com.studyplanner.studyplanner.service;
 
 import com.studyplanner.studyplanner.exception.ResourceNotFoundException;
 import com.studyplanner.studyplanner.model.Subject;
+import com.studyplanner.studyplanner.model.User;
 import com.studyplanner.studyplanner.repository.SubjectRepository;
+import com.studyplanner.studyplanner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,23 +16,33 @@ public class SubjectService {
      @Autowired
      private SubjectRepository subjectRepository;
 
-     public Subject addSubject(Subject subject) {
+     @Autowired
+     private UserRepository userRepository;
+
+     public Subject addSubject(Long userId, Subject subject) {
+          User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+          subject.setUser(user);
           applyDefaults(subject);
+
           return subjectRepository.save(subject);
      }
 
-     public List<Subject> getAllSubjects() {
-          return subjectRepository.findAll();
+     public List<Subject> getAllSubjects(Long userId) {
+          return subjectRepository.findByUserId(userId);
      }
 
-     public Subject getSubjectById(Long id) {
-          return subjectRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + id));
+     public Subject getSubjectById(Long userId, Long id) {
+          return subjectRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Subject not found with id: " + id + " for userId: " + userId));
      }
 
-     public Subject updateSubject(Long id, Subject updatedSubject) {
-          Subject existing = subjectRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + id));
+     public Subject updateSubject(Long userId, Long id, Subject updatedSubject) {
+          Subject existing = subjectRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Subject not found with id: " + id + " for userId: " + userId));
 
           existing.setSubjectName(updatedSubject.getSubjectName());
           existing.setCode(updatedSubject.getCode());
@@ -45,11 +57,12 @@ public class SubjectService {
           return subjectRepository.save(existing);
      }
 
-     public void deleteSubject(Long id) {
-          if (!subjectRepository.existsById(id)) {
-               throw new ResourceNotFoundException("Subject not found with id: " + id);
-          }
-          subjectRepository.deleteById(id);
+     public void deleteSubject(Long userId, Long id) {
+          Subject existing = subjectRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Subject not found with id: " + id + " for userId: " + userId));
+
+          subjectRepository.delete(existing);
      }
 
      private void applyDefaults(Subject subject) {

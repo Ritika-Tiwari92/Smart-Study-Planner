@@ -1,4 +1,7 @@
 const analyticsFilterSelect = document.querySelector(".analytics-filter select");
+const analyticsSearchInput = document.querySelector(
+    ".analytics-search input, .analytics-searchbar input, .search-bar input"
+);
 
 const overallStudyProgressValue = document.getElementById("overallStudyProgressValue");
 const averageTestScoreValue = document.getElementById("averageTestScoreValue");
@@ -16,6 +19,7 @@ const chartBarsContainer = document.getElementById("chartBars");
 const chartLabelsContainer = document.getElementById("chartLabels");
 
 const exportReportBtn = document.querySelector(".export-report-btn");
+
 const API_BASE_URL =
     window.location.port === "8080"
         ? ""
@@ -34,6 +38,37 @@ const analyticsStore = {
     tests: [],
     plans: []
 };
+
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+
+function buildApiUrlWithUserId(baseUrl) {
+    const userId = getCurrentUserId();
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}userId=${encodeURIComponent(userId)}`;
+}
 
 function escapeHtml(value) {
     return String(value ?? "")
@@ -127,7 +162,6 @@ function getSelectedRange() {
         ? analyticsFilterSelect.value
         : "This Week";
 }
-
 
 function safePercent(value) {
     if (!Number.isFinite(value)) return 0;
@@ -308,11 +342,11 @@ async function fetchJson(url) {
 
 async function loadAllAnalyticsData() {
     const results = await Promise.allSettled([
-        fetchJson(SUBJECTS_API_URL),
-        fetchJson(TASKS_API_URL),
-        fetchJson(REVISIONS_API_URL),
-        fetchJson(TESTS_API_URL),
-        fetchJson(PLANS_API_URL)
+        fetchJson(buildApiUrlWithUserId(SUBJECTS_API_URL)),
+        fetchJson(buildApiUrlWithUserId(TASKS_API_URL)),
+        fetchJson(buildApiUrlWithUserId(REVISIONS_API_URL)),
+        fetchJson(buildApiUrlWithUserId(TESTS_API_URL)),
+        fetchJson(buildApiUrlWithUserId(PLANS_API_URL))
     ]);
 
     const [subjectsResult, tasksResult, revisionsResult, testsResult, plansResult] = results;
@@ -361,16 +395,19 @@ function filterRevisions(revisions, rangeValue) {
         isDateInSelectedRange(revision.date, rangeValue)
     );
 }
+
 function filterTests(tests, rangeValue) {
     return tests.filter((test) =>
         isDateInSelectedRange(test.date, rangeValue)
     );
 }
+
 function filterPlans(plans, rangeValue) {
     return plans.filter((plan) =>
         isDateInSelectedRange(plan.date, rangeValue)
     );
 }
+
 function getFilteredAnalyticsData() {
     const rangeValue = getSelectedRange();
 
@@ -584,7 +621,8 @@ function buildCurrentWeekTrend(filteredData) {
 
     return days.map((day) => ({
         label: day.label,
-        height: maxValue > 0 ? Math.max(12, Math.round((day.value / maxValue) * 100)) : 12
+        value: day.value,
+        height: maxValue > 0 ? Math.max(14, Math.round((day.value / maxValue) * 100)) : 8
     }));
 }
 
@@ -592,17 +630,26 @@ function renderTrendChart(filteredData) {
     if (!chartBarsContainer || !chartLabelsContainer) return;
 
     const trend = buildCurrentWeekTrend(filteredData);
-    const hasRealTrend = trend.some((day) => day.height > 12);
+    const hasRealTrend = trend.some((day) => day.value > 0);
 
     chartBarsContainer.innerHTML = trend
         .map((day) => {
-            const finalHeight = hasRealTrend ? day.height : 6;
-            return `<div class="chart-bar" style="height: ${finalHeight}%;"></div>`;
+            const opacity = hasRealTrend
+                ? (day.value > 0 ? 1 : 0.35)
+                : 0.35;
+
+            return `
+                <div
+                    class="chart-bar"
+                    style="height: ${day.height}%; opacity: ${opacity};"
+                    title="${escapeHtml(`${day.label}: ${day.value} activity score`)}"
+                ></div>
+            `;
         })
         .join("");
 
     chartLabelsContainer.innerHTML = trend
-        .map((day) => `<span>${escapeHtml(day.label)}</span>`)
+        .map((day) => `<span title="${escapeHtml(`${day.label}: ${day.value}`)}">${escapeHtml(day.label)}</span>`)
         .join("");
 }
 
@@ -679,17 +726,10 @@ function buildSubjectInsights(filteredData) {
             subjectTests.length +
             subjectPlans.length;
 
-        const weakRevisionCount = subjectRevisions.filter((revision) => isWeakRevision(revision)).length;
-
         return {
             subjectName,
             finalScore,
-            activityCount,
-            weakRevisionCount,
-            taskCount: subjectTasks.length,
-            revisionCount: subjectRevisions.length,
-            testCount: subjectTests.length,
-            planCount: subjectPlans.length
+            activityCount
         };
     });
 
@@ -787,6 +827,15 @@ function generateRecommendations(filteredData, metrics, subjectInsights) {
     return [...new Set(recommendations)].slice(0, 4);
 }
 
+function hasAnyAnalyticsData(filteredData) {
+    return (
+        filteredData.tasks.length > 0 ||
+        filteredData.revisions.length > 0 ||
+        filteredData.tests.length > 0 ||
+        filteredData.plans.length > 0
+    );
+}
+
 function renderRecommendations(recommendations, filteredData) {
     if (!recommendationList) return;
 
@@ -808,14 +857,6 @@ function renderRecommendations(recommendations, filteredData) {
             </div>
         `)
         .join("");
-}
-function hasAnyAnalyticsData(filteredData) {
-    return (
-        filteredData.tasks.length > 0 ||
-        filteredData.revisions.length > 0 ||
-        filteredData.tests.length > 0 ||
-        filteredData.plans.length > 0
-    );
 }
 
 function getRangeFileLabel(rangeValue) {
@@ -852,17 +893,36 @@ function buildMetrics(filteredData) {
     };
 }
 
+function getAnalyticsSearchTerm() {
+    return analyticsSearchInput
+        ? analyticsSearchInput.value.toLowerCase().trim()
+        : "";
+}
+
 function renderAnalytics() {
     const filteredData = getFilteredAnalyticsData();
     const metrics = buildMetrics(filteredData);
-    const subjectInsights = buildSubjectInsights(filteredData);
-    const recommendations = generateRecommendations(filteredData, metrics, subjectInsights);
+
+    let subjectInsights = buildSubjectInsights(filteredData);
+    let recommendations = generateRecommendations(filteredData, metrics, subjectInsights);
+
+    const searchTerm = getAnalyticsSearchTerm();
+
+    if (searchTerm) {
+        subjectInsights = subjectInsights.filter((item) =>
+            item.subjectName.toLowerCase().includes(searchTerm)
+        );
+
+        recommendations = recommendations.filter((text) =>
+            text.toLowerCase().includes(searchTerm)
+        );
+    }
 
     updateSummaryCards(metrics);
     updateScoreOverview(metrics);
     renderTrendChart(filteredData);
     renderSubjectInsights(subjectInsights);
-renderRecommendations(recommendations, filteredData);
+    renderRecommendations(recommendations, filteredData);
 }
 
 function buildExportText() {
@@ -937,36 +997,34 @@ function exportAnalyticsReport() {
 
 async function initializeAnalyticsPage() {
     const pageReady =
-    overallStudyProgressValue &&
-    averageTestScoreValue &&
-    completedSessionsValue &&
-    weeklyConsistencyValue &&
-    mockTestsValue &&
-    revisionAccuracyValue &&
-    taskCompletionValue &&
-    focusEfficiencyValue &&
-    subjectInsightList &&
-    recommendationList &&
-    chartBarsContainer &&
-    chartLabelsContainer;
+        overallStudyProgressValue &&
+        averageTestScoreValue &&
+        completedSessionsValue &&
+        weeklyConsistencyValue &&
+        mockTestsValue &&
+        revisionAccuracyValue &&
+        taskCompletionValue &&
+        focusEfficiencyValue &&
+        subjectInsightList &&
+        recommendationList &&
+        chartBarsContainer &&
+        chartLabelsContainer;
+
     if (!pageReady) {
         return;
-    }
-
-    if (analyticsSearchInput) {
-        analyticsSearchInput.addEventListener("input", renderAnalytics);
     }
 
     if (analyticsFilterSelect) {
         analyticsFilterSelect.addEventListener("change", renderAnalytics);
     }
 
+    if (analyticsSearchInput) {
+        analyticsSearchInput.addEventListener("input", renderAnalytics);
+    }
+
     if (exportReportBtn) {
         exportReportBtn.addEventListener("click", exportAnalyticsReport);
     }
-    if (analyticsSearchInput) {
-    analyticsSearchInput.addEventListener("input", renderAnalytics);
-}
 
     try {
         await loadAllAnalyticsData();
@@ -974,7 +1032,7 @@ async function initializeAnalyticsPage() {
     } catch (error) {
         console.error("Analytics initialization failed:", error);
         renderAnalytics();
-        alert("Analytics data load nahi ho pa raha. Backend connection check karo.");
+        alert(`Analytics data load nahi ho pa raha: ${error.message}`);
     }
 }
 

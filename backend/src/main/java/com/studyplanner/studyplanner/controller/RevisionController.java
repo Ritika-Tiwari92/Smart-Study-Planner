@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/revisions")
+@CrossOrigin(origins = "*")
 public class RevisionController {
 
      private final RevisionService revisionService;
@@ -19,47 +19,32 @@ public class RevisionController {
      }
 
      @GetMapping
-     public List<Revision> getAllRevisions() {
-          return revisionService.getAllRevisions();
+     public List<Revision> getAllRevisions(@RequestParam Long userId) {
+          return revisionService.getAllRevisions(userId);
      }
 
      @GetMapping("/{id}")
-     public ResponseEntity<Revision> getRevisionById(@PathVariable Long id) {
-          Optional<Revision> revision = revisionService.getRevisionById(id);
-
-          if (revision.isPresent()) {
-               return ResponseEntity.ok(revision.get());
-          }
-
-          return ResponseEntity.notFound().build();
+     public ResponseEntity<Revision> getRevisionById(@PathVariable Long id, @RequestParam Long userId) {
+          return ResponseEntity.ok(revisionService.getRevisionById(userId, id));
      }
 
      @PostMapping
-     public Revision createRevision(@RequestBody Revision revision) {
-          return revisionService.createRevision(revision);
+     public Revision createRevision(@RequestParam Long userId, @RequestBody Revision revision) {
+          return revisionService.createRevision(userId, revision);
      }
 
      @PutMapping("/{id}")
-     public ResponseEntity<Revision> updateRevision(@PathVariable Long id, @RequestBody Revision revision) {
-          Optional<Revision> existingRevision = revisionService.getRevisionById(id);
-
-          if (existingRevision.isEmpty()) {
-               return ResponseEntity.notFound().build();
-          }
-
-          Revision updatedRevision = revisionService.updateRevision(id, revision);
+     public ResponseEntity<Revision> updateRevision(
+               @PathVariable Long id,
+               @RequestParam Long userId,
+               @RequestBody Revision revision) {
+          Revision updatedRevision = revisionService.updateRevision(userId, id, revision);
           return ResponseEntity.ok(updatedRevision);
      }
 
      @DeleteMapping("/{id}")
-     public ResponseEntity<String> deleteRevision(@PathVariable Long id) {
-          Optional<Revision> existingRevision = revisionService.getRevisionById(id);
-
-          if (existingRevision.isEmpty()) {
-               return ResponseEntity.notFound().build();
-          }
-
-          revisionService.deleteRevision(id);
+     public ResponseEntity<String> deleteRevision(@PathVariable Long id, @RequestParam Long userId) {
+          revisionService.deleteRevision(userId, id);
           return ResponseEntity.ok("Revision deleted successfully.");
      }
 }

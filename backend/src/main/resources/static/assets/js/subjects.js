@@ -24,17 +24,58 @@ const subjectProgressInput = document.getElementById("subjectProgress");
 const subjectIconInput = document.getElementById("subjectIcon");
 const subjectDescriptionInput = document.getElementById("subjectDescription");
 
-/*
-  Same-origin case:
-  "/subjects" works if frontend is served by Spring Boot itself.
-
-  If your frontend runs separately on another port,
-  replace this with something like:
-  "http://localhost:8080/subjects"
-*/
 const SUBJECTS_API_BASE = "http://localhost:8080/subjects";
 
 let editingSubjectId = null;
+
+
+
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function extractUserIdFromObject(obj) {
+    if (!obj || typeof obj !== "object") return null;
+
+    if (obj.id != null && obj.id !== "") return Number(obj.id);
+    if (obj.userId != null && obj.userId !== "") return Number(obj.userId);
+
+    if (obj.user && obj.user.id != null && obj.user.id !== "") {
+        return Number(obj.user.id);
+    }
+
+    if (obj.data && obj.data.id != null && obj.data.id !== "") {
+        return Number(obj.data.id);
+    }
+
+    return null;
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+function buildSubjectsApiUrl(subjectId = "") {
+    const userId = getCurrentUserId();
+    const normalizedPath = subjectId ? `/${subjectId}` : "";
+    return `${SUBJECTS_API_BASE}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+}
 
 function openSubjectModal() {
     if (!subjectModalOverlay) return;
@@ -150,7 +191,7 @@ async function handleApiResponse(response) {
 }
 
 async function fetchSubjectsFromApi() {
-    const response = await fetch(SUBJECTS_API_BASE);
+    const response = await fetch(buildSubjectsApiUrl());
     const data = await handleApiResponse(response);
 
     if (!Array.isArray(data)) {
@@ -161,7 +202,7 @@ async function fetchSubjectsFromApi() {
 }
 
 async function createSubjectInApi(subjectData) {
-    const response = await fetch(SUBJECTS_API_BASE, {
+    const response = await fetch(buildSubjectsApiUrl(), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -173,7 +214,7 @@ async function createSubjectInApi(subjectData) {
 }
 
 async function updateSubjectInApi(subjectId, subjectData) {
-    const response = await fetch(`${SUBJECTS_API_BASE}/${subjectId}`, {
+    const response = await fetch(buildSubjectsApiUrl(subjectId), {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -185,7 +226,7 @@ async function updateSubjectInApi(subjectId, subjectData) {
 }
 
 async function deleteSubjectFromApi(subjectId) {
-    const response = await fetch(`${SUBJECTS_API_BASE}/${subjectId}`, {
+    const response = await fetch(buildSubjectsApiUrl(subjectId), {
         method: "DELETE"
     });
 
@@ -467,7 +508,7 @@ if (
             clearSubjectModalState();
         } catch (error) {
             console.error("Failed to save subject:", error);
-            alert("Failed to save subject.");
+            alert(`Failed to save subject: ${error.message}`);
         }
     });
 

@@ -1,5 +1,6 @@
 package com.studyplanner.studyplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,6 +28,11 @@ public class Planner {
 
      @Column(length = 1000)
      private String description;
+
+     @JsonIgnore
+     @ManyToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "user_id")
+     private User user;
 
      public Planner() {
      }
@@ -85,5 +91,13 @@ public class Planner {
 
      public void setDescription(String description) {
           this.description = description;
+     }
+
+     public User getUser() {
+          return user;
+     }
+
+     public void setUser(User user) {
+          this.user = user;
      }
 }

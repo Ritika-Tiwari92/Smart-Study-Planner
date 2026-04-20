@@ -1,36 +1,47 @@
 package com.studyplanner.studyplanner.service;
 
+import com.studyplanner.studyplanner.exception.ResourceNotFoundException;
 import com.studyplanner.studyplanner.model.Revision;
+import com.studyplanner.studyplanner.model.User;
 import com.studyplanner.studyplanner.repository.RevisionRepository;
+import com.studyplanner.studyplanner.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RevisionService {
 
      private final RevisionRepository revisionRepository;
+     private final UserRepository userRepository;
 
-     public RevisionService(RevisionRepository revisionRepository) {
+     public RevisionService(RevisionRepository revisionRepository, UserRepository userRepository) {
           this.revisionRepository = revisionRepository;
+          this.userRepository = userRepository;
      }
 
-     public List<Revision> getAllRevisions() {
-          return revisionRepository.findAll();
+     public List<Revision> getAllRevisions(Long userId) {
+          return revisionRepository.findByUserId(userId);
      }
 
-     public Optional<Revision> getRevisionById(Long id) {
-          return revisionRepository.findById(id);
+     public Revision getRevisionById(Long userId, Long id) {
+          return revisionRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Revision not found with id: " + id + " for userId: " + userId));
      }
 
-     public Revision createRevision(Revision revision) {
+     public Revision createRevision(Long userId, Revision revision) {
+          User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+          revision.setUser(user);
           return revisionRepository.save(revision);
      }
 
-     public Revision updateRevision(Long id, Revision updatedRevision) {
-          Revision existingRevision = revisionRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Revision not found with id: " + id));
+     public Revision updateRevision(Long userId, Long id, Revision updatedRevision) {
+          Revision existingRevision = revisionRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Revision not found with id: " + id + " for userId: " + userId));
 
           existingRevision.setTitle(updatedRevision.getTitle());
           existingRevision.setSubject(updatedRevision.getSubject());
@@ -42,7 +53,11 @@ public class RevisionService {
           return revisionRepository.save(existingRevision);
      }
 
-     public void deleteRevision(Long id) {
-          revisionRepository.deleteById(id);
+     public void deleteRevision(Long userId, Long id) {
+          Revision existingRevision = revisionRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Revision not found with id: " + id + " for userId: " + userId));
+
+          revisionRepository.delete(existingRevision);
      }
 }

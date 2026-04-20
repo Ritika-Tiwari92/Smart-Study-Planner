@@ -33,12 +33,55 @@ const revisionDateInput = document.getElementById("revisionDate");
 const revisionStatusInput = document.getElementById("revisionStatus");
 const revisionDescriptionInput = document.getElementById("revisionDescription");
 
-const REVISION_API_URL = "/api/revisions";
-const SUBJECTS_API_URL = "/subjects";
+const REVISION_API_URL =
+    window.location.port === "8080"
+        ? "/api/revisions"
+        : "http://localhost:8080/api/revisions";
+
+const SUBJECTS_API_URL =
+    window.location.port === "8080"
+        ? "/subjects"
+        : "http://localhost:8080/subjects";
 
 let editingRevisionId = null;
 let allRevisionTopics = [];
 let allSubjects = [];
+
+function getStoredUserObject() {
+    const rawValue = localStorage.getItem("edumind_logged_in_user");
+
+    if (!rawValue) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.error("Failed to parse edumind_logged_in_user:", error);
+        return null;
+    }
+}
+
+function getCurrentUserId() {
+    const user = getStoredUserObject();
+
+    if (user && user.id != null && user.id !== "") {
+        return Number(user.id);
+    }
+
+    throw new Error("Logged-in user id not found in localStorage.");
+}
+
+function buildRevisionApiUrl(revisionId = "") {
+    const userId = getCurrentUserId();
+    const normalizedPath = revisionId ? `/${revisionId}` : "";
+    return `${REVISION_API_URL}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+}
+
+function buildSubjectsApiUrl() {
+    const userId = getCurrentUserId();
+    return `${SUBJECTS_API_URL}?userId=${encodeURIComponent(userId)}`;
+}
 
 function openRevisionModal() {
     if (!revisionModalOverlay) return;
@@ -477,7 +520,7 @@ async function apiRequest(url, options = {}) {
 }
 
 async function fetchAllRevisionTopics() {
-    const data = await apiRequest(REVISION_API_URL, {
+    const data = await apiRequest(buildRevisionApiUrl(), {
         method: "GET"
     });
 
@@ -485,7 +528,7 @@ async function fetchAllRevisionTopics() {
 }
 
 async function createRevisionTopicApi(topicData) {
-    const createdTopic = await apiRequest(REVISION_API_URL, {
+    const createdTopic = await apiRequest(buildRevisionApiUrl(), {
         method: "POST",
         body: JSON.stringify(convertToRequestBody(topicData))
     });
@@ -494,7 +537,7 @@ async function createRevisionTopicApi(topicData) {
 }
 
 async function updateRevisionTopicApi(topicId, topicData) {
-    const updatedTopic = await apiRequest(`${REVISION_API_URL}/${topicId}`, {
+    const updatedTopic = await apiRequest(buildRevisionApiUrl(topicId), {
         method: "PUT",
         body: JSON.stringify(convertToRequestBody(topicData))
     });
@@ -503,7 +546,7 @@ async function updateRevisionTopicApi(topicId, topicData) {
 }
 
 async function deleteRevisionTopicApi(topicId) {
-    await apiRequest(`${REVISION_API_URL}/${topicId}`, {
+    await apiRequest(buildRevisionApiUrl(topicId), {
         method: "DELETE"
     });
 }
@@ -567,7 +610,7 @@ function populateSubjectDropdown(subjects, selectedValue = "") {
 
 async function loadRevisionSubjects(selectedValue = "") {
     try {
-        const data = await apiRequest(SUBJECTS_API_URL, {
+        const data = await apiRequest(buildSubjectsApiUrl(), {
             method: "GET"
         });
 
@@ -576,6 +619,7 @@ async function loadRevisionSubjects(selectedValue = "") {
     } catch (error) {
         console.error("Failed to load subjects:", error);
         populateSubjectDropdown([], selectedValue);
+        alert(`Failed to load subjects: ${error.message}`);
     }
 }
 
@@ -654,7 +698,7 @@ async function loadRevisionTopics() {
         console.error("Failed to load revision topics:", error);
         allRevisionTopics = [];
         renderAllRealtimeSections([]);
-        alert("Revision data load nahi ho pa raha. Backend connection check karo.");
+        alert(`Failed to load revision topics: ${error.message}`);
     }
 }
 
@@ -731,7 +775,9 @@ if (
         });
 
         try {
-            revisionSaveBtn.disabled = true;
+            if (revisionSaveBtn) {
+                revisionSaveBtn.disabled = true;
+            }
 
             if (editingRevisionId) {
                 await updateRevisionTopicApi(editingRevisionId, revisionData);
@@ -744,9 +790,11 @@ if (
             clearRevisionModalState();
         } catch (error) {
             console.error("Failed to save revision topic:", error);
-            alert("Revision save/update nahi ho pa raha. Backend API check karo.");
+            alert(`Failed to save revision topic: ${error.message}`);
         } finally {
-            revisionSaveBtn.disabled = false;
+            if (revisionSaveBtn) {
+                revisionSaveBtn.disabled = false;
+            }
         }
     });
 
@@ -768,7 +816,7 @@ if (
                 await loadRevisionTopics();
             } catch (error) {
                 console.error("Failed to delete revision topic:", error);
-                alert("Revision delete nahi ho pa raha. Backend API check karo.");
+                alert(`Failed to delete revision topic: ${error.message}`);
             }
 
             return;
