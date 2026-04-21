@@ -10,7 +10,6 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
-
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -36,42 +35,34 @@
                          <i class="fa-solid fa-house"></i>
                          <span>Dashboard</span>
                     </a>
-
                     <a href="planner.html" class="nav-item">
                          <i class="fa-solid fa-calendar-days"></i>
                          <span>Planner</span>
                     </a>
-
                     <a href="subjects.html" class="nav-item">
                          <i class="fa-solid fa-book"></i>
                          <span>Subjects</span>
                     </a>
-
                     <a href="tasks.html" class="nav-item">
                          <i class="fa-solid fa-list-check"></i>
                          <span>Tasks</span>
                     </a>
-
                     <a href="revision.html" class="nav-item">
                          <i class="fa-solid fa-rotate"></i>
                          <span>Revision</span>
                     </a>
-
                     <a href="tests.html" class="nav-item">
                          <i class="fa-solid fa-file-lines"></i>
                          <span>Tests</span>
                     </a>
-
                     <a href="analytics.html" class="nav-item">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
-
                     <a href="assistant.html" class="nav-item active">
                          <i class="fa-solid fa-robot"></i>
                          <span>Assistant</span>
                     </a>
-
                     <a href="settings.html" class="nav-item">
                          <i class="fa-solid fa-gear"></i>
                          <span>Settings</span>
@@ -96,21 +87,20 @@
                     </div>
 
                     <div class="header-actions">
-                         <button class="new-chat-btn">
+                         <button class="new-chat-btn" id="newChatBtn" type="button">
                               <i class="fa-solid fa-plus"></i>
                               <span>New Chat</span>
                          </button>
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
                               <i class="fa-solid fa-moon"></i>
                          </button>
                          <div class="profile-mini" id="profileMenuToggle">
-                              <img src="../assets/avatar/default-user.png" alt="User">
+                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
                               <div>
-                                   <h4>Ritika</h4>
-                                   <p>Student</p>
+                                   <h4 id="assistantProfileName">Student</h4>
+                                   <p id="assistantProfileRole">Student</p>
                               </div>
                          </div>
-
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <a href="settings.html" class="profile-menu-item">
                                    <i class="fa-solid fa-user-gear"></i>
@@ -129,100 +119,134 @@
                </header>
 
                <section class="assistant-content">
+
+                    <!-- Intro Card -->
                     <div class="assistant-intro-card">
                          <div class="assistant-intro-left">
                               <div class="assistant-avatar">
                                    <i class="fa-solid fa-robot"></i>
                               </div>
                               <div>
-                                   <h3>Hello, I’m your Astra AI - Study Buddy</h3>
-                                   <p>I can help you with study plans, explanations, revision help, coding doubts, and
-                                        smart suggestions.</p>
+                                   <h3 id="assistantIntroTitle">Hello, I'm Astra — your AI Study Buddy</h3>
+                                   <p>I can help you with study plans, topic explanations, revision help, coding
+                                        doubts, and smart suggestions. Just type or pick a suggestion below!</p>
                               </div>
                          </div>
                     </div>
 
+                    <!-- Quick Action Chips -->
                     <div class="assistant-quick-actions">
-                         <button class="assistant-chip">Make a study plan</button>
-                         <button class="assistant-chip">Explain a topic</button>
-                         <button class="assistant-chip">Generate revision questions</button>
-                         <button class="assistant-chip">Help with coding</button>
-                         <button class="assistant-chip">Summarize notes</button>
+                         <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
+                              <i class="fa-solid fa-calendar-check"></i> Make a study plan
+                         </button>
+                         <button class="assistant-chip" type="button" data-prompt="Explain a topic in simple words">
+                              <i class="fa-solid fa-lightbulb"></i> Explain a topic
+                         </button>
+                         <button class="assistant-chip" type="button" data-prompt="Generate revision questions for me">
+                              <i class="fa-solid fa-rotate"></i> Generate revision questions
+                         </button>
+                         <button class="assistant-chip" type="button" data-prompt="Help me with a coding problem">
+                              <i class="fa-solid fa-code"></i> Help with coding
+                         </button>
+                         <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
+                              <i class="fa-solid fa-file-lines"></i> Summarize notes
+                         </button>
                     </div>
 
+                    <!-- Main Grid -->
                     <div class="assistant-main-grid">
+
+                         <!-- Chat Card -->
                          <div class="assistant-chat-card">
                               <div class="section-title">
-                                   <h3>Chat Window</h3>
+                                   <h3><i class="fa-solid fa-comments"></i> Chat with Astra</h3>
                                    <p>Ask anything related to your learning.</p>
                               </div>
 
-                              <div class="chat-messages">
-                                   <div class="chat-message assistant">
-                                        <div class="chat-bubble">
-                                             Hi Ritika! I can help you with study planning, revision, coding, and test
-                                             preparation. What would you like to do today?
-                                        </div>
-                                   </div>
-
-                                   <div class="chat-message user">
-                                        <div class="chat-bubble">
-                                             Help me prepare for my Java mock test.
-                                        </div>
-                                   </div>
-
-                                   <div class="chat-message assistant">
-                                        <div class="chat-bubble">
-                                             Sure! I can create a Java mock test plan, important topics list, and quick
-                                             revision strategy for you.
-                                        </div>
-                                   </div>
+                              <div class="chat-messages" id="chatMessages">
+                                   <!-- Rendered by assistant.js -->
                               </div>
 
-                              <div class="chat-input-box">
-                                   <i class="fa-regular fa-message"></i>
-                                   <input type="text" placeholder="Type your message here...">
-                                   <button class="send-chat-btn">
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                   </button>
+                              <div class="chat-input-wrapper">
+                                   <div class="chat-input-box" id="chatInputBox">
+                                        <i class="fa-solid fa-robot chat-icon"></i>
+                                        <input type="text" id="assistantMessageInput"
+                                             placeholder="Ask Astra anything... (Enter to send)" autocomplete="off" />
+                                        <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
+                                             <i class="fa-solid fa-paper-plane"></i>
+                                        </button>
+                                   </div>
+                                   <p class="input-hint">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        Astra AI can make mistakes. Always verify important information.
+                                   </p>
                               </div>
                          </div>
 
+                         <!-- Side Card -->
                          <div class="assistant-side-card">
+
+                              <!-- Suggested Help -->
                               <div class="section-title">
-                                   <h3>Suggested Help</h3>
+                                   <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Suggested Help</h3>
                                    <p>Quick things you can ask right now.</p>
                               </div>
 
                               <div class="assistant-help-list">
-                                   <div class="assistant-help-item">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Create a one-day exam revision plan for me">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Create a one-day exam revision plan</span>
                                    </div>
-                                   <div class="assistant-help-item">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Explain DBMS normalization in easy words">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Explain DBMS normalization in easy words</span>
                                    </div>
-                                   <div class="assistant-help-item">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Generate Java interview questions for me">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Generate Java interview questions</span>
                                    </div>
-                                   <div class="assistant-help-item">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Make short notes for Operating System">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Make short notes for Operating System</span>
                                    </div>
-                                   <div class="assistant-help-item">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Give me aptitude practice questions">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Give me aptitude practice questions</span>
                                    </div>
                               </div>
+
+                              <!-- Chat History -->
+                              <div class="history-section">
+                                   <div class="history-header">
+                                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Chats</h3>
+                                        <button class="new-chat-small-btn" id="newChatSmallBtn" type="button"
+                                             title="New Chat">
+                                             <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                   </div>
+
+                                   <div class="history-list" id="historyList">
+                                        <div class="history-empty" id="historyEmpty">
+                                             <i class="fa-solid fa-comment-slash"></i>
+                                             <p>No chat history yet</p>
+                                        </div>
+                                   </div>
+                              </div>
+
                          </div>
                     </div>
                </section>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/assistant.js"></script>
 </body>
 
 </html>
