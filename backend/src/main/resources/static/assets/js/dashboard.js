@@ -12,10 +12,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const dashboardProfileRole = document.getElementById("dashboardProfileRole");
     const dashboardProfileAvatar = document.getElementById("dashboardProfileAvatar");
 
+    const welcomeInsightPrimary = document.getElementById("welcomeInsightPrimary");
+    const welcomeInsightSecondary = document.getElementById("welcomeInsightSecondary");
+    const welcomeInsightTertiary = document.getElementById("welcomeInsightTertiary");
+    const welcomeBannerSubtitle = document.getElementById("welcomeBannerSubtitle");
+
     const totalSubjectsCount = document.getElementById("totalSubjectsCount");
     const pendingTasksCount = document.getElementById("pendingTasksCount");
     const completedTasksCount = document.getElementById("completedTasksCount");
     const studyProgressCount = document.getElementById("studyProgressCount");
+
+    const totalSubjectsHint = document.getElementById("totalSubjectsHint");
+    const pendingTasksHint = document.getElementById("pendingTasksHint");
+    const completedTasksHint = document.getElementById("completedTasksHint");
+    const studyProgressHint = document.getElementById("studyProgressHint");
 
     const subjectProgressList = document.getElementById("subjectProgressList");
     const upcomingScheduleList = document.getElementById("upcomingScheduleList");
@@ -45,6 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
         searchItems: []
     };
 
+    // ─── Utilities ───────────────────────────────────────────────────────────
+
     function closeDashboardDropdowns() {
         dashboardSearchResults?.classList.add("hidden");
         dashboardNotificationDropdown?.classList.add("hidden");
@@ -61,40 +73,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function getFirstAvailableValue(obj, keys, fallback = "") {
         if (!obj || typeof obj !== "object") return fallback;
-
         for (const key of keys) {
             const value = obj[key];
-            if (value !== undefined && value !== null && value !== "") {
-                return value;
-            }
+            if (value !== undefined && value !== null && value !== "") return value;
         }
-
         return fallback;
     }
 
     function getArrayFromResponse(response) {
         if (Array.isArray(response)) return response;
         if (!response || typeof response !== "object") return [];
-
-        const possibleKeys = [
-            "data",
-            "content",
-            "items",
-            "results",
-            "list",
-            "subjects",
-            "tasks",
-            "plans",
-            "revisions",
-            "tests"
-        ];
-
+        const possibleKeys = ["data", "content", "items", "results", "list", "subjects", "tasks", "plans", "revisions", "tests"];
         for (const key of possibleKeys) {
-            if (Array.isArray(response[key])) {
-                return response[key];
-            }
+            if (Array.isArray(response[key])) return response[key];
         }
-
         return [];
     }
 
@@ -112,44 +104,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function parseStoredJson(value) {
-        try {
-            return JSON.parse(value);
-        } catch {
-            return null;
-        }
+        try { return JSON.parse(value); } catch { return null; }
     }
 
     function getStoredUser() {
-        const possibleKeys = [
-            "edumind_logged_in_user",
-            "edumind_registered_user",
-            "loggedInUser",
-            "currentUser",
-            "user",
-            "authUser",
-            "studyPlannerUser"
-        ];
-
+        const possibleKeys = ["edumind_logged_in_user", "edumind_registered_user", "loggedInUser", "currentUser", "user", "authUser", "studyPlannerUser"];
         for (const key of possibleKeys) {
             const rawValue = localStorage.getItem(key);
             if (!rawValue) continue;
-
             const parsed = parseStoredJson(rawValue);
-            if (parsed && typeof parsed === "object") {
-                return parsed;
-            }
+            if (parsed && typeof parsed === "object") return parsed;
         }
-
         return null;
     }
 
     function getCurrentUserId() {
         const user = state.user || getStoredUser();
-
-        if (user && user.id != null && user.id !== "") {
-            return Number(user.id);
-        }
-
+        if (user && user.id != null && user.id !== "") return Number(user.id);
         throw new Error("Logged-in user id not found in localStorage.");
     }
 
@@ -160,54 +131,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getUserDisplayName(user) {
-        const fullName = getFirstAvailableValue(user, [
-            "fullName",
-            "name",
-            "displayName",
-            "username"
-        ], "Student");
-
-        return fullName || "Student";
+        return getFirstAvailableValue(user, ["fullName", "name", "displayName", "username"], "Student") || "Student";
     }
 
     function getUserFirstName(user) {
-        const name = getUserDisplayName(user);
-        return name.split(" ")[0] || "Student";
+        return getUserDisplayName(user).split(" ")[0] || "Student";
     }
 
     function getUserRole(user) {
         const role = getFirstAvailableValue(user, ["role", "userRole"], "");
         if (role) return role;
-
-        const course = getFirstAvailableValue(user, ["course"], "");
-        if (course) return course;
-
-        return "Student";
+        return getFirstAvailableValue(user, ["course"], "Student") || "Student";
     }
 
     function getUserAvatar(user) {
         const userId = user && user.id ? user.id : null;
-
         if (userId) {
             const userSpecificPhoto = localStorage.getItem(`edumind_profile_photo_${userId}`);
-            if (userSpecificPhoto && userSpecificPhoto.trim() !== "") {
-                return userSpecificPhoto;
-            }
+            if (userSpecificPhoto && userSpecificPhoto.trim() !== "") return userSpecificPhoto;
         }
-
         const legacyPhoto = localStorage.getItem("edumind_profile_photo");
-        if (legacyPhoto && legacyPhoto.trim() !== "") {
-            return legacyPhoto;
-        }
-
-        return getFirstAvailableValue(user, [
-            "profilePhoto",
-            "profileImage",
-            "avatar",
-            "imageUrl",
-            "photoUrl"
-        ], "../assets/avatar/default-user.png");
+        if (legacyPhoto && legacyPhoto.trim() !== "") return legacyPhoto;
+        return getFirstAvailableValue(user, ["profilePhoto", "profileImage", "avatar", "imageUrl", "photoUrl"], "../assets/avatar/default-user.png");
     }
+
+    function renderChipText(element, iconClass, text) {
+        if (!element) return;
+        element.innerHTML = `
+            <i class="fa-solid ${iconClass}"></i>
+            <span>${escapeHtml(text)}</span>
+        `;
+    }
+
+    // ─── User Info ───────────────────────────────────────────────────────────
 
     function renderUserInfo() {
         const user = state.user || getStoredUser();
@@ -216,21 +172,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const role = getUserRole(user);
         const avatar = getUserAvatar(user);
 
-        if (dashboardGreetingTitle) {
-            dashboardGreetingTitle.textContent = `Hello, ${firstName} 👋`;
-        }
-
-        if (dashboardGreetingSubtitle) {
-            dashboardGreetingSubtitle.textContent = "Let’s make today productive and well planned.";
-        }
-
-        if (dashboardProfileName) {
-            dashboardProfileName.textContent = fullName;
-        }
-
-        if (dashboardProfileRole) {
-            dashboardProfileRole.textContent = role;
-        }
+        if (dashboardGreetingTitle) dashboardGreetingTitle.textContent = `Hello, ${firstName} 👋`;
+        if (dashboardGreetingSubtitle) dashboardGreetingSubtitle.textContent = "Let's make today productive and well planned.";
+        if (dashboardProfileName) dashboardProfileName.textContent = fullName;
+        if (dashboardProfileRole) dashboardProfileRole.textContent = role;
 
         if (dashboardProfileAvatar) {
             dashboardProfileAvatar.src = avatar || "../assets/avatar/default-user.png";
@@ -239,19 +184,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 dashboardProfileAvatar.src = "../assets/avatar/default-user.png";
             };
         }
+
+        const dropdownAvatar = document.getElementById("dashboardProfileAvatarDropdown");
+        const dropdownName = document.getElementById("dashboardProfileNameDropdown");
+        const dropdownRole = document.getElementById("dashboardProfileRoleDropdown");
+
+        if (dropdownAvatar) {
+            dropdownAvatar.src = avatar || "../assets/avatar/default-user.png";
+            dropdownAvatar.onerror = function () {
+                dropdownAvatar.src = "../assets/avatar/default-user.png";
+            };
+        }
+        if (dropdownName) dropdownName.textContent = fullName;
+        if (dropdownRole) dropdownRole.textContent = role;
     }
 
+    // ─── Fetch ───────────────────────────────────────────────────────────────
+
     async function fetchJson(url) {
-        const response = await fetch(url, {
-            headers: {
-                "Accept": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`${url} failed with status ${response.status}`);
-        }
-
+        const response = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!response.ok) throw new Error(`${url} failed with status ${response.status}`);
         return response.json();
     }
 
@@ -265,34 +217,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // ─── Date Helpers ─────────────────────────────────────────────────────────
+
     function isValidDate(date) {
         return date instanceof Date && !Number.isNaN(date.getTime());
     }
 
     function parseDateValue(value) {
         if (!value) return null;
-
-        if (value instanceof Date) {
-            return isValidDate(value) ? value : null;
-        }
-
+        if (value instanceof Date) return isValidDate(value) ? value : null;
         if (typeof value === "number") {
-            const date = new Date(value);
-            return isValidDate(date) ? date : null;
+            const d = new Date(value);
+            return isValidDate(d) ? d : null;
         }
-
         if (typeof value !== "string") return null;
 
         const trimmed = value.trim();
         if (!trimmed) return null;
 
-        let date = null;
-
-        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-            date = new Date(`${trimmed}T00:00:00`);
-        } else {
-            date = new Date(trimmed);
-        }
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+            ? new Date(`${trimmed}T00:00:00`)
+            : new Date(trimmed);
 
         return isValidDate(date) ? date : null;
     }
@@ -300,54 +245,23 @@ document.addEventListener("DOMContentLoaded", function () {
     function parseItemDate(item) {
         if (!item || typeof item !== "object") return null;
 
-        const directDate = getFirstAvailableValue(item, [
-            "date",
-            "dueDate",
-            "planDate",
-            "studyDate",
-            "revisionDate",
-            "testDate",
-            "scheduledDate",
-            "scheduleDate",
-            "examDate",
-            "startDate",
-            "createdAt",
-            "updatedAt"
-        ], null);
-
+        const directDate = getFirstAvailableValue(
+            item,
+            ["date", "dueDate", "planDate", "studyDate", "revisionDate", "testDate", "scheduledDate", "scheduleDate", "examDate", "startDate", "createdAt", "updatedAt"],
+            null
+        );
         const directDateParsed = parseDateValue(directDate);
         if (directDateParsed) return directDateParsed;
 
-        const dateTime = getFirstAvailableValue(item, [
-            "dateTime",
-            "startDateTime",
-            "scheduledAt",
-            "start"
-        ], null);
-
+        const dateTime = getFirstAvailableValue(item, ["dateTime", "startDateTime", "scheduledAt", "start"], null);
         return parseDateValue(dateTime);
     }
 
     function getTimeText(item) {
-        const startTime = getFirstAvailableValue(item, [
-            "startTime",
-            "fromTime",
-            "time"
-        ], "");
-
-        const endTime = getFirstAvailableValue(item, [
-            "endTime",
-            "toTime"
-        ], "");
-
-        if (startTime && endTime) {
-            return `${startTime} to ${endTime}`;
-        }
-
-        if (startTime) {
-            return startTime;
-        }
-
+        const startTime = getFirstAvailableValue(item, ["startTime", "fromTime", "time"], "");
+        const endTime = getFirstAvailableValue(item, ["endTime", "toTime"], "");
+        if (startTime && endTime) return `${startTime} – ${endTime}`;
+        if (startTime) return startTime;
         return "";
     }
 
@@ -357,18 +271,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const today = new Date();
         const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const targetDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-        const diffMs = targetDay - startOfToday;
-        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        const diffDays = Math.round((targetDay - startOfToday) / (1000 * 60 * 60 * 24));
 
         if (diffDays === 0) return "Today";
         if (diffDays === 1) return "Tomorrow";
         if (diffDays === -1) return "Yesterday";
 
-        return targetDay.toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short"
-        });
+        return targetDay.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     }
 
     function formatChartDayLabel(date) {
@@ -376,37 +285,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function isSameDay(dateA, dateB) {
-        return (
-            isValidDate(dateA) &&
-            isValidDate(dateB) &&
+        return isValidDate(dateA) && isValidDate(dateB) &&
             dateA.getFullYear() === dateB.getFullYear() &&
             dateA.getMonth() === dateB.getMonth() &&
-            dateA.getDate() === dateB.getDate()
-        );
+            dateA.getDate() === dateB.getDate();
     }
 
     function isFutureOrToday(date) {
         if (!isValidDate(date)) return false;
-
         const today = new Date();
         const currentDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const targetDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
         return targetDay >= currentDay;
     }
 
     function isWithinNextDays(date, days) {
         if (!isValidDate(date)) return false;
-
         const today = new Date();
         const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const end = new Date(start);
         end.setDate(start.getDate() + days);
-
         const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
         return target >= start && target <= end;
     }
+
+    function isWithinLastDays(date, days) {
+        if (!isValidDate(date)) return false;
+        const today = new Date();
+        const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const start = new Date(end);
+        start.setDate(end.getDate() - days);
+        const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        return target >= start && target <= end;
+    }
+
+    // ─── Task Helpers ─────────────────────────────────────────────────────────
 
     function isTaskCompleted(task) {
         const status = normalizeText(getFirstAvailableValue(task, ["status"], ""));
@@ -419,23 +332,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getTaskBadgeInfo(task) {
-        if (isTaskCompleted(task)) {
-            return { label: "Done", className: "done" };
-        }
-
-        if (isTaskInProgress(task)) {
-            return { label: "In Progress", className: "progress" };
-        }
-
+        if (isTaskCompleted(task)) return { label: "Done", className: "done" };
+        if (isTaskInProgress(task)) return { label: "In Progress", className: "progress" };
         return { label: "Pending", className: "pending" };
     }
 
     function getTaskTitle(task) {
-        return getFirstAvailableValue(task, [
-            "title",
-            "taskTitle",
-            "name"
-        ], "Untitled Task");
+        return getFirstAvailableValue(task, ["title", "taskTitle", "name"], "Untitled Task");
     }
 
     function getTaskPriority(task) {
@@ -447,32 +350,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getSubjectName(subject) {
-        return getFirstAvailableValue(subject, [
-            "name",
-            "subjectName",
-            "title"
-        ], "Untitled Subject");
+        return getFirstAvailableValue(subject, ["name", "subjectName", "title"], "Untitled Subject");
     }
 
     function getTaskSubjectId(task) {
         const directId = getFirstAvailableValue(task, ["subjectId"], "");
         if (directId) return directId;
-
         if (task.subject && typeof task.subject === "object") {
             return getFirstAvailableValue(task.subject, ["id", "subjectId"], "");
         }
-
         return "";
     }
 
     function getTaskSubjectName(task) {
         const directName = getFirstAvailableValue(task, ["subjectName"], "");
         if (directName) return directName;
-
-        if (task.subject && typeof task.subject === "object") {
-            return getSubjectName(task.subject);
-        }
-
+        if (task.subject && typeof task.subject === "object") return getSubjectName(task.subject);
         return "";
     }
 
@@ -484,21 +377,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const taskSubjectId = String(getTaskSubjectId(task));
             const taskSubjectName = normalizeText(getTaskSubjectName(task));
 
-            return (
-                (subjectId && taskSubjectId && subjectId === taskSubjectId) ||
-                (subjectName && taskSubjectName && subjectName === taskSubjectName)
-            );
+            return (subjectId && taskSubjectId && subjectId === taskSubjectId) ||
+                   (subjectName && taskSubjectName && subjectName === taskSubjectName);
         });
     }
 
     function computeSubjectProgress(subject) {
         const explicitProgress = safeNumber(
-            getFirstAvailableValue(subject, [
-                "progress",
-                "completionPercentage",
-                "coverage",
-                "studyProgress"
-            ], null),
+            getFirstAvailableValue(subject, ["progress", "completionPercentage", "coverage", "studyProgress"], null),
             NaN
         );
 
@@ -513,34 +399,281 @@ document.addEventListener("DOMContentLoaded", function () {
         return clamp(Math.round((completedCount / relatedTasks.length) * 100), 0, 100);
     }
 
-    function renderStats() {
-        const subjects = state.subjects;
-        const tasks = state.tasks;
+    function getProgressStatusLabel(progress) {
+        if (progress >= 75) return "Excellent momentum";
+        if (progress >= 50) return "Steady progress";
+        if (progress >= 25) return "Building consistency";
+        return "Needs stronger focus";
+    }
 
-        const pendingTasks = tasks.filter((task) => !isTaskCompleted(task)).length;
-        const completedTasks = tasks.filter(isTaskCompleted).length;
-        const totalTasks = tasks.length;
+    // ─── Welcome Banner Insights ─────────────────────────────────────────────
 
-        const studyProgress = totalTasks > 0
-            ? Math.round((completedTasks / totalTasks) * 100)
-            : 0;
+    function renderWelcomeBannerInsights() {
+        const today = new Date();
 
-        if (totalSubjectsCount) {
-            totalSubjectsCount.textContent = String(subjects.length).padStart(2, "0");
+        const pendingToday = state.tasks.filter((task) => {
+            const date = parseItemDate(task);
+            return date && isSameDay(date, today) && !isTaskCompleted(task);
+        });
+
+        const upcomingRevision = state.revisions.find((item) => {
+            const d = parseItemDate(item);
+            return d && isWithinNextDays(d, 2);
+        });
+
+        const upcomingTest = state.tests.find((item) => {
+            const d = parseItemDate(item);
+            return d && isWithinNextDays(d, 3);
+        });
+
+        const incompleteTasks = state.tasks.filter((task) => !isTaskCompleted(task));
+        const strongestSubject = state.subjects.length
+            ? state.subjects
+                .map((subject) => ({
+                    name: getSubjectName(subject),
+                    progress: computeSubjectProgress(subject)
+                }))
+                .sort((a, b) => b.progress - a.progress)[0]
+            : null;
+
+        const subtitleText = pendingToday.length > 0
+            ? `You have ${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} to handle today.`
+            : incompleteTasks.length > 0
+                ? `You are doing well — focus on your next pending study actions.`
+                : `You are all caught up. Use today to revise and strengthen weak areas.`;
+
+        if (welcomeBannerSubtitle) {
+            welcomeBannerSubtitle.textContent = subtitleText;
         }
 
-        if (pendingTasksCount) {
-            pendingTasksCount.textContent = String(pendingTasks).padStart(2, "0");
+        if (pendingToday.length > 0) {
+            renderChipText(
+                welcomeInsightPrimary,
+                "fa-list-check",
+                `${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} pending today`
+            );
+        } else {
+            renderChipText(
+                welcomeInsightPrimary,
+                "fa-circle-check",
+                "No pending tasks due today"
+            );
         }
 
-        if (completedTasksCount) {
-            completedTasksCount.textContent = String(completedTasks).padStart(2, "0");
+        if (strongestSubject && strongestSubject.progress > 0) {
+            renderChipText(
+                welcomeInsightSecondary,
+                "fa-trophy",
+                `Strongest subject: ${strongestSubject.name} at ${strongestSubject.progress}%`
+            );
+        } else {
+            renderChipText(
+                welcomeInsightSecondary,
+                "fa-book-open",
+                "Start building subject progress with your first completed task"
+            );
         }
 
-        if (studyProgressCount) {
-            studyProgressCount.textContent = `${studyProgress}%`;
+        if (upcomingTest) {
+            const testName = getFirstAvailableValue(upcomingTest, ["title", "testName", "name", "subjectName"], "Upcoming test");
+            renderChipText(
+                welcomeInsightTertiary,
+                "fa-file-lines",
+                `${testName} is ${getRelativeDayLabel(parseItemDate(upcomingTest)).toLowerCase()}`
+            );
+        } else if (upcomingRevision) {
+            const revisionName = getFirstAvailableValue(upcomingRevision, ["title", "topic", "name"], "Revision session");
+            renderChipText(
+                welcomeInsightTertiary,
+                "fa-rotate",
+                `${revisionName} is coming up ${getRelativeDayLabel(parseItemDate(upcomingRevision)).toLowerCase()}`
+            );
+        } else {
+            renderChipText(
+                welcomeInsightTertiary,
+                "fa-bolt",
+                "No urgent test or revision alert right now"
+            );
         }
     }
+
+    // ─── Stats ────────────────────────────────────────────────────────────────
+
+    function renderStats() {
+        const tasks = state.tasks;
+        const pendingTasks = tasks.filter((t) => !isTaskCompleted(t));
+        const completedTasks = tasks.filter(isTaskCompleted);
+        const totalTasks = tasks.length;
+        const studyProgress = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+
+        const today = new Date();
+        const pendingToday = pendingTasks.filter((task) => {
+            const d = parseItemDate(task);
+            return d && isSameDay(d, today);
+        }).length;
+
+        const upcomingPending = pendingTasks.filter((task) => {
+            const d = parseItemDate(task);
+            return d && isWithinNextDays(d, 3);
+        }).length;
+
+        const recentlyCompleted = completedTasks.filter((task) => {
+            const d = parseItemDate(task);
+            return d && isWithinLastDays(d, 7);
+        }).length;
+
+        const subjectsWithProgress = state.subjects.map((subject) => ({
+            name: getSubjectName(subject),
+            progress: computeSubjectProgress(subject)
+        })).sort((a, b) => b.progress - a.progress);
+
+        const strongestSubject = subjectsWithProgress[0];
+
+        if (totalSubjectsCount) totalSubjectsCount.textContent = String(state.subjects.length).padStart(2, "0");
+        if (pendingTasksCount) pendingTasksCount.textContent = String(pendingTasks.length).padStart(2, "0");
+        if (completedTasksCount) completedTasksCount.textContent = String(completedTasks.length).padStart(2, "0");
+        if (studyProgressCount) studyProgressCount.textContent = `${studyProgress}%`;
+
+        if (totalSubjectsHint) {
+            totalSubjectsHint.textContent = state.subjects.length === 0
+                ? "Start by adding your first study subject."
+                : strongestSubject && strongestSubject.progress > 0
+                    ? `Top subject: ${strongestSubject.name} at ${strongestSubject.progress}%`
+                    : `${state.subjects.length} subject${state.subjects.length > 1 ? "s" : ""} ready to track`;
+        }
+
+        if (pendingTasksHint) {
+            pendingTasksHint.textContent = pendingTasks.length === 0
+                ? "All clear — no pending tasks right now."
+                : pendingToday > 0
+                    ? `${pendingToday} due today${upcomingPending > pendingToday ? ` · ${upcomingPending} due soon` : ""}`
+                    : `${upcomingPending > 0 ? `${upcomingPending} due soon` : "Plan your next completion push"}`;
+        }
+
+        if (completedTasksHint) {
+            completedTasksHint.textContent = completedTasks.length === 0
+                ? "No completed tasks yet — start with one win."
+                : recentlyCompleted > 0
+                    ? `${recentlyCompleted} completed in the recent study window`
+                    : `${completedTasks.length} completed overall`;
+        }
+
+        if (studyProgressHint) {
+            studyProgressHint.textContent = totalTasks === 0
+                ? "Add tasks to unlock progress tracking."
+                : `${getProgressStatusLabel(studyProgress)} · ${completedTasks.length}/${totalTasks} tasks done`;
+        }
+    }
+
+    // ─── Smart Insights Strip ─────────────────────────────────────────────────
+
+    function renderSmartInsights() {
+        const insightsContainer = document.getElementById("smartInsightsStrip");
+        if (!insightsContainer) return;
+
+        const insights = buildInsights();
+
+        if (!insights.length) {
+            insightsContainer.innerHTML = "";
+            return;
+        }
+
+        insightsContainer.innerHTML = insights.map((insight) => `
+            <div class="insight-chip insight-${insight.type}">
+                <div class="insight-chip-icon">
+                    <i class="fa-solid ${insight.icon}"></i>
+                </div>
+                <div class="insight-chip-body">
+                    <span class="insight-chip-label">${escapeHtml(insight.label)}</span>
+                    <span class="insight-chip-value">${escapeHtml(insight.value)}</span>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    function buildInsights() {
+        const insights = [];
+        const today = new Date();
+
+        if (state.subjects.length > 0) {
+            const subjectsWithProgress = state.subjects.map((s) => ({
+                name: getSubjectName(s),
+                progress: computeSubjectProgress(s)
+            }));
+
+            const strongest = subjectsWithProgress.reduce((a, b) => a.progress >= b.progress ? a : b);
+            const weakest = subjectsWithProgress.reduce((a, b) => a.progress <= b.progress ? a : b);
+
+            if (strongest.progress > 0) {
+                insights.push({
+                    type: "strong",
+                    icon: "fa-trophy",
+                    label: "Strongest Subject",
+                    value: `${strongest.name} — ${strongest.progress}%`
+                });
+            }
+
+            if (weakest.name !== strongest.name || subjectsWithProgress.length === 1) {
+                insights.push({
+                    type: "weak",
+                    icon: "fa-triangle-exclamation",
+                    label: "Needs Attention",
+                    value: `${weakest.name} — ${weakest.progress}%`
+                });
+            }
+        }
+
+        const todayPending = state.tasks.filter((t) => {
+            const d = parseItemDate(t);
+            return d && isSameDay(d, today) && !isTaskCompleted(t);
+        }).length;
+
+        if (todayPending > 0) {
+            insights.push({
+                type: "pending",
+                icon: "fa-hourglass-half",
+                label: "Due Today",
+                value: `${todayPending} task${todayPending > 1 ? "s" : ""} pending`
+            });
+        }
+
+        const nearTest = state.tests.find((t) => {
+            const d = parseItemDate(t);
+            return d && isWithinNextDays(d, 3);
+        });
+
+        if (nearTest) {
+            const testName = getFirstAvailableValue(nearTest, ["title", "testName", "name", "subjectName"], "Test");
+            const testDate = parseItemDate(nearTest);
+            const dayLabel = getRelativeDayLabel(testDate);
+
+            insights.push({
+                type: "test",
+                icon: "fa-file-lines",
+                label: "Upcoming Test",
+                value: `${testName} — ${dayLabel}`
+            });
+        }
+
+        const nearRevision = state.revisions.find((r) => {
+            const d = parseItemDate(r);
+            return d && isWithinNextDays(d, 2);
+        });
+
+        if (nearRevision) {
+            const revName = getFirstAvailableValue(nearRevision, ["title", "topic", "name"], "Revision");
+            insights.push({
+                type: "revision",
+                icon: "fa-rotate",
+                label: "Revision Due",
+                value: `${revName} coming up`
+            });
+        }
+
+        return insights.slice(0, 4);
+    }
+
+    // ─── Subject Progress ─────────────────────────────────────────────────────
 
     function renderSubjectProgress() {
         if (!subjectProgressList) return;
@@ -549,8 +682,8 @@ document.addEventListener("DOMContentLoaded", function () {
             subjectProgressList.innerHTML = `
                 <div class="subject-progress-item">
                     <div class="subject-row">
-                        <span>No subjects available</span>
-                        <span>0%</span>
+                        <span>No subjects added yet</span>
+                        <span class="progress-pct pct-low">0%</span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 0%;"></div>
@@ -560,42 +693,64 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const subjectItems = state.subjects.slice(0, 4).map((subject) => {
-            const name = getSubjectName(subject);
-            const progress = computeSubjectProgress(subject);
+        const subjectsWithProgress = state.subjects.map((subject) => ({
+            subject,
+            name: getSubjectName(subject),
+            progress: computeSubjectProgress(subject)
+        }));
+
+        const sorted = [...subjectsWithProgress].sort((a, b) => b.progress - a.progress);
+        const topProgress = sorted[0]?.progress ?? 0;
+        const lowProgress = sorted[sorted.length - 1]?.progress ?? 0;
+
+        const items = subjectsWithProgress.slice(0, 5).map(({ name, progress }) => {
+            const pctClass = progress >= 70 ? "pct-high" : progress >= 45 ? "pct-mid" : "pct-low";
+            const isStrongest = progress === topProgress && topProgress > 0 && subjectsWithProgress.length > 1;
+            const isWeakest = progress === lowProgress && subjectsWithProgress.length > 1 && progress < topProgress;
+
+            let badgeHtml = "";
+            if (isStrongest) {
+                badgeHtml = `<span class="subject-highlight-badge badge-strong"><i class="fa-solid fa-trophy"></i> Top</span>`;
+            } else if (isWeakest) {
+                badgeHtml = `<span class="subject-highlight-badge badge-weak"><i class="fa-solid fa-arrow-trend-up"></i> Focus</span>`;
+            }
 
             return `
-                <div class="subject-progress-item">
+                <div class="subject-progress-item ${isStrongest ? "item-strongest" : ""} ${isWeakest ? "item-weakest" : ""}">
                     <div class="subject-row">
-                        <span>${escapeHtml(name)}</span>
-                        <span>${progress}%</span>
+                        <span class="subject-name-text">${escapeHtml(name)}</span>
+                        <div class="subject-row-right">
+                            ${badgeHtml}
+                            <span class="progress-pct ${pctClass}">${progress}%</span>
+                        </div>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${progress}%;"></div>
+                        <div class="progress-fill ${isStrongest ? "fill-strong" : ""} ${isWeakest ? "fill-weak" : ""}" style="width: ${progress}%;"></div>
                     </div>
                 </div>
             `;
         }).join("");
 
-        subjectProgressList.innerHTML = subjectItems;
+        subjectProgressList.innerHTML = items;
     }
 
-    function formatUpcomingSubtitle(item, date) {
-        const dayLabel = getRelativeDayLabel(date);
-        const timeText = getTimeText(item);
-        const subjectName = getFirstAvailableValue(item, ["subjectName", "subject"], "");
+    // ─── Upcoming Schedule ────────────────────────────────────────────────────
 
-        let subtitle = dayLabel;
+    function getDayBadgeClass(date) {
+        const label = getRelativeDayLabel(date);
+        if (label === "Today") return "today-badge";
+        if (label === "Tomorrow") return "tomorrow-badge";
+        return "later-badge";
+    }
 
-        if (timeText) {
-            subtitle += ` • ${timeText}`;
-        }
-
-        if (subjectName) {
-            subtitle += ` • ${subjectName}`;
-        }
-
-        return subtitle;
+    function getItemTypeBadge(type) {
+        const map = {
+            "Planner": { cls: "type-planner", icon: "fa-calendar-days" },
+            "Revision": { cls: "type-revision", icon: "fa-rotate" },
+            "Test": { cls: "type-test", icon: "fa-file-lines" },
+            "Task": { cls: "type-task", icon: "fa-list-check" }
+        };
+        return map[type] || { cls: "type-planner", icon: "fa-calendar-days" };
     }
 
     function buildCombinedUpcomingItems() {
@@ -604,12 +759,11 @@ document.addEventListener("DOMContentLoaded", function () {
         state.plans.forEach((plan) => {
             const date = parseItemDate(plan);
             if (!isFutureOrToday(date)) return;
-
             items.push({
                 type: "Planner",
                 title: getFirstAvailableValue(plan, ["title", "planTitle", "name", "topic"], "Study Plan"),
-                subtitle: formatUpcomingSubtitle(plan, date),
-                icon: "fa-calendar-days",
+                date,
+                item: plan,
                 timestamp: date.getTime()
             });
         });
@@ -617,12 +771,11 @@ document.addEventListener("DOMContentLoaded", function () {
         state.revisions.forEach((revision) => {
             const date = parseItemDate(revision);
             if (!isFutureOrToday(date)) return;
-
             items.push({
                 type: "Revision",
                 title: getFirstAvailableValue(revision, ["title", "topic", "name"], "Revision Session"),
-                subtitle: formatUpcomingSubtitle(revision, date),
-                icon: "fa-book-open",
+                date,
+                item: revision,
                 timestamp: date.getTime()
             });
         });
@@ -630,12 +783,11 @@ document.addEventListener("DOMContentLoaded", function () {
         state.tests.forEach((test) => {
             const date = parseItemDate(test);
             if (!isFutureOrToday(date)) return;
-
             items.push({
                 type: "Test",
                 title: getFirstAvailableValue(test, ["title", "testName", "name", "subjectName"], "Upcoming Test"),
-                subtitle: formatUpcomingSubtitle(test, date),
-                icon: "fa-file-lines",
+                date,
+                item: test,
                 timestamp: date.getTime()
             });
         });
@@ -643,21 +795,17 @@ document.addEventListener("DOMContentLoaded", function () {
         state.tasks.forEach((task) => {
             const date = parseItemDate(task);
             if (!isFutureOrToday(date) || isTaskCompleted(task)) return;
-
             items.push({
                 type: "Task",
                 title: getTaskTitle(task),
-                subtitle: formatUpcomingSubtitle(
-                    { ...task, subjectName: getTaskSubjectName(task) },
-                    date
-                ),
-                icon: "fa-list-check",
+                date,
+                item: { ...task, subjectName: getTaskSubjectName(task) },
                 timestamp: date.getTime()
             });
         });
 
         items.sort((a, b) => a.timestamp - b.timestamp);
-        return items.slice(0, 4);
+        return items.slice(0, 5);
     }
 
     function renderUpcomingSchedule() {
@@ -667,7 +815,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!upcomingItems.length) {
             upcomingScheduleList.innerHTML = `
-                <div class="upcoming-item">
+                <div class="upcoming-item upcoming-empty">
                     <div class="upcoming-icon">
                         <i class="fa-solid fa-calendar-check"></i>
                     </div>
@@ -680,33 +828,43 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        upcomingScheduleList.innerHTML = upcomingItems.map((item) => `
-            <div class="upcoming-item">
-                <div class="upcoming-icon">
-                    <i class="fa-solid ${item.icon}"></i>
+        upcomingScheduleList.innerHTML = upcomingItems.map(({ type, title, date, item }) => {
+            const dayBadgeClass = getDayBadgeClass(date);
+            const dayLabel = getRelativeDayLabel(date);
+            const timeText = getTimeText(item);
+            const typeBadge = getItemTypeBadge(type);
+
+            return `
+                <div class="upcoming-item">
+                    <div class="upcoming-icon upcoming-icon-${typeBadge.cls}">
+                        <i class="fa-solid ${typeBadge.icon}"></i>
+                    </div>
+                    <div class="upcoming-info">
+                        <h4>${escapeHtml(title)}</h4>
+                        <p>
+                            <span class="day-badge ${dayBadgeClass}">${escapeHtml(dayLabel)}</span>
+                            ${timeText ? `<span class="upcoming-time">${escapeHtml(timeText)}</span>` : ""}
+                            <span class="upcoming-type-badge">${escapeHtml(type)}</span>
+                        </p>
+                    </div>
                 </div>
-                <div class="upcoming-info">
-                    <h4>${escapeHtml(item.title)}</h4>
-                    <p>${escapeHtml(item.subtitle)}</p>
-                </div>
-            </div>
-        `).join("");
+            `;
+        }).join("");
     }
+
+    // ─── Today's Tasks ────────────────────────────────────────────────────────
 
     function renderTodayTasks() {
         if (!todayTasksList) return;
 
         const today = new Date();
-
         let todaysTasks = state.tasks.filter((task) => {
             const taskDate = parseItemDate(task);
             return taskDate && isSameDay(taskDate, today);
         });
 
         if (!todaysTasks.length) {
-            todaysTasks = state.tasks
-                .filter((task) => !isTaskCompleted(task))
-                .slice(0, 3);
+            todaysTasks = state.tasks.filter((task) => !isTaskCompleted(task)).slice(0, 3);
         } else {
             todaysTasks = todaysTasks.slice(0, 3);
         }
@@ -716,7 +874,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="task-item">
                     <div class="task-info">
                         <h4>No tasks for today</h4>
-                        <p>You are all caught up for now.</p>
+                        <p>You are all caught up for now. 🎉</p>
                     </div>
                     <span class="task-badge done">Clear</span>
                 </div>
@@ -730,20 +888,21 @@ document.addEventListener("DOMContentLoaded", function () {
             const priority = getTaskPriority(task);
             const subjectName = getTaskSubjectName(task);
 
-            let subtitle = dueDate && isSameDay(dueDate, new Date())
-                ? "Due today"
-                : getRelativeDayLabel(dueDate);
+            const priorityLower = normalizeText(priority);
+            const priorityClass = badge.className === "done"
+                ? "priority-done"
+                : priorityLower.includes("high")
+                    ? "priority-high"
+                    : badge.className === "progress"
+                        ? "priority-normal"
+                        : "priority-low";
 
-            if (priority) {
-                subtitle += ` • ${priority} Priority`;
-            }
-
-            if (subjectName) {
-                subtitle += ` • ${subjectName}`;
-            }
+            let subtitle = dueDate && isSameDay(dueDate, new Date()) ? "Due today" : getRelativeDayLabel(dueDate);
+            if (priority) subtitle += ` • ${priority} Priority`;
+            if (subjectName) subtitle += ` • ${subjectName}`;
 
             return `
-                <div class="task-item">
+                <div class="task-item ${priorityClass}">
                     <div class="task-info">
                         <h4>${escapeHtml(getTaskTitle(task))}</h4>
                         <p>${escapeHtml(subtitle)}</p>
@@ -753,6 +912,8 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
         }).join("");
     }
+
+    // ─── Weekly Activity Tracker ─────────────────────────────────────────────
 
     function buildWeeklyActivityCounts() {
         const today = new Date();
@@ -767,105 +928,270 @@ document.addEventListener("DOMContentLoaded", function () {
         const counts = days.map((day) => ({
             date: day,
             label: formatChartDayLabel(day),
-            count: 0
+            count: 0,
+            breakdown: { tasks: 0, plans: 0, revisions: 0, tests: 0 }
         }));
 
-        const allItems = [
-            ...state.tasks,
-            ...state.plans,
-            ...state.revisions,
-            ...state.tests
-        ];
-
-        allItems.forEach((item) => {
-            const itemDate = parseItemDate(item);
-            if (!itemDate) return;
-
-            const match = counts.find((entry) => isSameDay(entry.date, itemDate));
+        state.tasks.forEach((item) => {
+            const d = parseItemDate(item);
+            if (!d) return;
+            const match = counts.find((entry) => isSameDay(entry.date, d));
             if (match) {
                 match.count += 1;
+                match.breakdown.tasks += 1;
+            }
+        });
+
+        state.plans.forEach((item) => {
+            const d = parseItemDate(item);
+            if (!d) return;
+            const match = counts.find((entry) => isSameDay(entry.date, d));
+            if (match) {
+                match.count += 1;
+                match.breakdown.plans += 1;
+            }
+        });
+
+        state.revisions.forEach((item) => {
+            const d = parseItemDate(item);
+            if (!d) return;
+            const match = counts.find((entry) => isSameDay(entry.date, d));
+            if (match) {
+                match.count += 1;
+                match.breakdown.revisions += 1;
+            }
+        });
+
+        state.tests.forEach((item) => {
+            const d = parseItemDate(item);
+            if (!d) return;
+            const match = counts.find((entry) => isSameDay(entry.date, d));
+            if (match) {
+                match.count += 1;
+                match.breakdown.tests += 1;
             }
         });
 
         return counts;
     }
 
+    function getWeeklyActivityCategories(item) {
+        return [
+            {
+                key: "tasks",
+                label: "Tasks",
+                className: "task",
+                count: item.breakdown.tasks
+            },
+            {
+                key: "plans",
+                label: "Planner",
+                className: "plan",
+                count: item.breakdown.plans
+            },
+            {
+                key: "revisions",
+                label: "Revision",
+                className: "revision",
+                count: item.breakdown.revisions
+            },
+            {
+                key: "tests",
+                label: "Tests",
+                className: "test",
+                count: item.breakdown.tests
+            }
+        ].filter((entry) => entry.count > 0);
+    }
+
+    function getDominantWeeklyActivityType(counts) {
+        const totals = counts.reduce((acc, item) => {
+            acc.tasks += item.breakdown.tasks;
+            acc.plans += item.breakdown.plans;
+            acc.revisions += item.breakdown.revisions;
+            acc.tests += item.breakdown.tests;
+            return acc;
+        }, {
+            tasks: 0,
+            plans: 0,
+            revisions: 0,
+            tests: 0
+        });
+
+        const labelMap = {
+            tasks: "Tasks",
+            plans: "Planner",
+            revisions: "Revision",
+            tests: "Tests"
+        };
+
+        const topEntry = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+        if (!topEntry || topEntry[1] <= 0) return "No focus yet";
+        return labelMap[topEntry[0]] || "Mixed";
+    }
+
+    function buildWeeklyActivityTooltip(item) {
+        const categories = getWeeklyActivityCategories(item);
+
+        if (!categories.length) {
+            return `${item.label}: No study activity recorded`;
+        }
+
+        const breakdownText = categories
+            .map((entry) => `${entry.count} ${entry.label}`)
+            .join(", ");
+
+        return `${item.label}: ${item.count} activit${item.count > 1 ? "ies" : "y"} — ${breakdownText}`;
+    }
+
+    function renderChartSummaryPills(counts) {
+        const overviewCard = document.querySelector(".overview-chart-card");
+        const chartHeader = overviewCard?.querySelector(".chart-header");
+        if (!overviewCard || !chartHeader) return;
+
+        let pillsContainer = document.getElementById("chartSummaryPills");
+
+        if (!pillsContainer) {
+            pillsContainer = document.createElement("div");
+            pillsContainer.id = "chartSummaryPills";
+            pillsContainer.className = "chart-summary-pills";
+            chartHeader.insertAdjacentElement("afterend", pillsContainer);
+        }
+
+        const totalWeek = counts.reduce((sum, item) => sum + item.count, 0);
+        const activeDays = counts.filter((item) => item.count > 0).length;
+        const busiestDay = counts.reduce((best, current) => current.count > best.count ? current : best, counts[0]);
+        const dominantType = getDominantWeeklyActivityType(counts);
+
+        pillsContainer.innerHTML = `
+            <span class="chart-summary-pill">
+                <span>Total</span>
+                <strong>${totalWeek}</strong>
+            </span>
+            <span class="chart-summary-pill">
+                <span>Active Days</span>
+                <strong>${activeDays}</strong>
+            </span>
+            <span class="chart-summary-pill">
+                <span>Best Day</span>
+                <strong>${busiestDay && busiestDay.count > 0 ? escapeHtml(busiestDay.label) : "—"}</strong>
+            </span>
+            <span class="chart-summary-pill">
+                <span>Focus</span>
+                <strong>${escapeHtml(dominantType)}</strong>
+            </span>
+        `;
+    }
+
     function renderWeeklyOverviewChart() {
         if (!weeklyOverviewChartBars) return;
 
         const counts = buildWeeklyActivityCounts();
-        const maxCount = Math.max(...counts.map((item) => item.count), 0);
+        const today = new Date();
+
+        renderChartSummaryPills(counts);
 
         weeklyOverviewChartBars.innerHTML = counts.map((item) => {
-            const height = maxCount > 0
-                ? Math.max(12, Math.round((item.count / maxCount) * 100))
-                : 12;
+            const isToday = isSameDay(item.date, today);
+            const isEmpty = item.count === 0;
+            const categories = getWeeklyActivityCategories(item);
+            const tooltipText = buildWeeklyActivityTooltip(item);
+
+            const cardClasses = [
+                "activity-day-card",
+                isToday ? "activity-day-card--today" : "",
+                isEmpty ? "activity-day-card--empty" : ""
+            ].filter(Boolean).join(" ");
+
+            const markerHtml = categories.length
+                ? `
+                    <div class="activity-marker-list">
+                        ${categories.map((entry) => `
+                            <div class="activity-marker-item" title="${escapeHtml(`${entry.label}: ${entry.count}`)}">
+                                <div class="activity-marker-left">
+                                    <span class="activity-marker-dot ${entry.className}"></span>
+                                    <span class="activity-marker-label">${escapeHtml(entry.label)}</span>
+                                </div>
+                                <span class="activity-marker-count ${entry.className}">${entry.count}</span>
+                            </div>
+                        `).join("")}
+                    </div>
+                `
+                : `
+                    <div class="activity-empty-text">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        <span>No study activity</span>
+                    </div>
+                `;
 
             return `
-                <div class="chart-bar-group">
-                    <div class="chart-bar" style="height: ${height}%;" title="${item.count} activities"></div>
-                    <span>${escapeHtml(item.label)}</span>
+                <div class="${cardClasses}" title="${escapeHtml(tooltipText)}">
+                    <div class="activity-day-top">
+                        <span class="activity-day-count">${item.count}</span>
+                    </div>
+
+                    <div class="activity-day-body">
+                        ${markerHtml}
+                    </div>
+
+                    <div class="activity-day-footer">
+                        <span class="chart-day-label">${escapeHtml(item.label)}</span>
+                    </div>
                 </div>
             `;
         }).join("");
+
+        renderChartInsight(counts, today);
     }
+
+    function renderChartInsight(counts, today) {
+        const insightEl = document.getElementById("chartInsightLine");
+        if (!insightEl) return;
+
+        const totalWeek = counts.reduce((sum, item) => sum + item.count, 0);
+        const activeDays = counts.filter((item) => item.count > 0).length;
+        const todayData = counts.find((item) => isSameDay(item.date, today));
+        const todayCount = todayData ? todayData.count : 0;
+        const busiestDay = counts.reduce((best, current) => current.count > best.count ? current : best, counts[0]);
+        const dominantType = getDominantWeeklyActivityType(counts);
+
+        if (totalWeek === 0) {
+            insightEl.textContent = "No study activity recorded in the last 7 days. Add one task, planner item, revision, or test to start building consistency.";
+            return;
+        }
+
+        let insightText = `Strong weekly snapshot: ${totalWeek} activit${totalWeek > 1 ? "ies" : "y"} across ${activeDays} active day${activeDays > 1 ? "s" : ""}.`;
+
+        if (busiestDay && busiestDay.count > 0) {
+            insightText += ` ${busiestDay.label} led the week with ${busiestDay.count} activit${busiestDay.count > 1 ? "ies" : "y"}.`;
+        }
+
+        insightText += ` Your main focus was ${dominantType.toLowerCase()}.`;
+
+        if (todayCount > 0) {
+            insightText += ` Today already looks productive with ${todayCount} tracked activit${todayCount > 1 ? "ies" : "y"}.`;
+        } else {
+            insightText += ` No activity is tracked for today yet.`;
+        }
+
+        insightEl.textContent = insightText;
+    }
+
+    // ─── Search ───────────────────────────────────────────────────────────────
 
     function buildSearchItems() {
         const items = [];
-
-        state.subjects.forEach((subject) => {
-            items.push({
-                type: "Subject",
-                title: getSubjectName(subject),
-                icon: "fa-book",
-                href: "subjects.html"
-            });
-        });
-
-        state.tasks.forEach((task) => {
-            items.push({
-                type: "Task",
-                title: getTaskTitle(task),
-                icon: "fa-list-check",
-                href: "tasks.html"
-            });
-        });
-
-        state.plans.forEach((plan) => {
-            items.push({
-                type: "Planner",
-                title: getFirstAvailableValue(plan, ["title", "planTitle", "name", "topic"], "Study Plan"),
-                icon: "fa-calendar-days",
-                href: "planner.html"
-            });
-        });
-
-        state.revisions.forEach((revision) => {
-            items.push({
-                type: "Revision",
-                title: getFirstAvailableValue(revision, ["title", "topic", "name"], "Revision"),
-                icon: "fa-rotate",
-                href: "revision.html"
-            });
-        });
-
-        state.tests.forEach((test) => {
-            items.push({
-                type: "Test",
-                title: getFirstAvailableValue(test, ["title", "testName", "name"], "Test"),
-                icon: "fa-file-lines",
-                href: "tests.html"
-            });
-        });
-
+        state.subjects.forEach((s) => items.push({ type: "Subject", title: getSubjectName(s), icon: "fa-book", href: "subjects.html" }));
+        state.tasks.forEach((t) => items.push({ type: "Task", title: getTaskTitle(t), icon: "fa-list-check", href: "tasks.html" }));
+        state.plans.forEach((p) => items.push({ type: "Planner", title: getFirstAvailableValue(p, ["title", "planTitle", "name", "topic"], "Study Plan"), icon: "fa-calendar-days", href: "planner.html" }));
+        state.revisions.forEach((r) => items.push({ type: "Revision", title: getFirstAvailableValue(r, ["title", "topic", "name"], "Revision"), icon: "fa-rotate", href: "revision.html" }));
+        state.tests.forEach((t) => items.push({ type: "Test", title: getFirstAvailableValue(t, ["title", "testName", "name"], "Test"), icon: "fa-file-lines", href: "tests.html" }));
         state.searchItems = items;
     }
 
     function renderSearchResults(query) {
         if (!dashboardSearchResults) return;
-
         const searchText = normalizeText(query);
-
         if (!searchText) {
             dashboardSearchResults.classList.add("hidden");
             return;
@@ -879,10 +1205,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dashboardSearchResults.innerHTML = `
                 <div class="search-result-item">
                     <i class="fa-solid fa-circle-info"></i>
-                    <div>
-                        <h4>No results found</h4>
-                        <p>Try another keyword</p>
-                    </div>
+                    <div><h4>No results found</h4><p>Try another keyword</p></div>
                 </div>
             `;
             dashboardSearchResults.classList.remove("hidden");
@@ -892,68 +1215,81 @@ document.addEventListener("DOMContentLoaded", function () {
         dashboardSearchResults.innerHTML = filteredItems.map((item) => `
             <div class="search-result-item" data-href="${item.href}">
                 <i class="fa-solid ${item.icon}"></i>
-                <div>
-                    <h4>${escapeHtml(item.title)}</h4>
-                    <p>${escapeHtml(item.type)}</p>
-                </div>
+                <div><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.type)}</p></div>
             </div>
         `).join("");
 
         dashboardSearchResults.classList.remove("hidden");
     }
 
+    // ─── Notifications ────────────────────────────────────────────────────────
+
     function buildNotifications() {
         const notifications = [];
-
         const today = new Date();
 
-        const todayPendingTasks = state.tasks
-            .filter((task) => {
-                const date = parseItemDate(task);
-                return date && isSameDay(date, today) && !isTaskCompleted(task);
-            })
-            .slice(0, 2);
+        const todayPendingTasks = state.tasks.filter((task) => {
+            const date = parseItemDate(task);
+            return date && isSameDay(date, today) && !isTaskCompleted(task);
+        }).slice(0, 2);
 
         todayPendingTasks.forEach((task) => {
             notifications.push({
-                title: "Task Reminder",
-                message: `${getTaskTitle(task)} is due today.`
+                type: "task",
+                icon: "fa-list-check",
+                iconClass: "notif-task",
+                title: "Task Due Today",
+                message: `${getTaskTitle(task)} needs to be completed today.`
             });
         });
 
-        const upcomingRevision = state.revisions.find((revision) => {
-            const date = parseItemDate(revision);
+        const upcomingRevision = state.revisions.find((r) => {
+            const date = parseItemDate(r);
             return date && isWithinNextDays(date, 3);
         });
 
         if (upcomingRevision) {
+            const revName = getFirstAvailableValue(upcomingRevision, ["title", "topic", "name"], "Revision session");
+            const revDate = parseItemDate(upcomingRevision);
             notifications.push({
-                title: "Revision Alert",
-                message: `${getFirstAvailableValue(upcomingRevision, ["title", "topic", "name"], "Revision session")} is coming up soon.`
+                type: "revision",
+                icon: "fa-rotate",
+                iconClass: "notif-revision",
+                title: "Revision Coming Up",
+                message: `${revName} is scheduled ${getRelativeDayLabel(revDate).toLowerCase()}.`
             });
         }
 
-        const upcomingTest = state.tests.find((test) => {
-            const date = parseItemDate(test);
+        const upcomingTest = state.tests.find((t) => {
+            const date = parseItemDate(t);
             return date && isWithinNextDays(date, 7);
         });
 
         if (upcomingTest) {
+            const testName = getFirstAvailableValue(upcomingTest, ["title", "testName", "name", "subjectName"], "Test");
+            const testDate = parseItemDate(upcomingTest);
             notifications.push({
-                title: "Upcoming Test",
-                message: `${getFirstAvailableValue(upcomingTest, ["title", "testName", "name"], "Test")} is scheduled soon.`
+                type: "test",
+                icon: "fa-file-lines",
+                iconClass: "notif-test",
+                title: "Test Approaching",
+                message: `${testName} is ${getRelativeDayLabel(testDate).toLowerCase()}. Prepare well!`
             });
         }
 
-        const upcomingPlan = state.plans.find((plan) => {
-            const date = parseItemDate(plan);
+        const upcomingPlan = state.plans.find((p) => {
+            const date = parseItemDate(p);
             return date && isWithinNextDays(date, 2);
         });
 
         if (upcomingPlan) {
+            const planName = getFirstAvailableValue(upcomingPlan, ["title", "planTitle", "name", "topic"], "Your study plan");
             notifications.push({
-                title: "Study Plan",
-                message: `${getFirstAvailableValue(upcomingPlan, ["title", "planTitle", "name", "topic"], "Your study plan")} is lined up next.`
+                type: "plan",
+                icon: "fa-calendar-days",
+                iconClass: "notif-plan",
+                title: "Study Plan Reminder",
+                message: `${planName} is lined up soon. Stay on track!`
             });
         }
 
@@ -964,37 +1300,49 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!dashboardNotificationDropdown) return;
 
         const notifications = buildNotifications();
+        const notifBadge = document.getElementById("notifBadgeDot");
 
         if (!notifications.length) {
+            if (notifBadge) notifBadge.classList.add("hidden");
             dashboardNotificationDropdown.innerHTML = `
-                <div class="notification-item">
-                    <h4>No new alerts</h4>
-                    <p>You are all caught up for now.</p>
+                <div class="dropdown-header"><span>Notifications</span></div>
+                <div class="notif-empty-state">
+                    <i class="fa-solid fa-bell-slash"></i>
+                    <p>All caught up! No new alerts.</p>
                 </div>
             `;
             return;
         }
 
-        dashboardNotificationDropdown.innerHTML = notifications.map((item) => `
-            <div class="notification-item">
-                <h4>${escapeHtml(item.title)}</h4>
-                <p>${escapeHtml(item.message)}</p>
-            </div>
-        `).join("");
+        if (notifBadge) notifBadge.classList.remove("hidden");
+
+        dashboardNotificationDropdown.innerHTML = `
+            <div class="dropdown-header"><span>Notifications</span><span class="notif-count-badge">${notifications.length}</span></div>
+            ${notifications.map((item) => `
+                <div class="notification-item">
+                    <div class="notif-icon-wrap ${item.iconClass}">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div>
+                        <h4>${escapeHtml(item.title)}</h4>
+                        <p>${escapeHtml(item.message)}</p>
+                    </div>
+                </div>
+            `).join("")}
+        `;
     }
+
+    // ─── Events ───────────────────────────────────────────────────────────────
 
     function attachSearchEvents() {
         if (dashboardSearchInput && dashboardSearchResults && dashboardSearchBox) {
             dashboardSearchInput.addEventListener("input", function () {
-                const value = dashboardSearchInput.value.trim();
-
                 dashboardNotificationDropdown?.classList.add("hidden");
-                renderSearchResults(value);
+                renderSearchResults(dashboardSearchInput.value.trim());
             });
 
             dashboardSearchInput.addEventListener("focus", function () {
                 dashboardNotificationDropdown?.classList.add("hidden");
-
                 if (dashboardSearchInput.value.trim().length > 0) {
                     renderSearchResults(dashboardSearchInput.value.trim());
                 }
@@ -1002,41 +1350,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
             dashboardSearchResults.addEventListener("click", function (event) {
                 event.stopPropagation();
-
                 const item = event.target.closest(".search-result-item");
                 if (!item) return;
-
                 const href = item.getAttribute("data-href");
-                if (href) {
-                    window.location.href = href;
-                }
+                if (href) window.location.href = href;
             });
         }
     }
 
     function attachNotificationEvents() {
         if (notificationToggleBtn && dashboardNotificationDropdown) {
-            function showNotificationDropdown() {
+            notificationToggleBtn.addEventListener("mouseenter", function () {
                 closeDashboardDropdowns();
                 document.dispatchEvent(new CustomEvent("dashboard:closeProfileMenu"));
                 dashboardNotificationDropdown.classList.remove("hidden");
-            }
-
-            function hideNotificationDropdown() {
-                dashboardNotificationDropdown.classList.add("hidden");
-            }
-
-            notificationToggleBtn.addEventListener("mouseenter", function () {
-                showNotificationDropdown();
             });
 
             notificationToggleBtn.addEventListener("mouseleave", function () {
                 setTimeout(() => {
-                    const isHoveringButton = notificationToggleBtn.matches(":hover");
-                    const isHoveringDropdown = dashboardNotificationDropdown.matches(":hover");
-
-                    if (!isHoveringButton && !isHoveringDropdown) {
-                        hideNotificationDropdown();
+                    if (!notificationToggleBtn.matches(":hover") && !dashboardNotificationDropdown.matches(":hover")) {
+                        dashboardNotificationDropdown.classList.add("hidden");
                     }
                 }, 80);
             });
@@ -1046,38 +1379,22 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             dashboardNotificationDropdown.addEventListener("mouseleave", function () {
-                hideNotificationDropdown();
+                dashboardNotificationDropdown.classList.add("hidden");
             });
         }
     }
 
     function attachSharedDropdownEvents() {
-        if (dashboardSearchBox) {
-            dashboardSearchBox.addEventListener("click", function (event) {
-                event.stopPropagation();
-            });
-        }
-
-        if (dashboardNotificationDropdown) {
-            dashboardNotificationDropdown.addEventListener("click", function (event) {
-                event.stopPropagation();
-            });
-        }
-
-        document.addEventListener("click", function () {
-            closeDashboardDropdowns();
-        });
-
-        document.addEventListener("dashboard:closeOtherDropdowns", function () {
-            closeDashboardDropdowns();
-        });
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-                closeDashboardDropdowns();
-            }
+        dashboardSearchBox?.addEventListener("click", (e) => e.stopPropagation());
+        dashboardNotificationDropdown?.addEventListener("click", (e) => e.stopPropagation());
+        document.addEventListener("click", closeDashboardDropdowns);
+        document.addEventListener("dashboard:closeOtherDropdowns", closeDashboardDropdowns);
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeDashboardDropdowns();
         });
     }
+
+    // ─── Load All ─────────────────────────────────────────────────────────────
 
     async function loadDashboardData() {
         state.user = getStoredUser();
@@ -1098,13 +1415,14 @@ document.addEventListener("DOMContentLoaded", function () {
         state.tests = tests;
 
         renderUserInfo();
+        renderWelcomeBannerInsights();
         renderStats();
+        renderSmartInsights();
         renderSubjectProgress();
         renderUpcomingSchedule();
         renderTodayTasks();
         renderWeeklyOverviewChart();
         renderNotifications();
-
         buildSearchItems();
 
         if (dashboardSearchInput?.value?.trim()) {
@@ -1116,4 +1434,4 @@ document.addEventListener("DOMContentLoaded", function () {
     attachNotificationEvents();
     attachSharedDropdownEvents();
     loadDashboardData();
-})
+});

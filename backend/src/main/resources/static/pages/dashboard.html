@@ -6,16 +6,12 @@
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Dashboard | EduMind AI</title>
 
-     <!-- Google Font -->
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
-
-     <!-- Font Awesome -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-     <!-- CSS Files -->
      <link rel="stylesheet" href="../assets/css/variables.css">
      <link rel="stylesheet" href="../assets/css/base.css">
      <link rel="stylesheet" href="../assets/css/layout.css">
@@ -38,42 +34,34 @@
                          <i class="fa-solid fa-house"></i>
                          <span>Dashboard</span>
                     </a>
-
                     <a href="planner.html" class="nav-item">
                          <i class="fa-solid fa-calendar-days"></i>
                          <span>Planner</span>
                     </a>
-
                     <a href="subjects.html" class="nav-item">
                          <i class="fa-solid fa-book"></i>
                          <span>Subjects</span>
                     </a>
-
                     <a href="tasks.html" class="nav-item">
                          <i class="fa-solid fa-list-check"></i>
                          <span>Tasks</span>
                     </a>
-
                     <a href="revision.html" class="nav-item">
                          <i class="fa-solid fa-rotate"></i>
                          <span>Revision</span>
                     </a>
-
                     <a href="tests.html" class="nav-item">
                          <i class="fa-solid fa-file-lines"></i>
                          <span>Tests</span>
                     </a>
-
                     <a href="analytics.html" class="nav-item">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
-
                     <a href="assistant.html" class="nav-item">
                          <i class="fa-solid fa-robot"></i>
                          <span>Assistant</span>
                     </a>
-
                     <a href="settings.html" class="nav-item">
                          <i class="fa-solid fa-gear"></i>
                          <span>Settings</span>
@@ -93,7 +81,7 @@
                     <div class="header-left">
                          <div>
                               <h1 id="dashboardGreetingTitle">Hello, Ritika 👋</h1>
-                              <p id="dashboardGreetingSubtitle">Let’s make today productive and well planned.</p>
+                              <p id="dashboardGreetingSubtitle">Let's make today productive and well planned.</p>
                          </div>
                     </div>
 
@@ -108,40 +96,47 @@
                                         <p>Subject</p>
                                    </div>
                               </div>
-                              <div class="search-result-item">
-                                   <i class="fa-solid fa-list-check"></i>
-                                   <div>
-                                        <h4>Complete Java Assignment</h4>
-                                        <p>Task</p>
-                                   </div>
-                              </div>
-                              <div class="search-result-item">
-                                   <i class="fa-solid fa-calendar-days"></i>
-                                   <div>
-                                        <h4>Evening Revision Session</h4>
-                                        <p>Planner</p>
-                                   </div>
-                              </div>
                          </div>
                     </div>
 
                     <div class="header-actions">
-                         <button class="icon-btn" id="notificationToggleBtn">
-                              <i class="fa-solid fa-bell"></i>
-                         </button>
+                         <div class="notification-btn-wrapper">
+                              <button class="icon-btn" id="notificationToggleBtn">
+                                   <i class="fa-solid fa-bell"></i>
+                                   <span class="notif-badge" id="notifBadgeDot"></span>
+                              </button>
 
-                         <div class="dashboard-notification-dropdown hidden" id="dashboardNotificationDropdown">
-                              <div class="notification-item">
-                                   <h4>Task Reminder</h4>
-                                   <p>Complete Java Assignment before 6 PM.</p>
-                              </div>
-                              <div class="notification-item">
-                                   <h4>Revision Alert</h4>
-                                   <p>DBMS revision session is scheduled for tonight.</p>
-                              </div>
-                              <div class="notification-item">
-                                   <h4>Upcoming Test</h4>
-                                   <p>You have a Java mock test tomorrow.</p>
+                              <div class="dashboard-notification-dropdown hidden" id="dashboardNotificationDropdown">
+                                   <div class="dropdown-header">
+                                        <span>Notifications</span>
+                                   </div>
+                                   <div class="notification-item">
+                                        <div class="notif-icon-wrap notif-task">
+                                             <i class="fa-solid fa-list-check"></i>
+                                        </div>
+                                        <div>
+                                             <h4>Task Reminder</h4>
+                                             <p>Complete Java Assignment before 6 PM.</p>
+                                        </div>
+                                   </div>
+                                   <div class="notification-item">
+                                        <div class="notif-icon-wrap notif-revision">
+                                             <i class="fa-solid fa-rotate"></i>
+                                        </div>
+                                        <div>
+                                             <h4>Revision Alert</h4>
+                                             <p>DBMS revision session is scheduled for tonight.</p>
+                                        </div>
+                                   </div>
+                                   <div class="notification-item">
+                                        <div class="notif-icon-wrap notif-test">
+                                             <i class="fa-solid fa-file-lines"></i>
+                                        </div>
+                                        <div>
+                                             <h4>Upcoming Test</h4>
+                                             <p>You have a Java mock test tomorrow.</p>
+                                        </div>
+                                   </div>
                               </div>
                          </div>
 
@@ -158,6 +153,15 @@
                          </div>
 
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <div class="profile-dropdown-header">
+                                   <img src="../assets/avatar/default-user.png" alt="User"
+                                        id="dashboardProfileAvatarDropdown">
+                                   <div>
+                                        <h4 id="dashboardProfileNameDropdown">Ritika</h4>
+                                        <p id="dashboardProfileRoleDropdown">Student</p>
+                                   </div>
+                              </div>
+                              <div class="profile-dropdown-divider"></div>
                               <a href="settings.html" class="profile-menu-item">
                                    <i class="fa-solid fa-user-gear"></i>
                                    <span>Profile Settings</span>
@@ -166,6 +170,7 @@
                                    <i class="fa-solid fa-chart-line"></i>
                                    <span>View Analytics</span>
                               </a>
+                              <div class="profile-dropdown-divider"></div>
                               <a href="login.html" class="profile-menu-item logout">
                                    <i class="fa-solid fa-right-from-bracket"></i>
                                    <span>Logout</span>
@@ -175,10 +180,31 @@
                </header>
 
                <section class="dashboard-content">
+
                     <div class="welcome-banner">
                          <div class="welcome-text">
+                              <div class="welcome-date-pill" id="welcomeDatePill">
+                                   <i class="fa-regular fa-calendar"></i>
+                                   <span id="welcomeDateText">Monday, 21 April 2025</span>
+                              </div>
                               <h2>Smart Study Planning Dashboard</h2>
-                              <p>Track your subjects, tasks, and study progress from one place.</p>
+                              <p id="welcomeBannerSubtitle">Track your subjects, tasks, and study progress from one
+                                   place.</p>
+
+                              <div class="welcome-banner-insights" id="welcomeBannerInsights">
+                                   <span class="welcome-banner-chip" id="welcomeInsightPrimary">
+                                        <i class="fa-solid fa-bolt"></i>
+                                        <span>Loading today’s smart summary...</span>
+                                   </span>
+                                   <span class="welcome-banner-chip" id="welcomeInsightSecondary">
+                                        <i class="fa-solid fa-list-check"></i>
+                                        <span>Your study priorities will appear here.</span>
+                                   </span>
+                                   <span class="welcome-banner-chip" id="welcomeInsightTertiary">
+                                        <i class="fa-solid fa-rotate"></i>
+                                        <span>Revision and test alerts will show here.</span>
+                                   </span>
+                              </div>
                          </div>
 
                          <div class="welcome-image">
@@ -187,51 +213,79 @@
                     </div>
 
                     <div class="stats-grid">
-                         <div class="stat-card">
-                              <h3 id="totalSubjectsCount">05</h3>
-                              <p>Total Subjects</p>
+                         <div class="stat-card stat-subjects">
+                              <div class="stat-icon-wrap">
+                                   <i class="fa-solid fa-book"></i>
+                              </div>
+                              <div class="stat-info">
+                                   <h3 id="totalSubjectsCount">05</h3>
+                                   <p class="stat-label">Total Subjects</p>
+                                   <span class="stat-helper-text" id="totalSubjectsHint">Your active study subjects
+                                        overview.</span>
+                              </div>
                          </div>
 
-                         <div class="stat-card">
-                              <h3 id="pendingTasksCount">12</h3>
-                              <p>Pending Tasks</p>
+                         <div class="stat-card stat-pending">
+                              <div class="stat-icon-wrap">
+                                   <i class="fa-solid fa-hourglass-half"></i>
+                              </div>
+                              <div class="stat-info">
+                                   <h3 id="pendingTasksCount">12</h3>
+                                   <p class="stat-label">Pending Tasks</p>
+                                   <span class="stat-helper-text" id="pendingTasksHint">Track what still needs your
+                                        attention.</span>
+                              </div>
                          </div>
 
-                         <div class="stat-card">
-                              <h3 id="completedTasksCount">08</h3>
-                              <p>Completed Tasks</p>
+                         <div class="stat-card stat-completed">
+                              <div class="stat-icon-wrap">
+                                   <i class="fa-solid fa-circle-check"></i>
+                              </div>
+                              <div class="stat-info">
+                                   <h3 id="completedTasksCount">08</h3>
+                                   <p class="stat-label">Completed Tasks</p>
+                                   <span class="stat-helper-text" id="completedTasksHint">See how much work you’ve
+                                        finished.</span>
+                              </div>
                          </div>
 
-                         <div class="stat-card">
-                              <h3 id="studyProgressCount">76%</h3>
-                              <p>Study Progress</p>
+                         <div class="stat-card stat-progress">
+                              <div class="stat-icon-wrap">
+                                   <i class="fa-solid fa-chart-pie"></i>
+                              </div>
+                              <div class="stat-info">
+                                   <h3 id="studyProgressCount">76%</h3>
+                                   <p class="stat-label">Study Progress</p>
+                                   <span class="stat-helper-text" id="studyProgressHint">Your current study completion
+                                        snapshot.</span>
+                              </div>
                          </div>
                     </div>
 
+                    <div class="smart-insights-strip" id="smartInsightsStrip">
+                    </div>
+
                     <div class="dashboard-lower-grid">
+
                          <div class="quick-actions-card">
                               <div class="section-title">
-                                   <h3>Quick Actions</h3>
+                                   <h3><i class="fa-solid fa-bolt section-title-icon"></i> Quick Actions</h3>
                                    <p>Access your most-used features quickly.</p>
                               </div>
-
                               <div class="quick-actions-grid">
-                                   <a href="subjects.html" class="quick-action-btn">
+                                   <a href="subjects.html" class="quick-action-btn qa-subjects">
                                         <i class="fa-solid fa-book"></i>
                                         <span>Add Subject</span>
                                    </a>
-
-                                   <a href="tasks.html" class="quick-action-btn">
+                                   <a href="tasks.html" class="quick-action-btn qa-tasks">
                                         <i class="fa-solid fa-square-plus"></i>
                                         <span>Add Task</span>
                                    </a>
-
-                                   <a href="planner.html" class="quick-action-btn">
+                                   <a href="planner.html" class="quick-action-btn qa-planner">
                                         <i class="fa-solid fa-calendar-days"></i>
                                         <span>Open Planner</span>
                                    </a>
-
-                                   <a href="analytics.html" class="quick-action-btn">
+                                   <a href="analytics.html" class="quick-action-btn qa-analytics">
                                         <i class="fa-solid fa-chart-pie"></i>
                                         <span>View Analytics</span>
                                    </a>
@@ -241,45 +295,42 @@
                          <div class="dashboard-bottom-grid">
                               <div class="subject-progress-card">
                                    <div class="section-title">
-                                        <h3>Subject Progress</h3>
+                                        <h3><i class="fa-solid fa-bars-progress section-title-icon"></i> Subject
+                                             Progress</h3>
                                         <p>Track how much you have covered in each subject.</p>
                                    </div>
-
                                    <div class="subject-progress-list" id="subjectProgressList">
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
                                                   <span>Java Programming</span>
-                                                  <span>80%</span>
+                                                  <span class="progress-pct pct-high">80%</span>
                                              </div>
                                              <div class="progress-bar">
                                                   <div class="progress-fill" style="width: 80%;"></div>
                                              </div>
                                         </div>
-
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
                                                   <span>DBMS</span>
-                                                  <span>65%</span>
+                                                  <span class="progress-pct pct-mid">65%</span>
                                              </div>
                                              <div class="progress-bar">
                                                   <div class="progress-fill" style="width: 65%;"></div>
                                              </div>
                                         </div>
-
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
                                                   <span>Computer Networks</span>
-                                                  <span>55%</span>
+                                                  <span class="progress-pct pct-low">55%</span>
                                              </div>
                                              <div class="progress-bar">
                                                   <div class="progress-fill" style="width: 55%;"></div>
                                              </div>
                                         </div>
-
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
                                                   <span>Operating System</span>
-                                                  <span>72%</span>
+                                                  <span class="progress-pct pct-high">72%</span>
                                              </div>
                                              <div class="progress-bar">
                                                   <div class="progress-fill" style="width: 72%;"></div>
@@ -290,10 +341,9 @@
 
                               <div class="upcoming-card">
                                    <div class="section-title">
-                                        <h3>Upcoming Schedule</h3>
+                                        <h3><i class="fa-solid fa-clock section-title-icon"></i> Upcoming Schedule</h3>
                                         <p>Your next important study activities.</p>
                                    </div>
-
                                    <div class="upcoming-list" id="upcomingScheduleList">
                                         <div class="upcoming-item">
                                              <div class="upcoming-icon">
@@ -301,27 +351,26 @@
                                              </div>
                                              <div class="upcoming-info">
                                                   <h4>Java Revision Session</h4>
-                                                  <p>Today • 6:00 PM to 7:00 PM</p>
+                                                  <p><span class="day-badge today-badge">Today</span> 6:00 PM – 7:00 PM
+                                                  </p>
                                              </div>
                                         </div>
-
                                         <div class="upcoming-item">
                                              <div class="upcoming-icon">
                                                   <i class="fa-solid fa-file-pen"></i>
                                              </div>
                                              <div class="upcoming-info">
                                                   <h4>DBMS Assignment Submission</h4>
-                                                  <p>Tomorrow • 11:00 AM</p>
+                                                  <p><span class="day-badge tomorrow-badge">Tomorrow</span> 11:00 AM</p>
                                              </div>
                                         </div>
-
                                         <div class="upcoming-item">
                                              <div class="upcoming-icon">
                                                   <i class="fa-solid fa-laptop-code"></i>
                                              </div>
                                              <div class="upcoming-info">
                                                   <h4>Coding Practice</h4>
-                                                  <p>Tomorrow • 8:00 PM</p>
+                                                  <p><span class="day-badge tomorrow-badge">Tomorrow</span> 8:00 PM</p>
                                              </div>
                                         </div>
                                    </div>
@@ -330,28 +379,25 @@
 
                          <div class="today-tasks-card">
                               <div class="section-title">
-                                   <h3>Today’s Tasks</h3>
+                                   <h3><i class="fa-solid fa-list-check section-title-icon"></i> Today's Tasks</h3>
                                    <p>Your important tasks for today.</p>
                               </div>
-
                               <div class="task-list" id="todayTasksList">
-                                   <div class="task-item">
+                                   <div class="task-item priority-high">
                                         <div class="task-info">
                                              <h4>Complete Java Assignment</h4>
                                              <p>Due today • High Priority</p>
                                         </div>
                                         <span class="task-badge pending">Pending</span>
                                    </div>
-
-                                   <div class="task-item">
+                                   <div class="task-item priority-normal">
                                         <div class="task-info">
                                              <h4>Revise DBMS Notes</h4>
                                              <p>2 chapters • Evening session</p>
                                         </div>
                                         <span class="task-badge progress">In Progress</span>
                                    </div>
-
-                                   <div class="task-item">
+                                   <div class="task-item priority-done">
                                         <div class="task-info">
                                              <h4>Practice Aptitude Questions</h4>
                                              <p>30 questions • Night practice</p>
@@ -363,44 +409,41 @@
                     </div>
 
                     <div class="overview-chart-card">
-                         <div class="section-title">
-                              <h3>Weekly Study Overview</h3>
-                              <p>Your study activity for the last 7 days.</p>
-                         </div>
+                         <div class="chart-header">
+                              <div class="section-title">
+                                   <h3><i class="fa-solid fa-chart-column section-title-icon"></i> Weekly Study Activity
+                                   </h3>
+                                   <p>Track tasks, planner items, revisions, and tests across the last 7 days.</p>
+                              </div>
 
-                         <div class="chart-area">
-                              <div class="chart-bars" id="weeklyOverviewChartBars">
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 70%;"></div>
-                                        <span>Mon</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 55%;"></div>
-                                        <span>Tue</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 82%;"></div>
-                                        <span>Wed</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 60%;"></div>
-                                        <span>Thu</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 90%;"></div>
-                                        <span>Fri</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 68%;"></div>
-                                        <span>Sat</span>
-                                   </div>
-                                   <div class="chart-bar-group">
-                                        <div class="chart-bar" style="height: 76%;"></div>
-                                        <span>Sun</span>
-                                   </div>
+                              <div class="chart-legend chart-legend-multi">
+                                   <span class="chart-legend-item">
+                                        <span class="legend-dot legend-dot-task"></span>
+                                        <span class="legend-label">Tasks</span>
+                                   </span>
+                                   <span class="chart-legend-item">
+                                        <span class="legend-dot legend-dot-plan"></span>
+                                        <span class="legend-label">Planner</span>
+                                   </span>
+                                   <span class="chart-legend-item">
+                                        <span class="legend-dot legend-dot-revision"></span>
+                                        <span class="legend-label">Revision</span>
+                                   </span>
+                                   <span class="chart-legend-item">
+                                        <span class="legend-dot legend-dot-test"></span>
+                                        <span class="legend-label">Tests</span>
+                                   </span>
                               </div>
                          </div>
+
+                         <div class="chart-area chart-area-activity-tracker">
+                              <div class="chart-bars activity-tracker-grid" id="weeklyOverviewChartBars">
+                              </div>
+                         </div>
+
+                         <div class="chart-insight-line" id="chartInsightLine"></div>
                     </div>
+
                </section>
           </main>
      </div>
@@ -408,6 +451,22 @@
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/dashboard.js"></script>
      <script src="../assets/js/theme.js"></script>
+
+     <script>
+          (function () {
+               const el = document.getElementById("welcomeDateText");
+               if (el) {
+                    const now = new Date();
+                    const formatted = now.toLocaleDateString("en-IN", {
+                         weekday: "long",
+                         day: "numeric",
+                         month: "long",
+                         year: "numeric"
+                    });
+                    el.textContent = formatted;
+               }
+          })();
+     </script>
 </body>
 
 </html>
