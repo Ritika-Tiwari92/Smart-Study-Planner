@@ -202,10 +202,36 @@ document.addEventListener("DOMContentLoaded", function () {
     // ─── Fetch ───────────────────────────────────────────────────────────────
 
     async function fetchJson(url) {
-        const response = await fetch(url, { headers: { "Accept": "application/json" } });
-        if (!response.ok) throw new Error(`${url} failed with status ${response.status}`);
-        return response.json();
+    const token = (localStorage.getItem("token") || "").trim();
+
+    const response = await fetch(url, {
+        headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    let responseText = "";
+    try {
+        responseText = await response.text();
+    } catch (error) {
+        responseText = "";
     }
+
+    if (!response.ok) {
+        throw new Error(responseText || `${url} failed with status ${response.status}`);
+    }
+
+    if (!responseText) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(responseText);
+    } catch (error) {
+        return null;
+    }
+}
 
     async function fetchArray(baseUrl, label) {
         try {

@@ -36,42 +36,34 @@
                          <i class="fa-solid fa-house"></i>
                          <span>Dashboard</span>
                     </a>
-
                     <a href="planner.html" class="nav-item">
                          <i class="fa-solid fa-calendar-days"></i>
                          <span>Planner</span>
                     </a>
-
                     <a href="subjects.html" class="nav-item active">
                          <i class="fa-solid fa-book"></i>
                          <span>Subjects</span>
                     </a>
-
                     <a href="tasks.html" class="nav-item">
                          <i class="fa-solid fa-list-check"></i>
                          <span>Tasks</span>
                     </a>
-
                     <a href="revision.html" class="nav-item">
                          <i class="fa-solid fa-rotate"></i>
                          <span>Revision</span>
                     </a>
-
                     <a href="tests.html" class="nav-item">
                          <i class="fa-solid fa-file-lines"></i>
                          <span>Tests</span>
                     </a>
-
                     <a href="analytics.html" class="nav-item">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
-
                     <a href="assistant.html" class="nav-item">
                          <i class="fa-solid fa-robot"></i>
                          <span>Assistant</span>
                     </a>
-
                     <a href="settings.html" class="nav-item">
                          <i class="fa-solid fa-gear"></i>
                          <span>Settings</span>
@@ -79,7 +71,7 @@
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
                          <i class="fa-solid fa-right-from-bracket"></i>
                          <span>Logout</span>
                     </a>
@@ -91,7 +83,7 @@
                     <div class="header-left">
                          <div>
                               <h1>My Subjects</h1>
-                              <p>Manage your study subjects and track progress easily.</p>
+                              <p>Manage your study subjects and upload syllabi.</p>
                          </div>
                     </div>
 
@@ -106,11 +98,10 @@
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
-                                   <h4>Ritika</h4>
+                                   <h4 id="profileName">Student</h4>
                                    <p>Student</p>
                               </div>
                          </div>
-
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <a href="settings.html" class="profile-menu-item">
                                    <i class="fa-solid fa-user-gear"></i>
@@ -120,7 +111,7 @@
                                    <i class="fa-solid fa-chart-line"></i>
                                    <span>View Analytics</span>
                               </a>
-                              <a href="login.html" class="profile-menu-item logout">
+                              <a href="login.html" class="profile-menu-item logout" id="profileLogoutBtn">
                                    <i class="fa-solid fa-right-from-bracket"></i>
                                    <span>Logout</span>
                               </a>
@@ -131,22 +122,19 @@
                <section class="subjects-content">
                     <div class="subjects-summary-grid">
                          <div class="summary-card">
-                              <h3 id="totalSubjectsCount">05</h3>
+                              <h3 id="totalSubjectsCount">00</h3>
                               <p>Total Subjects</p>
                          </div>
-
                          <div class="summary-card">
-                              <h3 id="completedSubjectsCount">01</h3>
+                              <h3 id="completedSubjectsCount">00</h3>
                               <p>Completed</p>
                          </div>
-
                          <div class="summary-card">
-                              <h3 id="inProgressSubjectsCount">04</h3>
+                              <h3 id="inProgressSubjectsCount">00</h3>
                               <p>In Progress</p>
                          </div>
-
                          <div class="summary-card">
-                              <h3 id="averageProgressCount">68%</h3>
+                              <h3 id="averageProgressCount">0%</h3>
                               <p>Average Progress</p>
                          </div>
                     </div>
@@ -156,7 +144,6 @@
                               <i class="fa-solid fa-magnifying-glass"></i>
                               <input type="text" id="subjectSearchInput" placeholder="Search subjects...">
                          </div>
-
                          <div class="subjects-filter">
                               <i class="fa-solid fa-filter"></i>
                               <select id="subjectFilterSelect">
@@ -168,129 +155,23 @@
                          </div>
                     </div>
 
-                    <div class="subjects-grid" id="subjectsGrid">
-                         <div class="subject-card">
-                              <div class="subject-card-top">
-                                   <div class="subject-icon">
-                                        <i class="fa-solid fa-code"></i>
-                                   </div>
+                    <div class="subjects-grid" id="subjectsGrid"></div>
 
-                                   <div class="subject-actions">
-                                        <button class="subject-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="subject-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <h3>Java Programming</h3>
-                              <p>OOP concepts, collections, exception handling, and practice.</p>
-                              <div class="subject-meta">
-                                   <span>12 Chapters</span>
-                                   <span>80% Done</span>
-                              </div>
-                              <div class="subject-progress-bar">
-                                   <div class="subject-progress-fill" style="width: 80%;"></div>
-                              </div>
-                         </div>
-
-                         <div class="subject-card">
-                              <div class="subject-card-top">
-                                   <div class="subject-icon">
-                                        <i class="fa-solid fa-database"></i>
-                                   </div>
-
-                                   <div class="subject-actions">
-                                        <button class="subject-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="subject-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <h3>DBMS</h3>
-                              <p>ER model, normalization, SQL queries, and transactions.</p>
-                              <div class="subject-meta">
-                                   <span>10 Chapters</span>
-                                   <span>65% Done</span>
-                              </div>
-                              <div class="subject-progress-bar">
-                                   <div class="subject-progress-fill" style="width: 65%;"></div>
-                              </div>
-                         </div>
-
-                         <div class="subject-card">
-                              <div class="subject-card-top">
-                                   <div class="subject-icon">
-                                        <i class="fa-solid fa-network-wired"></i>
-                                   </div>
-
-                                   <div class="subject-actions">
-                                        <button class="subject-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="subject-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <h3>Computer Networks</h3>
-                              <p>OSI model, IP addressing, protocols, and network basics.</p>
-                              <div class="subject-meta">
-                                   <span>9 Chapters</span>
-                                   <span>55% Done</span>
-                              </div>
-                              <div class="subject-progress-bar">
-                                   <div class="subject-progress-fill" style="width: 55%;"></div>
-                              </div>
-                         </div>
-
-                         <div class="subject-card">
-                              <div class="subject-card-top">
-                                   <div class="subject-icon">
-                                        <i class="fa-solid fa-desktop"></i>
-                                   </div>
-
-                                   <div class="subject-actions">
-                                        <button class="subject-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="subject-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <h3>Operating System</h3>
-                              <p>Process management, memory, scheduling, and file systems.</p>
-                              <div class="subject-meta">
-                                   <span>11 Chapters</span>
-                                   <span>72% Done</span>
-                              </div>
-                              <div class="subject-progress-bar">
-                                   <div class="subject-progress-fill" style="width: 72%;"></div>
-                              </div>
-                         </div>
-                    </div>
                     <div class="subjects-empty-state hidden" id="subjectsEmptyState">
                          <i class="fa-regular fa-folder-open"></i>
                          <h3>No subjects found</h3>
-                         <p>Try changing your search text or filter option.</p>
+                         <p>Try changing your search or filter, or add a new subject.</p>
                     </div>
                </section>
+
+               <!-- ===================== SUBJECT MODAL ===================== -->
                <div class="subject-modal-overlay hidden" id="subjectModalOverlay">
                     <div class="subject-modal">
                          <div class="subject-modal-header">
                               <div>
                                    <h2 id="subjectModalTitle">Add New Subject</h2>
-                                   <p>Create a new subject with chapters, progress, and description.</p>
+                                   <p>Fill in subject details and optionally upload a syllabus.</p>
                               </div>
-
                               <button class="subject-modal-close" type="button" id="closeSubjectModalBtn">
                                    <i class="fa-solid fa-xmark"></i>
                               </button>
@@ -298,27 +179,37 @@
 
                          <form class="subject-modal-form" id="subjectModalForm">
                               <div class="subject-form-grid">
+
+                                   <!-- Subject Name -->
                                    <div class="subject-form-group full-width">
-                                        <label for="subjectName">Subject Name</label>
-                                        <input type="text" id="subjectName" placeholder="Enter subject name">
+                                        <label for="subjectName">Subject Name <span class="required">*</span></label>
+                                        <input type="text" id="subjectName" placeholder="e.g. Computer Networks">
+                                        <span class="field-error hidden" id="subjectNameError">Subject name is
+                                             required.</span>
                                    </div>
 
+                                   <!-- Subject Code -->
                                    <div class="subject-form-group">
                                         <label for="subjectCode">Subject Code</label>
                                         <input type="text" id="subjectCode" placeholder="e.g. BCA-601">
                                    </div>
 
+                                   <!-- Total Chapters -->
                                    <div class="subject-form-group">
-                                        <label for="subjectChapters">Total Chapters</label>
-                                        <input type="number" id="subjectChapters" placeholder="Enter total chapters">
+                                        <label for="subjectChapters">Total Chapters <span
+                                                  class="required">*</span></label>
+                                        <input type="number" id="subjectChapters" placeholder="e.g. 10" min="1">
+                                        <span class="field-error hidden" id="subjectChaptersError">Please enter total
+                                             chapters.</span>
                                    </div>
 
+                                   <!-- Progress -->
                                    <div class="subject-form-group">
                                         <label for="subjectProgress">Progress (%)</label>
-                                        <input type="number" id="subjectProgress"
-                                             placeholder="Enter progress percentage">
+                                        <input type="number" id="subjectProgress" placeholder="0" min="0" max="100">
                                    </div>
 
+                                   <!-- Icon -->
                                    <div class="subject-form-group">
                                         <label for="subjectIcon">Subject Icon</label>
                                         <select id="subjectIcon">
@@ -327,27 +218,98 @@
                                              <option value="fa-network-wired">Network</option>
                                              <option value="fa-desktop">Computer</option>
                                              <option value="fa-book">Book</option>
+                                             <option value="fa-calculator">Mathematics</option>
+                                             <option value="fa-flask">Science</option>
+                                             <option value="fa-globe">Geography</option>
                                         </select>
                                    </div>
 
+                                   <!-- Description -->
                                    <div class="subject-form-group full-width">
                                         <label for="subjectDescription">Description</label>
-                                        <textarea id="subjectDescription" rows="4"
-                                             placeholder="Write subject details..."></textarea>
+                                        <textarea id="subjectDescription" rows="3"
+                                             placeholder="Brief description of the subject..."></textarea>
                                    </div>
+
+                                   <!-- ===== SYLLABUS UPLOAD SECTION ===== -->
+                                   <div class="subject-form-group full-width">
+                                        <div class="syllabus-upload-header">
+                                             <label>Syllabus Upload <span class="optional-tag">(Optional)</span></label>
+                                             <label class="syllabus-toggle-switch">
+                                                  <input type="checkbox" id="syllabusUploadToggle">
+                                                  <span class="toggle-slider"></span>
+                                                  <span class="toggle-label">Enable</span>
+                                             </label>
+                                        </div>
+
+                                        <!-- Upload area — shown only when toggle is ON -->
+                                        <div class="syllabus-upload-area hidden" id="syllabusUploadArea">
+                                             <div class="syllabus-dropzone" id="syllabusDropzone">
+                                                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                  <p>Drag & drop your syllabus here</p>
+                                                  <span>or</span>
+                                                  <label class="syllabus-browse-btn" for="syllabusFileInput">
+                                                       Browse File
+                                                  </label>
+                                                  <input type="file" id="syllabusFileInput" accept=".pdf,.docx,.txt"
+                                                       hidden>
+                                                  <p class="syllabus-format-hint">
+                                                       Supported: PDF, DOCX, TXT &nbsp;|&nbsp; Max: 10MB
+                                                  </p>
+                                             </div>
+
+                                             <!-- File selected preview -->
+                                             <div class="syllabus-file-preview hidden" id="syllabusFilePreview">
+                                                  <div class="syllabus-file-info">
+                                                       <i class="fa-solid fa-file-lines"></i>
+                                                       <div>
+                                                            <p id="syllabusFileName">filename.pdf</p>
+                                                            <span id="syllabusFileSize">0 KB</span>
+                                                       </div>
+                                                  </div>
+                                                  <button type="button" class="syllabus-remove-btn"
+                                                       id="syllabusRemoveBtn" title="Remove file">
+                                                       <i class="fa-solid fa-xmark"></i>
+                                                  </button>
+                                             </div>
+
+                                             <!-- Upload error message -->
+                                             <span class="field-error hidden" id="syllabusFileError">
+                                                  Invalid file. Use PDF, DOCX, or TXT under 10MB.
+                                             </span>
+
+                                             <!-- Parsed chapters preview (shown after subject saved + syllabus uploaded) -->
+                                             <div class="syllabus-chapters-preview hidden" id="syllabusChaptersPreview">
+                                                  <div class="chapters-preview-header">
+                                                       <i class="fa-solid fa-list-ol"></i>
+                                                       <span>Parsed Chapters</span>
+                                                       <span class="chapters-count-badge"
+                                                            id="chaptersCountBadge">0</span>
+                                                  </div>
+                                                  <ul class="chapters-list" id="chaptersList"></ul>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <!-- ===== END SYLLABUS SECTION ===== -->
+
                               </div>
 
                               <div class="subject-modal-actions">
                                    <button type="button" class="subject-cancel-btn"
                                         id="cancelSubjectModalBtn">Cancel</button>
-                                   <button type="submit" class="subject-save-btn" id="subjectSaveBtn">Save
-                                        Subject</button>
+                                   <button type="submit" class="subject-save-btn" id="subjectSaveBtn">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                        Save Subject
+                                   </button>
                               </div>
                          </form>
                     </div>
                </div>
+               <!-- ===================== END MODAL ===================== -->
+
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/subjects.js"></script>

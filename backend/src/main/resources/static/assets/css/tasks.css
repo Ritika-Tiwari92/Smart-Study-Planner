@@ -343,6 +343,9 @@
   padding: 20px;
   z-index: 1000;
 }
+.task-modal-overlay.hidden {
+  display: none !important;
+}
 
 .task-modal {
   width: 100%;

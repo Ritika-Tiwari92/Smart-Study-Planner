@@ -412,6 +412,9 @@
   padding: 20px;
   z-index: 1000;
 }
+.plan-modal-overlay.hidden {
+  display: none !important;
+}
 
 .plan-modal {
   width: 100%;

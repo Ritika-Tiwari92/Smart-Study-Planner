@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Test Engine | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/test-engine.css">
+</head>
+
+<body class="test-engine-body">
+     <div class="test-engine-page">
+          <!-- Top Header -->
+          <header class="test-engine-header">
+               <div class="test-engine-brand">
+                    <div class="test-engine-brand-left">
+                         <div class="test-engine-logo-box">
+                              <i class="fa-solid fa-graduation-cap"></i>
+                         </div>
+                         <div>
+                              <h1>EduMind AI Test Engine</h1>
+                              <p>Computer Based Test Interface</p>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="test-engine-header-right">
+                    <div class="test-engine-language-wrap">
+                         <label for="examLanguageSelect">View In</label>
+                         <select id="examLanguageSelect">
+                              <option value="English">English</option>
+                              <option value="Hindi">Hindi</option>
+                         </select>
+                    </div>
+
+                    <div class="test-engine-header-timer" id="engineHeaderTimer">
+                         <i class="fa-regular fa-clock"></i>
+                         <div>
+                              <span>Remaining Time</span>
+                              <strong id="examRemainingTime">00:00:00</strong>
+                         </div>
+                    </div>
+               </div>
+          </header>
+
+          <!-- Candidate / Exam Info Strip -->
+          <section class="test-engine-info-strip">
+               <div class="test-engine-candidate-card">
+                    <div class="candidate-avatar-box">
+                         <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="candidate-info-list">
+                         <div class="candidate-info-row">
+                              <span>Candidate Name</span>
+                              <strong id="examCandidateName">Student Name</strong>
+                         </div>
+
+                         <div class="candidate-info-row">
+                              <span>Exam Name</span>
+                              <strong id="examNameValue">CUET Mock Test</strong>
+                         </div>
+
+                         <div class="candidate-info-row">
+                              <span>Subject Name</span>
+                              <strong id="examSubjectValue">General Test</strong>
+                         </div>
+
+                         <div class="candidate-info-row">
+                              <span>Total Questions</span>
+                              <strong id="examTotalQuestionsValue">0</strong>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="test-engine-info-actions">
+                    <div class="exam-status-chip">
+                         <span>Question Type</span>
+                         <strong id="engineQuestionTypeTop">MCQ</strong>
+                    </div>
+
+                    <div class="exam-status-chip">
+                         <span>Current Question</span>
+                         <strong id="engineCurrentQuestionTop">Q1</strong>
+                    </div>
+               </div>
+          </section>
+
+          <!-- Main Workspace -->
+          <main class="test-engine-main">
+               <!-- Left: Question Area -->
+               <section class="test-engine-question-panel">
+                    <div class="question-panel-banner">
+                         <div class="question-panel-banner-left">
+                              <span class="question-panel-label">Section</span>
+                              <strong id="engineSectionName">General Test</strong>
+                         </div>
+
+                         <div class="question-panel-banner-right">
+                              <span class="question-progress-chip" id="engineQuestionProgressChip">Question 1 of
+                                   0</span>
+                         </div>
+                    </div>
+
+                    <div class="question-panel-top">
+                         <div class="question-panel-top-left">
+                              <h2 id="engineQuestionNumber">Question 1</h2>
+                              <p id="engineQuestionMeta">Marks: 1</p>
+                         </div>
+
+                         <div class="question-focus-topic hidden" id="engineFocusTopicWrap">
+                              <i class="fa-solid fa-circle-exclamation"></i>
+                              <span id="engineFocusTopic">Focus topic here</span>
+                         </div>
+                    </div>
+
+                    <div class="question-card">
+                         <div class="question-text-wrap">
+                              <p id="engineQuestionText">
+                                   Question text will appear here.
+                              </p>
+                         </div>
+
+                         <div class="question-options-list" id="engineOptionsList"></div>
+
+                         <div class="question-theory-wrap hidden" id="engineTheoryWrap">
+                              <label for="engineTheoryAnswer">Your Answer</label>
+                              <textarea id="engineTheoryAnswer" rows="8"
+                                   placeholder="Write your answer here..."></textarea>
+                         </div>
+                    </div>
+
+                    <div class="question-action-row primary-actions">
+                         <button type="button" class="engine-btn green" id="engineSaveNextBtn">
+                              Save &amp; Next
+                         </button>
+
+                         <button type="button" class="engine-btn light" id="engineClearResponseBtn">
+                              Clear Response
+                         </button>
+
+                         <button type="button" class="engine-btn amber" id="engineSaveMarkReviewBtn">
+                              Save &amp; Mark for Review
+                         </button>
+
+                         <button type="button" class="engine-btn blue" id="engineMarkReviewNextBtn">
+                              Mark for Review &amp; Next
+                         </button>
+                    </div>
+
+                    <div class="question-action-row secondary-actions">
+                         <button type="button" class="engine-btn muted" id="enginePrevBtn">
+                              &lt;&lt; Back
+                         </button>
+
+                         <button type="button" class="engine-btn muted" id="engineNextBtn">
+                              Next &gt;&gt;
+                         </button>
+
+                         <button type="button" class="engine-btn submit" id="engineSubmitBtn">
+                              Submit
+                         </button>
+                    </div>
+               </section>
+
+               <!-- Right: Sidebar -->
+               <aside class="test-engine-sidebar">
+                    <div class="sidebar-card candidate-side-card">
+                         <div class="candidate-side-top">
+                              <div class="candidate-side-avatar">
+                                   <img id="sidebarCandidateImage" src="../assets/avatar/default-user.png"
+                                        alt="Candidate Photo">
+                              </div>
+
+                              <div class="candidate-side-info">
+                                   <span>Candidate</span>
+                                   <strong id="sidebarCandidateName">Student Name</strong>
+                                   <small id="sidebarCandidateSubject">General Test</small>
+                              </div>
+                         </div>
+
+                         <div class="candidate-side-meta">
+                              <div class="candidate-meta-box">
+                                   <span>Exam</span>
+                                   <strong id="sidebarExamName">CUET Mock Test</strong>
+                              </div>
+
+                              <div class="candidate-meta-box">
+                                   <span>Question</span>
+                                   <strong id="sidebarCurrentQuestion">Q1</strong>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="sidebar-card legend-card">
+                         <h3>Question Status</h3>
+
+                         <div class="status-legend-list">
+                              <div class="status-legend-item">
+                                   <span class="legend-shape not-visited" id="legendNotVisitedCount">0</span>
+                                   <p>Not Visited</p>
+                              </div>
+
+                              <div class="status-legend-item">
+                                   <span class="legend-shape not-answered" id="legendNotAnsweredCount">0</span>
+                                   <p>Not Answered</p>
+                              </div>
+
+                              <div class="status-legend-item">
+                                   <span class="legend-shape answered" id="legendAnsweredCount">0</span>
+                                   <p>Answered</p>
+                              </div>
+
+                              <div class="status-legend-item">
+                                   <span class="legend-shape marked" id="legendMarkedCount">0</span>
+                                   <p>Marked for Review</p>
+                              </div>
+
+                              <div class="status-legend-item full">
+                                   <span class="legend-shape answered-marked" id="legendAnsweredMarkedCount">0</span>
+                                   <p>Answered &amp; Marked for Review<br><small>(will be considered for
+                                             evaluation)</small></p>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="sidebar-card palette-card">
+                         <div class="palette-card-top">
+                              <h3>Question Palette</h3>
+                              <button type="button" class="palette-collapse-btn" id="enginePaletteCollapseBtn">
+                                   <i class="fa-solid fa-chevron-right"></i>
+                              </button>
+                         </div>
+
+                         <div class="question-palette-grid" id="engineQuestionPalette"></div>
+                    </div>
+
+                    <div class="sidebar-card note-card">
+                         <h4>Exam Instructions</h4>
+                         <ul>
+                              <li>Use palette to jump directly to any question.</li>
+                              <li>Save responses before moving ahead.</li>
+                              <li>Marked questions can be reviewed later.</li>
+                              <li>Test auto-submits when time ends.</li>
+                         </ul>
+                    </div>
+               </aside>
+          </main>
+     </div>
+
+     <!-- Submit Summary Modal -->
+     <div class="submit-summary-overlay hidden" id="submitSummaryOverlay">
+          <div class="submit-summary-modal">
+               <div class="submit-summary-header">
+                    <div>
+                         <h2>Submit Test</h2>
+                         <p>Review your attempt summary before final submission.</p>
+                    </div>
+
+                    <button type="button" class="submit-summary-close" id="closeSubmitSummaryBtn">
+                         <i class="fa-solid fa-xmark"></i>
+                    </button>
+               </div>
+
+               <div class="submit-summary-top">
+                    <div class="submit-summary-exam-info">
+                         <div class="submit-summary-info-card">
+                              <span>Exam Name</span>
+                              <strong id="summaryExamName">-</strong>
+                         </div>
+
+                         <div class="submit-summary-info-card">
+                              <span>Subject</span>
+                              <strong id="summarySubjectName">-</strong>
+                         </div>
+
+                         <div class="submit-summary-info-card">
+                              <span>Remaining Time</span>
+                              <strong id="summaryRemainingTime">00:00:00</strong>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="submit-summary-grid">
+                    <div class="submit-summary-stat total">
+                         <span>Total Questions</span>
+                         <strong id="summaryTotalQuestions">0</strong>
+                    </div>
+
+                    <div class="submit-summary-stat answered">
+                         <span>Answered</span>
+                         <strong id="summaryAnswered">0</strong>
+                    </div>
+
+                    <div class="submit-summary-stat not-answered">
+                         <span>Not Answered</span>
+                         <strong id="summaryNotAnswered">0</strong>
+                    </div>
+
+                    <div class="submit-summary-stat marked">
+                         <span>Marked for Review</span>
+                         <strong id="summaryMarked">0</strong>
+                    </div>
+
+                    <div class="submit-summary-stat answered-marked">
+                         <span>Answered &amp; Marked</span>
+                         <strong id="summaryAnsweredMarked">0</strong>
+                    </div>
+
+                    <div class="submit-summary-stat not-visited">
+                         <span>Not Visited</span>
+                         <strong id="summaryNotVisited">0</strong>
+                    </div>
+               </div>
+
+               <div class="submit-summary-note">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p>
+                         Once you click <strong>Final Submit</strong>, your test will be submitted and you will not be
+                         able to change your answers.
+                    </p>
+               </div>
+
+               <div class="submit-summary-actions">
+                    <button type="button" class="submit-summary-btn light" id="cancelSubmitSummaryBtn">
+                         Cancel
+                    </button>
+
+                    <button type="button" class="submit-summary-btn final" id="confirmFinalSubmitBtn">
+                         Final Submit
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/test-engine.js"></script>
+</body>
+
+</html>

@@ -10,7 +10,6 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
-
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -58,27 +57,56 @@
                          <p>Login with your registered email and password.</p>
                     </div>
 
-                    <form class="auth-form" id="loginForm">
+                    <form class="auth-form" id="loginForm" novalidate>
+
+                         <!-- Email Field -->
                          <div class="auth-form-group">
-                              <label for="loginEmail">Email Address</label>
-                              <input type="email" id="loginEmail" placeholder="Enter your email">
+                              <label for="loginEmail">
+                                   Email Address
+                                   <span class="req-star" aria-hidden="true">*</span>
+                              </label>
+                              <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="email"
+                                   required />
+                              <span class="auth-field-error" id="loginEmailError" role="alert"></span>
                          </div>
 
+                         <!-- Password Field -->
                          <div class="auth-form-group">
-                              <label for="loginPassword">Password</label>
-                              <input type="password" id="loginPassword" placeholder="Enter your password">
+                              <div class="auth-flex-between">
+                                   <label for="loginPassword">
+                                        Password
+                                        <span class="req-star" aria-hidden="true">*</span>
+                                   </label>
+                                   <!-- ✅ FORGOT PASSWORD LINK -->
+                                   <a href="forgot-password.html" class="auth-forgot-link">
+                                        Forgot Password?
+                                   </a>
+                              </div>
+                              <div class="auth-input-wrapper">
+                                   <input type="password" id="loginPassword" placeholder="Enter your password"
+                                        autocomplete="current-password" required />
+                                   <button type="button" class="auth-eye-btn" id="loginPasswordEye"
+                                        aria-label="Toggle password visibility" tabindex="-1">
+                                        <i class="fa-solid fa-eye" id="loginPasswordEyeIcon"></i>
+                                   </button>
+                              </div>
+                              <span class="auth-field-error" id="loginPasswordError" role="alert"></span>
                          </div>
 
-                         <button type="submit" class="auth-submit-btn">Sign In</button>
+                         <!-- Submit -->
+                         <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
+                              Sign In
+                         </button>
 
                          <p class="auth-bottom-text">
-                              Don’t have an account?
+                              Don't have an account?
                               <a href="register.html">Create Account</a>
                          </p>
                     </form>
                </div>
           </div>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/login.js"></script>
 </body>

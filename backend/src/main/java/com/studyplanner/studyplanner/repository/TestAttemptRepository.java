@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public interface TestAttemptRepository extends JpaRepository<TestAttempt, Long> {
 
+     Optional<TestAttempt> findByIdAndUserId(Long id, Long userId);
+
      List<TestAttempt> findByUserIdOrderByStartedAtDesc(Long userId);
 
      List<TestAttempt> findByUserIdAndStatusOrderBySubmittedAtDesc(Long userId, String status);
 
-     List<TestAttempt> findByTestIdAndUserIdOrderByStartedAtDesc(Long testId, Long userId);
-
-     Optional<TestAttempt> findByIdAndUserId(Long attemptId, Long userId);
+     boolean existsByTestId(Long testId);
 }

@@ -375,6 +375,12 @@
   padding: 20px;
   z-index: 1000;
 }
+.revision-modal-overlay.hidden {
+  display: none !important;
+}
+.task-modal-overlay.hidden {
+  display: none !important;
+}
 
 .revision-modal {
   width: 100%;

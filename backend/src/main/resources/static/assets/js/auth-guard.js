@@ -1,46 +1,95 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const currentPath = window.location.pathname.toLowerCase();
+/**
+ * auth-guard.js
+ * Runs on protected pages.
+ * Verifies token with backend.
+ * Public pages like login/register should never be blocked.
+ */
 
-    const publicPages = ["login.html", "register.html"];
-    const isPublicPage = publicPages.some((page) => currentPath.includes(page));
+(async function () {
+    const PUBLIC_PAGES = [
+        "/pages/login.html",
+        "/pages/register.html",
+        "/pages/landing.html",
+        "/pages/index.html",
+        "/index.html",
+        "/"
+    ];
 
-    const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
-    const loggedInUserRaw = localStorage.getItem("edumind_logged_in_user");
+    const currentPath = window.location.pathname;
 
-    function clearAuthAndRedirect() {
+    function isPublicPage(pathname) {
+        return PUBLIC_PAGES.some((page) => pathname.endsWith(page) || pathname === page);
+    }
+
+    function redirectToLogin() {
+        if (currentPath.endsWith("/pages/login.html")) {
+            return;
+        }
+        window.location.href = "/pages/login.html";
+    }
+
+    function clearAuthStorage() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
         localStorage.removeItem("edumind_logged_in_user");
+        localStorage.removeItem("edumind_registered_user");
+        localStorage.removeItem("loggedInUser");
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("user");
+        localStorage.removeItem("authUser");
+        localStorage.removeItem("studyPlannerUser");
         localStorage.removeItem("edumind_is_logged_in");
-
-        if (!isPublicPage) {
-            window.location.href = "login.html";
-        }
     }
 
-    function getParsedLoggedInUser() {
-        if (!loggedInUserRaw) return null;
-
-        try {
-            const parsedUser = JSON.parse(loggedInUserRaw);
-
-            if (!parsedUser || !parsedUser.email) {
-                return null;
-            }
-
-            return parsedUser;
-        } catch (error) {
-            console.error("Invalid logged in user data:", error);
-            return null;
-        }
-    }
-
-    const loggedInUser = getParsedLoggedInUser();
-
-    if (!isLoggedIn || !loggedInUser) {
-        clearAuthAndRedirect();
+    if (isPublicPage(currentPath)) {
         return;
     }
 
-    if (isLoggedIn && loggedInUser && isPublicPage) {
-        window.location.href = "dashboard.html";
+    const rawToken = localStorage.getItem("token");
+    const token = rawToken ? rawToken.trim() : "";
+
+    console.log("Auth Guard Current Path:", currentPath);
+    console.log("Auth Guard Token Present:", !!token);
+    console.log("Auth Guard Token Preview:", token ? token.substring(0, 25) + "..." : "NO TOKEN");
+
+    if (!token) {
+        redirectToLogin();
+        return;
     }
-});
+
+    try {
+        const response = await fetch("/api/auth/validate", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const responseText = await response.text();
+        console.log("Validate Status:", response.status);
+        console.log("Validate Response:", responseText);
+
+        if (!response.ok) {
+            clearAuthStorage();
+            redirectToLogin();
+            return;
+        }
+
+    } catch (error) {
+        console.error("Auth validation failed:", error);
+        clearAuthStorage();
+        redirectToLogin();
+    }
+})();
+
+function getAuthHeader() {
+    const rawToken = localStorage.getItem("token");
+    const token = rawToken ? rawToken.trim() : "";
+
+    return {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+    };
+}

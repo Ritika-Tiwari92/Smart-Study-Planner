@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Test Result | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/test-result.css">
+</head>
+
+<body class="test-result-body">
+     <div class="test-result-page">
+          <header class="test-result-header">
+               <div class="test-result-header-left">
+                    <div class="test-result-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                         <h1>EduMind AI Result Center</h1>
+                         <p>Your detailed test performance analysis</p>
+                    </div>
+               </div>
+
+               <div class="test-result-header-actions">
+                    <button type="button" class="result-header-btn secondary" id="reviewAnswersBtn">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Review Answers</span>
+                    </button>
+
+                    <button type="button" class="result-header-btn primary" id="backToTestsBtn">
+                         <i class="fa-solid fa-arrow-left"></i>
+                         <span>Back to Tests</span>
+                    </button>
+               </div>
+          </header>
+
+          <div class="result-loading-state" id="resultLoadingState">
+               <div class="result-loading-card">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <h3>Loading Result</h3>
+                    <p>Please wait while your test analysis is being prepared.</p>
+               </div>
+          </div>
+
+          <div class="result-error-state hidden" id="resultErrorState">
+               <div class="result-error-card">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <h3>Result not found</h3>
+                    <p id="resultErrorText">We could not load this result.</p>
+                    <button type="button" class="result-header-btn primary" id="errorBackToTestsBtn">
+                         Go Back
+                    </button>
+               </div>
+          </div>
+
+          <main class="test-result-content hidden" id="resultPageContent">
+               <section class="result-hero-card">
+                    <div class="result-hero-left">
+                         <div class="result-hero-label">Test Result Summary</div>
+                         <h2 id="resultTitle">Mock Test Result</h2>
+                         <p id="resultSubject">Subject Name</p>
+
+                         <div class="result-meta-row">
+                              <span class="result-status-badge" id="resultStatusBadge">SUBMITTED</span>
+                              <span class="result-submitted-time" id="resultSubmittedAt">Submitted on --</span>
+                         </div>
+                    </div>
+
+                    <div class="result-hero-right">
+                         <div class="hero-score-box">
+                              <span>Score</span>
+                              <strong id="resultScoreMain">0/0</strong>
+                         </div>
+
+                         <div class="hero-percentage-box">
+                              <span>Percentage</span>
+                              <strong id="resultPercentageMain">0%</strong>
+                         </div>
+                    </div>
+               </section>
+
+               <section class="result-stats-grid">
+                    <div class="result-stat-card total">
+                         <span>Total Questions</span>
+                         <strong id="resultTotalQuestions">0</strong>
+                    </div>
+
+                    <div class="result-stat-card answered">
+                         <span>Answered</span>
+                         <strong id="resultAnsweredQuestions">0</strong>
+                    </div>
+
+                    <div class="result-stat-card correct">
+                         <span>Correct</span>
+                         <strong id="resultCorrectAnswers">0</strong>
+                    </div>
+
+                    <div class="result-stat-card incorrect">
+                         <span>Incorrect</span>
+                         <strong id="resultIncorrectAnswers">0</strong>
+                    </div>
+
+                    <div class="result-stat-card accuracy">
+                         <span>Accuracy</span>
+                         <strong id="resultAccuracy">0%</strong>
+                    </div>
+               </section>
+
+               <section class="result-insights-grid">
+                    <div class="result-insight-card">
+                         <div class="insight-card-top">
+                              <i class="fa-solid fa-bullseye"></i>
+                              <h3>Focus Area</h3>
+                         </div>
+                         <p id="resultFocusArea">No focus area available.</p>
+                    </div>
+
+                    <div class="result-insight-card">
+                         <div class="insight-card-top">
+                              <i class="fa-solid fa-lightbulb"></i>
+                              <h3>Test Tip</h3>
+                         </div>
+                         <p id="resultTestTip">No test tip available.</p>
+                    </div>
+               </section>
+
+               <section class="result-answers-section" id="resultAnswersSection">
+                    <div class="result-section-top">
+                         <div>
+                              <h3>Question-wise Review</h3>
+                              <p>See your submitted answers, correct answers, and awarded marks.</p>
+                         </div>
+                    </div>
+
+                    <div class="result-answers-list" id="resultAnswersList">
+                         <div class="result-answer-empty">
+                              <i class="fa-regular fa-file-lines"></i>
+                              <p>Question review will appear here.</p>
+                         </div>
+                    </div>
+               </section>
+          </main>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/test-result.js"></script>
+</body>
+
+</html>

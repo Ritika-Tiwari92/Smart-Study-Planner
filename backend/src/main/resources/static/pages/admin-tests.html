@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Admin Tests | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/admin-tests.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="admin-dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-table-columns"></i>
+                         <span>Admin Dashboard</span>
+                    </a>
+
+                    <a href="admin-tests.html" class="nav-item active">
+                         <i class="fa-solid fa-file-circle-plus"></i>
+                         <span>Admin Tests</span>
+                    </a>
+
+                    <a href="admin-questions.html" class="nav-item">
+                         <i class="fa-solid fa-list-ul"></i>
+                         <span>Question Bank</span>
+                    </a>
+
+                    <a href="admin-results.html" class="nav-item">
+                         <i class="fa-solid fa-square-poll-vertical"></i>
+                         <span>Admin Results</span>
+                    </a>
+
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Student Dashboard</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Student Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Admin Test Management</h1>
+                              <p>Create, manage, publish, and organize tests from one place.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <button class="add-test-btn" id="openAdminTestModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Create Test</span>
+                         </button>
+
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+
+                         <div class="profile-mini" id="profileMenuToggle">
+                              <img src="../assets/avatar/default-user.png" alt="Admin">
+                              <div>
+                                   <h4>Admin</h4>
+                                   <p>EduMind Manager</p>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <a href="settings.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
+                              </a>
+                              <a href="admin-results.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-square-poll-vertical"></i>
+                                   <span>Manage Results</span>
+                              </a>
+                              <a href="login.html" class="profile-menu-item logout">
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
+                              </a>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="admin-tests-content">
+                    <div class="admin-tests-summary-grid">
+                         <div class="admin-summary-card">
+                              <div class="admin-summary-icon total">
+                                   <i class="fa-solid fa-file-lines"></i>
+                              </div>
+                              <div>
+                                   <h3 id="adminTotalTestsCount">00</h3>
+                                   <p>Total Tests</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-summary-card">
+                              <div class="admin-summary-icon draft">
+                                   <i class="fa-solid fa-pen-to-square"></i>
+                              </div>
+                              <div>
+                                   <h3 id="adminDraftTestsCount">00</h3>
+                                   <p>Draft Tests</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-summary-card">
+                              <div class="admin-summary-icon published">
+                                   <i class="fa-solid fa-paper-plane"></i>
+                              </div>
+                              <div>
+                                   <h3 id="adminPublishedTestsCount">00</h3>
+                                   <p>Published Tests</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-summary-card">
+                              <div class="admin-summary-icon questions">
+                                   <i class="fa-solid fa-list-check"></i>
+                              </div>
+                              <div>
+                                   <h3 id="adminTotalQuestionsCount">00</h3>
+                                   <p>Total Questions</p>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="admin-tests-toolbar">
+                         <div class="tests-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="adminTestSearchInput"
+                                   placeholder="Search tests by title or subject...">
+                         </div>
+
+                         <div class="tests-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="adminTestFilterSelect">
+                                   <option value="ALL">All Tests</option>
+                                   <option value="DRAFT">Draft</option>
+                                   <option value="PUBLISHED">Published</option>
+                                   <option value="UPCOMING">Upcoming</option>
+                                   <option value="THIS_WEEK">This Week</option>
+                                   <option value="MOCK_TEST">Mock Test</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="admin-tests-main-card">
+                         <div class="section-title">
+                              <h3>Manage Tests</h3>
+                              <p>Create tests, update details, manage questions, and publish when ready.</p>
+                         </div>
+
+                         <div class="admin-test-list" id="adminTestList"></div>
+
+                         <div class="tests-empty-state hidden" id="adminTestsEmptyState">
+                              <i class="fa-regular fa-folder-open"></i>
+                              <h3>No admin tests found</h3>
+                              <p>Create your first test or change the current filter.</p>
+                         </div>
+                    </div>
+               </section>
+
+               <div class="admin-test-modal-overlay hidden" id="adminTestModalOverlay">
+                    <div class="admin-test-modal">
+                         <div class="admin-test-modal-header">
+                              <div>
+                                   <h2 id="adminTestModalTitle">Create Test</h2>
+                                   <p>Add test details and save it as a managed test draft.</p>
+                              </div>
+
+                              <button class="admin-test-modal-close" type="button" id="closeAdminTestModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="admin-test-modal-form" id="adminTestModalForm">
+                              <div class="test-form-grid">
+                                   <div class="test-form-group full-width">
+                                        <label for="adminTestTitle">Test Title</label>
+                                        <input type="text" id="adminTestTitle"
+                                             placeholder="e.g. CUET General Test Mock 01">
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminTestSubject">Subject</label>
+                                        <select id="adminTestSubject">
+                                             <option value="">Select subject</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminTestDate">Test Date</label>
+                                        <input type="date" id="adminTestDate">
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminTestType">Test Type</label>
+                                        <select id="adminTestType">
+                                             <option>Upcoming</option>
+                                             <option>This Week</option>
+                                             <option>Mock Test</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminTestDuration">Duration</label>
+                                        <input type="text" id="adminTestDuration" placeholder="e.g. 60 mins">
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminTestStatus">Publish Status</label>
+                                        <select id="adminTestStatus">
+                                             <option value="DRAFT">Draft</option>
+                                             <option value="PUBLISHED">Published</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group">
+                                        <label for="adminNegativeMarking">Negative Marking</label>
+                                        <select id="adminNegativeMarking">
+                                             <option value="false">No</option>
+                                             <option value="true">Yes</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="test-form-group full-width">
+                                        <label for="adminTestDescription">Description</label>
+                                        <textarea id="adminTestDescription" rows="4"
+                                             placeholder="Write short details about this test..."></textarea>
+                                   </div>
+
+                                   <div class="test-form-group full-width">
+                                        <label for="adminTestInstructions">Instructions</label>
+                                        <textarea id="adminTestInstructions" rows="5"
+                                             placeholder="Write exam instructions, timing rules, and attempt guidelines..."></textarea>
+                                   </div>
+                              </div>
+
+                              <div class="admin-test-modal-actions">
+                                   <button type="button" class="test-cancel-btn"
+                                        id="cancelAdminTestModalBtn">Cancel</button>
+                                   <button type="submit" class="test-save-btn" id="saveAdminTestBtn">Save Test</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/admin-tests.js"></script>
+</body>
+
+</html>

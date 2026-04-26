@@ -112,6 +112,47 @@ public class Test {
           this.description = description;
      }
 
+     private Boolean published = false;
+
+     private String adminStatus = "DRAFT";
+
+     @Column(columnDefinition = "TEXT")
+     private String instructions;
+
+     private Boolean negativeMarking = false;
+
+     public Boolean getPublished() {
+          return published;
+     }
+
+     public void setPublished(Boolean published) {
+          this.published = published;
+     }
+
+     public String getAdminStatus() {
+          return adminStatus;
+     }
+
+     public void setAdminStatus(String adminStatus) {
+          this.adminStatus = adminStatus;
+     }
+
+     public String getInstructions() {
+          return instructions;
+     }
+
+     public void setInstructions(String instructions) {
+          this.instructions = instructions;
+     }
+
+     public Boolean getNegativeMarking() {
+          return negativeMarking;
+     }
+
+     public void setNegativeMarking(Boolean negativeMarking) {
+          this.negativeMarking = negativeMarking;
+     }
+
      public Integer getScore() {
           return score;
      }

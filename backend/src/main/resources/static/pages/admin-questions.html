@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Admin Questions | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/admin-questions.css">
+</head>
+
+<body>
+     <div class="dashboard-layout">
+          <aside class="sidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="admin-dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-table-columns"></i>
+                         <span>Admin Dashboard</span>
+                    </a>
+
+                    <a href="admin-tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-circle-plus"></i>
+                         <span>Admin Tests</span>
+                    </a>
+
+                    <a href="admin-questions.html" class="nav-item active">
+                         <i class="fa-solid fa-list-ul"></i>
+                         <span>Question Bank</span>
+                    </a>
+
+                    <a href="admin-results.html" class="nav-item">
+                         <i class="fa-solid fa-square-poll-vertical"></i>
+                         <span>Admin Results</span>
+                    </a>
+
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Student Dashboard</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Student Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main">
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Admin Question Builder</h1>
+                              <p>Create, organize, and manage questions for selected tests.</p>
+                         </div>
+                    </div>
+
+                    <div class="header-actions">
+                         <a href="admin-tests.html" class="back-admin-btn">
+                              <i class="fa-solid fa-arrow-left"></i>
+                              <span>Back to Tests</span>
+                         </a>
+
+                         <button class="add-question-btn" id="openQuestionModalBtn">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>Add Question</span>
+                         </button>
+
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+
+                         <div class="profile-mini" id="profileMenuToggle">
+                              <img src="../assets/avatar/default-user.png" alt="Admin">
+                              <div>
+                                   <h4>Admin</h4>
+                                   <p>EduMind Manager</p>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <a href="settings.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
+                              </a>
+                              <a href="admin-tests.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-file-circle-plus"></i>
+                                   <span>Manage Tests</span>
+                              </a>
+                              <a href="login.html" class="profile-menu-item logout">
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
+                              </a>
+                         </div>
+                    </div>
+               </header>
+
+               <section class="admin-questions-content">
+                    <div class="admin-question-test-card">
+                         <div class="admin-question-test-left">
+                              <div class="question-page-badge">
+                                   <i class="fa-solid fa-file-lines"></i>
+                              </div>
+
+                              <div>
+                                   <h2 id="selectedTestTitle">Select a test</h2>
+                                   <p id="selectedTestSubtitle">Question management details will appear here.</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-question-test-meta">
+                              <div class="question-meta-chip">
+                                   <span>Subject</span>
+                                   <strong id="selectedTestSubject">-</strong>
+                              </div>
+
+                              <div class="question-meta-chip">
+                                   <span>Type</span>
+                                   <strong id="selectedTestType">-</strong>
+                              </div>
+
+                              <div class="question-meta-chip">
+                                   <span>Duration</span>
+                                   <strong id="selectedTestDuration">-</strong>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="admin-questions-summary-grid">
+                         <div class="admin-question-summary-card">
+                              <div class="summary-icon total">
+                                   <i class="fa-solid fa-list-check"></i>
+                              </div>
+                              <div>
+                                   <h3 id="totalQuestionCount">00</h3>
+                                   <p>Total Questions</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-question-summary-card">
+                              <div class="summary-icon mcq">
+                                   <i class="fa-solid fa-circle-dot"></i>
+                              </div>
+                              <div>
+                                   <h3 id="mcqQuestionCount">00</h3>
+                                   <p>MCQ Questions</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-question-summary-card">
+                              <div class="summary-icon theory">
+                                   <i class="fa-solid fa-pen"></i>
+                              </div>
+                              <div>
+                                   <h3 id="theoryQuestionCount">00</h3>
+                                   <p>Theory Questions</p>
+                              </div>
+                         </div>
+
+                         <div class="admin-question-summary-card">
+                              <div class="summary-icon marks">
+                                   <i class="fa-solid fa-award"></i>
+                              </div>
+                              <div>
+                                   <h3 id="totalMarksCount">00</h3>
+                                   <p>Total Marks</p>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="admin-questions-toolbar">
+                         <div class="questions-search">
+                              <i class="fa-solid fa-magnifying-glass"></i>
+                              <input type="text" id="questionSearchInput"
+                                   placeholder="Search by question text or focus topic...">
+                         </div>
+
+                         <div class="questions-filter">
+                              <i class="fa-solid fa-filter"></i>
+                              <select id="questionTypeFilter">
+                                   <option value="ALL">All Questions</option>
+                                   <option value="MCQ">MCQ</option>
+                                   <option value="THEORY">Theory</option>
+                              </select>
+                         </div>
+                    </div>
+
+                    <div class="admin-question-list-card">
+                         <div class="section-title">
+                              <h3>Saved Questions</h3>
+                              <p>Review and manage all questions added to this test.</p>
+                         </div>
+
+                         <div class="admin-question-list" id="adminQuestionList"></div>
+
+                         <div class="tests-empty-state hidden" id="adminQuestionsEmptyState">
+                              <i class="fa-regular fa-folder-open"></i>
+                              <h3>No questions found</h3>
+                              <p>Add your first question or change the current filter.</p>
+                         </div>
+                    </div>
+               </section>
+
+               <div class="question-modal-overlay hidden" id="questionModalOverlay">
+                    <div class="question-modal">
+                         <div class="question-modal-header">
+                              <div>
+                                   <h2 id="questionModalTitle">Add Question</h2>
+                                   <p>Create MCQ or theory questions for the selected test.</p>
+                              </div>
+
+                              <button class="question-modal-close" type="button" id="closeQuestionModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <form class="question-modal-form" id="questionModalForm">
+                              <div class="question-form-grid">
+                                   <div class="question-form-group full-width">
+                                        <label for="questionText">Question Text</label>
+                                        <textarea id="questionText" rows="4"
+                                             placeholder="Write the full question here..."></textarea>
+                                   </div>
+
+                                   <div class="question-form-group">
+                                        <label for="questionType">Question Type</label>
+                                        <select id="questionType">
+                                             <option value="MCQ">MCQ</option>
+                                             <option value="THEORY">Theory</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="question-form-group">
+                                        <label for="questionMarks">Marks</label>
+                                        <input type="number" id="questionMarks" min="1" value="1" placeholder="1">
+                                   </div>
+
+                                   <div class="question-form-group">
+                                        <label for="questionOrder">Question Order</label>
+                                        <input type="number" id="questionOrder" min="1" placeholder="Auto">
+                                   </div>
+
+                                   <div class="question-form-group full-width">
+                                        <label for="questionFocusTopic">Focus Topic</label>
+                                        <input type="text" id="questionFocusTopic"
+                                             placeholder="e.g. Java OOP, DBMS joins, CN protocols">
+                                   </div>
+
+                                   <div class="question-form-group full-width">
+                                        <label for="questionCorrectAnswer">Correct Answer</label>
+                                        <input type="text" id="questionCorrectAnswer"
+                                             placeholder="For MCQ use A / B / C / D, for theory write model answer">
+                                   </div>
+
+                                   <div class="question-options-wrap full-width" id="questionOptionsWrap">
+                                        <div class="section-title compact">
+                                             <h3>MCQ Options</h3>
+                                             <p>Add answer options for the MCQ question.</p>
+                                        </div>
+
+                                        <div class="question-options-grid">
+                                             <div class="question-form-group">
+                                                  <label for="optionA">Option A</label>
+                                                  <input type="text" id="optionA" placeholder="Enter option A">
+                                             </div>
+
+                                             <div class="question-form-group">
+                                                  <label for="optionB">Option B</label>
+                                                  <input type="text" id="optionB" placeholder="Enter option B">
+                                             </div>
+
+                                             <div class="question-form-group">
+                                                  <label for="optionC">Option C</label>
+                                                  <input type="text" id="optionC" placeholder="Enter option C">
+                                             </div>
+
+                                             <div class="question-form-group">
+                                                  <label for="optionD">Option D</label>
+                                                  <input type="text" id="optionD" placeholder="Enter option D">
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="question-modal-actions">
+                                   <button type="button" class="question-reset-btn"
+                                        id="resetQuestionModalBtn">Reset</button>
+                                   <button type="submit" class="question-save-btn" id="saveQuestionModalBtn">Save
+                                        Question</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </main>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/admin-questions.js"></script>
+</body>
+
+</html>

@@ -1,351 +1,105 @@
-* {
+/* ============================================================
+   EduMind AI — Base / Reset
+   base.css
+   Global resets, body, typography foundations.
+   ============================================================ */
+
+/* ── Box Sizing Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+/* ── Root / Body ── */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: "Poppins", sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background-color: var(--bg-deep);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
+/* ── Headings ── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-main);
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+/* ── Links ── */
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--text-link-hover);
+}
+
+/* ── Images ── */
 img {
   max-width: 100%;
   display: block;
 }
 
-a {
-  text-decoration: none;
-}
-.hidden {
-  display: none !important;
-}
-body.preview-dark {
-  background: #0f172a;
-  color: #f9fafb;
+/* ── Buttons base reset ── */
+button {
+  font-family: var(--font-main);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
 }
 
-body.preview-dark .dashboard-layout,
-body.preview-dark .dashboard-main {
-  background: #111827;
+/* ── Input base reset ── */
+input,
+textarea,
+select {
+  font-family: var(--font-main);
+  outline: none;
 }
 
-/* Sidebar */
-body.preview-dark .sidebar {
-  background: #0f172a;
-  border-right: 1px solid #1f2937;
+/* ── Lists ── */
+ul,
+ol {
+  list-style: none;
 }
 
-body.preview-dark .sidebar-logo,
-body.preview-dark .sidebar-logo span,
-body.preview-dark .sidebar-logo i,
-body.preview-dark .nav-item,
-body.preview-dark .logout-btn {
-  color: #e5e7eb !important;
+/* ── Selection ── */
+::selection {
+  background: var(--cyan-dim);
+  color: var(--cyan);
 }
 
-body.preview-dark .nav-item:hover,
-body.preview-dark .nav-item.active,
-body.preview-dark .logout-btn:hover {
-  background: #1f2937 !important;
-  color: #ffffff !important;
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
 }
-
-/* Header / profile / theme button */
-body.preview-dark .dashboard-header,
-body.preview-dark .profile-mini,
-body.preview-dark .theme-toggle-btn {
-  background: #1f2937 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
 }
-
-body.preview-dark .theme-toggle-btn i,
-body.preview-dark .notification-btn i {
-  color: #f9fafb !important;
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.25);
+  border-radius: var(--radius-full);
 }
-
-/* Universal cards */
-body.preview-dark [class*="-card"],
-body.preview-dark [class*="-summary-card"],
-body.preview-dark [class*="-modal"] {
-  background: #1f2937 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-/* Inner blocks / list items / boxes */
-body.preview-dark [class*="-item"],
-body.preview-dark [class*="-box"],
-body.preview-dark [class*="-action-btn"],
-body.preview-dark .quick-action-item,
-body.preview-dark .action-card,
-body.preview-dark .summary-box,
-body.preview-dark .summary-item,
-body.preview-dark .schedule-item,
-body.preview-dark .subject-item,
-body.preview-dark .progress-item {
-  border-color: #374151 !important;
-}
-
-/* Keep user chat bubble purple */
-body.preview-dark .chat-message.user .chat-bubble {
-  color: #ffffff !important;
-}
-
-/* Assistant / generic inner light surfaces */
-body.preview-dark .chat-message.assistant .chat-bubble,
-body.preview-dark .study-session-item,
-body.preview-dark .upcoming-plan-item,
-body.preview-dark .focus-tip-item,
-body.preview-dark .revision-topic-item,
-body.preview-dark .revision-schedule-item,
-body.preview-dark .weak-area-item,
-body.preview-dark .revision-tip-item,
-body.preview-dark .test-item,
-body.preview-dark .result-item,
-body.preview-dark .focus-area-item,
-body.preview-dark .test-tip-item,
-body.preview-dark .score-stat-item,
-body.preview-dark .recommendation-item,
-body.preview-dark .assistant-help-item,
-body.preview-dark .settings-toggle-item,
-body.preview-dark .settings-avatar-box,
-body.preview-dark .appearance-option,
-body.preview-dark .security-action-btn,
-body.preview-dark .subject-card,
-body.preview-dark .task-card,
-body.preview-dark .quick-action-item,
-body.preview-dark .action-card,
-body.preview-dark .summary-box,
-body.preview-dark .summary-item,
-body.preview-dark .schedule-item,
-body.preview-dark .subject-item,
-body.preview-dark .progress-item {
-  background: #111827 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-/* All headings */
-body.preview-dark h1,
-body.preview-dark h2,
-body.preview-dark h3,
-body.preview-dark h4,
-body.preview-dark h5,
-body.preview-dark h6,
-body.preview-dark label,
-body.preview-dark strong,
-body.preview-dark .section-title h3,
-body.preview-dark .dashboard-main h1,
-body.preview-dark .dashboard-main h2,
-body.preview-dark .dashboard-main h3,
-body.preview-dark .dashboard-main h4 {
-  color: #f9fafb !important;
-}
-
-/* All normal text */
-body.preview-dark p,
-body.preview-dark span,
-body.preview-dark small,
-body.preview-dark li,
-body.preview-dark .section-title p,
-body.preview-dark .dashboard-main p,
-body.preview-dark .dashboard-main span,
-body.preview-dark .profile-mini p {
-  color: #d1d5db !important;
-}
-
-/* Inputs / search / filter / textarea */
-body.preview-dark input,
-body.preview-dark select,
-body.preview-dark textarea,
-body.preview-dark .planner-search,
-body.preview-dark .planner-filter,
-body.preview-dark .tasks-search,
-body.preview-dark .tasks-filter,
-body.preview-dark .subjects-search,
-body.preview-dark .subjects-filter,
-body.preview-dark .revision-search,
-body.preview-dark .revision-filter,
-body.preview-dark .tests-search,
-body.preview-dark .tests-filter,
-body.preview-dark .analytics-search,
-body.preview-dark .analytics-filter,
-body.preview-dark .chat-input-box,
-body.preview-dark .settings-form-group input,
-body.preview-dark .settings-form-group select {
-  background: #111827 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-body.preview-dark input::placeholder,
-body.preview-dark textarea::placeholder {
-  color: #9ca3af !important;
-}
-
-/* Progress bars / tracks / charts */
-body.preview-dark .progress-bar,
-body.preview-dark .progress-track,
-body.preview-dark .weekly-progress-bar,
-body.preview-dark .subject-progress-bar,
-body.preview-dark .chart-placeholder.large {
-  background: #111827 !important;
-  border-color: #374151 !important;
-}
-
-body.preview-dark .chart-labels span,
-body.preview-dark .weekly-target-top span,
-body.preview-dark .subject-insight-top span,
-body.preview-dark .session-time,
-body.preview-dark .revision-schedule-time {
-  color: #c4b5fd !important;
-}
-
-/* Empty states */
-body.preview-dark [class*="empty-state"] {
-  background: #1f2937 !important;
-  border-color: #4b5563 !important;
-  color: #d1d5db !important;
-}
-
-/* Buttons inside dark mode */
-body.preview-dark .change-photo-btn,
-body.preview-dark .security-action-btn,
-body.preview-dark .appearance-option {
-  color: #f9fafb !important;
-}
-
-/* Dashboard-specific hero/search wrappers */
-body.preview-dark .welcome-card,
-body.preview-dark .top-header-card,
-body.preview-dark .hero-card,
-body.preview-dark .search-profile-bar,
-body.preview-dark .dashboard-top-bar,
-body.preview-dark .dashboard-search,
-body.preview-dark .search-box,
-body.preview-dark .header-search,
-body.preview-dark .top-search {
-  background: #1f2937 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-body.preview-dark .dashboard-search input,
-body.preview-dark .search-box input,
-body.preview-dark .header-search input,
-body.preview-dark .top-search input {
-  background: transparent !important;
-  color: #f9fafb !important;
-}
-
-body.preview-dark .dashboard-search input::placeholder,
-body.preview-dark .search-box input::placeholder,
-body.preview-dark .header-search input::placeholder,
-body.preview-dark .top-search input::placeholder {
-  color: #9ca3af !important;
-}
-body.preview-dark .summary-card,
-body.preview-dark .task-summary-card,
-body.preview-dark .subject-summary-card,
-body.preview-dark .planner-summary-card,
-body.preview-dark .revision-summary-card,
-body.preview-dark .tests-summary-card,
-body.preview-dark .analytics-summary-card,
-body.preview-dark .quick-action-item,
-body.preview-dark .action-card,
-body.preview-dark .subject-card,
-body.preview-dark .task-card,
-body.preview-dark .subject-item,
-body.preview-dark .schedule-item,
-body.preview-dark .progress-item {
-  background: #1f2937 !important;
-  border: 1px solid #374151 !important;
-}
-
-body.preview-dark .summary-card h3,
-body.preview-dark .task-summary-card h3,
-body.preview-dark .subject-summary-card h3,
-body.preview-dark .planner-summary-card h3,
-body.preview-dark .revision-summary-card h3,
-body.preview-dark .tests-summary-card h3,
-body.preview-dark .analytics-summary-card h3,
-body.preview-dark .quick-action-item h4,
-body.preview-dark .action-card h4,
-body.preview-dark .subject-card h4,
-body.preview-dark .task-card h4 {
-  color: #f9fafb !important;
-}
-
-body.preview-dark .summary-card p,
-body.preview-dark .task-summary-card p,
-body.preview-dark .subject-summary-card p,
-body.preview-dark .planner-summary-card p,
-body.preview-dark .revision-summary-card p,
-body.preview-dark .tests-summary-card p,
-body.preview-dark .analytics-summary-card p,
-body.preview-dark .quick-action-item p,
-body.preview-dark .action-card p,
-body.preview-dark .subject-card p,
-body.preview-dark .task-card p,
-body.preview-dark .subject-item p,
-body.preview-dark .schedule-item p,
-body.preview-dark .progress-item p,
-body.preview-dark .subject-item span,
-body.preview-dark .schedule-item span,
-body.preview-dark .progress-item span {
-  color: #d1d5db !important;
-}
-
-body.preview-dark .subject-action-btn,
-body.preview-dark .task-action-btn,
-body.preview-dark .session-action-btn,
-body.preview-dark .revision-topic-action-btn,
-body.preview-dark .test-action-btn,
-body.preview-dark .session-action-btn.edit,
-body.preview-dark .session-action-btn.delete,
-body.preview-dark .revision-topic-action-btn.edit,
-body.preview-dark .revision-topic-action-btn.delete,
-body.preview-dark .test-action-btn.edit,
-body.preview-dark .test-action-btn.delete {
-  background: #111827 !important;
-  border: 1px solid #374151 !important;
-  color: #f9fafb !important;
-}
-
-body.preview-dark .subject-action-btn i,
-body.preview-dark .task-action-btn i,
-body.preview-dark .session-action-btn i,
-body.preview-dark .revision-topic-action-btn i,
-body.preview-dark .test-action-btn i {
-  color: #f9fafb !important;
-}
-
-body.preview-dark .subject-action-btn:hover,
-body.preview-dark .task-action-btn:hover,
-body.preview-dark .session-action-btn:hover,
-body.preview-dark .revision-topic-action-btn:hover,
-body.preview-dark .test-action-btn:hover {
-  background: #1f2937 !important;
-  border-color: #8b7cff !important;
-  color: #ffffff !important;
-}
-
-body.preview-dark .subject-action-btn.delete:hover,
-body.preview-dark .task-action-btn.delete:hover,
-body.preview-dark .session-action-btn.delete:hover,
-body.preview-dark .revision-topic-action-btn.delete:hover,
-body.preview-dark .test-action-btn.delete:hover {
-  background: #3f1d24 !important;
-  border-color: #ef4444 !important;
-}
-
-body.preview-dark .subject-action-btn.delete:hover i,
-body.preview-dark .task-action-btn.delete:hover i,
-body.preview-dark .session-action-btn.delete:hover i,
-body.preview-dark .revision-topic-action-btn.delete:hover i,
-body.preview-dark .test-action-btn.delete:hover i {
-  color: #fecaca !important;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.45);
 }

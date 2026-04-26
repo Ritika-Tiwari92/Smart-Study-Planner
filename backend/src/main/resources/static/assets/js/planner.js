@@ -34,9 +34,8 @@ const PLANNER_API_BASE_URL =
 
 const SUBJECTS_API_BASE_URL =
     window.location.port === "8080"
-        ? "/subjects"
-        : "http://localhost:8080/subjects";
-
+        ? "/api/subjects"
+        : "http://localhost:8080/api/subjects";
 let editingPlanId = null;
 let allPlans = [];
 
@@ -72,8 +71,15 @@ function buildPlannerApiUrl(planId = "") {
 }
 
 function buildSubjectsApiUrl() {
-    const userId = getCurrentUserId();
-    return `${SUBJECTS_API_BASE_URL}?userId=${encodeURIComponent(userId)}`;
+    return SUBJECTS_API_BASE_URL;
+}
+function getAuthHeaders(extraHeaders = {}) {
+    const token = (localStorage.getItem("token") || "").trim();
+
+    return {
+        "Authorization": `Bearer ${token}`,
+        ...extraHeaders
+    };
 }
 
 async function handleApiResponse(response) {
@@ -548,7 +554,9 @@ function fillPlanFormForEdit(sessionItem) {
 }
 
 async function fetchAllPlans() {
-    const response = await fetch(buildPlannerApiUrl());
+    const response = await fetch(buildPlannerApiUrl(), {
+        headers: getAuthHeaders()
+    });
     const data = await handleApiResponse(response);
     return Array.isArray(data) ? data : [];
 }
@@ -556,9 +564,9 @@ async function fetchAllPlans() {
 async function createPlanApi(planData) {
     const response = await fetch(buildPlannerApiUrl(), {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
             "Content-Type": "application/json"
-        },
+        }),
         body: JSON.stringify(planData)
     });
 
@@ -568,9 +576,9 @@ async function createPlanApi(planData) {
 async function updatePlanApi(planId, planData) {
     const response = await fetch(buildPlannerApiUrl(planId), {
         method: "PUT",
-        headers: {
+        headers: getAuthHeaders({
             "Content-Type": "application/json"
-        },
+        }),
         body: JSON.stringify(planData)
     });
 
@@ -579,17 +587,21 @@ async function updatePlanApi(planId, planData) {
 
 async function deletePlanApi(planId) {
     const response = await fetch(buildPlannerApiUrl(planId), {
-        method: "DELETE"
+        method: "DELETE",
+        headers: getAuthHeaders()
     });
 
     return handleApiResponse(response);
 }
 
 async function fetchAllSubjects() {
-    const response = await fetch(buildSubjectsApiUrl());
+    const response = await fetch(buildSubjectsApiUrl(), {
+        headers: getAuthHeaders()
+    });
     const data = await handleApiResponse(response);
     return Array.isArray(data) ? data : [];
 }
+
 
 function getSubjectDisplayName(subject) {
     return (
@@ -675,74 +687,68 @@ async function deletePlan(planId) {
     await deletePlanApi(planId);
     await loadPlans();
 }
+// PURANA wala pura if block hatao aur yeh daalo:
 
-if (
-    openPlanModalBtn &&
-    planModalOverlay &&
-    closePlanModalBtn &&
-    cancelPlanModalBtn &&
-    planModalForm &&
-    studySessionList
-) {
+// ─── Event Listeners — individually attach karo ───────────
+
+if (openPlanModalBtn) {
     openPlanModalBtn.addEventListener("click", async function () {
         clearPlanModalState();
         await loadSubjectOptions();
         openPlanModal();
     });
+}
 
+if (closePlanModalBtn) {
     closePlanModalBtn.addEventListener("click", function () {
         closePlanModal();
         clearPlanModalState();
     });
+}
 
+if (cancelPlanModalBtn) {
     cancelPlanModalBtn.addEventListener("click", function () {
         closePlanModal();
         clearPlanModalState();
     });
+}
 
+if (planModalOverlay) {
     planModalOverlay.addEventListener("click", function (event) {
+        // Sirf overlay pe click hone pe close karo, modal ke andar nahi
         if (event.target === planModalOverlay) {
             closePlanModal();
             clearPlanModalState();
         }
     });
+}
 
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !planModalOverlay.classList.contains("hidden")) {
-            closePlanModal();
-            clearPlanModalState();
-        }
-    });
+document.addEventListener("keydown", function (event) {
+    if (
+        event.key === "Escape" &&
+        planModalOverlay &&
+        !planModalOverlay.classList.contains("hidden")
+    ) {
+        closePlanModal();
+        clearPlanModalState();
+    }
+});
 
+if (planModalForm) {
     planModalForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        const title = planTitleInput.value.trim();
-        const subject = planSubjectInput.value.trim();
-        const time = planTimeInput.value;
-        const date = planDateInput.value;
-        const status = planStatusInput.value;
+        const title       = planTitleInput.value.trim();
+        const subject     = planSubjectInput.value.trim();
+        const time        = planTimeInput.value;
+        const date        = planDateInput.value;
+        const status      = planStatusInput.value;
         const description = planDescriptionInput.value.trim();
 
-        if (!title) {
-            alert("Please enter a plan title.");
-            return;
-        }
-
-        if (!subject) {
-            alert("Please select a subject.");
-            return;
-        }
-
-        if (!time) {
-            alert("Please select a session time.");
-            return;
-        }
-
-        if (!date) {
-            alert("Please select a plan date.");
-            return;
-        }
+        if (!title)   { alert("Please enter a plan title.");   return; }
+        if (!subject) { alert("Please select a subject.");     return; }
+        if (!time)    { alert("Please select a session time."); return; }
+        if (!date)    { alert("Please select a plan date.");   return; }
 
         const finalDescription = description || "Study session planned for focused learning.";
 
@@ -756,9 +762,7 @@ if (
         };
 
         try {
-            if (planSaveBtn) {
-                planSaveBtn.disabled = true;
-            }
+            if (planSaveBtn) planSaveBtn.disabled = true;
 
             if (editingPlanId) {
                 await updatePlan(editingPlanId, planData);
@@ -772,20 +776,19 @@ if (
             console.error("Error saving plan:", error);
             alert(`Failed to save plan: ${error.message}`);
         } finally {
-            if (planSaveBtn) {
-                planSaveBtn.disabled = false;
-            }
+            if (planSaveBtn) planSaveBtn.disabled = false;
         }
     });
+}
 
+if (studySessionList) {
     studySessionList.addEventListener("click", async function (event) {
         const deleteButton = event.target.closest(".session-action-btn.delete");
-        const editButton = event.target.closest(".session-action-btn.edit");
+        const editButton   = event.target.closest(".session-action-btn.edit");
 
         if (deleteButton) {
             const sessionItem = deleteButton.closest(".study-session-item");
-            const planId = sessionItem?.dataset.planId;
-
+            const planId      = sessionItem?.dataset.planId;
             if (!planId) return;
 
             const shouldDelete = confirm("Do you want to delete this study plan?");
@@ -794,10 +797,8 @@ if (
             try {
                 await deletePlan(planId);
             } catch (error) {
-                console.error("Error deleting plan:", error);
                 alert(`Failed to delete plan: ${error.message}`);
             }
-
             return;
         }
 
@@ -806,24 +807,24 @@ if (
             if (!sessionItem) return;
 
             setEditPlanMode();
-
             const selectedSubject = sessionItem.dataset.subject || "";
             await loadSubjectOptions(selectedSubject);
-
             fillPlanFormForEdit(sessionItem);
             openPlanModal();
         }
     });
 
-    if (planSearchInput) {
-        planSearchInput.addEventListener("input", applyPlanFilters);
+
+      if (planSearchInput) {
+       planSearchInput.addEventListener("input", applyPlanFilters);
     }
 
-    if (planFilterSelect) {
-        planFilterSelect.addEventListener("change", applyPlanFilters);
-    }
+     if (planFilterSelect) {
+         planFilterSelect.addEventListener("change", applyPlanFilters);
+      }
 
-    loadPlans();
-    loadSubjectOptions();
-    setAddPlanMode();
+     // ─── Init ─────────────────────────────────────────────────
+     loadPlans();
+     loadSubjectOptions();
+     setAddPlanMode();
 }

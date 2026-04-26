@@ -2,47 +2,61 @@ package com.studyplanner.studyplanner.controller;
 
 import com.studyplanner.studyplanner.model.Subject;
 import com.studyplanner.studyplanner.service.SubjectService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Subject endpoints — all secured.
+ * userId is NEVER taken from URL. Always extracted from JWT
+ * via @AuthenticationPrincipal.
+ * User A cannot access User B's subjects.
+ */
 @RestController
-@RequestMapping("/subjects")
-@CrossOrigin("*")
+@RequestMapping("/api/subjects")
+@CrossOrigin(origins = "*")
 public class SubjectController {
 
-     @Autowired
-     private SubjectService subjectService;
+     private final SubjectService subjectService;
 
-     @PostMapping
-     public Subject addSubject(@RequestParam Long userId, @Valid @RequestBody Subject subject) {
-          return subjectService.addSubject(userId, subject);
-     }
-
-     @PutMapping("/{id}")
-     public ResponseEntity<Subject> updateSubject(
-               @PathVariable Long id,
-               @RequestParam Long userId,
-               @Valid @RequestBody Subject subject) {
-          return ResponseEntity.ok(subjectService.updateSubject(userId, id, subject));
+     public SubjectController(SubjectService subjectService) {
+          this.subjectService = subjectService;
      }
 
      @GetMapping
-     public List<Subject> getAllSubjects(@RequestParam Long userId) {
-          return subjectService.getAllSubjects(userId);
+     public ResponseEntity<List<Subject>> getMySubjects(
+               @AuthenticationPrincipal UserDetails userDetails) {
+          List<Subject> subjects = subjectService.getSubjectsByEmail(userDetails.getUsername());
+          return ResponseEntity.ok(subjects);
      }
 
-     @GetMapping("/{id}")
-     public ResponseEntity<Subject> getSubjectById(@PathVariable Long id, @RequestParam Long userId) {
-          return ResponseEntity.ok(subjectService.getSubjectById(userId, id));
+     @PostMapping
+     public ResponseEntity<Subject> addSubject(
+               @AuthenticationPrincipal UserDetails userDetails,
+               @Valid @RequestBody Subject subject) {
+          Subject saved = subjectService.addSubjectByEmail(userDetails.getUsername(), subject);
+          return ResponseEntity.ok(saved);
      }
 
-     @DeleteMapping("/{id}")
-     public ResponseEntity<String> deleteSubject(@PathVariable Long id, @RequestParam Long userId) {
-          subjectService.deleteSubject(userId, id);
+     @PutMapping("/{subjectId}")
+     public ResponseEntity<Subject> updateSubject(
+               @AuthenticationPrincipal UserDetails userDetails,
+               @PathVariable Long subjectId,
+               @Valid @RequestBody Subject subject) {
+          Subject updated = subjectService.updateSubjectByEmail(
+                    userDetails.getUsername(), subjectId, subject);
+          return ResponseEntity.ok(updated);
+     }
+
+     @DeleteMapping("/{subjectId}")
+     public ResponseEntity<String> deleteSubject(
+               @AuthenticationPrincipal UserDetails userDetails,
+               @PathVariable Long subjectId) {
+          subjectService.deleteSubjectByEmail(userDetails.getUsername(), subjectId);
           return ResponseEntity.ok("Subject deleted successfully");
      }
 }

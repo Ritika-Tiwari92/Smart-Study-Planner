@@ -1,6 +1,7 @@
 package com.studyplanner.studyplanner.model;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,6 +56,9 @@ public class Subject {
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "user_id")
      private User user;
+
+     @OneToOne(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+     private SyllabusFile syllabusFile;
 
      public Subject() {
      }
@@ -150,4 +154,13 @@ public class Subject {
      public void setUser(User user) {
           this.user = user;
      }
+
+     public SyllabusFile getSyllabusFile() {
+          return syllabusFile;
+     }
+
+     public void setSyllabusFile(SyllabusFile syllabusFile) {
+          this.syllabusFile = syllabusFile;
+     }
+
 }

@@ -21,8 +21,44 @@
 </head>
 
 <body>
-     <div class="dashboard-layout">
-          <aside class="sidebar">
+
+
+     <!-- AI Background Animation -->
+     <div class="ai-bg-animation" id="aiBgAnimation">
+          <div class="ai-grid"></div>
+          <div class="ai-core"></div>
+          <div class="ai-orbit ai-orbit-1">
+               <div class="ai-orbit-dot"></div>
+          </div>
+          <div class="ai-orbit ai-orbit-2">
+               <div class="ai-orbit-dot"></div>
+          </div>
+          <div class="ai-orbit ai-orbit-3">
+               <div class="ai-orbit-dot"></div>
+               <div class="ai-orbit-dot ai-orbit-dot-2"></div>
+          </div>
+          <div class="ai-orbit ai-orbit-4">
+               <div class="ai-orbit-dot"></div>
+          </div>
+          <div class="ai-node ai-node-1"></div>
+          <div class="ai-node ai-node-2"></div>
+          <div class="ai-node ai-node-3"></div>
+          <div class="ai-node ai-node-4"></div>
+          <div class="ai-node ai-node-5"></div>
+          <div class="ai-node ai-node-6"></div>
+          <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+               <line class="ai-line" x1="15" y1="20" x2="50" y2="50" />
+               <line class="ai-line" x1="85" y1="30" x2="50" y2="50" />
+               <line class="ai-line" x1="20" y1="80" x2="50" y2="50" />
+               <line class="ai-line" x1="80" y1="75" x2="50" y2="50" />
+          </svg>
+     </div>
+     <div class="dashboard-layout" id="dashboardLayout">
+
+          <!-- Sidebar Overlay (mobile) -->
+          <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+          <aside class="sidebar" id="mainSidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
                          <i class="fa-solid fa-graduation-cap"></i>
@@ -77,16 +113,23 @@
                </div>
           </aside>
 
-          <main class="dashboard-main">
-               <header class="dashboard-header">
-                    <div class="header-left">
+          <!-- ══ ASSISTANT MAIN ══ -->
+          <main class="dashboard-main assistant-page-main">
+
+               <!-- Top Bar -->
+               <header class="assistant-topbar">
+                    <div class="assistant-topbar-left">
+                         <!-- Hamburger -->
+                         <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" title="Toggle Sidebar">
+                              <i class="fa-solid fa-bars"></i>
+                         </button>
                          <div>
                               <h1>AI Study Assistant</h1>
                               <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
                          </div>
                     </div>
 
-                    <div class="header-actions">
+                    <div class="assistant-topbar-right">
                          <button class="new-chat-btn" id="newChatBtn" type="button">
                               <i class="fa-solid fa-plus"></i>
                               <span>New Chat</span>
@@ -118,80 +161,79 @@
                     </div>
                </header>
 
-               <section class="assistant-content">
+               <!-- ══ TWO-COLUMN LAYOUT ══ -->
+               <div class="assistant-body">
 
-                    <!-- Intro Card -->
-                    <div class="assistant-intro-card">
-                         <div class="assistant-intro-left">
-                              <div class="assistant-avatar">
+                    <!-- LEFT: Chat Panel -->
+                    <div class="assistant-chat-panel">
+
+                         <!-- Intro Hero (shown when no chat) -->
+                         <div class="assistant-hero" id="assistantHero">
+                              <div class="assistant-hero-avatar">
                                    <i class="fa-solid fa-robot"></i>
                               </div>
-                              <div>
-                                   <h3 id="assistantIntroTitle">Hello, I'm Astra — your AI Study Buddy</h3>
-                                   <p>I can help you with study plans, topic explanations, revision help, coding
-                                        doubts, and smart suggestions. Just type or pick a suggestion below!</p>
-                              </div>
-                         </div>
-                    </div>
+                              <h2 id="assistantIntroTitle">Hello — I'm Astra, your AI Study Buddy</h2>
+                              <p>I can help you with study plans, topic explanations, revision help, coding doubts, and
+                                   smart suggestions.</p>
 
-                    <!-- Quick Action Chips -->
-                    <div class="assistant-quick-actions">
-                         <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
-                              <i class="fa-solid fa-calendar-check"></i> Make a study plan
-                         </button>
-                         <button class="assistant-chip" type="button" data-prompt="Explain a topic in simple words">
-                              <i class="fa-solid fa-lightbulb"></i> Explain a topic
-                         </button>
-                         <button class="assistant-chip" type="button" data-prompt="Generate revision questions for me">
-                              <i class="fa-solid fa-rotate"></i> Generate revision questions
-                         </button>
-                         <button class="assistant-chip" type="button" data-prompt="Help me with a coding problem">
-                              <i class="fa-solid fa-code"></i> Help with coding
-                         </button>
-                         <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
-                              <i class="fa-solid fa-file-lines"></i> Summarize notes
-                         </button>
-                    </div>
-
-                    <!-- Main Grid -->
-                    <div class="assistant-main-grid">
-
-                         <!-- Chat Card -->
-                         <div class="assistant-chat-card">
-                              <div class="section-title">
-                                   <h3><i class="fa-solid fa-comments"></i> Chat with Astra</h3>
-                                   <p>Ask anything related to your learning.</p>
-                              </div>
-
-                              <div class="chat-messages" id="chatMessages">
-                                   <!-- Rendered by assistant.js -->
-                              </div>
-
-                              <div class="chat-input-wrapper">
-                                   <div class="chat-input-box" id="chatInputBox">
-                                        <i class="fa-solid fa-robot chat-icon"></i>
-                                        <input type="text" id="assistantMessageInput"
-                                             placeholder="Ask Astra anything... (Enter to send)" autocomplete="off" />
-                                        <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
-                                             <i class="fa-solid fa-paper-plane"></i>
-                                        </button>
-                                   </div>
-                                   <p class="input-hint">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                        Astra AI can make mistakes. Always verify important information.
-                                   </p>
+                              <!-- Quick Action Chips -->
+                              <div class="assistant-quick-actions">
+                                   <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
+                                        <i class="fa-solid fa-calendar-check"></i> Make a study plan
+                                   </button>
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Explain a topic in simple words">
+                                        <i class="fa-solid fa-lightbulb"></i> Explain a topic
+                                   </button>
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Generate revision questions for me">
+                                        <i class="fa-solid fa-rotate"></i> Generate revision questions
+                                   </button>
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Help me with a coding problem">
+                                        <i class="fa-solid fa-code"></i> Help with coding
+                                   </button>
+                                   <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
+                                        <i class="fa-solid fa-file-lines"></i> Summarize notes
+                                   </button>
                               </div>
                          </div>
 
-                         <!-- Side Card -->
-                         <div class="assistant-side-card">
+                         <!-- Chat Messages -->
+                         <div class="chat-messages" id="chatMessages"></div>
 
-                              <!-- Suggested Help -->
-                              <div class="section-title">
-                                   <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Suggested Help</h3>
-                                   <p>Quick things you can ask right now.</p>
+                         <!-- Input -->
+                         <div class="chat-input-wrapper">
+                              <div class="chat-input-box" id="chatInputBox">
+                                   <i class="fa-solid fa-robot chat-icon"></i>
+                                   <input type="text" id="assistantMessageInput"
+                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off" />
+                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                   </button>
                               </div>
+                              <p class="input-hint">
+                                   <i class="fa-solid fa-circle-info"></i>
+                                   Astra AI can make mistakes. Always verify important information.
+                              </p>
+                         </div>
+                    </div>
 
+                    <!-- RIGHT: Sidebar Panel -->
+                    <div class="assistant-side-panel" id="assistantSidePanel">
+
+                         <!-- New Chat Button -->
+                         <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+
+                         <!-- Suggested Help -->
+                         <div class="side-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                   <span>Suggested Help</span>
+                              </div>
                               <div class="assistant-help-list">
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Create a one-day exam revision plan for me">
@@ -219,32 +261,30 @@
                                         <span>Give me aptitude practice questions</span>
                                    </div>
                               </div>
+                         </div>
 
-                              <!-- Chat History -->
-                              <div class="history-section">
-                                   <div class="history-header">
-                                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Chats</h3>
-                                        <button class="new-chat-small-btn" id="newChatSmallBtn" type="button"
-                                             title="New Chat">
-                                             <i class="fa-solid fa-plus"></i>
-                                        </button>
-                                   </div>
-
-                                   <div class="history-list" id="historyList">
-                                        <div class="history-empty" id="historyEmpty">
-                                             <i class="fa-solid fa-comment-slash"></i>
-                                             <p>No chat history yet</p>
-                                        </div>
+                         <!-- Recent Chats -->
+                         <div class="side-section side-history-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-clock-rotate-left"></i>
+                                   <span>Recent Chats</span>
+                              </div>
+                              <div class="history-list" id="historyList">
+                                   <div class="history-empty" id="historyEmpty">
+                                        <i class="fa-solid fa-comment-slash"></i>
+                                        <p>No chat history yet</p>
                                    </div>
                               </div>
-
                          </div>
+
                     </div>
-               </section>
+               </div>
+
           </main>
      </div>
 
      <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/api.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/assistant.js"></script>
 </body>

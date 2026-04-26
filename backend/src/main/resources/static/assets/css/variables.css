@@ -1,12 +1,81 @@
+/* ============================================================
+   EduMind AI — Design Tokens
+   variables.css
+   All CSS custom properties used across the project.
+   ============================================================ */
+
 :root {
-  --primary-color: #6c63ff;
-  --primary-dark: #574bdb;
-  --bg-color: #f5f7fb;
-  --white: #ffffff;
-  --text-dark: #1f2937;
-  --text-light: #6b7280;
-  --border-color: #dbe3ef;
-  --input-bg: #f9fafb;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --radius: 16px;
+  /* ── Background ── */
+  --bg-deep: #071a1f; /* page background */
+  --bg-mid: #081c24; /* alternate dark bg */
+  --bg-card: rgba(255, 255, 255, 0.06); /* glassmorphism card */
+  --bg-card-hover: rgba(255, 255, 255, 0.09);
+  --bg-input: rgba(255, 255, 255, 0.05); /* input field bg */
+  --bg-input-focus: rgba(0, 229, 255, 0.06);
+
+  /* ── Accent / Brand ── */
+  --cyan: #00e5ff; /* primary neon accent */
+  --cyan-dim: rgba(0, 229, 255, 0.18);
+  --cyan-glow: rgba(0, 229, 255, 0.3);
+  --purple: #7c3aed; /* secondary accent */
+  --purple-dim: rgba(124, 58, 237, 0.2);
+  --purple-glow: rgba(124, 58, 237, 0.35);
+  --gradient-brand: linear-gradient(135deg, #00e5ff 0%, #7c3aed 100%);
+  --gradient-btn: linear-gradient(135deg, #00c8e0 0%, #6d28d9 100%);
+
+  /* ── Text ── */
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-label: #cbd5e1;
+  --text-link: #00e5ff;
+  --text-link-hover: #7c3aed;
+
+  /* ── Validation States ── */
+  --error: #ff5c7a;
+  --error-bg: rgba(255, 92, 122, 0.08);
+  --success: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.08);
+  --warning: #f59e0b;
+
+  /* ── Border ── */
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-focus: #00e5ff;
+  --border-error: #ff5c7a;
+  --border-success: #22c55e;
+
+  /* ── Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-card:
+    0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-cyan: 0 0 24px rgba(0, 229, 255, 0.25);
+  --shadow-purple: 0 0 24px rgba(124, 58, 237, 0.3);
+  --shadow-btn: 0 8px 24px rgba(0, 229, 255, 0.3);
+  --shadow-btn-hover: 0 12px 32px rgba(0, 229, 255, 0.5);
+
+  /* ── Transition ── */
+  --transition-fast: 0.18s ease;
+  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Typography ── */
+  --font-main: "Poppins", sans-serif;
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.8125rem; /* 13px */
+  --font-size-base: 0.9375rem; /* 15px */
+  --font-size-md: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.375rem; /* 22px */
+  --font-size-2xl: 1.75rem; /* 28px */
+  --font-size-3xl: 2.25rem; /* 36px */
+
+  /* ── Z-index ── */
+  --z-base: 1;
+  --z-overlay: 10;
+  --z-modal: 100;
 }

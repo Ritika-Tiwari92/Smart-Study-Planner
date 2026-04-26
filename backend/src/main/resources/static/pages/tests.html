@@ -100,6 +100,7 @@
                               <i class="fa-solid fa-plus"></i>
                               <span>Add Test</span>
                          </button>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
@@ -132,22 +133,22 @@
                <section class="tests-content">
                     <div class="tests-summary-grid">
                          <div class="tests-summary-card">
-                              <h3 id="upcomingTestsCount">08</h3>
+                              <h3 id="upcomingTestsCount">00</h3>
                               <p>Upcoming Tests</p>
                          </div>
 
                          <div class="tests-summary-card">
-                              <h3 id="thisWeekTestsCount">03</h3>
+                              <h3 id="thisWeekTestsCount">00</h3>
                               <p>This Week</p>
                          </div>
 
                          <div class="tests-summary-card">
-                              <h3 id="completedTestsCount">05</h3>
+                              <h3 id="completedTestsCount">00</h3>
                               <p>Completed Tests</p>
                          </div>
 
                          <div class="tests-summary-card">
-                              <h3 id="averageScoreCount">76%</h3>
+                              <h3 id="averageScoreCount">0%</h3>
                               <p>Average Score</p>
                          </div>
                     </div>
@@ -163,9 +164,9 @@
                               <select id="testFilterSelect">
                                    <option>All Tests</option>
                                    <option>Upcoming</option>
-                                   <option>Completed</option>
                                    <option>This Week</option>
                                    <option>Mock Tests</option>
+                                   <option>Completed</option>
                               </select>
                          </div>
                     </div>
@@ -173,91 +174,12 @@
                     <div class="tests-main-grid">
                          <div class="upcoming-tests-card">
                               <div class="section-title">
-                                   <h3>Upcoming Tests</h3>
-                                   <p>Your next scheduled exams and mock tests.</p>
+                                   <h3>Available Tests</h3>
+                                   <p>Your published tests, mock exams, and completed attempts.</p>
                               </div>
 
-                              <div class="test-list" id="testList">
-                                   <div class="test-item">
-                                        <div class="test-date-box">
-                                             <span>18</span>
-                                             <small>APR</small>
-                                        </div>
-                                        <div class="test-info">
-                                             <h4>Java Mock Test</h4>
-                                             <p>Subject: Java Programming • Duration: 60 mins</p>
-                                        </div>
-                                        <span class="test-badge upcoming">Upcoming</span>
-                                        <div class="test-actions">
-                                             <button class="test-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="test-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
+                              <div class="test-list" id="testList"></div>
 
-                                   <div class="test-item">
-                                        <div class="test-date-box">
-                                             <span>19</span>
-                                             <small>APR</small>
-                                        </div>
-                                        <div class="test-info">
-                                             <h4>DBMS Unit Test</h4>
-                                             <p>Subject: DBMS • SQL and normalization focus</p>
-                                        </div>
-                                        <span class="test-badge upcoming">Upcoming</span>
-                                        <div class="test-actions">
-                                             <button class="test-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="test-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
-
-                                   <div class="test-item">
-                                        <div class="test-date-box">
-                                             <span>21</span>
-                                             <small>APR</small>
-                                        </div>
-                                        <div class="test-info">
-                                             <h4>Computer Networks Quiz</h4>
-                                             <p>Subject: CN • OSI model and protocols</p>
-                                        </div>
-                                        <span class="test-badge week">This Week</span>
-                                        <div class="test-actions">
-                                             <button class="test-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="test-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
-
-                                   <div class="test-item">
-                                        <div class="test-date-box">
-                                             <span>24</span>
-                                             <small>APR</small>
-                                        </div>
-                                        <div class="test-info">
-                                             <h4>Aptitude Practice Test</h4>
-                                             <p>Subject: Aptitude • Quantitative reasoning</p>
-                                        </div>
-                                        <span class="test-badge mock">Mock Test</span>
-                                        <div class="test-actions">
-                                             <button class="test-action-btn edit" title="Edit">
-                                                  <i class="fa-solid fa-pen"></i>
-                                             </button>
-                                             <button class="test-action-btn delete" title="Delete">
-                                                  <i class="fa-solid fa-trash"></i>
-                                             </button>
-                                        </div>
-                                   </div>
-                              </div>
                               <div class="tests-empty-state hidden" id="testsEmptyState">
                                    <i class="fa-regular fa-folder-open"></i>
                                    <h3>No tests found</h3>
@@ -274,26 +196,10 @@
                               <div class="result-list">
                                    <div class="result-item">
                                         <div class="result-info">
-                                             <h4>Operating System Test</h4>
-                                             <p>Completed on 15 Apr</p>
+                                             <h4>No completed test yet</h4>
+                                             <p>Your recent results will appear here.</p>
                                         </div>
-                                        <span class="result-score">82%</span>
-                                   </div>
-
-                                   <div class="result-item">
-                                        <div class="result-info">
-                                             <h4>DBMS Practice Test</h4>
-                                             <p>Completed on 13 Apr</p>
-                                        </div>
-                                        <span class="result-score">74%</span>
-                                   </div>
-
-                                   <div class="result-item">
-                                        <div class="result-info">
-                                             <h4>Java OOP Test</h4>
-                                             <p>Completed on 11 Apr</p>
-                                        </div>
-                                        <span class="result-score">79%</span>
+                                        <span class="result-score">--%</span>
                                    </div>
                               </div>
                          </div>
@@ -309,15 +215,7 @@
                               <div class="focus-area-list">
                                    <div class="focus-area-item">
                                         <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>Java inheritance, interfaces, and exception handling</span>
-                                   </div>
-                                   <div class="focus-area-item">
-                                        <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>DBMS joins, normalization, and transactions</span>
-                                   </div>
-                                   <div class="focus-area-item">
-                                        <i class="fa-solid fa-circle-exclamation"></i>
-                                        <span>Computer Networks protocol layering concepts</span>
+                                        <span>Your upcoming test focus areas will appear here.</span>
                                    </div>
                               </div>
                          </div>
@@ -331,24 +229,14 @@
                               <div class="test-tip-list">
                                    <div class="test-tip-item">
                                         <i class="fa-solid fa-circle-check"></i>
-                                        <span>Attempt easy questions first to build confidence.</span>
-                                   </div>
-                                   <div class="test-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Revise formulas and short notes before starting.</span>
-                                   </div>
-                                   <div class="test-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Keep 5–10 minutes for final review at the end.</span>
-                                   </div>
-                                   <div class="test-tip-item">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Analyze mistakes after every mock test.</span>
+                                        <span>Your test preparation tips will appear here.</span>
                                    </div>
                               </div>
                          </div>
                     </div>
                </section>
+
+               <!-- Hidden admin add/edit modal -->
                <div class="test-modal-overlay hidden" id="testModalOverlay">
                     <div class="test-modal">
                          <div class="test-modal-header">
@@ -372,11 +260,7 @@
                                    <div class="test-form-group">
                                         <label for="testSubject">Subject</label>
                                         <select id="testSubject">
-                                             <option>Java Programming</option>
-                                             <option>DBMS</option>
-                                             <option>Computer Networks</option>
-                                             <option>Operating System</option>
-                                             <option>Aptitude</option>
+                                             <option value="">Select subject</option>
                                         </select>
                                    </div>
 
@@ -399,27 +283,11 @@
                                         <label for="testDuration">Duration</label>
                                         <input type="text" id="testDuration" placeholder="e.g. 60 mins">
                                    </div>
-                                   <div class="test-form-group">
-                                        <label for="testScore">Score (%)</label>
-                                        <input type="number" id="testScore" min="0" max="100" placeholder="e.g. 82">
-                                   </div>
 
                                    <div class="test-form-group full-width">
                                         <label for="testDescription">Description</label>
                                         <textarea id="testDescription" rows="4"
-                                             placeholder="Write test details..."></textarea>
-                                   </div>
-
-                                   <div class="test-form-group full-width">
-                                        <label for="testFocusArea">Focus Area</label>
-                                        <textarea id="testFocusArea" rows="3"
-                                             placeholder="e.g. Java inheritance, interfaces, and exception handling"></textarea>
-                                   </div>
-
-                                   <div class="test-form-group full-width">
-                                        <label for="testTip">Test Tip</label>
-                                        <textarea id="testTip" rows="3"
-                                             placeholder="e.g. Attempt easy questions first to build confidence"></textarea>
+                                             placeholder="Write test details, syllabus coverage, or instructions..."></textarea>
                                    </div>
                               </div>
 
@@ -430,8 +298,358 @@
                          </form>
                     </div>
                </div>
+
+               <!-- Instructions modal -->
+               <div class="test-instructions-overlay hidden" id="testInstructionsOverlay">
+                    <div class="test-instructions-modal">
+                         <div class="test-instructions-header">
+                              <div>
+                                   <h2 id="instructionsTestTitle">Test Instructions</h2>
+                                   <p>Read all instructions carefully before you begin the test.</p>
+                              </div>
+
+                              <button class="test-instructions-close" type="button" id="closeInstructionsModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <div class="test-instructions-meta">
+                              <div class="instructions-meta-chip">
+                                   <span>Subject</span>
+                                   <strong id="instructionsSubject">-</strong>
+                              </div>
+
+                              <div class="instructions-meta-chip">
+                                   <span>Duration</span>
+                                   <strong id="instructionsDuration">-</strong>
+                              </div>
+
+                              <div class="instructions-meta-chip">
+                                   <span>Total Questions</span>
+                                   <strong id="instructionsTotalQuestions">0</strong>
+                              </div>
+
+                              <div class="instructions-meta-chip">
+                                   <span>Negative Marking</span>
+                                   <strong id="instructionsNegativeMarking">No</strong>
+                              </div>
+                         </div>
+
+                         <div class="instructions-description-box">
+                              <h4>About this test</h4>
+                              <p id="instructionsDescription">
+                                   Read each question carefully and manage your time well.
+                              </p>
+                         </div>
+
+                         <div class="instructions-list-box">
+                              <h4>General Instructions</h4>
+                              <ul class="instructions-list" id="instructionsList">
+                                   <li>Read each question carefully before answering.</li>
+                                   <li>Do not refresh or close the page during the test.</li>
+                                   <li>Use Next and Previous buttons to navigate questions.</li>
+                                   <li>Submit the test only after reviewing your answers.</li>
+                                   <li>Once submitted, your responses will be evaluated automatically.</li>
+                              </ul>
+                         </div>
+
+                         <div class="test-instructions-actions">
+                              <button type="button" class="test-cancel-btn" id="instructionsCancelBtn">Cancel</button>
+                              <button type="button" class="test-save-btn" id="instructionsStartBtn">
+                                   <i class="fa-solid fa-play"></i>
+                                   <span>Start Now</span>
+                              </button>
+                         </div>
+                    </div>
+               </div>
+
+               <!-- Attempt modal -->
+               <div class="test-attempt-overlay hidden" id="testAttemptOverlay">
+                    <div class="test-attempt-modal">
+                         <div class="test-attempt-header">
+                              <div>
+                                   <h2 id="attemptTestTitle">Start Test</h2>
+                                   <p id="attemptTestSubtitle">Solve questions and submit your test.</p>
+                              </div>
+
+                              <button class="test-attempt-close" type="button" id="closeAttemptModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <div class="test-attempt-meta">
+                              <div class="attempt-meta-chip">
+                                   <span>Subject</span>
+                                   <strong id="attemptSubject">-</strong>
+                              </div>
+
+                              <div class="attempt-meta-chip">
+                                   <span>Duration</span>
+                                   <strong id="attemptDuration">-</strong>
+                              </div>
+
+                              <div class="attempt-meta-chip">
+                                   <span>Total Questions</span>
+                                   <strong id="attemptTotalQuestions">0</strong>
+                              </div>
+                         </div>
+
+                         <div class="test-attempt-progress-wrap">
+                              <div class="attempt-progress-top">
+                                   <span id="attemptProgressText">Question 1 of 1</span>
+
+                                   <div class="attempt-progress-right">
+                                        <span id="attemptQuestionTypeBadge" class="attempt-question-type">MCQ</span>
+
+                                        <div class="attempt-live-timer" id="attemptLiveTimer">
+                                             <i class="fa-regular fa-clock"></i>
+                                             <span id="attemptTimerText">00:00</span>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="attempt-progress-bar">
+                                   <div class="attempt-progress-fill" id="attemptProgressFill"></div>
+                              </div>
+                         </div>
+
+                         <div class="test-attempt-workspace">
+                              <div class="test-attempt-body">
+                                   <div class="attempt-focus-topic hidden" id="attemptFocusTopicWrap">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        <span id="attemptFocusTopic">-</span>
+                                   </div>
+
+                                   <div class="attempt-question-card">
+                                        <div class="attempt-question-meta">
+                                             <span id="attemptQuestionNumber">Question 1</span>
+                                             <span id="attemptQuestionMarks">1 mark</span>
+                                        </div>
+
+                                        <h3 id="attemptQuestionText">Question text will appear here.</h3>
+
+                                        <div class="attempt-options-list" id="attemptOptionsList"></div>
+
+                                        <div class="attempt-theory-wrap hidden" id="attemptTheoryWrap">
+                                             <label for="attemptTheoryAnswer">Your Answer</label>
+                                             <textarea id="attemptTheoryAnswer" rows="6"
+                                                  placeholder="Write your answer here..."></textarea>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <aside class="attempt-palette-panel">
+                                   <div class="attempt-palette-header">
+                                        <h4>Question Palette</h4>
+                                        <p>Jump to any question and track attempt status.</p>
+                                   </div>
+
+                                   <div class="attempt-palette-stats">
+                                        <div class="attempt-palette-stat answered">
+                                             <span id="attemptPaletteAnsweredCount">0</span>
+                                             <small>Answered</small>
+                                        </div>
+
+                                        <div class="attempt-palette-stat review">
+                                             <span id="attemptPaletteReviewCount">0</span>
+                                             <small>Review</small>
+                                        </div>
+
+                                        <div class="attempt-palette-stat unanswered">
+                                             <span id="attemptPaletteNotAnsweredCount">0</span>
+                                             <small>Pending</small>
+                                        </div>
+                                   </div>
+
+                                   <div class="attempt-palette-legend">
+                                        <div class="attempt-legend-item">
+                                             <span class="attempt-legend-dot current"></span>
+                                             <small>Current</small>
+                                        </div>
+
+                                        <div class="attempt-legend-item">
+                                             <span class="attempt-legend-dot answered"></span>
+                                             <small>Answered</small>
+                                        </div>
+
+                                        <div class="attempt-legend-item">
+                                             <span class="attempt-legend-dot review"></span>
+                                             <small>Review</small>
+                                        </div>
+
+                                        <div class="attempt-legend-item">
+                                             <span class="attempt-legend-dot unanswered"></span>
+                                             <small>Unanswered</small>
+                                        </div>
+                                   </div>
+
+                                   <div class="attempt-palette-grid" id="attemptPaletteGrid"></div>
+                              </aside>
+                         </div>
+
+                         <div class="test-attempt-actions">
+                              <div class="attempt-action-left">
+                                   <button type="button" class="attempt-nav-btn tertiary" id="attemptClearBtn">
+                                        <i class="fa-solid fa-eraser"></i>
+                                        <span>Clear Response</span>
+                                   </button>
+
+                                   <button type="button" class="attempt-nav-btn tertiary" id="attemptMarkReviewBtn">
+                                        <i class="fa-regular fa-bookmark"></i>
+                                        <span>Mark for Review</span>
+                                   </button>
+                              </div>
+
+                              <div class="attempt-action-right">
+                                   <button type="button" class="attempt-nav-btn secondary" id="attemptPrevBtn">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                        <span>Previous</span>
+                                   </button>
+
+                                   <button type="button" class="attempt-nav-btn secondary" id="attemptNextBtn">
+                                        <span>Next</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                   </button>
+
+                                   <button type="button" class="attempt-submit-btn hidden" id="attemptSubmitBtn">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                        <span>Submit Test</span>
+                                   </button>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+
+               <!-- Result modal -->
+               <div class="test-result-overlay hidden" id="testResultOverlay">
+                    <div class="test-result-modal">
+                         <div class="test-result-header">
+                              <div>
+                                   <h2>Test Submitted</h2>
+                                   <p>Your result summary is ready.</p>
+                              </div>
+
+                              <button class="test-result-close" type="button" id="closeResultModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <div class="test-result-summary-grid">
+                              <div class="test-result-summary-card">
+                                   <span>Score</span>
+                                   <strong id="resultScoreText">0</strong>
+                              </div>
+
+                              <div class="test-result-summary-card">
+                                   <span>Percentage</span>
+                                   <strong id="resultPercentageText">0%</strong>
+                              </div>
+
+                              <div class="test-result-summary-card">
+                                   <span>Correct Answers</span>
+                                   <strong id="resultCorrectAnswersText">0</strong>
+                              </div>
+
+                              <div class="test-result-summary-card">
+                                   <span>Answered Questions</span>
+                                   <strong id="resultAnsweredQuestionsText">0</strong>
+                              </div>
+                         </div>
+
+                         <div class="test-result-detail-block">
+                              <h4>Focus Area</h4>
+                              <p id="resultFocusAreaText">No focus area available.</p>
+                         </div>
+
+                         <div class="test-result-detail-block">
+                              <h4>Test Tip</h4>
+                              <p id="resultTestTipText">No test tip available.</p>
+                         </div>
+
+                         <div class="test-result-actions">
+                              <button type="button" class="test-cancel-btn" id="resultCloseBtn">Close</button>
+                         </div>
+                    </div>
+               </div>
+
+               <!-- Review modal -->
+               <div class="review-result-overlay hidden" id="reviewResultOverlay">
+                    <div class="review-result-modal">
+                         <div class="review-result-header">
+                              <div>
+                                   <h2 id="reviewResultTitle">Test Review</h2>
+                                   <p id="reviewResultSubtitle">Question-wise performance and answer analysis.</p>
+                              </div>
+
+                              <button class="review-result-close" type="button" id="closeReviewResultModalBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+
+                         <div class="review-result-summary">
+                              <div class="review-summary-chip">
+                                   <span>Score</span>
+                                   <strong id="reviewScoreText">0</strong>
+                              </div>
+
+                              <div class="review-summary-chip">
+                                   <span>Percentage</span>
+                                   <strong id="reviewPercentageText">0%</strong>
+                              </div>
+
+                              <div class="review-summary-chip">
+                                   <span>Correct</span>
+                                   <strong id="reviewCorrectText">0</strong>
+                              </div>
+
+                              <div class="review-summary-chip">
+                                   <span>Status</span>
+                                   <strong id="reviewStatusText">-</strong>
+                              </div>
+                         </div>
+
+                         <div class="review-meta-grid">
+                              <div class="review-meta-card">
+                                   <span>Subject</span>
+                                   <strong id="reviewSubjectText">-</strong>
+                              </div>
+
+                              <div class="review-meta-card">
+                                   <span>Duration</span>
+                                   <strong id="reviewDurationText">-</strong>
+                              </div>
+
+                              <div class="review-meta-card">
+                                   <span>Answered</span>
+                                   <strong id="reviewAnsweredText">0</strong>
+                              </div>
+
+                              <div class="review-meta-card">
+                                   <span>Focus Area</span>
+                                   <strong id="reviewFocusAreaText">-</strong>
+                              </div>
+                         </div>
+
+                         <div class="review-tip-box">
+                              <h4>Test Tip</h4>
+                              <p id="reviewTestTipText">No tip available.</p>
+                         </div>
+
+                         <div class="review-answers-list" id="reviewAnswersList">
+                              <div class="review-answer-empty">
+                                   <i class="fa-regular fa-file-lines"></i>
+                                   <p>Question-wise review will appear here.</p>
+                              </div>
+                         </div>
+
+                         <div class="review-result-actions">
+                              <button type="button" class="test-cancel-btn" id="reviewResultCloseBtn">Close</button>
+                         </div>
+                    </div>
+               </div>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/tests.js"></script>

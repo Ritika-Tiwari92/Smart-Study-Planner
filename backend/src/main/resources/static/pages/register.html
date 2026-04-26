@@ -4,7 +4,7 @@
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Create Account | EduMind AI</title>
+     <title>Register | EduMind AI</title>
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,71 +28,155 @@
                          <span>EduMind AI</span>
                     </div>
 
-                    <h1>Create Your Study Space</h1>
+                    <h1>Start Your Smart Learning Journey</h1>
                     <p>
-                         Join EduMind AI and manage your subjects, tasks, revision plans, tests, and study progress
-                         in one smart dashboard.
+                         Create your free EduMind AI account and unlock personalised study plans,
+                         AI-powered revision schedules, task tracking, and performance insights.
                     </p>
 
                     <div class="auth-feature-list">
                          <div class="auth-feature-item">
-                              <i class="fa-solid fa-book"></i>
-                              <span>Track your subjects and study goals</span>
+                              <i class="fa-solid fa-robot"></i>
+                              <span>AI-powered personalised study plans</span>
                          </div>
                          <div class="auth-feature-item">
-                              <i class="fa-solid fa-list-check"></i>
-                              <span>Manage tasks and revision easily</span>
+                              <i class="fa-solid fa-calendar-check"></i>
+                              <span>Smart revision scheduling and reminders</span>
                          </div>
                          <div class="auth-feature-item">
-                              <i class="fa-solid fa-chart-line"></i>
-                              <span>See your learning progress clearly</span>
+                              <i class="fa-solid fa-trophy"></i>
+                              <span>Track progress and hit your goals faster</span>
                          </div>
                     </div>
                </div>
           </div>
 
           <div class="auth-right">
-               <div class="auth-card">
+               <div class="auth-card" style="max-width: 540px;">
                     <div class="auth-card-top">
                          <h2>Create Account</h2>
-                         <p>Fill in your details to get started.</p>
+                         <p>Fill in your details to get started with EduMind AI.</p>
                     </div>
 
-                    <form class="auth-form" id="registerForm">
-                         <div class="auth-form-grid">
-                              <div class="auth-form-group">
-                                   <label for="registerFullName">Full Name</label>
-                                   <input type="text" id="registerFullName" placeholder="Enter your full name">
-                              </div>
+                    <form class="auth-form" id="registerForm" novalidate>
 
-                              <div class="auth-form-group">
-                                   <label for="registerEmail">Email Address</label>
-                                   <input type="email" id="registerEmail" placeholder="Enter your email">
-                              </div>
-
-                              <div class="auth-form-group">
-                                   <label for="registerPassword">Password</label>
-                                   <input type="password" id="registerPassword" placeholder="Create a password">
-                              </div>
-
-                              <div class="auth-form-group">
-                                   <label for="registerConfirmPassword">Confirm Password</label>
-                                   <input type="password" id="registerConfirmPassword"
-                                        placeholder="Confirm your password">
-                              </div>
-
-                              <div class="auth-form-group">
-                                   <label for="registerCourse">Course</label>
-                                   <input type="text" id="registerCourse" placeholder="e.g. BCA Final Year">
-                              </div>
-
-                              <div class="auth-form-group">
-                                   <label for="registerCollege">College Name</label>
-                                   <input type="text" id="registerCollege" placeholder="Enter your college name">
-                              </div>
+                         <!-- ── Full Name ── -->
+                         <div class="auth-form-group">
+                              <label for="registerFullName">
+                                   Full Name
+                                   <span class="req-star" aria-hidden="true">*</span>
+                              </label>
+                              <input type="text" id="registerFullName" placeholder="Enter your full name"
+                                   autocomplete="name" required />
+                              <span class="auth-field-error" id="registerFullNameError" role="alert"></span>
                          </div>
 
-                         <button type="submit" class="auth-submit-btn">Create Account</button>
+                         <!-- ── Email ── -->
+                         <div class="auth-form-group">
+                              <label for="registerEmail">
+                                   Email Address
+                                   <span class="req-star" aria-hidden="true">*</span>
+                              </label>
+                              <input type="email" id="registerEmail" placeholder="Enter your email" autocomplete="email"
+                                   required />
+                              <span class="auth-field-error" id="registerEmailError" role="alert"></span>
+                         </div>
+
+                         <!-- ── Password ── -->
+                         <div class="auth-form-group">
+                              <label for="registerPassword">
+                                   Password
+                                   <span class="req-star" aria-hidden="true">*</span>
+                              </label>
+                              <div class="auth-input-wrapper">
+                                   <input type="password" id="registerPassword" placeholder="Create a strong password"
+                                        autocomplete="new-password" required />
+                                   <button type="button" class="auth-eye-btn" id="registerPasswordEye"
+                                        aria-label="Toggle password visibility" tabindex="-1">
+                                        <i class="fa-solid fa-eye" id="registerPasswordEyeIcon"></i>
+                                   </button>
+                              </div>
+                              <span class="auth-field-error" id="registerPasswordError" role="alert"></span>
+
+                              <!-- Password Strength Indicator -->
+                              <div class="auth-password-strength" id="passwordStrengthContainer">
+                                   <div class="auth-strength-bar">
+                                        <div class="auth-strength-fill" id="passwordStrengthFill"></div>
+                                   </div>
+                                   <span class="auth-strength-label" id="passwordStrengthLabel"></span>
+                              </div>
+
+                              <!-- Password Rule Checklist -->
+                              <ul class="auth-password-rules" id="passwordRules" aria-label="Password requirements">
+                                   <li class="auth-rule" id="rule-length" data-rule="length">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Minimum 8 characters</span>
+                                   </li>
+                                   <li class="auth-rule" id="rule-upper" data-rule="upper">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>At least one uppercase letter (A–Z)</span>
+                                   </li>
+                                   <li class="auth-rule" id="rule-lower" data-rule="lower">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>At least one lowercase letter (a–z)</span>
+                                   </li>
+                                   <li class="auth-rule" id="rule-number" data-rule="number">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>At least one number (0–9)</span>
+                                   </li>
+                                   <li class="auth-rule" id="rule-special" data-rule="special">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>At least one special character (@, #, $, %, &, *)</span>
+                                   </li>
+                              </ul>
+                         </div>
+
+                         <!-- ── Confirm Password ── -->
+                         <div class="auth-form-group">
+                              <label for="registerConfirmPassword">
+                                   Confirm Password
+                                   <span class="req-star" aria-hidden="true">*</span>
+                              </label>
+                              <div class="auth-input-wrapper">
+                                   <input type="password" id="registerConfirmPassword"
+                                        placeholder="Re-enter your password" autocomplete="new-password" required />
+                                   <button type="button" class="auth-eye-btn" id="registerConfirmPasswordEye"
+                                        aria-label="Toggle confirm password visibility" tabindex="-1">
+                                        <i class="fa-solid fa-eye" id="registerConfirmPasswordEyeIcon"></i>
+                                   </button>
+                              </div>
+                              <span class="auth-field-error" id="registerConfirmPasswordError" role="alert"></span>
+                         </div>
+
+                         <!-- ── Course & College (side by side on desktop) ── -->
+                         <div class="auth-form-row">
+
+                              <div class="auth-form-group">
+                                   <label for="registerCourse">
+                                        Course
+                                        <span class="req-star" aria-hidden="true">*</span>
+                                   </label>
+                                   <input type="text" id="registerCourse" placeholder="e.g. B.Tech, BCA, MCA"
+                                        autocomplete="off" required />
+                                   <span class="auth-field-error" id="registerCourseError" role="alert"></span>
+                              </div>
+
+                              <div class="auth-form-group">
+                                   <label for="registerCollege">
+                                        College / Institution
+                                        <span class="req-star" aria-hidden="true">*</span>
+                                   </label>
+                                   <input type="text" id="registerCollege" placeholder="Enter your college name"
+                                        autocomplete="organization" required />
+                                   <span class="auth-field-error" id="registerCollegeError" role="alert"></span>
+                              </div>
+
+                         </div>
+
+                         <!-- Submit Button -->
+                         <button type="submit" class="auth-submit-btn" id="registerSubmitBtn">
+                              Create Account
+                         </button>
 
                          <p class="auth-bottom-text">
                               Already have an account?

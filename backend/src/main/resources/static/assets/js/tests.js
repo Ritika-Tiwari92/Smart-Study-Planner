@@ -1,500 +1,423 @@
-const openTestModalBtn = document.getElementById("openTestModalBtn");
-const testModalOverlay = document.getElementById("testModalOverlay");
-const closeTestModalBtn = document.getElementById("closeTestModalBtn");
+const openTestModalBtn   = document.getElementById("openTestModalBtn");
+const testModalOverlay   = document.getElementById("testModalOverlay");
+const closeTestModalBtn  = document.getElementById("closeTestModalBtn");
 const cancelTestModalBtn = document.getElementById("cancelTestModalBtn");
+const testModalForm      = document.getElementById("testModalForm");
+const testModalTitle     = document.getElementById("testModalTitle");
+const testSaveBtn        = document.getElementById("testSaveBtn");
 
-const testModalForm = document.getElementById("testModalForm");
-const testModalTitle = document.getElementById("testModalTitle");
-const testSaveBtn = document.getElementById("testSaveBtn");
+const testList          = document.getElementById("testList");
+const testsEmptyState   = document.getElementById("testsEmptyState");
+const testSearchInput   = document.getElementById("testSearchInput");
+const testFilterSelect  = document.getElementById("testFilterSelect");
 
-const testList = document.getElementById("testList");
-const testsEmptyState = document.getElementById("testsEmptyState");
-const testSearchInput = document.getElementById("testSearchInput");
-const testFilterSelect = document.getElementById("testFilterSelect");
-
-const upcomingTestsCount = document.getElementById("upcomingTestsCount");
-const thisWeekTestsCount = document.getElementById("thisWeekTestsCount");
+const upcomingTestsCount  = document.getElementById("upcomingTestsCount");
+const thisWeekTestsCount  = document.getElementById("thisWeekTestsCount");
 const completedTestsCount = document.getElementById("completedTestsCount");
-const averageScoreCount = document.getElementById("averageScoreCount");
+const averageScoreCount   = document.getElementById("averageScoreCount");
 
-const testTitleInput = document.getElementById("testTitle");
-const testSubjectInput = document.getElementById("testSubject");
-const testDateInput = document.getElementById("testDate");
-const testTypeInput = document.getElementById("testType");
-const testDurationInput = document.getElementById("testDuration");
-const testScoreInput = document.getElementById("testScore");
-const testScoreGroup = testScoreInput ? testScoreInput.closest(".test-form-group") : null;
+const testTitleInput       = document.getElementById("testTitle");
+const testSubjectInput     = document.getElementById("testSubject");
+const testDateInput        = document.getElementById("testDate");
+const testTypeInput        = document.getElementById("testType");
+const testDurationInput    = document.getElementById("testDuration");
 const testDescriptionInput = document.getElementById("testDescription");
-const testFocusAreaInput = document.getElementById("testFocusArea");
-const testTipInput = document.getElementById("testTip");
 
-const resultList = document.querySelector(".result-list");
+const resultList   = document.querySelector(".result-list");
 const focusAreaList = document.querySelector(".focus-area-list");
-const testTipList = document.querySelector(".test-tip-list");
+const testTipList   = document.querySelector(".test-tip-list");
 
-const defaultRecentResultsHTML = resultList ? resultList.innerHTML : "";
-const defaultFocusAreaHTML = focusAreaList ? focusAreaList.innerHTML : "";
-const defaultTestTipHTML = testTipList ? testTipList.innerHTML : "";
+const defaultRecentResultsHTML = resultList    ? resultList.innerHTML    : "";
+const defaultFocusAreaHTML     = focusAreaList ? focusAreaList.innerHTML : "";
+const defaultTestTipHTML       = testTipList   ? testTipList.innerHTML   : "";
 
-const API_BASE_URL = "http://localhost:8080";
-const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
-const SUBJECTS_API_URL = `${API_BASE_URL}/subjects`;
+/* Review modal */
+const reviewResultOverlay      = document.getElementById("reviewResultOverlay");
+const closeReviewResultModalBtn = document.getElementById("closeReviewResultModalBtn");
+const reviewResultCloseBtn     = document.getElementById("reviewResultCloseBtn");
+const reviewResultTitle        = document.getElementById("reviewResultTitle");
+const reviewResultSubtitle     = document.getElementById("reviewResultSubtitle");
+const reviewScoreText          = document.getElementById("reviewScoreText");
+const reviewPercentageText     = document.getElementById("reviewPercentageText");
+const reviewCorrectText        = document.getElementById("reviewCorrectText");
+const reviewStatusText         = document.getElementById("reviewStatusText");
+const reviewSubjectText        = document.getElementById("reviewSubjectText");
+const reviewDurationText       = document.getElementById("reviewDurationText");
+const reviewAnsweredText       = document.getElementById("reviewAnsweredText");
+const reviewFocusAreaText      = document.getElementById("reviewFocusAreaText");
+const reviewTestTipText        = document.getElementById("reviewTestTipText");
+const reviewAnswersList        = document.getElementById("reviewAnswersList");
+
+// ─── API URLs ────────────────────────────────────────────
+const API_BASE_URL               = window.location.port === "8080" ? "" : "http://localhost:8080";
+const TESTS_API_URL              = `${API_BASE_URL}/api/tests`;
+const SUBJECTS_API_URL           = `${API_BASE_URL}/api/subjects`;  // ← Fixed: /api/subjects
+const TESTS_RECENT_RESULTS_API_URL = `${API_BASE_URL}/api/tests/attempts/recent`;
+const TESTS_HISTORY_API_URL      = `${API_BASE_URL}/api/tests/attempts/history`;
 
 let editingTestId = null;
-let allTests = [];
+let allTests      = [];
+let recentAttemptResults = [];
+let attemptHistory       = [];
+let latestSubmittedAttemptByTestId = new Map();
 
-function getStoredUserObject() {
-    const rawValue = localStorage.getItem("edumind_logged_in_user");
-
-    if (!rawValue) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(rawValue);
-    } catch (error) {
-        console.error("Failed to parse edumind_logged_in_user:", error);
-        return null;
-    }
-}
+// ─── AUTH & USER ID ──────────────────────────────────────
+function getToken() { return (localStorage.getItem("token") || "").trim(); }
 
 function getCurrentUserId() {
-    const user = getStoredUserObject();
+    // 1. Direct userId
+    const uid = localStorage.getItem("userId");
+    if (uid) return Number(uid);
 
-    if (user && user.id != null && user.id !== "") {
-        return Number(user.id);
+    // 2. edumind_logged_in_user object
+    try {
+        const raw = localStorage.getItem("edumind_logged_in_user");
+        if (raw) {
+            const u = JSON.parse(raw);
+            if (u && u.id) return Number(u.id);
+        }
+    } catch(e) {}
+
+    // 3. JWT payload
+    const token = getToken();
+    if (token) {
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const id = payload.userId || payload.id;
+            if (id && !isNaN(Number(id))) return Number(id);
+        } catch(e) {}
     }
 
-    throw new Error("Logged-in user id not found in localStorage.");
+    throw new Error("User ID not found. Please login again.");
 }
 
+// ─── URL BUILDERS ────────────────────────────────────────
 function buildTestsApiUrl(testId = "") {
     const userId = getCurrentUserId();
-    const normalizedPath = testId ? `/${testId}` : "";
-    return `${TESTS_API_URL}${normalizedPath}?userId=${encodeURIComponent(userId)}`;
+    const path   = testId ? `/${testId}` : "";
+    return `${TESTS_API_URL}${path}?userId=${encodeURIComponent(userId)}`;
 }
 
+// ✅ Subjects JWT se milega — userId nahi chahiye
 function buildSubjectsApiUrl() {
+    return SUBJECTS_API_URL;
+}
+
+function buildRecentResultsApiUrl() {
     const userId = getCurrentUserId();
-    return `${SUBJECTS_API_URL}?userId=${encodeURIComponent(userId)}`;
+    return `${TESTS_RECENT_RESULTS_API_URL}?userId=${encodeURIComponent(userId)}`;
 }
 
-function openTestModal() {
-    if (!testModalOverlay) return;
-    testModalOverlay.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
+function buildHistoryApiUrl() {
+    const userId = getCurrentUserId();
+    return `${TESTS_HISTORY_API_URL}?userId=${encodeURIComponent(userId)}`;
 }
 
-function closeTestModal() {
-    if (!testModalOverlay) return;
-    testModalOverlay.classList.add("hidden");
-    document.body.style.overflow = "";
+function buildAttemptDetailsApiUrl(attemptId) {
+    const userId = getCurrentUserId();
+    return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}?userId=${encodeURIComponent(userId)}`;
 }
 
-function setAddTestMode() {
-    editingTestId = null;
+// ─── FETCH HELPER ────────────────────────────────────────
+async function fetchJson(url, options = {}) {
+    const token    = getToken();
+    const response = await fetch(url, {
+        headers: {
+            "Accept":        "application/json",
+            "Authorization": `Bearer ${token}`,
+            ...(options.headers || {})
+        },
+        ...options
+    });
 
-    if (testModalTitle) {
-        testModalTitle.textContent = "Add Test";
+    let text = "";
+    try { text = await response.text(); } catch(e) {}
+
+    if (!response.ok) {
+        let msg = `HTTP ${response.status}`;
+        try { const p = JSON.parse(text); msg = p.message || p.error || msg; } catch(e) { if (text) msg = text; }
+        throw new Error(msg);
     }
 
-    if (testSaveBtn) {
-        testSaveBtn.textContent = "Save Test";
-    }
+    if (!text) return null;
+    try { return JSON.parse(text); } catch(e) { return null; }
 }
 
-function setEditTestMode() {
-    if (testModalTitle) {
-        testModalTitle.textContent = "Edit Test";
+// ─── DATE HELPERS ────────────────────────────────────────
+function parseDateValue(dateValue) {
+    if (!dateValue) return null;
+    if (dateValue instanceof Date) return isNaN(dateValue.getTime()) ? null : dateValue;
+    if (typeof dateValue === "string") {
+        const trimmed = dateValue.trim();
+        if (!trimmed) return null;
+        const d = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+            ? new Date(`${trimmed}T00:00:00`)
+            : new Date(trimmed);
+        return isNaN(d.getTime()) ? null : d;
     }
-
-    if (testSaveBtn) {
-        testSaveBtn.textContent = "Update Test";
-    }
-}
-
-function resetTestForm() {
-    if (!testModalForm) return;
-
-    testModalForm.reset();
-
-    if (testTypeInput) {
-        testTypeInput.value = "Upcoming";
-    }
-
-    if (testScoreInput) {
-        testScoreInput.value = "";
-    }
-
-    updateScoreFieldVisibility();
-}
-
-function clearTestModalState() {
-    resetTestForm();
-    setAddTestMode();
-}
-
-function updateScoreFieldVisibility() {
-    if (!testTypeInput || !testScoreGroup || !testScoreInput) return;
-
-    const isCompleted = normalizeTestType(testTypeInput.value) === "Completed";
-
-    if (isCompleted) {
-        testScoreGroup.style.display = "";
-        testScoreInput.disabled = false;
-    } else {
-        testScoreGroup.style.display = "none";
-        testScoreInput.disabled = true;
-        testScoreInput.value = "";
-    }
-}
-
-function normalizeTestType(typeText) {
-    const value = (typeText || "").trim().toLowerCase();
-
-    if (value === "upcoming") return "Upcoming";
-    if (value === "this week") return "This Week";
-    if (value === "mock test" || value === "mock tests") return "Mock Test";
-    if (value === "completed") return "Completed";
-
-    return "Upcoming";
-}
-
-function getTestBadgeClass(type) {
-    const value = (type || "").toLowerCase();
-
-    if (value === "upcoming") return "upcoming";
-    if (value === "this week") return "week";
-    if (value === "mock test" || value === "mock tests") return "mock";
-    if (value === "completed") return "completed";
-
-    return "upcoming";
+    const d = new Date(dateValue);
+    return isNaN(d.getTime()) ? null : d;
 }
 
 function getMonthShort(dateValue) {
-    if (!dateValue) return "---";
-
-    const date = new Date(dateValue);
-    if (Number.isNaN(date.getTime())) return "---";
-
-    return date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+    const d = parseDateValue(dateValue);
+    return d ? d.toLocaleDateString("en-US", { month: "short" }).toUpperCase() : "---";
 }
 
 function getDayNumber(dateValue) {
-    if (!dateValue) return "--";
-
-    const date = new Date(dateValue);
-    if (Number.isNaN(date.getTime())) return "--";
-
-    return String(date.getDate()).padStart(2, "0");
+    const d = parseDateValue(dateValue);
+    return d ? String(d.getDate()).padStart(2,"0") : "--";
 }
 
 function formatShortDate(dateValue) {
-    if (!dateValue) return "Date not available";
+    const d = parseDateValue(dateValue);
+    return d ? d.toLocaleDateString("en-GB", { day:"2-digit", month:"short" }) : "Date not available";
+}
 
-    const date = new Date(dateValue);
-    if (Number.isNaN(date.getTime())) return "Date not available";
+// ─── NORMALIZERS ─────────────────────────────────────────
+function normalizeTestType(typeText) {
+    const v = (typeText || "").trim().toLowerCase();
+    if (v === "upcoming")                    return "Upcoming";
+    if (v === "this week")                   return "This Week";
+    if (v === "mock test" || v === "mock tests") return "Mock Test";
+    if (v === "completed")                   return "Completed";
+    return "Upcoming";
+}
 
-    return date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short"
-    });
+function normalizeAdminStatus(statusText, publishedValue = false) {
+    const v = (statusText || "").trim().toUpperCase();
+    if (v === "PUBLISHED") return "PUBLISHED";
+    if (v === "DRAFT")     return "DRAFT";
+    return publishedValue ? "PUBLISHED" : "DRAFT";
+}
+
+function isPublishedForStudent(test) {
+    const pub = Boolean(test?.published);
+    return pub || normalizeAdminStatus(test?.adminStatus, pub) === "PUBLISHED";
+}
+
+function shouldShowTestOnStudentPage(test) {
+    return isPublishedForStudent(test) || latestSubmittedAttemptByTestId.has(String(test.id));
+}
+
+function getTestBadgeClass(type) {
+    const v = (type || "").toLowerCase();
+    if (v === "upcoming")   return "upcoming";
+    if (v === "this week")  return "week";
+    if (v === "mock test" || v === "mock tests") return "mock";
+    if (v === "completed")  return "completed";
+    return "upcoming";
 }
 
 function escapeHtml(value) {
     return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 
+// ─── SORT HELPERS ────────────────────────────────────────
 function sortTestsByDate(tests) {
-    return [...tests].sort((a, b) => {
-        const aTime = a.date ? new Date(a.date).getTime() : Number.MAX_SAFE_INTEGER;
-        const bTime = b.date ? new Date(b.date).getTime() : Number.MAX_SAFE_INTEGER;
-
-        const safeATime = Number.isNaN(aTime) ? Number.MAX_SAFE_INTEGER : aTime;
-        const safeBTime = Number.isNaN(bTime) ? Number.MAX_SAFE_INTEGER : bTime;
-
-        if (safeATime !== safeBTime) {
-            return safeATime - safeBTime;
-        }
-
-        return Number(b.id || 0) - Number(a.id || 0);
+    return [...tests].sort((a,b) => {
+        const aT = parseDateValue(a.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        const bT = parseDateValue(b.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        return aT !== bT ? aT - bT : Number(b.id||0) - Number(a.id||0);
     });
 }
 
+function sortBySubmitted(results) {
+    return [...results].sort((a,b) => {
+        const aT = parseDateValue(a.submittedAt)?.getTime() ?? 0;
+        const bT = parseDateValue(b.submittedAt)?.getTime() ?? 0;
+        return bT - aT;
+    });
+}
+
+function sortByStarted(items) {
+    return [...items].sort((a,b) => {
+        const aT = parseDateValue(a.startedAt)?.getTime() ?? 0;
+        const bT = parseDateValue(b.startedAt)?.getTime() ?? 0;
+        return bT - aT;
+    });
+}
+
+// ─── DATA MAPPING ────────────────────────────────────────
 function mapBackendTestToFrontend(test) {
+    const pub = typeof test.published === "boolean" ? test.published : false;
     return {
-        id: test.id,
-        title: test.title || "",
-        subject: test.subject || "",
-        date: test.testDate || "",
-        type: normalizeTestType(test.testType || ""),
-        duration: test.duration || "",
+        id:          test.id,
+        title:       test.title       || "",
+        subject:     test.subject     || "",
+        date:        test.testDate    || "",
+        type:        normalizeTestType(test.testType || ""),
+        duration:    test.duration    || "",
         description: test.description || "",
-        score: test.score ?? null,
-        focusArea: test.focusArea || "",
-        testTip: test.testTip || ""
+        score:       test.score       ?? null,
+        focusArea:   test.focusArea   || "",
+        testTip:     test.testTip     || "",
+        published:   pub,
+        adminStatus: normalizeAdminStatus(test.adminStatus, pub)
     };
 }
 
-function normalizeScoreValue(rawValue) {
-    if (rawValue === null || rawValue === undefined || rawValue === "") {
-        return null;
-    }
-
-    const numericValue = Number(rawValue);
-
-    if (!Number.isFinite(numericValue)) {
-        return null;
-    }
-
-    return Math.max(0, Math.min(100, Math.round(numericValue)));
-}
-
-function buildBackendPayload(testData) {
+function mapBackendRecentResult(result) {
     return {
-        title: testData.title,
-        subject: testData.subject,
-        testDate: testData.date,
-        testType: normalizeTestType(testData.type),
-        duration: testData.duration,
-        description: testData.description,
-        score: normalizeScoreValue(testData.score),
-        focusArea: testData.focusArea || null,
-        testTip: testData.testTip || null
+        attemptId:   result.attemptId  ?? null,
+        testId:      result.testId     ?? null,
+        title:       result.title      || "",
+        subject:     result.subject    || "",
+        percentage:  result.percentage ?? null,
+        score:       result.score      ?? null,
+        focusArea:   result.focusArea  || "",
+        testTip:     result.testTip    || "",
+        submittedAt: result.submittedAt || ""
     };
 }
 
-async function fetchJson(url, options = {}) {
-    const response = await fetch(url, options);
-
-    let responseText = "";
-    try {
-        responseText = await response.text();
-    } catch (error) {
-        responseText = "";
-    }
-
-    if (!response.ok) {
-        throw new Error(responseText || `HTTP ${response.status}`);
-    }
-
-    if (!responseText) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(responseText);
-    } catch (error) {
-        return null;
-    }
+function mapBackendHistory(item) {
+    return {
+        attemptId:        item.attemptId        ?? null,
+        testId:           item.testId           ?? null,
+        title:            item.title            || "",
+        subject:          item.subject          || "",
+        testType:         normalizeTestType(item.testType || ""),
+        duration:         item.duration         || "",
+        totalQuestions:   item.totalQuestions   ?? 0,
+        answeredQuestions:item.answeredQuestions ?? 0,
+        correctAnswers:   item.correctAnswers   ?? 0,
+        score:            item.score            ?? null,
+        percentage:       item.percentage       ?? null,
+        focusArea:        item.focusArea        || "",
+        testTip:          item.testTip          || "",
+        status:           item.status           || "",
+        startedAt:        item.startedAt        || "",
+        submittedAt:      item.submittedAt      || ""
+    };
 }
 
-function createTestItem({ id, title, subject, date, type, duration, description }) {
-    const testItem = document.createElement("div");
-    testItem.className = "test-item";
-    testItem.dataset.testId = id;
-    testItem.dataset.date = date || "";
-    testItem.dataset.type = normalizeTestType(type);
-    testItem.dataset.subject = subject || "";
-    testItem.dataset.duration = duration || "";
-    testItem.dataset.description = description || "";
+function rebuildLatestAttemptIndex() {
+    latestSubmittedAttemptByTestId = new Map();
+    attemptHistory
+        .filter(item => String(item.status||"").toUpperCase() === "SUBMITTED")
+        .forEach(item => {
+            if (!latestSubmittedAttemptByTestId.has(String(item.testId))) {
+                latestSubmittedAttemptByTestId.set(String(item.testId), item);
+            }
+        });
+}
 
-    const badgeClass = getTestBadgeClass(type);
-    const day = getDayNumber(date);
-    const month = getMonthShort(date);
+function getLatestSubmittedAttempt(testId) {
+    return latestSubmittedAttemptByTestId.get(String(testId)) || null;
+}
+
+// ─── RENDER: TEST LIST ───────────────────────────────────
+function getDisplayTypeForStudent(test) {
+    return getLatestSubmittedAttempt(test.id) ? "Completed" : normalizeTestType(test.type);
+}
+
+function createTestItem(test) {
+    const { id, title, subject, date, duration, description } = test;
+    const latestAttempt = getLatestSubmittedAttempt(id);
+    const displayType   = getDisplayTypeForStudent(test);
+
+    const item = document.createElement("div");
+    item.className       = "test-item";
+    item.dataset.testId  = id;
+    item.dataset.date    = date        || "";
+    item.dataset.type    = displayType;
+    item.dataset.subject = subject     || "";
+    item.dataset.duration    = duration    || "";
+    item.dataset.description = description || "";
+
+    const startBtn  = !latestAttempt
+        ? `<button class="test-action-btn start" title="Start Test"><i class="fa-solid fa-play"></i></button>`
+        : "";
+    const reviewBtn = latestAttempt
+        ? `<button class="test-action-btn review" title="Review Result" data-attempt-id="${escapeHtml(latestAttempt.attemptId)}"><i class="fa-solid fa-eye"></i></button>`
+        : "";
 
     const infoParts = [`Subject: ${subject || "-"}`];
+    if (duration)    infoParts.push(`Duration: ${duration}`);
+    if (description) infoParts.push(description);
 
-    if (duration) {
-        infoParts.push(`Duration: ${duration}`);
-    }
-
-    if (description) {
-        infoParts.push(description);
-    }
-
-    testItem.innerHTML = `
-        <div class="test-date-box">
-            <span>${day}</span>
-            <small>${month}</small>
-        </div>
+    item.innerHTML = `
+        <div class="test-date-box"><span>${getDayNumber(date)}</span><small>${getMonthShort(date)}</small></div>
         <div class="test-info">
             <h4>${escapeHtml(title || "Untitled Test")}</h4>
             <p>${escapeHtml(infoParts.join(" • "))}</p>
         </div>
-        <span class="test-badge ${badgeClass}">${escapeHtml(normalizeTestType(type))}</span>
-        <div class="test-actions">
-            <button class="test-action-btn edit" title="Edit">
-                <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="test-action-btn delete" title="Delete">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </div>
-    `;
-
-    return testItem;
+        <span class="test-badge ${getTestBadgeClass(displayType)}">${escapeHtml(displayType)}</span>
+        <div class="test-actions">${startBtn}${reviewBtn}</div>`;
+    return item;
 }
 
 function updateTestsCounts() {
-    let upcoming = 0;
-    let thisWeek = 0;
-    let completed = 0;
-    let totalScore = 0;
-    let scoreCount = 0;
+    const submitted = attemptHistory.filter(i => String(i.status||"").toUpperCase() === "SUBMITTED");
+    const upcoming  = allTests.filter(t => !getLatestSubmittedAttempt(t.id) && isPublishedForStudent(t)).length;
+    const thisWeek  = allTests.filter(t => !getLatestSubmittedAttempt(t.id) && normalizeTestType(t.type) === "This Week" && isPublishedForStudent(t)).length;
+    const completed = latestSubmittedAttemptByTestId.size;
+    const pcts      = submitted.map(i => Number(i.percentage)).filter(Number.isFinite);
+    const avg       = pcts.length > 0 ? Math.round(pcts.reduce((s,v)=>s+v,0)/pcts.length) : 0;
 
-    allTests.forEach((test) => {
-        const type = normalizeTestType(test.type);
+    if (upcomingTestsCount)  upcomingTestsCount.textContent  = String(upcoming).padStart(2,"0");
+    if (thisWeekTestsCount)  thisWeekTestsCount.textContent  = String(thisWeek).padStart(2,"0");
+    if (completedTestsCount) completedTestsCount.textContent = String(completed).padStart(2,"0");
+    if (averageScoreCount)   averageScoreCount.textContent   = `${avg}%`;
+}
 
-        if (type === "Upcoming" || type === "This Week" || type === "Mock Test") {
-            upcoming++;
-        }
-
-        if (type === "This Week") {
-            thisWeek++;
-        }
-
-        if (type === "Completed") {
-            completed++;
-
-            const numericScore = Number(test.score);
-            if (Number.isFinite(numericScore)) {
-                totalScore += numericScore;
-                scoreCount++;
-            }
-        }
+function bindRecentResultClicks() {
+    if (!resultList) return;
+    resultList.querySelectorAll(".result-item[data-attempt-id]").forEach(item => {
+        item.style.cursor = "pointer";
+        item.setAttribute("title", "View Result Review");
+        item.onclick = async () => await openReviewForAttempt(item.dataset.attemptId);
     });
-
-    const averageScore = scoreCount > 0
-        ? Math.round(totalScore / scoreCount)
-        : (completed > 0 ? 80 : 76);
-
-    if (upcomingTestsCount) {
-        upcomingTestsCount.textContent = String(upcoming).padStart(2, "0");
-    }
-
-    if (thisWeekTestsCount) {
-        thisWeekTestsCount.textContent = String(thisWeek).padStart(2, "0");
-    }
-
-    if (completedTestsCount) {
-        completedTestsCount.textContent = String(completed).padStart(2, "0");
-    }
-
-    if (averageScoreCount) {
-        averageScoreCount.textContent = `${averageScore}%`;
-    }
 }
 
 function renderRecentResults() {
     if (!resultList) return;
-
-    const completedTests = [...allTests]
-        .filter((test) => {
-            const isCompleted = normalizeTestType(test.type) === "Completed";
-            const hasValidScore =
-                test.score !== null &&
-                test.score !== undefined &&
-                !Number.isNaN(Number(test.score));
-
-            return isCompleted && hasValidScore;
-        })
-        .sort((a, b) => {
-            const aTime = a.date ? new Date(a.date).getTime() : 0;
-            const bTime = b.date ? new Date(b.date).getTime() : 0;
-            return bTime - aTime;
-        })
-        .slice(0, 3);
-
-    if (completedTests.length === 0) {
+    const results = sortBySubmitted(recentAttemptResults).slice(0,3);
+    if (results.length > 0) {
+        resultList.innerHTML = results.map(r => {
+            const pct     = Number.isFinite(Number(r.percentage)) ? `${Math.round(Number(r.percentage))}%` : "--%";
+            const dateText = r.submittedAt ? `Completed on ${formatShortDate(r.submittedAt)}` : "Completed test";
+            const attr     = r.attemptId != null ? `data-attempt-id="${escapeHtml(r.attemptId)}"` : "";
+            return `<div class="result-item" ${attr}>
+                <div class="result-info"><h4>${escapeHtml(r.title||"Completed Test")}</h4><p>${escapeHtml(dateText)}</p></div>
+                <span class="result-score">${escapeHtml(pct)}</span>
+            </div>`;
+        }).join("");
+        bindRecentResultClicks();
+    } else {
         resultList.innerHTML = defaultRecentResultsHTML;
-        return;
     }
-
-    resultList.innerHTML = completedTests.map((test) => {
-        const scoreText = `${Math.round(Number(test.score))}%`;
-
-        const completedDateText = test.date
-            ? `Completed on ${formatShortDate(test.date)}`
-            : "Completed test";
-
-        return `
-            <div class="result-item">
-                <div class="result-info">
-                    <h4>${escapeHtml(test.title || "Completed Test")}</h4>
-                    <p>${escapeHtml(completedDateText)}</p>
-                </div>
-                <span class="result-score">${escapeHtml(scoreText)}</span>
-            </div>
-        `;
-    }).join("");
 }
 
 function renderFocusAreas() {
     if (!focusAreaList) return;
-
-    const activeTypes = ["Upcoming", "This Week", "Mock Test"];
-
-    const focusAreas = [
-        ...new Set(
-            allTests
-                .filter((test) => activeTypes.includes(normalizeTestType(test.type)))
-                .map((test) => (test.focusArea || "").trim())
-                .filter(Boolean)
-        )
-    ].slice(0, 3);
-
-    if (focusAreas.length === 0) {
-        focusAreaList.innerHTML = defaultFocusAreaHTML;
-        return;
-    }
-
-    focusAreaList.innerHTML = focusAreas.map((area) => `
-        <div class="focus-area-item">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span>${escapeHtml(area)}</span>
-        </div>
-    `).join("");
+    const areas = [...new Set([
+        ...recentAttemptResults.map(i=>i.focusArea||""),
+        ...allTests.map(i=>i.focusArea||"")
+    ].map(s=>String(s||"").trim()).filter(Boolean))].slice(0,3);
+    focusAreaList.innerHTML = areas.length > 0
+        ? areas.map(a=>`<div class="focus-area-item"><i class="fa-solid fa-circle-exclamation"></i><span>${escapeHtml(a)}</span></div>`).join("")
+        : defaultFocusAreaHTML;
 }
 
 function renderTestTips() {
     if (!testTipList) return;
-
-    const tips = [
-        ...new Set(
-            allTests
-                .map((test) => (test.testTip || "").trim())
-                .filter(Boolean)
-        )
-    ].slice(0, 4);
-
-    if (tips.length === 0) {
-        testTipList.innerHTML = defaultTestTipHTML;
-        return;
-    }
-
-    testTipList.innerHTML = tips.map((tip) => `
-        <div class="test-tip-item">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>${escapeHtml(tip)}</span>
-        </div>
-    `).join("");
+    const tips = [...new Set([
+        ...recentAttemptResults.map(i=>i.testTip||""),
+        ...allTests.map(i=>i.testTip||"")
+    ].map(s=>String(s||"").trim()).filter(Boolean))].slice(0,4);
+    testTipList.innerHTML = tips.length > 0
+        ? tips.map(t=>`<div class="test-tip-item"><i class="fa-solid fa-circle-check"></i><span>${escapeHtml(t)}</span></div>`).join("")
+        : defaultTestTipHTML;
 }
 
 function renderTests(tests) {
     if (!testList) return;
-
     testList.innerHTML = "";
-
-    tests.forEach((test) => {
-        testList.appendChild(createTestItem(test));
-    });
-
+    tests.forEach(t => testList.appendChild(createTestItem(t)));
     updateTestsCounts();
     renderRecentResults();
     renderFocusAreas();
@@ -502,384 +425,213 @@ function renderTests(tests) {
     applyTestFilters();
 }
 
+// ─── LOAD ────────────────────────────────────────────────
 async function loadTests() {
     try {
-        const backendTests = await fetchJson(buildTestsApiUrl());
+        const [testsRes, recentRes, historyRes] = await Promise.allSettled([
+            fetchJson(buildTestsApiUrl()),
+            fetchJson(buildRecentResultsApiUrl()),
+            fetchJson(buildHistoryApiUrl())
+        ]);
 
-        allTests = Array.isArray(backendTests)
-            ? sortTestsByDate(backendTests.map(mapBackendTestToFrontend))
+        if (testsRes.status !== "fulfilled") throw testsRes.reason;
+
+        const mapped = Array.isArray(testsRes.value)
+            ? sortTestsByDate(testsRes.value.map(mapBackendTestToFrontend))
             : [];
 
+        recentAttemptResults = recentRes.status === "fulfilled" && Array.isArray(recentRes.value)
+            ? sortBySubmitted(recentRes.value.map(mapBackendRecentResult))
+            : [];
+
+        attemptHistory = historyRes.status === "fulfilled" && Array.isArray(historyRes.value)
+            ? sortByStarted(historyRes.value.map(mapBackendHistory))
+            : [];
+
+        rebuildLatestAttemptIndex();
+        allTests = mapped.filter(shouldShowTestOnStudentPage);
         renderTests(allTests);
     } catch (error) {
         console.error("Failed to load tests:", error);
-        alert(`Tests load nahi ho pa rahe: ${error.message}`);
+        // Silent fail — empty state dikhega
     }
 }
 
-async function addTest(testData) {
-    await fetchJson(buildTestsApiUrl(), {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(buildBackendPayload(testData))
-    });
-
-    await loadTests();
+// ─── REVIEW MODAL ────────────────────────────────────────
+function renderReviewAnswers(answers) {
+    if (!reviewAnswersList) return;
+    if (!Array.isArray(answers) || answers.length === 0) {
+        reviewAnswersList.innerHTML = `<div class="review-answer-empty"><i class="fa-regular fa-file-lines"></i><p>Question-wise review will appear here.</p></div>`;
+        return;
+    }
+    reviewAnswersList.innerHTML = answers.map((a, i) => {
+        const correct = Boolean(a.isCorrect);
+        return `<div class="review-answer-card">
+            <div class="review-answer-top">
+                <div class="review-answer-top-left">
+                    <span class="review-question-index">Question ${i+1}</span>
+                    <span class="review-question-topic">${escapeHtml(a.focusTopic||"General concepts")}</span>
+                </div>
+                <span class="review-answer-status ${correct?"correct":"wrong"}">${correct?"Correct":"Needs Review"}</span>
+            </div>
+            <h4 class="review-answer-question">${escapeHtml(a.questionText||"Question text not available.")}</h4>
+            <div class="review-answer-grid">
+                <div class="review-answer-block"><span>Your Answer</span><p>${escapeHtml(a.submittedAnswer||"Not answered")}</p></div>
+                <div class="review-answer-block"><span>Correct Answer</span><p>${escapeHtml(a.correctAnswer||"Not available")}</p></div>
+                <div class="review-answer-block"><span>Marks</span><p>${escapeHtml(`${a.marksAwarded??0}/${a.totalMarks??0}`)}</p></div>
+            </div>
+        </div>`;
+    }).join("");
 }
 
-async function updateTest(testId, testData) {
-    await fetchJson(buildTestsApiUrl(testId), {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(buildBackendPayload(testData))
-    });
-
-    await loadTests();
+function fillReviewModal(details) {
+    if (reviewResultTitle)     reviewResultTitle.textContent     = details.title || "Test Review";
+    if (reviewResultSubtitle)  reviewResultSubtitle.textContent  = details.submittedAt ? `Submitted on ${formatShortDate(details.submittedAt)}` : "Question-wise performance and answer analysis.";
+    if (reviewScoreText)       reviewScoreText.textContent       = `${details.score ?? 0}`;
+    if (reviewPercentageText)  reviewPercentageText.textContent  = `${Math.round(Number(details.percentage??0))}%`;
+    if (reviewCorrectText)     reviewCorrectText.textContent     = `${details.correctAnswers??0}/${details.totalQuestions??0}`;
+    if (reviewStatusText)      reviewStatusText.textContent      = details.status    || "-";
+    if (reviewSubjectText)     reviewSubjectText.textContent     = details.subject   || "-";
+    if (reviewDurationText)    reviewDurationText.textContent    = details.duration  || "-";
+    if (reviewAnsweredText)    reviewAnsweredText.textContent    = `${details.answeredQuestions??0}/${details.totalQuestions??0}`;
+    if (reviewFocusAreaText)   reviewFocusAreaText.textContent   = details.focusArea || "No major weak area detected.";
+    if (reviewTestTipText)     reviewTestTipText.textContent     = details.testTip   || "No test tip available.";
+    renderReviewAnswers(details.answers || []);
 }
 
-async function deleteTest(testId) {
-    await fetchJson(buildTestsApiUrl(testId), {
-        method: "DELETE"
-    });
-
-    await loadTests();
+function openReviewResultModal() {
+    if (!reviewResultOverlay) return;
+    reviewResultOverlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
 }
 
+function closeReviewResultModal() {
+    if (!reviewResultOverlay) return;
+    reviewResultOverlay.classList.add("hidden");
+    document.body.style.overflow = "";
+}
+
+async function openReviewForAttempt(attemptId) {
+    if (!attemptId) { alert("Review data not found."); return; }
+    try {
+        const details = await fetchJson(buildAttemptDetailsApiUrl(attemptId));
+        fillReviewModal(details || {});
+        openReviewResultModal();
+    } catch (error) {
+        console.error("Review load failed:", error);
+        alert(`Result review load nahi hua: ${error.message}`);
+    }
+}
+
+// ─── FILTER ──────────────────────────────────────────────
 function matchesTestFilter(testItem, filterValue) {
     if (!filterValue || filterValue === "All Tests") return true;
-
     const type = normalizeTestType(testItem.dataset.type);
-
-    if (filterValue === "Upcoming") return type === "Upcoming";
-    if (filterValue === "Completed") return type === "Completed";
-    if (filterValue === "This Week") return type === "This Week";
+    if (filterValue === "Upcoming")   return type === "Upcoming";
+    if (filterValue === "Completed")  return type === "Completed";
+    if (filterValue === "This Week")  return type === "This Week";
     if (filterValue === "Mock Tests") return type === "Mock Test";
-
     return true;
-}
-
-function updateTestsEmptyState(visibleCount) {
-    if (!testsEmptyState) return;
-
-    if (visibleCount === 0) {
-        testsEmptyState.classList.remove("hidden");
-    } else {
-        testsEmptyState.classList.add("hidden");
-    }
 }
 
 function applyTestFilters() {
     if (!testList) return;
-
-    const testItems = testList.querySelectorAll(".test-item");
-    const searchText = testSearchInput ? testSearchInput.value.toLowerCase().trim() : "";
+    const items       = testList.querySelectorAll(".test-item");
+    const search      = testSearchInput  ? testSearchInput.value.toLowerCase().trim() : "";
     const filterValue = testFilterSelect ? testFilterSelect.value : "All Tests";
-
-    let visibleCount = 0;
-
-    testItems.forEach((testItem) => {
-        const title = testItem.querySelector(".test-info h4")?.textContent.toLowerCase() || "";
-        const description = testItem.querySelector(".test-info p")?.textContent.toLowerCase() || "";
-
-        const matchesSearch = title.includes(searchText) || description.includes(searchText);
-        const passesFilter = matchesTestFilter(testItem, filterValue);
-
-        if (matchesSearch && passesFilter) {
-            testItem.style.display = "";
-            visibleCount++;
-        } else {
-            testItem.style.display = "none";
-        }
+    let visible = 0;
+    items.forEach(item => {
+        const title = item.querySelector(".test-info h4")?.textContent.toLowerCase() || "";
+        const desc  = item.querySelector(".test-info p")?.textContent.toLowerCase()  || "";
+        const show  = (title.includes(search) || desc.includes(search)) && matchesTestFilter(item, filterValue);
+        item.style.display = show ? "" : "none";
+        if (show) visible++;
     });
-
-    updateTestsEmptyState(visibleCount);
+    if (testsEmptyState) testsEmptyState.classList.toggle("hidden", visible > 0);
 }
 
-function fillTestFormForEdit(testItem) {
-    editingTestId = testItem.dataset.testId || null;
-
-    const testData = allTests.find((test) => String(test.id) === String(editingTestId)) || null;
-
-    if (testTitleInput) {
-        testTitleInput.value = testItem.querySelector(".test-info h4")?.textContent.trim() || "";
-    }
-
-    if (testSubjectInput) {
-        testSubjectInput.value = testItem.dataset.subject || "";
-    }
-
-    if (testDateInput) {
-        testDateInput.value = testItem.dataset.date || "";
-    }
-
-    if (testTypeInput) {
-        testTypeInput.value = normalizeTestType(testItem.dataset.type);
-    }
-
-    if (testDurationInput) {
-        testDurationInput.value = testItem.dataset.duration || "";
-    }
-
-    if (testScoreInput) {
-        testScoreInput.value =
-            testData?.score !== null && testData?.score !== undefined
-                ? String(testData.score)
-                : "";
-    }
-
-    if (testDescriptionInput) {
-        testDescriptionInput.value = testItem.dataset.description || "";
-    }
-
-    if (testFocusAreaInput) {
-        testFocusAreaInput.value = testData?.focusArea || "";
-    }
-
-    if (testTipInput) {
-        testTipInput.value = testData?.testTip || "";
-    }
-
-    updateScoreFieldVisibility();
-}
-
-function extractSubjectName(subjectItem) {
-    if (typeof subjectItem === "string") {
-        return subjectItem.trim();
-    }
-
-    if (!subjectItem || typeof subjectItem !== "object") {
-        return "";
-    }
-
-    return String(
-        subjectItem.name ??
-        subjectItem.subjectName ??
-        subjectItem.title ??
-        subjectItem.subject ??
-        ""
-    ).trim();
+// ─── SUBJECTS DROPDOWN ───────────────────────────────────
+function extractSubjectName(s) {
+    if (typeof s === "string") return s.trim();
+    if (!s || typeof s !== "object") return "";
+    return String(s.name ?? s.subjectName ?? s.title ?? s.subject ?? "").trim();
 }
 
 async function loadSubjectOptions() {
     if (!testSubjectInput) return;
-
     try {
         const subjects = await fetchJson(buildSubjectsApiUrl());
-
-        if (!Array.isArray(subjects) || subjects.length === 0) {
-            return;
-        }
-
-        const currentValue = testSubjectInput.value;
-        const subjectNames = [...new Set(subjects.map(extractSubjectName).filter(Boolean))];
-
-        if (subjectNames.length === 0) {
-            return;
-        }
-
+        if (!Array.isArray(subjects) || subjects.length === 0) return;
+        const current = testSubjectInput.value;
+        const names   = [...new Set(subjects.map(extractSubjectName).filter(Boolean))];
+        if (names.length === 0) return;
         testSubjectInput.innerHTML = "";
-
-        subjectNames.forEach((name) => {
-            const option = document.createElement("option");
-            option.value = name;
-            option.textContent = name;
-            testSubjectInput.appendChild(option);
+        names.forEach(name => {
+            const opt = document.createElement("option");
+            opt.value = opt.textContent = name;
+            testSubjectInput.appendChild(opt);
         });
-
-        if (currentValue && subjectNames.includes(currentValue)) {
-            testSubjectInput.value = currentValue;
-        } else {
-            testSubjectInput.value = subjectNames[0];
-        }
+        testSubjectInput.value = names.includes(current) ? current : names[0];
     } catch (error) {
-        console.warn("Subjects dropdown backend se load nahi hua.", error);
-        alert(`Subjects load nahi ho pa rahe: ${error.message}`);
+        console.warn("Subjects dropdown load nahi hua:", error);
     }
 }
 
-async function handleFormSubmit(event) {
-    event.preventDefault();
-
-    const title = testTitleInput ? testTitleInput.value.trim() : "";
-    const subject = testSubjectInput ? testSubjectInput.value : "";
-    const date = testDateInput ? testDateInput.value : "";
-    const type = testTypeInput ? testTypeInput.value : "Upcoming";
-    const normalizedType = normalizeTestType(type);
-    const duration = testDurationInput ? testDurationInput.value.trim() : "";
-    const scoreRaw = testScoreInput ? testScoreInput.value.trim() : "";
-    const description = testDescriptionInput
-        ? (testDescriptionInput.value.trim() || "Scheduled test for practice and performance review.")
-        : "Scheduled test for practice and performance review.";
-    const focusArea = testFocusAreaInput ? testFocusAreaInput.value.trim() : "";
-    const testTip = testTipInput ? testTipInput.value.trim() : "";
-
-    if (!title) {
-        alert("Please enter a test title.");
-        return;
-    }
-
-    if (!subject) {
-        alert("Please select a subject.");
-        return;
-    }
-
-    if (!date) {
-        alert("Please select a test date.");
-        return;
-    }
-
-    if (normalizedType === "Completed" && scoreRaw === "") {
-        alert("Please enter score for a completed test.");
-        return;
-    }
-
-    if (scoreRaw !== "") {
-        const numericScore = Number(scoreRaw);
-
-        if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 100) {
-            alert("Please enter a valid score between 0 and 100.");
-            return;
-        }
-    }
-
-    const testData = {
-        title,
-        subject,
-        date,
-        type,
-        duration,
-        score: normalizedType === "Completed" ? Number(scoreRaw) : null,
-        description,
-        focusArea,
-        testTip
-    };
-
-    try {
-        if (testSaveBtn) {
-            testSaveBtn.disabled = true;
-            testSaveBtn.textContent = editingTestId ? "Updating..." : "Saving...";
-        }
-
-        if (editingTestId) {
-            await updateTest(editingTestId, testData);
-        } else {
-            await addTest(testData);
-        }
-
-        closeTestModal();
-        clearTestModalState();
-    } catch (error) {
-        console.error("Save failed:", error);
-        alert(`Save nahi hua: ${error.message}`);
-    } finally {
-        if (testSaveBtn) {
-            testSaveBtn.disabled = false;
-        }
-
-        if (editingTestId) {
-            setEditTestMode();
-        } else {
-            setAddTestMode();
-        }
-    }
+// ─── TEST ACTIONS ────────────────────────────────────────
+function handleStartTest(testId) {
+    if (!testId) { alert("Test id not found."); return; }
+    window.location.href = `test-engine.html?testId=${encodeURIComponent(testId)}`;
 }
 
-async function handleTestListClick(event) {
-    const deleteButton = event.target.closest(".test-action-btn.delete");
-    const editButton = event.target.closest(".test-action-btn.edit");
-
-    if (deleteButton) {
-        const testItem = deleteButton.closest(".test-item");
-        const testId = testItem?.dataset.testId;
-
-        if (!testId) return;
-
-        const shouldDelete = confirm("Do you want to delete this test?");
-        if (!shouldDelete) return;
-
-        try {
-            await deleteTest(testId);
-        } catch (error) {
-            console.error("Delete failed:", error);
-            alert(`Delete nahi hua: ${error.message}`);
-        }
-
-        return;
-    }
-
-    if (editButton) {
-        const testItem = editButton.closest(".test-item");
-        if (!testItem) return;
-
-        setEditTestMode();
-        fillTestFormForEdit(testItem);
-        openTestModal();
-    }
+async function handleTestListClick(e) {
+    const startBtn  = e.target.closest(".test-action-btn.start");
+    const reviewBtn = e.target.closest(".test-action-btn.review");
+    if (startBtn)  { handleStartTest(startBtn.closest(".test-item")?.dataset.testId); return; }
+    if (reviewBtn) { await openReviewForAttempt(reviewBtn.dataset.attemptId); }
 }
 
+// ─── INIT ────────────────────────────────────────────────
 function initializeTestsPage() {
-    if (
-        !openTestModalBtn ||
-        !testModalOverlay ||
-        !closeTestModalBtn ||
-        !cancelTestModalBtn ||
-        !testModalForm ||
-        !testList
-    ) {
-        return;
+    if (!testList) return;
+
+    // Hide add test modal (student page)
+    if (openTestModalBtn)  openTestModalBtn.style.display = "none";
+    if (testModalOverlay)  testModalOverlay.classList.add("hidden");
+
+    // Test modal close buttons
+    if (closeTestModalBtn)  closeTestModalBtn.addEventListener("click",  () => testModalOverlay?.classList.add("hidden"));
+    if (cancelTestModalBtn) cancelTestModalBtn.addEventListener("click", () => testModalOverlay?.classList.add("hidden"));
+    if (testModalOverlay) {
+        testModalOverlay.addEventListener("click", e => {
+            if (e.target === testModalOverlay) testModalOverlay.classList.add("hidden");
+        });
     }
 
-    openTestModalBtn.addEventListener("click", function () {
-        clearTestModalState();
-        openTestModal();
-    });
+    // Review modal close buttons
+    if (closeReviewResultModalBtn) closeReviewResultModalBtn.addEventListener("click", closeReviewResultModal);
+    if (reviewResultCloseBtn)      reviewResultCloseBtn.addEventListener("click",      closeReviewResultModal);
+    if (reviewResultOverlay) {
+        reviewResultOverlay.addEventListener("click", e => {
+            if (e.target === reviewResultOverlay) closeReviewResultModal();
+        });
+    }
 
-    closeTestModalBtn.addEventListener("click", function () {
-        closeTestModal();
-        clearTestModalState();
-    });
-
-    cancelTestModalBtn.addEventListener("click", function () {
-        closeTestModal();
-        clearTestModalState();
-    });
-
-    testModalOverlay.addEventListener("click", function (event) {
-        if (event.target === testModalOverlay) {
-            closeTestModal();
-            clearTestModalState();
-        }
-    });
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !testModalOverlay.classList.contains("hidden")) {
-            closeTestModal();
-            clearTestModalState();
-        }
-    });
-
-    testModalForm.addEventListener("submit", handleFormSubmit);
+    // Test list clicks
     testList.addEventListener("click", handleTestListClick);
 
-    if (testTypeInput) {
-        testTypeInput.addEventListener("change", updateScoreFieldVisibility);
-    }
+    // Search & filter
+    if (testSearchInput)  testSearchInput.addEventListener("input",  applyTestFilters);
+    if (testFilterSelect) testFilterSelect.addEventListener("change", applyTestFilters);
 
-    if (testSearchInput) {
-        testSearchInput.addEventListener("input", applyTestFilters);
-    }
+    // ESC key
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && reviewResultOverlay && !reviewResultOverlay.classList.contains("hidden")) {
+            closeReviewResultModal();
+        }
+    });
 
-    if (testFilterSelect) {
-        testFilterSelect.addEventListener("change", applyTestFilters);
-    }
-
-    setAddTestMode();
+    editingTestId = null;
     loadSubjectOptions();
-    updateScoreFieldVisibility();
     loadTests();
 }
 

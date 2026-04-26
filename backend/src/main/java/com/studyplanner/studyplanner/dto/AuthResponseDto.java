@@ -1,43 +1,54 @@
 package com.studyplanner.studyplanner.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+/**
+ * Auth Response DTO — updated with refreshToken field.
+ *
+ * @JsonInclude(NON_NULL) means null fields are NOT sent in JSON response.
+ *                        So refreshToken only appears in login/register
+ *                        responses, not profile fetch.
+ *
+ *                        IMPORTANT: password field does NOT exist here — never
+ *                        returned to frontend.
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponseDto {
 
      private Long id;
      private String fullName;
      private String email;
+     // NO password field — intentional security measure
+
      private String course;
      private String college;
-
      private boolean twoFactorEnabled;
-
      private String preferredStudyTime;
      private String dailyStudyGoal;
      private String preferredSubjectsFocus;
-
      private boolean taskRemindersEnabled;
      private boolean revisionAlertsEnabled;
      private boolean testNotificationsEnabled;
      private boolean assistantSuggestionsEnabled;
 
+     // JWT access token (short-lived: 15 min)
+     private String token;
+
+     // NEW: Refresh token (long-lived: 7 days)
+     // null on profile/settings endpoints → not included in JSON (@JsonInclude)
+     private String refreshToken;
+
      private String message;
 
-     public AuthResponseDto() {
-     }
-
-     public AuthResponseDto(Long id,
-               String fullName,
-               String email,
-               String course,
-               String college,
-               boolean twoFactorEnabled,
-               String preferredStudyTime,
-               String dailyStudyGoal,
-               String preferredSubjectsFocus,
-               boolean taskRemindersEnabled,
-               boolean revisionAlertsEnabled,
+     // ── Constructor (matches existing mapToAuthResponse calls) ──
+     public AuthResponseDto(Long id, String fullName, String email,
+               String course, String college,
+               boolean twoFactorEnabled, String preferredStudyTime,
+               String dailyStudyGoal, String preferredSubjectsFocus,
+               boolean taskRemindersEnabled, boolean revisionAlertsEnabled,
                boolean testNotificationsEnabled,
                boolean assistantSuggestionsEnabled,
-               String message) {
+               String token, String message) {
           this.id = id;
           this.fullName = fullName;
           this.email = email;
@@ -51,9 +62,14 @@ public class AuthResponseDto {
           this.revisionAlertsEnabled = revisionAlertsEnabled;
           this.testNotificationsEnabled = testNotificationsEnabled;
           this.assistantSuggestionsEnabled = assistantSuggestionsEnabled;
+          this.token = token;
           this.message = message;
      }
 
+     public AuthResponseDto() {
+     }
+
+     // Getters & Setters
      public Long getId() {
           return id;
      }
@@ -156,6 +172,22 @@ public class AuthResponseDto {
 
      public void setAssistantSuggestionsEnabled(boolean assistantSuggestionsEnabled) {
           this.assistantSuggestionsEnabled = assistantSuggestionsEnabled;
+     }
+
+     public String getToken() {
+          return token;
+     }
+
+     public void setToken(String token) {
+          this.token = token;
+     }
+
+     public String getRefreshToken() {
+          return refreshToken;
+     }
+
+     public void setRefreshToken(String refreshToken) {
+          this.refreshToken = refreshToken;
      }
 
      public String getMessage() {
