@@ -35,3 +35,9 @@ build/
 
 #### application.properties
 backend/src/main/resources/application.properties
+
+##env 
+.env
+*.env
+application-secret.properties
+application-local.properties
