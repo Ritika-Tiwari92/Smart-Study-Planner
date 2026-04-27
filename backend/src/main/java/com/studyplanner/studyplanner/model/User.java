@@ -6,16 +6,23 @@ import java.time.LocalDateTime;
 /**
  * User entity — updated with:
  *
- * NEW FIELDS ADDED:
- * failedLoginAttempts → counts wrong password attempts (reset on success)
- * accountLockedUntil → if set and in future, account is locked
+ * NEW FIELDS ADDED (this update):
+ * role → STUDENT or ADMIN (default = STUDENT)
  *
  * All existing fields are UNCHANGED.
- * Spring JPA ddl-auto=update will add new columns automatically.
+ * Spring JPA ddl-auto=update will add role column automatically.
  */
 @Entity
 @Table(name = "users")
 public class User {
+
+     // ─────────────────────────────────────────
+     // Role Enum — STUDENT ya ADMIN
+     // ─────────────────────────────────────────
+     public enum Role {
+          STUDENT,
+          ADMIN
+     }
 
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +42,15 @@ public class User {
 
      @Column(nullable = false)
      private String college;
+
+     // ─────────────────────────────────────────
+     // NEW: Role field
+     // Default = STUDENT (existing users safe rahenge)
+     // Admin banane ke liye SQL se manually set karein
+     // ─────────────────────────────────────────
+     @Enumerated(EnumType.STRING)
+     @Column(nullable = false)
+     private Role role = Role.STUDENT;
 
      @Column(nullable = false)
      private boolean twoFactorEnabled = false;
@@ -64,23 +80,12 @@ public class User {
      private LocalDateTime createdAt;
 
      // ─────────────────────────────────────────
-     // NEW: Rate limiting / Account lock fields
-     // Added by ddl-auto=update automatically
+     // Rate limiting / Account lock fields
      // ─────────────────────────────────────────
 
-     /**
-      * Counts consecutive failed login attempts.
-      * Resets to 0 on successful login.
-      * When this reaches MAX_ATTEMPTS (5), account gets locked.
-      */
      @Column(nullable = false)
      private int failedLoginAttempts = 0;
 
-     /**
-      * When account is locked, this holds the unlock time.
-      * null = not locked.
-      * If LocalDateTime.now() is before this value → account is locked.
-      */
      @Column(nullable = true)
      private LocalDateTime accountLockedUntil;
 
@@ -97,45 +102,29 @@ public class User {
      }
 
      // ─────────────────────────────────────────
-     // Helper methods for account lock logic
+     // Helper methods
      // ─────────────────────────────────────────
 
-     /**
-      * Returns true if account is currently locked.
-      * Lock expires automatically after lockout duration.
-      */
      public boolean isAccountLocked() {
           return accountLockedUntil != null &&
                     LocalDateTime.now().isBefore(accountLockedUntil);
      }
 
-     /**
-      * Increments failed attempt counter.
-      * Called by AuthService on wrong password.
-      */
      public void incrementFailedAttempts() {
           this.failedLoginAttempts++;
      }
 
-     /**
-      * Resets counter and clears lock.
-      * Called by AuthService on successful login.
-      */
      public void resetFailedAttempts() {
           this.failedLoginAttempts = 0;
           this.accountLockedUntil = null;
      }
 
-     /**
-      * Locks account for given minutes.
-      * Called by AuthService after MAX_ATTEMPTS failures.
-      */
      public void lockAccount(int minutes) {
           this.accountLockedUntil = LocalDateTime.now().plusMinutes(minutes);
      }
 
      // ─────────────────────────────────────────
-     // Getters & Setters (all existing + new)
+     // Getters & Setters
      // ─────────────────────────────────────────
 
      public Long getId() {
@@ -184,6 +173,15 @@ public class User {
 
      public void setCollege(String college) {
           this.college = college;
+     }
+
+     // NEW: role getter/setter
+     public Role getRole() {
+          return role;
+     }
+
+     public void setRole(Role role) {
+          this.role = role;
      }
 
      public boolean isTwoFactorEnabled() {
@@ -258,7 +256,6 @@ public class User {
           this.createdAt = createdAt;
      }
 
-     // New fields getters/setters
      public int getFailedLoginAttempts() {
           return failedLoginAttempts;
      }

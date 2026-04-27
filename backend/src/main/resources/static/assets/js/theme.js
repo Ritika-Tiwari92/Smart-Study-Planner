@@ -181,6 +181,30 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    /* =====================================================
+   COMMON THEME TOGGLE SPIN
+   File: theme.js
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+  if (!themeToggleBtn) return;
+
+  themeToggleBtn.addEventListener("click", function () {
+    themeToggleBtn.classList.remove("theme-spin");
+
+    // Re-trigger animation
+    void themeToggleBtn.offsetWidth;
+
+    themeToggleBtn.classList.add("theme-spin");
+
+    setTimeout(function () {
+      themeToggleBtn.classList.remove("theme-spin");
+    }, 600);
+  });
+});
+
     populateProfileMini();
     loadTheme();
 });

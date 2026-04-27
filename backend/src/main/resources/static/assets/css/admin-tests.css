@@ -290,6 +290,10 @@
   z-index: 1200;
 }
 
+.admin-test-modal-overlay.hidden {
+  display: none !important;
+}
+
 .admin-test-modal {
   width: 100%;
   max-width: 940px;

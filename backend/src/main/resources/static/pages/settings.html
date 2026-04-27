@@ -19,6 +19,8 @@
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
      <link rel="stylesheet" href="../assets/css/settings.css">
+     <link rel="stylesheet" href="../assets/css/sidebar.css">
+     <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 
 <body>
@@ -36,42 +38,34 @@
                          <i class="fa-solid fa-house"></i>
                          <span>Dashboard</span>
                     </a>
-
                     <a href="planner.html" class="nav-item">
                          <i class="fa-solid fa-calendar-days"></i>
                          <span>Planner</span>
                     </a>
-
                     <a href="subjects.html" class="nav-item">
                          <i class="fa-solid fa-book"></i>
                          <span>Subjects</span>
                     </a>
-
                     <a href="tasks.html" class="nav-item">
                          <i class="fa-solid fa-list-check"></i>
                          <span>Tasks</span>
                     </a>
-
                     <a href="revision.html" class="nav-item">
                          <i class="fa-solid fa-rotate"></i>
                          <span>Revision</span>
                     </a>
-
                     <a href="tests.html" class="nav-item">
                          <i class="fa-solid fa-file-lines"></i>
                          <span>Tests</span>
                     </a>
-
                     <a href="analytics.html" class="nav-item">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
-
                     <a href="assistant.html" class="nav-item">
                          <i class="fa-solid fa-robot"></i>
                          <span>Assistant</span>
                     </a>
-
                     <a href="settings.html" class="nav-item active">
                          <i class="fa-solid fa-gear"></i>
                          <span>Settings</span>
@@ -133,52 +127,62 @@
 
                <section class="settings-content">
                     <div class="settings-main-grid">
+                         <!-- LEFT COLUMN -->
                          <div class="settings-left-column">
-                              <div class="settings-card profile-settings-card">
+
+                              <!-- Profile Card -->
+                              <div class="settings-card profile-settings-card animate-card">
                                    <div class="section-title">
-                                        <h3>Profile Settings</h3>
+                                        <h3><i class="fa-solid fa-user-circle"></i> Profile Settings</h3>
                                         <p>Update your basic profile details.</p>
                                    </div>
 
                                    <div class="profile-settings-layout">
                                         <div class="settings-avatar-box">
-                                             <img src="../assets/avatar/default-user.png" alt="Profile"
-                                                  id="settingsProfileImage">
+                                             <div class="avatar-ring-wrapper">
+                                                  <img src="../assets/avatar/default-user.png" alt="Profile"
+                                                       id="settingsProfileImage">
+                                                  <div class="avatar-upload-overlay" id="avatarOverlay">
+                                                       <i class="fa-solid fa-camera"></i>
+                                                  </div>
+                                             </div>
                                              <input type="file" id="profilePhotoInput" accept="image/*"
                                                   style="display: none;">
                                              <button class="change-photo-btn" id="changePhotoBtn" type="button">
-                                                  Change Photo
+                                                  <i class="fa-solid fa-camera"></i> Change Photo
                                              </button>
                                         </div>
 
                                         <div class="settings-form-grid">
                                              <div class="settings-form-group">
                                                   <label for="settingsFullName">Full Name</label>
-                                                  <input type="text" id="settingsFullName" value="Ritika Tiwari">
+                                                  <input type="text" id="settingsFullName" value="Ritika Tiwari"
+                                                       placeholder="Enter full name">
                                              </div>
-
                                              <div class="settings-form-group">
                                                   <label for="settingsEmail">Email</label>
-                                                  <input type="email" id="settingsEmail" value="ritika@example.com">
+                                                  <input type="email" id="settingsEmail" value="ritika@example.com"
+                                                       placeholder="Enter email">
                                              </div>
-
                                              <div class="settings-form-group">
                                                   <label for="settingsCourse">Course</label>
-                                                  <input type="text" id="settingsCourse" value="BCA Final Year">
+                                                  <input type="text" id="settingsCourse" value="BCA Final Year"
+                                                       placeholder="Enter course">
                                              </div>
-
                                              <div class="settings-form-group">
                                                   <label for="settingsCollege">College</label>
                                                   <input type="text" id="settingsCollege"
-                                                       value="ITM College of Science and Management">
+                                                       value="ITM College of Science and Management"
+                                                       placeholder="Enter college">
                                              </div>
                                         </div>
                                    </div>
                               </div>
 
-                              <div class="settings-card preferences-card">
+                              <!-- Study Preferences -->
+                              <div class="settings-card preferences-card animate-card" style="animation-delay:0.1s">
                                    <div class="section-title">
-                                        <h3>Study Preferences</h3>
+                                        <h3><i class="fa-solid fa-brain"></i> Study Preferences</h3>
                                         <p>Customize your learning environment and habits.</p>
                                    </div>
 
@@ -192,7 +196,6 @@
                                                   <option value="Night">Night</option>
                                              </select>
                                         </div>
-
                                         <div class="settings-form-group">
                                              <label for="settingsStudyGoal">Daily Study Goal</label>
                                              <select id="settingsStudyGoal">
@@ -202,19 +205,22 @@
                                                   <option value="8 Hours">8 Hours</option>
                                              </select>
                                         </div>
-
                                         <div class="settings-form-group full-width">
                                              <label for="settingsSubjectFocus">Preferred Subjects Focus</label>
-                                             <input type="text" id="settingsSubjectFocus" value="Java, DBMS, Aptitude">
+                                             <input type="text" id="settingsSubjectFocus" value="Java, DBMS, Aptitude"
+                                                  placeholder="e.g. Java, DBMS, Aptitude">
                                         </div>
                                    </div>
                               </div>
                          </div>
 
+                         <!-- RIGHT COLUMN -->
                          <div class="settings-right-column">
-                              <div class="settings-card notification-card">
+
+                              <!-- Notifications -->
+                              <div class="settings-card notification-card animate-card" style="animation-delay:0.15s">
                                    <div class="section-title">
-                                        <h3>Notifications</h3>
+                                        <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
                                         <p>Choose what reminders and alerts you want.</p>
                                    </div>
 
@@ -229,7 +235,6 @@
                                                   <span class="slider"></span>
                                              </label>
                                         </div>
-
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Revision Alerts</h4>
@@ -240,7 +245,6 @@
                                                   <span class="slider"></span>
                                              </label>
                                         </div>
-
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Test Notifications</h4>
@@ -251,7 +255,6 @@
                                                   <span class="slider"></span>
                                              </label>
                                         </div>
-
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Assistant Suggestions</h4>
@@ -265,61 +268,69 @@
                                    </div>
                               </div>
 
-                              <div class="settings-card security-card">
+                              <!-- Security & Account -->
+                              <div class="settings-card security-card animate-card" style="animation-delay:0.2s">
                                    <div class="section-title">
-                                        <h3>Security & Account</h3>
+                                        <h3><i class="fa-solid fa-shield-halved"></i> Security & Account</h3>
                                         <p>Manage account security settings.</p>
+                                   </div>
+
+                                   <!-- 2FA Status Banner -->
+                                   <div class="twofa-status-banner" id="twofaStatusBanner">
+                                        <div class="twofa-status-left">
+                                             <span class="twofa-dot" id="twofaDot"></span>
+                                             <div>
+                                                  <p class="twofa-status-label" id="twofaStatusLabel">2FA Disabled</p>
+                                                  <p class="twofa-status-sub">Two-Factor Authentication</p>
+                                             </div>
+                                        </div>
+                                        <span class="twofa-badge" id="twofaBadge">OFF</span>
                                    </div>
 
                                    <div class="security-action-list">
                                         <button class="security-action-btn" id="changePasswordBtn" type="button">
                                              <i class="fa-solid fa-key"></i>
                                              <span>Change Password</span>
+                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
                                         </button>
 
-                                        <button class="security-action-btn" id="twoFactorBtn" type="button">
+                                        <button class="security-action-btn twofa-btn" id="twoFactorBtn" type="button">
                                              <i class="fa-solid fa-shield-halved"></i>
                                              <span>Enable Two-Factor Auth</span>
+                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
                                         </button>
 
                                         <button class="security-action-btn danger" id="deleteAccountBtn" type="button">
                                              <i class="fa-solid fa-trash"></i>
                                              <span>Delete Account</span>
+                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
                                         </button>
                                    </div>
 
-                                   <p id="twoFactorStatusText"
-                                        style="margin-top: 12px; font-size: 0.95rem; color: #64748b;">
-                                        Two-factor authentication status: Disabled
-                                   </p>
-
-                                   <div id="changePasswordForm" style="display: none; margin-top: 18px;">
-                                        <div class="settings-form-grid">
+                                   <!-- Change Password Inline Form -->
+                                   <div id="changePasswordForm" class="password-form-panel" style="display:none">
+                                        <div class="password-form-inner">
                                              <div class="settings-form-group full-width">
                                                   <label for="currentPassword">Current Password</label>
                                                   <input type="password" id="currentPassword"
                                                        placeholder="Enter current password">
                                              </div>
-
                                              <div class="settings-form-group">
                                                   <label for="newPassword">New Password</label>
                                                   <input type="password" id="newPassword"
-                                                       placeholder="Enter new password">
+                                                       placeholder="Min 6 characters">
                                              </div>
-
                                              <div class="settings-form-group">
                                                   <label for="confirmNewPassword">Confirm New Password</label>
                                                   <input type="password" id="confirmNewPassword"
-                                                       placeholder="Confirm new password">
+                                                       placeholder="Repeat new password">
                                              </div>
                                         </div>
-
-                                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+                                        <div class="password-form-actions">
                                              <button class="save-settings-btn" id="updatePasswordBtn" type="button">
                                                   <i class="fa-solid fa-lock"></i>
                                                   <span>Update Password</span>
                                              </button>
-
                                              <button class="security-action-btn" id="cancelPasswordBtn" type="button">
                                                   <i class="fa-solid fa-xmark"></i>
                                                   <span>Cancel</span>
@@ -327,14 +338,75 @@
                                         </div>
                                    </div>
                               </div>
+
                          </div>
                     </div>
                </section>
           </main>
      </div>
 
+     <!-- ===== 2FA MODAL ===== -->
+     <div class="modal-overlay" id="twofaModalOverlay">
+          <div class="modal-box twofa-modal">
+               <button class="modal-close-btn" id="twofaModalClose">
+                    <i class="fa-solid fa-xmark"></i>
+               </button>
+
+               <div class="modal-header">
+                    <div class="modal-icon-wrap">
+                         <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h2>Two-Factor Authentication</h2>
+                    <p>Scan the QR code with Google Authenticator or Authy, then enter the 6-digit code below.</p>
+               </div>
+
+               <!-- QR Code area — swap src with backend data -->
+               <div class="qr-code-area">
+                    <div class="qr-placeholder" id="qrCodeImg">
+                         <i class="fa-solid fa-qrcode"></i>
+                         <span>QR Code loads here</span>
+                    </div>
+               </div>
+
+               <div class="secret-key-box" id="secretKeyBox" title="Click to copy">
+                    <i class="fa-solid fa-copy"></i>
+                    <span id="secretKeyText">EDUMIND-XXXX-XXXX-XXXX</span>
+               </div>
+               <p class="secret-copy-hint">Click above to copy the secret key</p>
+
+               <p class="otp-instruction">Enter the 6-digit code from your authenticator app</p>
+
+               <div class="otp-input-row" id="otpInputRow">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp0">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp1">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp2">
+                    <span class="otp-divider">—</span>
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp3">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp4">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp5">
+               </div>
+
+               <p class="otp-error-msg" id="otpErrorMsg"></p>
+
+               <div class="modal-actions">
+                    <button class="modal-cancel-btn" id="twofaModalCancel">Cancel</button>
+                    <button class="save-settings-btn" id="verify2FABtn">
+                         <i class="fa-solid fa-check-circle"></i>
+                         <span>Verify & Enable</span>
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <!-- ===== TOAST NOTIFICATION ===== -->
+     <div class="toast-notification" id="toastNotification">
+          <i class="toast-icon fa-solid fa-circle-check" id="toastIcon"></i>
+          <span id="toastMsg">Saved successfully!</span>
+     </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/settings.js"></script>
 </body>
 

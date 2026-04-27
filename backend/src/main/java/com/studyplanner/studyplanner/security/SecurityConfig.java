@@ -18,6 +18,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * SecurityConfig — Updated with Admin Routes
+ *
+ * CHANGES FROM ORIGINAL:
+ * 1. /api/admin/auth/login → public (admin login ke liye)
+ * 2. /api/admin/** → authenticated (protected admin APIs)
+ * 3. /pages/admin/** → public (HTML files ko Spring block na kare)
+ *
+ * Existing student routes UNCHANGED.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -49,14 +59,25 @@ public class SecurityConfig {
 
                               .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                              // Auth APIs public
+                              // ─────────────────────────────────────────
+                              // Student Auth APIs — public
+                              // ─────────────────────────────────────────
                               .requestMatchers("/api/auth/**").permitAll()
 
-                              // Frontend pages public
+                              // ─────────────────────────────────────────
+                              // NEW: Admin Login API — public
+                              // (Baaki /api/admin/** protected rahenge)
+                              // ─────────────────────────────────────────
+                              .requestMatchers("/api/admin/auth/login").permitAll()
+
+                              // ─────────────────────────────────────────
+                              // Frontend pages — public
+                              // (admin HTML files bhi yahan cover hain)
+                              // ─────────────────────────────────────────
                               .requestMatchers(
                                         "/",
                                         "/index.html",
-                                        "/pages/**",
+                                        "/pages/**", // student pages
                                         "/landing.html",
                                         "/assets/**",
                                         "/css/**",
@@ -67,10 +88,18 @@ public class SecurityConfig {
                               .permitAll()
 
                               .requestMatchers("/api/syllabus/health").permitAll()
-                              // All API endpoints protected except auth
+
+                              // ─────────────────────────────────────────
+                              // NEW: Admin APIs — authentication required
+                              // Role check AdminAuthController mein hoga
+                              // ─────────────────────────────────────────
+                              .requestMatchers("/api/admin/**").authenticated()
+
+                              // ─────────────────────────────────────────
+                              // All other APIs — authentication required
+                              // ─────────────────────────────────────────
                               .requestMatchers("/api/**").authenticated()
 
-                              // Any other leftover request public
                               .anyRequest().permitAll())
 
                     .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

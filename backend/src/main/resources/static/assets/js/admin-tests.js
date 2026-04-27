@@ -824,49 +824,65 @@ async function handleAdminTestListClick(event) {
 }
 
 function initializeAdminTestsPage() {
-    if (
-        !openAdminTestModalBtn ||
-        !adminTestModalOverlay ||
-        !closeAdminTestModalBtn ||
-        !cancelAdminTestModalBtn ||
-        !adminTestModalForm ||
-        !adminTestList
-    ) {
-        return;
+
+    // ─── Modal Open ───────────────────────────────────────────────
+    if (openAdminTestModalBtn) {
+        openAdminTestModalBtn.addEventListener("click", function () {
+            clearAdminTestModalState();
+            loadAdminSubjectOptions();
+            openAdminTestModal();
+        });
     }
 
-    openAdminTestModalBtn.addEventListener("click", function () {
-        clearAdminTestModalState();
-        openAdminTestModal();
-    });
-
-    closeAdminTestModalBtn.addEventListener("click", function () {
-        closeAdminTestModal();
-        clearAdminTestModalState();
-    });
-
-    cancelAdminTestModalBtn.addEventListener("click", function () {
-        closeAdminTestModal();
-        clearAdminTestModalState();
-    });
-
-    adminTestModalOverlay.addEventListener("click", function (event) {
-        if (event.target === adminTestModalOverlay) {
+    // ─── Modal Close — X button ───────────────────────────────────
+    if (closeAdminTestModalBtn) {
+        closeAdminTestModalBtn.addEventListener("click", function () {
             closeAdminTestModal();
             clearAdminTestModalState();
-        }
-    });
+        });
+    }
 
+    // ─── Modal Close — Cancel button ─────────────────────────────
+    if (cancelAdminTestModalBtn) {
+        cancelAdminTestModalBtn.addEventListener("click", function () {
+            closeAdminTestModal();
+            clearAdminTestModalState();
+        });
+    }
+
+    // ─── Modal Close — Overlay click ─────────────────────────────
+    if (adminTestModalOverlay) {
+        adminTestModalOverlay.addEventListener("click", function (event) {
+            if (event.target === adminTestModalOverlay) {
+                closeAdminTestModal();
+                clearAdminTestModalState();
+            }
+        });
+    }
+
+    // ─── Modal Close — Escape key ────────────────────────────────
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !adminTestModalOverlay.classList.contains("hidden")) {
+        if (
+            event.key === "Escape" &&
+            adminTestModalOverlay &&
+            !adminTestModalOverlay.classList.contains("hidden")
+        ) {
             closeAdminTestModal();
             clearAdminTestModalState();
         }
     });
 
-    adminTestModalForm.addEventListener("submit", handleAdminModalSubmit);
-    adminTestList.addEventListener("click", handleAdminTestListClick);
+    // ─── Form Submit ──────────────────────────────────────────────
+    if (adminTestModalForm) {
+        adminTestModalForm.addEventListener("submit", handleAdminModalSubmit);
+    }
 
+    // ─── Test List Click (edit/delete/publish/manage) ─────────────
+    if (adminTestList) {
+        adminTestList.addEventListener("click", handleAdminTestListClick);
+    }
+
+    // ─── Search & Filter ──────────────────────────────────────────
     if (adminTestSearchInput) {
         adminTestSearchInput.addEventListener("input", applyAdminFilters);
     }
@@ -875,6 +891,7 @@ function initializeAdminTestsPage() {
         adminTestFilterSelect.addEventListener("change", applyAdminFilters);
     }
 
+    // ─── Init ─────────────────────────────────────────────────────
     setCreateAdminTestMode();
     loadAdminSubjectOptions();
     loadAdminTests();

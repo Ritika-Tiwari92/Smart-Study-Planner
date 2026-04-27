@@ -1,0 +1,1092 @@
+/* =============================================
+   DARK MODE FIX
+   dark-fix.css — include in ALL dashboard pages
+   Fixes: Planner, Subjects, Revision, Settings
+   Uses: body.preview-dark (same as dashboard)
+   ============================================= */
+
+/* ══════════════════════════════════════════
+   SHARED — All pages dark fixes
+══════════════════════════════════════════ */
+
+body.preview-dark {
+  background: #0b1220 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Header */
+body.preview-dark .dashboard-header {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .dashboard-header h1 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .dashboard-header p {
+  color: #94a3b8 !important;
+}
+
+/* Sidebar */
+body.preview-dark .sidebar {
+  background: #111827 !important;
+}
+
+/* Buttons in header */
+body.preview-dark .theme-toggle-btn,
+body.preview-dark .add-plan-btn,
+body.preview-dark .add-subject-btn,
+body.preview-dark .add-revision-btn,
+body.preview-dark .add-task-btn,
+body.preview-dark .add-test-btn {
+  background: linear-gradient(135deg, #6c63ff, #7c6cff) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* ══════════════════════════════════════════
+   PLANNER PAGE
+══════════════════════════════════════════ */
+
+/* Summary cards */
+body.preview-dark .planner-summary-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .planner-summary-card h3 {
+  color: #a78bfa !important;
+}
+
+body.preview-dark .planner-summary-card p {
+  color: #94a3b8 !important;
+}
+
+/* Toolbar */
+body.preview-dark .planner-search,
+body.preview-dark .planner-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .planner-search input,
+body.preview-dark .planner-filter select {
+  color: #f1f5f9 !important;
+  background: transparent !important;
+}
+
+body.preview-dark .planner-search input::placeholder {
+  color: #64748b !important;
+}
+
+body.preview-dark .planner-search i,
+body.preview-dark .planner-filter i {
+  color: #64748b !important;
+}
+
+/* Cards */
+body.preview-dark .daily-plan-card,
+body.preview-dark .weekly-plan-card,
+body.preview-dark .upcoming-plan-card,
+body.preview-dark .focus-tips-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .section-title h3 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .section-title p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .section-title {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Session items */
+body.preview-dark .study-session-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .study-session-item:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.3) !important;
+}
+
+body.preview-dark .study-session-item h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .study-session-item p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .session-time {
+  color: #a78bfa !important;
+}
+
+/* Session badges */
+body.preview-dark .session-badge.done {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+body.preview-dark .session-badge.progress {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+body.preview-dark .session-badge.pending {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+/* Action buttons */
+body.preview-dark .session-action-btn {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .session-action-btn:hover {
+  background: #334155 !important;
+  color: #a78bfa !important;
+}
+
+/* Weekly overview */
+body.preview-dark .weekly-target-item {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.preview-dark .weekly-target-item h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .weekly-target-item span {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .weekly-progress-bar {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Upcoming plans */
+body.preview-dark .upcoming-plan-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .upcoming-plan-icon {
+  background: rgba(108, 99, 255, 0.15) !important;
+  color: #a78bfa !important;
+}
+
+body.preview-dark .upcoming-plan-info h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .upcoming-plan-info p {
+  color: #94a3b8 !important;
+}
+
+/* Focus tips */
+body.preview-dark .focus-tip-item {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .focus-tip-item i {
+  color: #6c63ff !important;
+}
+
+/* Planner modal */
+body.preview-dark .plan-modal-overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+body.preview-dark .plan-modal {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.preview-dark .plan-modal-header h2 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .plan-modal-header p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .plan-modal-close {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .plan-form-group label {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .plan-form-group input,
+body.preview-dark .plan-form-group select,
+body.preview-dark .plan-form-group textarea {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .plan-form-group input:focus,
+body.preview-dark .plan-form-group select:focus,
+body.preview-dark .plan-form-group textarea:focus {
+  border-color: #6c63ff !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+}
+
+body.preview-dark .plan-cancel-btn {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .plan-save-btn {
+  background: linear-gradient(135deg, #6c63ff, #7c6cff) !important;
+  color: #fff !important;
+}
+
+/* Empty state */
+body.preview-dark .planner-empty-state {
+  color: #64748b !important;
+}
+
+body.preview-dark .planner-empty-state h3 {
+  color: #94a3b8 !important;
+}
+
+/* ══════════════════════════════════════════
+   SUBJECTS PAGE
+══════════════════════════════════════════ */
+
+body.preview-dark .subjects-content {
+  background: transparent !important;
+}
+
+/* Summary cards */
+body.preview-dark .summary-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .summary-card h3 {
+  color: #a78bfa !important;
+}
+
+body.preview-dark .summary-card p {
+  color: #94a3b8 !important;
+}
+
+/* Toolbar */
+body.preview-dark .subjects-search,
+body.preview-dark .subjects-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .subjects-search input,
+body.preview-dark .subjects-filter select {
+  color: #f1f5f9 !important;
+  background: transparent !important;
+}
+
+body.preview-dark .subjects-search input::placeholder {
+  color: #64748b !important;
+}
+
+body.preview-dark .subjects-search i,
+body.preview-dark .subjects-filter i {
+  color: #64748b !important;
+}
+
+/* Subject cards */
+body.preview-dark .subject-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.preview-dark .subject-card:hover {
+  background: #243044 !important;
+  border-color: rgba(139, 124, 255, 0.3) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .subject-card h3 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .subject-card p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-icon {
+  background: rgba(108, 99, 255, 0.15) !important;
+  color: #a78bfa !important;
+}
+
+body.preview-dark .subject-meta {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-progress-bar {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .subject-action-btn {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-action-btn:hover {
+  background: #1e293b !important;
+  color: #a78bfa !important;
+  border-color: rgba(139, 124, 255, 0.3) !important;
+}
+
+body.preview-dark .subject-action-btn.delete:hover {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #f87171 !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Subject modal */
+body.preview-dark .subject-modal-overlay {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+body.preview-dark .subject-modal {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.preview-dark .subject-modal-header h2 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .subject-modal-header p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-modal-close {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-form-group label {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .subject-form-group input,
+body.preview-dark .subject-form-group select,
+body.preview-dark .subject-form-group textarea {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .subject-form-group input:focus,
+body.preview-dark .subject-form-group select:focus,
+body.preview-dark .subject-form-group textarea:focus {
+  border-color: #6c63ff !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+}
+
+body.preview-dark .subject-cancel-btn {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .subject-save-btn {
+  background: linear-gradient(135deg, #6c63ff, #7c6cff) !important;
+}
+
+/* Syllabus section */
+body.preview-dark .syllabus-dropzone {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #0f172a !important;
+}
+
+body.preview-dark .syllabus-file-preview {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .toggle-slider {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Empty state */
+body.preview-dark .subjects-empty-state {
+  background: #1e293b !important;
+  border-color: rgba(139, 124, 255, 0.2) !important;
+  color: #64748b !important;
+}
+
+body.preview-dark .subjects-empty-state h3 {
+  color: #94a3b8 !important;
+}
+
+/* ══════════════════════════════════════════
+   REVISION PAGE
+══════════════════════════════════════════ */
+
+/* Summary cards */
+body.preview-dark .revision-summary-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.preview-dark .revision-summary-card h3 {
+  color: #a78bfa !important;
+}
+
+body.preview-dark .revision-summary-card p {
+  color: #94a3b8 !important;
+}
+
+/* Toolbar */
+body.preview-dark .revision-search,
+body.preview-dark .revision-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .revision-search input,
+body.preview-dark .revision-filter select {
+  color: #f1f5f9 !important;
+  background: transparent !important;
+}
+
+body.preview-dark .revision-search input::placeholder {
+  color: #64748b !important;
+}
+
+/* Cards */
+body.preview-dark .revision-topics-card,
+body.preview-dark .revision-schedule-card,
+body.preview-dark .weak-areas-card,
+body.preview-dark .revision-tips-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Topic items */
+body.preview-dark .revision-topic-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .revision-topic-item:hover {
+  background: #162033 !important;
+  border-color: rgba(139, 124, 255, 0.25) !important;
+}
+
+body.preview-dark .revision-topic-info h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .revision-topic-info p {
+  color: #94a3b8 !important;
+}
+
+/* Action buttons */
+body.preview-dark .revision-topic-action-btn {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .revision-topic-action-btn:hover {
+  background: #334155 !important;
+  color: #a78bfa !important;
+}
+
+body.preview-dark .revision-topic-action-btn.delete:hover {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #f87171 !important;
+}
+
+/* Schedule */
+body.preview-dark .revision-schedule-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .revision-schedule-time {
+  color: #a78bfa !important;
+}
+
+body.preview-dark .revision-schedule-info h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .revision-schedule-info p {
+  color: #94a3b8 !important;
+}
+
+/* Weak areas */
+body.preview-dark .weak-area-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .weak-area-item i {
+  color: #f87171 !important;
+}
+
+/* Tips */
+body.preview-dark .revision-tip-item {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .revision-tip-item i {
+  color: #a78bfa !important;
+}
+
+/* Revision modal */
+body.preview-dark .revision-modal-overlay {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+body.preview-dark .revision-modal {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.preview-dark .revision-modal-header h2 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .revision-modal-header p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .revision-modal-close {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .revision-form-group label {
+  color: #cbd5e1 !important;
+}
+
+body.preview-dark .revision-form-group input,
+body.preview-dark .revision-form-group select,
+body.preview-dark .revision-form-group textarea {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .revision-form-group input:focus,
+body.preview-dark .revision-form-group select:focus,
+body.preview-dark .revision-form-group textarea:focus {
+  border-color: #6c63ff !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+}
+
+body.preview-dark .revision-cancel-btn {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .revision-save-btn {
+  background: linear-gradient(135deg, #6c63ff, #7c6cff) !important;
+}
+
+/* Empty state */
+body.preview-dark .revision-empty-state {
+  background: #1e293b !important;
+  border-color: rgba(139, 124, 255, 0.2) !important;
+  color: #64748b !important;
+}
+
+body.preview-dark .revision-empty-state h3 {
+  color: #94a3b8 !important;
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS PAGE
+══════════════════════════════════════════ */
+
+body.preview-dark .settings-content,
+body.preview-dark .settings-section,
+body.preview-dark .settings-card,
+body.preview-dark .settings-group,
+body.preview-dark .profile-card,
+body.preview-dark .account-card,
+body.preview-dark .preferences-card,
+body.preview-dark .notifications-card,
+body.preview-dark .danger-zone-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .settings-card h2,
+body.preview-dark .settings-card h3,
+body.preview-dark .settings-group h3,
+body.preview-dark .settings-section h2,
+body.preview-dark .settings-label,
+body.preview-dark .setting-title {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .settings-card p,
+body.preview-dark .settings-group p,
+body.preview-dark .settings-section p,
+body.preview-dark .setting-desc {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .settings-divider,
+body.preview-dark .settings-separator {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Settings inputs */
+body.preview-dark .settings-input,
+body.preview-dark .settings-select,
+body.preview-dark .settings-textarea,
+body.preview-dark .form-control,
+body.preview-dark .settings-card input[type="text"],
+body.preview-dark .settings-card input[type="email"],
+body.preview-dark .settings-card input[type="password"],
+body.preview-dark .settings-card select,
+body.preview-dark .settings-card textarea {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .settings-card input:focus,
+body.preview-dark .settings-card select:focus,
+body.preview-dark .settings-card textarea:focus {
+  border-color: #6c63ff !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+}
+
+/* Toggle switch */
+body.preview-dark .toggle-switch,
+body.preview-dark .settings-toggle {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Save button */
+body.preview-dark .settings-save-btn,
+body.preview-dark .btn-save-settings {
+  background: linear-gradient(135deg, #6c63ff, #7c6cff) !important;
+  color: #fff !important;
+}
+
+/* Danger zone */
+body.preview-dark .danger-zone-card,
+body.preview-dark .settings-danger {
+  background: rgba(220, 38, 38, 0.06) !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+/* Profile avatar area */
+body.preview-dark .avatar-wrapper,
+body.preview-dark .profile-avatar-section {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ══════════════════════════════════════════
+   TASKS PAGE (extra fixes)
+══════════════════════════════════════════ */
+
+body.preview-dark .task-summary-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .task-summary-card h3 {
+  color: #a78bfa !important;
+}
+
+body.preview-dark .task-summary-card p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .tasks-search,
+body.preview-dark .tasks-filter {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.preview-dark .tasks-search input,
+body.preview-dark .tasks-filter select {
+  color: #f1f5f9 !important;
+  background: transparent !important;
+}
+
+/* Task modal */
+body.preview-dark .task-modal-overlay {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+body.preview-dark .task-modal {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.preview-dark .task-modal-header h2,
+body.preview-dark .task-form-group label {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .task-modal-header p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .task-modal-close {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .task-form-group input,
+body.preview-dark .task-form-group select,
+body.preview-dark .task-form-group textarea {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .task-cancel-btn {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+}
+
+/* ══════════════════════════════════════════
+   PROFILE MINI DARK
+══════════════════════════════════════════ */
+
+body.preview-dark .profile-mini {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+body.preview-dark .profile-mini h4 {
+  color: #f1f5f9 !important;
+}
+
+body.preview-dark .profile-mini p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .theme-toggle-btn {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+}
+/* =====================================================
+   COMMON THEME TOGGLE FIX
+   Applies to all dashboard pages
+   File: dark-fix.css
+===================================================== */
+
+.header-actions #themeToggleBtn,
+.header-actions .theme-toggle-btn,
+#themeToggleBtn.theme-toggle-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid rgba(124, 92, 255, 0.35) !important;
+  border-radius: 14px !important;
+
+  background: rgba(124, 92, 255, 0.16) !important;
+  color: #c4b5fd !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 50 !important;
+
+  box-shadow: 0 8px 24px rgba(124, 92, 255, 0.22) !important;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+
+.header-actions #themeToggleBtn i,
+.header-actions .theme-toggle-btn i,
+#themeToggleBtn.theme-toggle-btn i {
+  font-size: 18px !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+/* Hover same as assistant style */
+.header-actions #themeToggleBtn:hover,
+.header-actions .theme-toggle-btn:hover,
+#themeToggleBtn.theme-toggle-btn:hover {
+  background: rgba(124, 92, 255, 0.26) !important;
+  border-color: #8b7cff !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 32px rgba(124, 92, 255, 0.38) !important;
+}
+
+/* Light theme me bhi visible */
+body:not(.preview-dark) .header-actions #themeToggleBtn,
+body:not(.preview-dark) .header-actions .theme-toggle-btn,
+body:not(.dark-mode) .header-actions #themeToggleBtn,
+body:not(.dark-mode) .header-actions .theme-toggle-btn {
+  background: rgba(124, 92, 255, 0.12) !important;
+  border-color: rgba(124, 92, 255, 0.25) !important;
+  color: #6c63ff !important;
+}
+
+/* Dark theme me assistant jaisa visible */
+body.preview-dark .header-actions #themeToggleBtn,
+body.preview-dark .header-actions .theme-toggle-btn,
+body.dark-mode .header-actions #themeToggleBtn,
+body.dark-mode .header-actions .theme-toggle-btn {
+  background: rgba(124, 92, 255, 0.18) !important;
+  border-color: rgba(196, 181, 253, 0.35) !important;
+  color: #c4b5fd !important;
+}
+
+/* Spin animation */
+#themeToggleBtn.theme-spin i,
+.theme-toggle-btn.theme-spin i {
+  animation: themeToggleSpin 0.55s ease;
+}
+
+@keyframes themeToggleSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.16);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* =====================================================
+   ASSISTANT ANIMATION RESTORE + DARK/LIGHT SAFE FIX
+===================================================== */
+
+/* AI background ko page ke peeche fixed layer bana do */
+.ai-bg-animation {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Main layout animation ke upar rahe */
+.dashboard-layout {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Assistant page ka solid background transparent-ish rakho */
+.assistant-page-main,
+.assistant-chat-panel {
+  position: relative !important;
+  background: transparent !important;
+}
+
+/* Assistant body ko background cover na banne do */
+.assistant-body {
+  position: relative !important;
+  z-index: 3 !important;
+  background: transparent !important;
+}
+
+/* Topbar aur right panel readable rahe */
+.assistant-topbar,
+.assistant-side-panel {
+  position: relative !important;
+  z-index: 4 !important;
+}
+
+/* Dark mode me animation visible + text readable */
+body.preview-dark .ai-bg-animation,
+body.dark-mode .ai-bg-animation {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+body.preview-dark .ai-grid,
+body.dark-mode .ai-grid {
+  opacity: 0.18 !important;
+}
+
+body.preview-dark .ai-core,
+body.dark-mode .ai-core {
+  opacity: 0.9 !important;
+  box-shadow:
+    0 0 80px rgba(124, 92, 255, 0.35),
+    0 0 140px rgba(34, 211, 238, 0.18) !important;
+}
+
+body.preview-dark .ai-orbit,
+body.dark-mode .ai-orbit {
+  border-color: rgba(124, 92, 255, 0.2) !important;
+  opacity: 1 !important;
+}
+
+body.preview-dark .ai-orbit-dot,
+body.dark-mode .ai-orbit-dot,
+body.preview-dark .ai-node,
+body.dark-mode .ai-node {
+  opacity: 1 !important;
+  box-shadow: 0 0 18px rgba(124, 92, 255, 0.55) !important;
+}
+
+body.preview-dark .ai-line,
+body.dark-mode .ai-line {
+  opacity: 0.28 !important;
+  stroke: rgba(124, 92, 255, 0.45) !important;
+}
+
+/* Light mode me animation soft but visible */
+body:not(.preview-dark):not(.dark-mode) .ai-bg-animation {
+  opacity: 0.9 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.16 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-orbit {
+  border-color: rgba(124, 92, 255, 0.16) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-line {
+  opacity: 0.18 !important;
+}
+
+/* Hero text dono themes me visible */
+.assistant-hero {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+body.preview-dark .assistant-hero h2,
+body.dark-mode .assistant-hero h2 {
+  color: #f8fafc !important;
+  text-shadow: 0 0 20px rgba(124, 92, 255, 0.35) !important;
+}
+
+body.preview-dark .assistant-hero p,
+body.dark-mode .assistant-hero p {
+  color: #cbd5e1 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-hero h2 {
+  color: #1f2937 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-hero p {
+  color: #64748b !important;
+}
+/* =====================================================
+   ORBIT ANIMATION FIX
+   Yeh code dark-fix.css ke SABSE NEECHE paste karo
+   Sirf assistant page ko affect karta hai
+   Koi aur page disturb nahi hoga
+===================================================== */
+
+/* ── Light mode mein bhi orbit visible karo ── */
+body:not(.dark-mode):not(.preview-dark) .ai-bg-animation {
+  opacity: 1 !important;
+}
+
+/* Light mode mein soft colors — white bg pe readable */
+body:not(.dark-mode):not(.preview-dark) .ai-core {
+  background: radial-gradient(
+    circle,
+    rgba(108, 99, 255, 0.18) 0%,
+    rgba(108, 99, 255, 0.05) 60%,
+    transparent 80%
+  ) !important;
+  box-shadow:
+    0 0 30px rgba(108, 99, 255, 0.12),
+    0 0 60px rgba(108, 99, 255, 0.06) !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-orbit {
+  border-color: rgba(108, 99, 255, 0.18) !important;
+  opacity: 1 !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-orbit-1 {
+  border-color: rgba(108, 99, 255, 0.22) !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-orbit-dot {
+  opacity: 0.7 !important;
+  box-shadow:
+    0 0 8px rgba(108, 99, 255, 0.5),
+    0 0 16px rgba(108, 99, 255, 0.25) !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-node {
+  opacity: 0.45 !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-grid {
+  opacity: 0.12 !important;
+}
+
+body:not(.dark-mode):not(.preview-dark) .ai-lines-svg {
+  opacity: 0.1 !important;
+}

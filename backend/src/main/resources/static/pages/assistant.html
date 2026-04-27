@@ -18,10 +18,64 @@
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
      <link rel="stylesheet" href="../assets/css/assistant.css">
+     <link rel="stylesheet" href="../assets/css/sidebar.css">
+     <link rel="stylesheet" href="../assets/css/dark-mode.css">
+
+     <!-- ORBIT ANIMATION FIX -->
+     <style>
+          .ai-bg-animation {
+               opacity: 1 !important;
+               visibility: visible !important;
+               position: fixed !important;
+               inset: 0 !important;
+               z-index: 0 !important;
+               pointer-events: none !important;
+          }
+
+          /* Body background */
+          body::before {
+               content: '';
+               position: fixed;
+               inset: 0;
+               background: #f0eeff;
+               z-index: -1;
+          }
+
+          body.dark-mode::before {
+               background: #0d0b1a;
+          }
+
+          /* Sab layouts transparent — orbit dikhti rahe */
+          .dashboard-layout,
+          .dashboard-main,
+          .assistant-page-main,
+          .assistant-body,
+          .assistant-chat-panel {
+               background: transparent !important;
+          }
+
+          /* Topbar aur side panel: frosted glass */
+          .assistant-topbar {
+               background: rgba(248, 247, 255, 0.85) !important;
+               backdrop-filter: blur(14px) !important;
+          }
+
+          .assistant-side-panel {
+               background: rgba(255, 255, 255, 0.82) !important;
+               backdrop-filter: blur(14px) !important;
+          }
+
+          body.dark-mode .assistant-topbar {
+               background: rgba(17, 13, 30, 0.85) !important;
+          }
+
+          body.dark-mode .assistant-side-panel {
+               background: rgba(17, 13, 30, 0.82) !important;
+          }
+     </style>
 </head>
 
 <body>
-
 
      <!-- AI Background Animation -->
      <div class="ai-bg-animation" id="aiBgAnimation">
@@ -53,11 +107,13 @@
                <line class="ai-line" x1="80" y1="75" x2="50" y2="50" />
           </svg>
      </div>
+
      <div class="dashboard-layout" id="dashboardLayout">
 
           <!-- Sidebar Overlay (mobile) -->
           <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+          <!-- ══ SIDEBAR ══ -->
           <aside class="sidebar" id="mainSidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -119,14 +175,8 @@
                <!-- Top Bar -->
                <header class="assistant-topbar">
                     <div class="assistant-topbar-left">
-                         <!-- Hamburger -->
-                         <button class="sidebar-toggle-btn" id="sidebarToggleBtn" type="button" title="Toggle Sidebar">
-                              <i class="fa-solid fa-bars"></i>
-                         </button>
-                         <div>
-                              <h1>AI Study Assistant</h1>
-                              <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
-                         </div>
+                         <h1>AI Study Assistant</h1>
+                         <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
                     </div>
 
                     <div class="assistant-topbar-right">
@@ -286,6 +336,7 @@
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/api.js"></script>
      <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/assistant.js"></script>
 </body>
 
