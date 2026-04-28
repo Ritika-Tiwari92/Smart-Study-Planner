@@ -38,11 +38,11 @@ document.addEventListener("DOMContentLoaded", function () {
             : "http://localhost:8080";
 
     const ENDPOINTS = {
-    subjects: `${API_BASE_URL}/api/subjects`,  // ✅ same as subjects.js
-    tasks: `${API_BASE_URL}/api/tasks`,
-    plans: `${API_BASE_URL}/api/plans`,
-    revisions: `${API_BASE_URL}/api/revisions`,
-    tests: `${API_BASE_URL}/api/tests`
+    subjects:  `${API_BASE_URL}/api/subjects`,   // JWT ✅ (SubjectController already JWT based)
+    tasks:     `${API_BASE_URL}/api/tasks`,       // JWT ✅ (ab fix ho gaya)
+    plans:     `${API_BASE_URL}/api/plans`,       // JWT ✅ (ab fix ho gaya)
+    revisions: `${API_BASE_URL}/api/revisions`,   // JWT ✅ (ab fix ho gaya)
+    tests:     `${API_BASE_URL}/api/tests`        // JWT ✅ (ab fix ho gaya)
 };
 
     const state = {

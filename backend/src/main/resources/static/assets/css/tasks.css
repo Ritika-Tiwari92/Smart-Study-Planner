@@ -739,3 +739,6 @@ body.preview-dark .task-card-meta .task-date * {
   color: #e5e7eb !important;
   opacity: 1 !important;
 }
+.tasks-empty-state.hidden {
+  display: none !important;
+}

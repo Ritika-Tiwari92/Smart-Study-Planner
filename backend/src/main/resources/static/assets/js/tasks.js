@@ -23,58 +23,31 @@ const taskPriorityInput    = document.getElementById("taskPriority");
 const taskStatusInput      = document.getElementById("taskStatus");
 const taskDescriptionInput = document.getElementById("taskDescription");
 
-// ─── API URLs ────────────────────────────────────────────
-const TASKS_API_BASE    = "http://localhost:8080/tasks";
+// ─── API URLs ─────────────────────────────────────────────
+// FIXED: /tasks → /api/tasks (matches updated TaskController)
+const TASKS_API_BASE    = "http://localhost:8080/api/tasks";
 const SUBJECTS_API_BASE = "http://localhost:8080/api/subjects";
 
 let editingTaskId = null;
 
-// ─── AUTH HEADER ─────────────────────────────────────────
+// ─── AUTH HEADER ──────────────────────────────────────────
 function getAuthHeaders(extraHeaders = {}) {
     const token = (localStorage.getItem("token") || "").trim();
     return { "Authorization": `Bearer ${token}`, ...extraHeaders };
 }
 
-// ─── GET USER ID ─────────────────────────────────────────
-function getCurrentUserId() {
-    // 1. Direct userId
-    const userId = localStorage.getItem("userId");
-    if (userId) return Number(userId);
-
-    // 2. edumind_logged_in_user object
-    try {
-        const raw = localStorage.getItem("edumind_logged_in_user");
-        if (raw) {
-            const user = JSON.parse(raw);
-            if (user && user.id) return Number(user.id);
-        }
-    } catch (e) {}
-
-    // 3. JWT payload
-    const token = localStorage.getItem("token");
-    if (token) {
-        try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            const id = payload.userId || payload.id;
-            if (id && !isNaN(Number(id))) return Number(id);
-        } catch (e) {}
-    }
-
-    throw new Error("User ID not found. Please login again.");
-}
-
-// ─── API URL BUILDERS ────────────────────────────────────
+// ─── API URL BUILDERS ─────────────────────────────────────
+// FIXED: No more ?userId= param — JWT token se userId backend extract karta hai
 function buildTasksApiUrl(taskId = "") {
-    const userId = getCurrentUserId();
-    const path   = taskId ? `/${taskId}` : "";
-    return `${TASKS_API_BASE}${path}?userId=${encodeURIComponent(userId)}`;
+    const path = taskId ? `/${taskId}` : "";
+    return `${TASKS_API_BASE}${path}`;
 }
 
 function buildSubjectsApiUrl() {
     return SUBJECTS_API_BASE;
 }
 
-// ─── MODAL OPEN / CLOSE ──────────────────────────────────
+// ─── MODAL OPEN / CLOSE ───────────────────────────────────
 function openTaskModal() {
     if (!taskModalOverlay) return;
     taskModalOverlay.classList.remove("hidden");
@@ -111,7 +84,7 @@ function clearModalState() {
     setAddMode();
 }
 
-// ─── DATE HELPERS ────────────────────────────────────────
+// ─── DATE HELPERS ─────────────────────────────────────────
 function formatDueDate(dateValue) {
     if (!dateValue) return "No date";
     const sel   = new Date(dateValue);
@@ -134,7 +107,7 @@ function isPastDate(dateValue) {
     return sel < today;
 }
 
-// ─── STATUS / PRIORITY HELPERS ───────────────────────────
+// ─── STATUS / PRIORITY HELPERS ────────────────────────────
 function getPriorityClass(priority) {
     const v = (priority || "").toLowerCase();
     if (v === "high")   return "high";
@@ -169,10 +142,10 @@ function normalizeStatus(text) {
 
 function getDisplayStatus(rawStatus, dueDate) {
     const normalized = normalizeStatus(rawStatus);
-    if (normalized === "Completed")   return "Completed";
-    if (normalized === "Overdue")     return "Overdue";
+    if (normalized === "Completed")     return "Completed";
+    if (normalized === "Overdue")       return "Overdue";
     if (dueDate && isPastDate(dueDate)) return "Overdue";
-    if (normalized === "In Progress") return "In Progress";
+    if (normalized === "In Progress")   return "In Progress";
     return "Pending";
 }
 
@@ -181,21 +154,21 @@ function getSubjectName(subject) {
     return subject.name || subject.subjectName || "";
 }
 
-// ─── DATA MAPPING ────────────────────────────────────────
+// ─── DATA MAPPING ─────────────────────────────────────────
 function mapBackendTaskToFrontend(task) {
-    const subject      = task.subject || {};
-    const rawStatus    = normalizeStatus(task.status || "Pending");
+    const subject       = task.subject || {};
+    const rawStatus     = normalizeStatus(task.status || "Pending");
     const displayStatus = getDisplayStatus(rawStatus, task.dueDate);
     return {
-        id:          task.id,
-        title:       task.title       || "",
-        description: task.description || "",
-        dueDate:     task.dueDate     || "",
-        priority:    normalizePriority(task.priority || "High"),
-        status:      rawStatus,
+        id:            task.id,
+        title:         task.title       || "",
+        description:   task.description || "",
+        dueDate:       task.dueDate     || "",
+        priority:      normalizePriority(task.priority || "High"),
+        status:        rawStatus,
         displayStatus,
-        subjectId:   subject.id       || "",
-        subjectName: getSubjectName(subject)
+        subjectId:     subject.id       || "",
+        subjectName:   getSubjectName(subject)
     };
 }
 
@@ -210,7 +183,7 @@ function buildTaskPayload(taskData) {
     };
 }
 
-// ─── SUBJECT DROPDOWN ────────────────────────────────────
+// ─── SUBJECT DROPDOWN ─────────────────────────────────────
 function createSubjectOption(subject) {
     const option       = document.createElement("option");
     option.value       = String(subject.id);
@@ -228,7 +201,7 @@ function populateSubjectDropdown(subjects) {
     subjects.forEach(s => taskSubjectInput.appendChild(createSubjectOption(s)));
 }
 
-// ─── API RESPONSE HANDLER ────────────────────────────────
+// ─── API RESPONSE HANDLER ─────────────────────────────────
 async function handleApiResponse(response) {
     if (!response.ok) {
         let message = `Request failed with status ${response.status}`;
@@ -243,7 +216,7 @@ async function handleApiResponse(response) {
     return ct.includes("application/json") ? response.json() : response.text();
 }
 
-// ─── API CALLS — only one copy each, all with auth headers ─
+// ─── API CALLS ────────────────────────────────────────────
 async function fetchSubjectsFromApi() {
     const res  = await fetch(buildSubjectsApiUrl(), { headers: getAuthHeaders() });
     const data = await handleApiResponse(res);
@@ -282,7 +255,7 @@ async function deleteTaskFromApi(taskId) {
     return handleApiResponse(res);
 }
 
-// ─── RENDER ──────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────
 function updateTaskCounts() {
     if (!tasksList) return;
     const cards    = tasksList.querySelectorAll(".task-card");
@@ -301,11 +274,11 @@ function updateTaskCounts() {
 
 function createTaskCard(task) {
     const card = document.createElement("div");
-    card.className         = "task-card";
-    card.dataset.taskId    = task.id;
-    card.dataset.subjectId = String(task.subjectId || "");
+    card.className           = "task-card";
+    card.dataset.taskId      = task.id;
+    card.dataset.subjectId   = String(task.subjectId || "");
     card.dataset.description = task.description || "";
-    card.dataset.rawStatus = task.status || "Pending";
+    card.dataset.rawStatus   = task.status || "Pending";
 
     const priorityClass = getPriorityClass(task.priority);
     const statusClass   = getStatusClass(task.displayStatus);
@@ -331,11 +304,11 @@ function createTaskCard(task) {
         </div>`;
     return card;
 }
-
 function renderTasks(tasks) {
     if (!tasksList) return;
     tasksList.innerHTML = "";
     tasks.forEach(t => tasksList.appendChild(createTaskCard(t)));
+    if (tasksEmptyState) tasksEmptyState.classList.add("hidden"); 
     updateTaskCounts();
     applyTaskFilters();
 }
@@ -382,7 +355,7 @@ function fillFormForEdit(card) {
     taskDescriptionInput.value = card.dataset.description || "";
 }
 
-// ─── LOAD FUNCTIONS ──────────────────────────────────────
+// ─── LOAD FUNCTIONS ───────────────────────────────────────
 async function loadSubjectsForTaskForm() {
     try {
         const subjects = await fetchSubjectsFromApi();
@@ -390,7 +363,6 @@ async function loadSubjectsForTaskForm() {
     } catch (error) {
         console.error("Failed to load subjects:", error);
         populateSubjectDropdown([]);
-        // Silent fail — don't block the page with alert
     }
 }
 
@@ -404,13 +376,12 @@ async function loadTasks() {
         if (tasksList) tasksList.innerHTML = "";
         updateTaskCounts();
         updateEmptyState(0);
-        // Silent fail — show empty state instead of annoying alert
     }
 }
 
-async function addTask(taskData)              { await createTaskInApi(taskData);         await loadTasks(); }
-async function updateTask(taskId, updatedData){ await updateTaskInApi(taskId, updatedData); await loadTasks(); }
-async function deleteTask(taskId)             { await deleteTaskFromApi(taskId);          await loadTasks(); }
+async function addTask(taskData)               { await createTaskInApi(taskData);            await loadTasks(); }
+async function updateTask(taskId, updatedData) { await updateTaskInApi(taskId, updatedData); await loadTasks(); }
+async function deleteTask(taskId)              { await deleteTaskFromApi(taskId);             await loadTasks(); }
 
 async function initializeTaskPage() {
     await loadSubjectsForTaskForm();
@@ -418,7 +389,7 @@ async function initializeTaskPage() {
     setAddMode();
 }
 
-// ─── EVENT LISTENERS ─────────────────────────────────────
+// ─── EVENT LISTENERS ──────────────────────────────────────
 if (openTaskModalBtn) {
     openTaskModalBtn.addEventListener("click", function () {
         clearModalState();
@@ -466,10 +437,10 @@ if (taskModalForm) {
         const status      = taskStatusInput.value;
         const description = taskDescriptionInput.value.trim();
 
-        if (!title)       { alert("Please enter a task title.");     return; }
-        if (!subjectId)   { alert("Please select a subject.");        return; }
-        if (!dueDate)     { alert("Please select a due date.");       return; }
-        if (!description) { alert("Please enter task description.");  return; }
+        if (!title)       { alert("Please enter a task title.");    return; }
+        if (!subjectId)   { alert("Please select a subject.");       return; }
+        if (!dueDate)     { alert("Please select a due date.");      return; }
+        if (!description) { alert("Please enter task description."); return; }
 
         const taskData = { title, subjectId, dueDate, priority, status, description };
         try {
@@ -511,9 +482,8 @@ if (tasksList) {
     });
 }
 
-// ─── Search & Filter — outside tasksList block ───────────
 if (taskSearchInput)  taskSearchInput.addEventListener("input",  applyTaskFilters);
 if (taskFilterSelect) taskFilterSelect.addEventListener("change", applyTaskFilters);
 
-// ─── INIT ────────────────────────────────────────────────
+// ─── INIT ─────────────────────────────────────────────────
 initializeTaskPage();

@@ -784,3 +784,6 @@
   padding: 2px 8px;
   border-radius: 99px;
 }
+.subjects-empty-state.hidden {
+  display: none !important;
+}

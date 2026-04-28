@@ -82,9 +82,8 @@ function getCurrentUserId() {
 
 // ─── URL BUILDERS ────────────────────────────────────────
 function buildRevisionApiUrl(revisionId = "") {
-    const userId = getCurrentUserId();
-    const path   = revisionId ? `/${revisionId}` : "";
-    return `${REVISION_API_URL}${path}?userId=${encodeURIComponent(userId)}`;
+    const path = revisionId ? `/${revisionId}` : "";
+    return `${REVISION_API_URL}${path}`;
 }
 
 function buildSubjectsApiUrl() {
