@@ -404,6 +404,7 @@ async function loadSubjects() {
         const subjects = await fetchSubjectsFromApi();
         renderSubjects(subjects);
         updateSubjectsEmptyState(subjects.length);
+        localStorage.setItem("edumind_subjects_updated", Date.now().toString());
     } catch (err) {
         console.error("Failed to load subjects:", err);
         subjectsGrid.innerHTML = "";
@@ -412,6 +413,7 @@ async function loadSubjects() {
         showToast("Failed to load subjects. Please refresh.", "error");
     }
 }
+
 
 // ─────────────────────────────────────────────
 // CHAPTER PREVIEW (shown in modal after upload)

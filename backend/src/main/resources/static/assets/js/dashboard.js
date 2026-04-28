@@ -38,12 +38,12 @@ document.addEventListener("DOMContentLoaded", function () {
             : "http://localhost:8080";
 
     const ENDPOINTS = {
-        subjects: `${API_BASE_URL}/subjects`,
-        tasks: `${API_BASE_URL}/tasks`,
-        plans: `${API_BASE_URL}/api/plans`,
-        revisions: `${API_BASE_URL}/api/revisions`,
-        tests: `${API_BASE_URL}/api/tests`
-    };
+    subjects: `${API_BASE_URL}/api/subjects`,  // ✅ same as subjects.js
+    tasks: `${API_BASE_URL}/api/tasks`,
+    plans: `${API_BASE_URL}/api/plans`,
+    revisions: `${API_BASE_URL}/api/revisions`,
+    tests: `${API_BASE_URL}/api/tests`
+};
 
     const state = {
         user: null,
@@ -125,10 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function buildEndpointUrl(baseUrl) {
-        const userId = getCurrentUserId();
-        const separator = baseUrl.includes("?") ? "&" : "?";
-        return `${baseUrl}${separator}userId=${encodeURIComponent(userId)}`;
-    }
+    return baseUrl; // JWT token se hi user identify hoga
+}
 
     function getUserDisplayName(user) {
         return getFirstAvailableValue(user, ["fullName", "name", "displayName", "username"], "Student") || "Student";
@@ -234,14 +232,14 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
     async function fetchArray(baseUrl, label) {
-        try {
-            const response = await fetchJson(buildEndpointUrl(baseUrl));
-            return getArrayFromResponse(response);
-        } catch (error) {
-            console.error(`Failed to load ${label}:`, error);
-            return [];
-        }
+    try {
+        const response = await fetchJson(baseUrl); // buildEndpointUrl hatao
+        return getArrayFromResponse(response);
+    } catch (error) {
+        console.error(`Failed to load ${label}:`, error);
+        return [];
     }
+}
 
     // ─── Date Helpers ─────────────────────────────────────────────────────────
 
@@ -1460,4 +1458,189 @@ document.addEventListener("DOMContentLoaded", function () {
     attachNotificationEvents();
     attachSharedDropdownEvents();
     loadDashboardData();
+
+    // ════════════════════════════════════════════
+    // STUDY ENGINE — Dashboard Integration
+    // ════════════════════════════════════════════
+
+    async function loadStudySummary() {
+        try {
+            const token = (localStorage.getItem("token") || "").trim();
+            if (!token) return;
+
+            const response = await fetch(
+                "http://localhost:8080/api/dashboard/study-summary", {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                }
+            });
+
+            if (!response.ok) return;
+            const data = await response.json();
+            if (!data) return;
+
+            renderStudyStats(data);
+            renderDailyTarget(data.today);
+            renderCalendar(data.calendar);
+            renderBadges(data.badges);
+            renderWeeklyAnalytics(data.weekly);
+
+        } catch (e) {
+            console.warn("Study summary not loaded:", e.message);
+        }
+    }
+
+    function renderStudyStats(data) {
+        const today   = data.today   || {};
+        const streak  = data.streak  || {};
+        const badges  = data.badges  || {};
+
+        const dsStreak   = document.getElementById("dsStreakValue");
+        const dsFocus    = document.getElementById("dsFocusValue");
+        const dsVideos   = document.getElementById("dsVideosValue");
+        const dsSessions = document.getElementById("dsSessionsValue");
+        const dsBadges   = document.getElementById("dsBadgesValue");
+        const dsBadgesSub = document.getElementById("dsBadgesSub");
+        const dsTargetSub = document.getElementById("dsTargetSub");
+
+        if (dsStreak)   dsStreak.textContent   = streak.currentStreak || 0;
+        if (dsFocus)    dsFocus.textContent     = today.focusMinutes  || 0;
+        if (dsVideos)   dsVideos.textContent    = today.videosCompleted || 0;
+        if (dsSessions) dsSessions.textContent  = today.sessionsCompleted || 0;
+
+        if (dsBadges) {
+            dsBadges.textContent = badges.unlockedBadges || 0;
+        }
+        if (dsBadgesSub) {
+            dsBadgesSub.textContent =
+                `of ${badges.totalBadges || 7} total`;
+        }
+        if (dsTargetSub) {
+            dsTargetSub.textContent =
+                `of ${today.targetVideos || 3} target`;
+        }
+    }
+
+    function renderDailyTarget(today) {
+        if (!today) return;
+
+        const fill   = document.getElementById("dsTargetFill");
+        const pct    = document.getElementById("dsTargetPct");
+        const label  = document.getElementById("dsTargetLabel");
+        const status = document.getElementById("dsTargetStatus");
+
+        const done   = today.videosCompleted || 0;
+        const target = today.targetVideos    || 3;
+        const pctVal = today.progressPercent || 0;
+
+        if (fill)   fill.style.width  = `${pctVal}%`;
+        if (pct)    pct.textContent   = `${pctVal}%`;
+        if (label)  label.textContent =
+            `${done} of ${target} videos completed today`;
+
+        if (status) {
+            if (pctVal >= 100) {
+                status.textContent   = "🎯 Target Reached!";
+                status.style.background = "#ecfdf5";
+                status.style.color      = "#047857";
+            } else if (pctVal >= 50) {
+                status.textContent   = "⚡ Halfway there";
+                status.style.background = "#fffbeb";
+                status.style.color      = "#d97706";
+            } else {
+                status.textContent   = "📚 Keep going";
+                status.style.background = "#f5f3ff";
+                status.style.color      = "#6c63ff";
+            }
+        }
+    }
+
+    function renderCalendar(calendarData) {
+        const grid = document.getElementById("dsCalendarGrid");
+        if (!grid || !calendarData) return;
+
+        const today = new Date().toISOString().split("T")[0];
+
+        grid.innerHTML = calendarData.map(day => {
+            const level = getActivityLevel(day.focusMinutes, day.sessionsCompleted);
+            const isToday = day.date === today;
+
+            const tip = day.active
+                ? `${day.date}: ${day.focusMinutes}m focus · ` +
+                  `${day.videosCompleted} videos · ` +
+                  `${day.sessionsCompleted} sessions`
+                : `${day.date}: No activity`;
+
+            return `<div
+                class="ds-cal-box ds-level-${level} ${isToday ? "today-box" : ""}"
+                data-tip="${escapeHtml(tip)}"
+                title="${escapeHtml(tip)}">
+            </div>`;
+        }).join("");
+    }
+
+    function getActivityLevel(focusMinutes, sessions) {
+        const score = (focusMinutes || 0) + (sessions || 0) * 5;
+        if (score === 0)  return 0;
+        if (score < 10)   return 1;
+        if (score < 30)   return 2;
+        if (score < 60)   return 3;
+        return 4;
+    }
+
+    function renderBadges(badgesData) {
+        const grid = document.getElementById("dsBadgesGrid");
+        if (!grid || !badgesData) return;
+
+        const list = badgesData.badges || [];
+        if (!list.length) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;
+                            color:#9ca3af;font-size:13px;padding:16px 0;">
+                    No badges yet. Start studying!
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = list.map(badge => `
+            <div class="ds-badge-item ${badge.unlocked ? "unlocked" : "locked"}"
+                 title="${escapeHtml(badge.description)}">
+                <div class="ds-badge-icon-wrap">
+                    <i class="fa-solid ${escapeHtml(badge.icon || "fa-trophy")}"></i>
+                </div>
+                <div class="ds-badge-info">
+                    <div class="ds-badge-name">${escapeHtml(badge.name)}</div>
+                    <div class="ds-badge-desc">${escapeHtml(badge.description)}</div>
+                    ${badge.unlocked
+                        ? `<span class="ds-badge-unlocked-tag">✓ Unlocked</span>`
+                        : ""}
+                </div>
+            </div>
+        `).join("");
+    }
+
+    function renderWeeklyAnalytics(weekly) {
+        if (!weekly) return;
+
+        const focusEl    = document.getElementById("dsWeeklyFocus");
+        const videosEl   = document.getElementById("dsWeeklyVideos");
+        const sessionsEl = document.getElementById("dsWeeklySessions");
+        const daysEl     = document.getElementById("dsWeeklyActiveDays");
+        const bestEl     = document.getElementById("dsWeeklyBestDay");
+
+        const mins = weekly.totalFocusMinutes || 0;
+        const display = mins >= 60
+            ? `${Math.floor(mins/60)}h ${mins%60}m`
+            : `${mins} min`;
+
+        if (focusEl)    focusEl.textContent    = display;
+        if (videosEl)   videosEl.textContent   = weekly.videosWatched    || 0;
+        if (sessionsEl) sessionsEl.textContent = weekly.sessionsCompleted || 0;
+        if (daysEl)     daysEl.textContent     = weekly.activeDays        || 0;
+        if (bestEl)     bestEl.textContent     = weekly.bestDay           || "—";
+    }
+
+    // Call study summary after all other data loads
+    loadStudySummary();
 });

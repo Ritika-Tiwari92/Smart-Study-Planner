@@ -11,7 +11,7 @@
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
+     <link rel="stylesheet" href="../assets/css/dashboard-study.css">
      <link rel="stylesheet" href="../assets/css/variables.css">
      <link rel="stylesheet" href="../assets/css/base.css">
      <link rel="stylesheet" href="../assets/css/layout.css">
@@ -59,6 +59,10 @@
                     <a href="analytics.html" class="nav-item">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
+                    </a>
+                    <a href="pomodoro.html" class="nav-item">
+                         <i class="fa-solid fa-stopwatch"></i>
+                         <span>Study Timer</span>
                     </a>
                     <a href="assistant.html" class="nav-item">
                          <i class="fa-solid fa-robot"></i>
@@ -445,7 +449,180 @@
 
                          <div class="chart-insight-line" id="chartInsightLine"></div>
                     </div>
+                    <!-- ═══════════════════════════════════════════
+     STUDY ENGINE SECTION — NEW
+     Paste karo .dashboard-content ke andar,
+     .overview-chart-card ke baad
+     ═══════════════════════════════════════════ -->
 
+                    <!-- Study Stats Row -->
+                    <div class="ds-stats-row" id="dsStatsRow">
+
+                         <div class="ds-stat-card">
+                              <div class="ds-stat-icon" style="background:#f5f3ff;color:#6c63ff">
+                                   <i class="fa-solid fa-fire"></i>
+                              </div>
+                              <div class="ds-stat-body">
+                                   <span class="ds-stat-label">Current Streak</span>
+                                   <span class="ds-stat-value" id="dsStreakValue">0</span>
+                                   <span class="ds-stat-sub">days</span>
+                              </div>
+                         </div>
+
+                         <div class="ds-stat-card">
+                              <div class="ds-stat-icon" style="background:#ecfdf5;color:#059669">
+                                   <i class="fa-solid fa-clock"></i>
+                              </div>
+                              <div class="ds-stat-body">
+                                   <span class="ds-stat-label">Today's Focus</span>
+                                   <span class="ds-stat-value" id="dsFocusValue">0</span>
+                                   <span class="ds-stat-sub">minutes</span>
+                              </div>
+                         </div>
+
+                         <div class="ds-stat-card">
+                              <div class="ds-stat-icon" style="background:#fffbeb;color:#d97706">
+                                   <i class="fa-solid fa-video"></i>
+                              </div>
+                              <div class="ds-stat-body">
+                                   <span class="ds-stat-label">Videos Today</span>
+                                   <span class="ds-stat-value" id="dsVideosValue">0</span>
+                                   <span class="ds-stat-sub" id="dsTargetSub">of 3 target</span>
+                              </div>
+                         </div>
+
+                         <div class="ds-stat-card">
+                              <div class="ds-stat-icon" style="background:#eff6ff;color:#2563eb">
+                                   <i class="fa-solid fa-stopwatch"></i>
+                              </div>
+                              <div class="ds-stat-body">
+                                   <span class="ds-stat-label">Sessions Today</span>
+                                   <span class="ds-stat-value" id="dsSessionsValue">0</span>
+                                   <span class="ds-stat-sub">completed</span>
+                              </div>
+                         </div>
+
+                         <div class="ds-stat-card">
+                              <div class="ds-stat-icon" style="background:#fdf4ff;color:#a21caf">
+                                   <i class="fa-solid fa-trophy"></i>
+                              </div>
+                              <div class="ds-stat-body">
+                                   <span class="ds-stat-label">Badges</span>
+                                   <span class="ds-stat-value" id="dsBadgesValue">0</span>
+                                   <span class="ds-stat-sub" id="dsBadgesSub">unlocked</span>
+                              </div>
+                         </div>
+
+                    </div>
+
+                    <!-- Daily Target Progress -->
+                    <div class="ds-target-card">
+                         <div class="ds-target-header">
+                              <div class="ds-target-left">
+                                   <i class="fa-solid fa-bullseye"></i>
+                                   <span>Daily Study Target</span>
+                              </div>
+                              <a href="pomodoro.html" class="ds-target-link">
+                                   <i class="fa-solid fa-stopwatch"></i> Open Study Timer
+                              </a>
+                         </div>
+                         <div class="ds-target-bar-wrap">
+                              <div class="ds-target-bar">
+                                   <div class="ds-target-fill" id="dsTargetFill" style="width:0%"></div>
+                              </div>
+                              <span class="ds-target-pct" id="dsTargetPct">0%</span>
+                         </div>
+                         <div class="ds-target-footer">
+                              <span id="dsTargetLabel">0 of 3 videos completed today</span>
+                              <span id="dsTargetStatus" class="ds-target-status"></span>
+                         </div>
+                    </div>
+
+                    <!-- Activity Calendar + Badges Row -->
+                    <div class="ds-lower-row">
+
+                         <!-- 30-Day Activity Calendar -->
+                         <div class="ds-calendar-card">
+                              <div class="section-title">
+                                   <h3>
+                                        <i class="fa-solid fa-calendar-days section-title-icon"></i>
+                                        30-Day Activity
+                                   </h3>
+                                   <p>Your study activity over the last 30 days.</p>
+                              </div>
+                              <div class="ds-calendar-grid" id="dsCalendarGrid">
+                                   <!-- Filled by JS -->
+                              </div>
+                              <div class="ds-calendar-legend">
+                                   <span>Less</span>
+                                   <span class="ds-legend-box ds-level-0"></span>
+                                   <span class="ds-legend-box ds-level-1"></span>
+                                   <span class="ds-legend-box ds-level-2"></span>
+                                   <span class="ds-legend-box ds-level-3"></span>
+                                   <span class="ds-legend-box ds-level-4"></span>
+                                   <span>More</span>
+                              </div>
+                         </div>
+
+                         <!-- Achievement Badges -->
+                         <div class="ds-badges-card">
+                              <div class="section-title">
+                                   <h3>
+                                        <i class="fa-solid fa-trophy section-title-icon"></i>
+                                        Achievements
+                                   </h3>
+                                   <p>Unlock badges by studying consistently.</p>
+                              </div>
+                              <div class="ds-badges-grid" id="dsBadgesGrid">
+                                   <!-- Filled by JS -->
+                              </div>
+                         </div>
+
+                    </div>
+
+                    <!-- Weekly Study Analytics -->
+                    <div class="ds-weekly-card">
+                         <div class="section-title">
+                              <h3>
+                                   <i class="fa-solid fa-chart-bar section-title-icon"></i>
+                                   Weekly Study Analytics
+                              </h3>
+                              <p>Your Pomodoro focus time and video completions this week.</p>
+                         </div>
+                         <div class="ds-weekly-stats">
+                              <div class="ds-weekly-stat">
+                                   <span class="ds-weekly-icon" style="background:#f5f3ff;color:#6c63ff">
+                                        <i class="fa-solid fa-clock"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Total Focus</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyFocus">0 min</span>
+                                   </div>
+                              </div>
+                              <div class="ds-weekly-stat">
+                                   <span class="ds-weekly-icon" style="background:#ecfdf5;color:#059669">
+                                        <i class="fa-solid fa-video"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Videos Watched</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyVideos">0</span>
+                                   </div>
+                              </div>
+                              <div class="ds-weekly-stat">
+                                   <span class="ds-weekly-icon" style="background:#fffbeb;color:#d97706">
+                                        <i class="fa-solid fa-stopwatch"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Sessions Done</span>
+                                        <span class="ds-weekly-value" id="dsWeeklySessions">0</span>
+                                   </div>
+                              </div>
+                              <div class="ds-weekly-stat">
+                                   <span class="ds-weekly-icon" style="background:#eff6ff;color:#2563eb">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Active Days</span>
                </section>
           </main>
      </div>

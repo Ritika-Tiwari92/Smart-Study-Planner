@@ -10,7 +10,6 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
-
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -32,50 +31,29 @@
                          <span>EduMind AI</span>
                     </h2>
                </div>
-
                <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
+                    <a href="dashboard.html" class="nav-item"><i
+                              class="fa-solid fa-house"></i><span>Dashboard</span></a>
+                    <a href="planner.html" class="nav-item"><i
+                              class="fa-solid fa-calendar-days"></i><span>Planner</span></a>
+                    <a href="subjects.html" class="nav-item"><i class="fa-solid fa-book"></i><span>Subjects</span></a>
+                    <a href="tasks.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
+                    <a href="revision.html" class="nav-item"><i class="fa-solid fa-rotate"></i><span>Revision</span></a>
+                    <a href="tests.html" class="nav-item"><i class="fa-solid fa-file-lines"></i><span>Tests</span></a>
+                    <a href="analytics.html" class="nav-item"><i
+                              class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                    <a href="pomodoro.html" class="nav-item">
+                         <i class="fa-solid fa-stopwatch"></i>
+                         <span>Study Timer</span>
                     </a>
-                    <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
-                    </a>
-                    <a href="subjects.html" class="nav-item">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
-                    </a>
-                    <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
-                    </a>
-                    <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
-                    </a>
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
-                    </a>
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-                    <a href="assistant.html" class="nav-item">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
-                    </a>
-                    <a href="settings.html" class="nav-item active">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
+                    <a href="assistant.html" class="nav-item"><i
+                              class="fa-solid fa-robot"></i><span>Assistant</span></a>
+                    <a href="settings.html" class="nav-item active"><i
+                              class="fa-solid fa-gear"></i><span>Settings</span></a>
                </nav>
-
                <div class="sidebar-bottom">
                     <a href="login.html" class="logout-btn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
+                         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
                     </a>
                </div>
           </aside>
@@ -88,18 +66,15 @@
                               <p>Manage your profile, preferences, notifications, and account options.</p>
                          </div>
                     </div>
-
                     <div class="header-actions">
                          <button class="save-settings-btn" id="saveSettingsBtn">
                               <i class="fa-solid fa-floppy-disk"></i>
                               <span>Save Changes</span>
                          </button>
                          <p class="settings-save-status" id="settingsSaveStatus"></p>
-
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
-
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User" id="headerProfileImage">
                               <div>
@@ -107,19 +82,15 @@
                                    <p>Student</p>
                               </div>
                          </div>
-
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
+                                   <i class="fa-solid fa-user-gear"></i><span>Profile Settings</span>
                               </a>
                               <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
+                                   <i class="fa-solid fa-chart-line"></i><span>View Analytics</span>
                               </a>
                               <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
+                                   <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
                               </a>
                          </div>
                     </div>
@@ -127,6 +98,7 @@
 
                <section class="settings-content">
                     <div class="settings-main-grid">
+
                          <!-- LEFT COLUMN -->
                          <div class="settings-left-column">
 
@@ -136,7 +108,6 @@
                                         <h3><i class="fa-solid fa-user-circle"></i> Profile Settings</h3>
                                         <p>Update your basic profile details.</p>
                                    </div>
-
                                    <div class="profile-settings-layout">
                                         <div class="settings-avatar-box">
                                              <div class="avatar-ring-wrapper">
@@ -147,33 +118,32 @@
                                                   </div>
                                              </div>
                                              <input type="file" id="profilePhotoInput" accept="image/*"
-                                                  style="display: none;">
+                                                  style="display:none">
                                              <button class="change-photo-btn" id="changePhotoBtn" type="button">
                                                   <i class="fa-solid fa-camera"></i> Change Photo
                                              </button>
                                         </div>
-
                                         <div class="settings-form-grid">
                                              <div class="settings-form-group">
                                                   <label for="settingsFullName">Full Name</label>
                                                   <input type="text" id="settingsFullName" value="Ritika Tiwari"
-                                                       placeholder="Enter full name">
+                                                       placeholder="Full name">
                                              </div>
                                              <div class="settings-form-group">
                                                   <label for="settingsEmail">Email</label>
                                                   <input type="email" id="settingsEmail" value="ritika@example.com"
-                                                       placeholder="Enter email">
+                                                       placeholder="Email">
                                              </div>
                                              <div class="settings-form-group">
                                                   <label for="settingsCourse">Course</label>
                                                   <input type="text" id="settingsCourse" value="BCA Final Year"
-                                                       placeholder="Enter course">
+                                                       placeholder="Course">
                                              </div>
                                              <div class="settings-form-group">
                                                   <label for="settingsCollege">College</label>
                                                   <input type="text" id="settingsCollege"
                                                        value="ITM College of Science and Management"
-                                                       placeholder="Enter college">
+                                                       placeholder="College">
                                              </div>
                                         </div>
                                    </div>
@@ -185,7 +155,6 @@
                                         <h3><i class="fa-solid fa-brain"></i> Study Preferences</h3>
                                         <p>Customize your learning environment and habits.</p>
                                    </div>
-
                                    <div class="settings-form-grid">
                                         <div class="settings-form-group">
                                              <label for="settingsStudyTime">Preferred Study Time</label>
@@ -223,52 +192,43 @@
                                         <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
                                         <p>Choose what reminders and alerts you want.</p>
                                    </div>
-
                                    <div class="settings-toggle-list">
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Task Reminders</h4>
                                                   <p>Get reminders for pending study tasks.</p>
                                              </div>
-                                             <label class="switch">
-                                                  <input type="checkbox" checked>
-                                                  <span class="slider"></span>
-                                             </label>
+                                             <label class="switch"><input type="checkbox" checked><span
+                                                       class="slider"></span></label>
                                         </div>
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Revision Alerts</h4>
                                                   <p>Receive reminders for revision topics.</p>
                                              </div>
-                                             <label class="switch">
-                                                  <input type="checkbox" checked>
-                                                  <span class="slider"></span>
-                                             </label>
+                                             <label class="switch"><input type="checkbox" checked><span
+                                                       class="slider"></span></label>
                                         </div>
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Test Notifications</h4>
                                                   <p>Get alerts for upcoming tests and mock exams.</p>
                                              </div>
-                                             <label class="switch">
-                                                  <input type="checkbox" checked>
-                                                  <span class="slider"></span>
-                                             </label>
+                                             <label class="switch"><input type="checkbox" checked><span
+                                                       class="slider"></span></label>
                                         </div>
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Assistant Suggestions</h4>
                                                   <p>Show smart recommendations from AI assistant.</p>
                                              </div>
-                                             <label class="switch">
-                                                  <input type="checkbox">
-                                                  <span class="slider"></span>
-                                             </label>
+                                             <label class="switch"><input type="checkbox"><span
+                                                       class="slider"></span></label>
                                         </div>
                                    </div>
                               </div>
 
-                              <!-- Security & Account -->
+                              <!-- Security -->
                               <div class="settings-card security-card animate-card" style="animation-delay:0.2s">
                                    <div class="section-title">
                                         <h3><i class="fa-solid fa-shield-halved"></i> Security & Account</h3>
@@ -293,13 +253,11 @@
                                              <span>Change Password</span>
                                              <i class="fa-solid fa-chevron-right sec-arrow"></i>
                                         </button>
-
                                         <button class="security-action-btn twofa-btn" id="twoFactorBtn" type="button">
                                              <i class="fa-solid fa-shield-halved"></i>
                                              <span>Enable Two-Factor Auth</span>
                                              <i class="fa-solid fa-chevron-right sec-arrow"></i>
                                         </button>
-
                                         <button class="security-action-btn danger" id="deleteAccountBtn" type="button">
                                              <i class="fa-solid fa-trash"></i>
                                              <span>Delete Account</span>
@@ -345,7 +303,9 @@
           </main>
      </div>
 
-     <!-- ===== 2FA MODAL ===== -->
+     <!-- ══════════════════════════════════════════
+          2FA MODAL — Email OTP Flow
+          ══════════════════════════════════════════ -->
      <div class="modal-overlay" id="twofaModalOverlay">
           <div class="modal-box twofa-modal">
                <button class="modal-close-btn" id="twofaModalClose">
@@ -354,38 +314,39 @@
 
                <div class="modal-header">
                     <div class="modal-icon-wrap">
-                         <i class="fa-solid fa-shield-halved"></i>
+                         <i class="fa-solid fa-envelope-open-text"></i>
                     </div>
-                    <h2>Two-Factor Authentication</h2>
-                    <p>Scan the QR code with Google Authenticator or Authy, then enter the 6-digit code below.</p>
+                    <h2>Enable Two-Factor Auth</h2>
+                    <p>We'll send a 6-digit OTP to your registered email address.</p>
                </div>
 
-               <!-- QR Code area — swap src with backend data -->
-               <div class="qr-code-area">
-                    <div class="qr-placeholder" id="qrCodeImg">
-                         <i class="fa-solid fa-qrcode"></i>
-                         <span>QR Code loads here</span>
+               <!-- Step 1: Send OTP -->
+               <div class="otp-send-section">
+                    <div class="otp-email-display">
+                         <i class="fa-solid fa-envelope"></i>
+                         <span>OTP will be sent to: <strong id="maskedEmailDisplay">your email</strong></span>
                     </div>
+                    <button class="send-otp-btn" id="sendOtpBtn" type="button">
+                         <i class="fa-solid fa-paper-plane"></i>
+                         <span>Send OTP</span>
+                    </button>
                </div>
 
-               <div class="secret-key-box" id="secretKeyBox" title="Click to copy">
-                    <i class="fa-solid fa-copy"></i>
-                    <span id="secretKeyText">EDUMIND-XXXX-XXXX-XXXX</span>
+               <div class="otp-divider-line">
+                    <span>Enter OTP below after receiving email</span>
                </div>
-               <p class="secret-copy-hint">Click above to copy the secret key</p>
 
-               <p class="otp-instruction">Enter the 6-digit code from your authenticator app</p>
-
+               <!-- Step 2: Enter OTP -->
+               <p class="otp-instruction">Enter the 6-digit code from your email</p>
                <div class="otp-input-row" id="otpInputRow">
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp0">
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp1">
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp2">
-                    <span class="otp-divider">—</span>
+                    <span class="otp-sep">—</span>
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp3">
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp4">
                     <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp5">
                </div>
-
                <p class="otp-error-msg" id="otpErrorMsg"></p>
 
                <div class="modal-actions">
@@ -398,16 +359,16 @@
           </div>
      </div>
 
-     <!-- ===== TOAST NOTIFICATION ===== -->
+     <!-- TOAST -->
      <div class="toast-notification" id="toastNotification">
           <i class="toast-icon fa-solid fa-circle-check" id="toastIcon"></i>
-          <span id="toastMsg">Saved successfully!</span>
+          <span id="toastMsg">Saved!</span>
      </div>
 
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
-     <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/settings.js"></script>
+     <script src="../assets/js/sidebar.js"></script>
 </body>
 
 </html>

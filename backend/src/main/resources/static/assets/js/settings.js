@@ -3,64 +3,81 @@ document.addEventListener("DOMContentLoaded", function () {
      /* =============================================
         ELEMENT REFS
         ============================================= */
-     const saveSettingsBtn       = document.getElementById("saveSettingsBtn");
-     const settingsSaveStatus    = document.getElementById("settingsSaveStatus");
+     const saveSettingsBtn         = document.getElementById("saveSettingsBtn");
+     const settingsFullName        = document.getElementById("settingsFullName");
+     const settingsEmail           = document.getElementById("settingsEmail");
+     const settingsCourse          = document.getElementById("settingsCourse");
+     const settingsCollege         = document.getElementById("settingsCollege");
+     const settingsStudyTime       = document.getElementById("settingsStudyTime");
+     const settingsStudyGoal       = document.getElementById("settingsStudyGoal");
+     const settingsSubjectFocus    = document.getElementById("settingsSubjectFocus");
+     const settingsToggles         = document.querySelectorAll(".settings-toggle-item input[type='checkbox']");
 
-     const settingsFullName      = document.getElementById("settingsFullName");
-     const settingsEmail         = document.getElementById("settingsEmail");
-     const settingsCourse        = document.getElementById("settingsCourse");
-     const settingsCollege       = document.getElementById("settingsCollege");
+     const changePhotoBtn          = document.getElementById("changePhotoBtn");
+     const profilePhotoInput       = document.getElementById("profilePhotoInput");
+     const settingsProfileImage    = document.getElementById("settingsProfileImage");
+     const headerProfileImage      = document.getElementById("headerProfileImage");
+     const avatarOverlay           = document.getElementById("avatarOverlay");
 
-     const settingsStudyTime     = document.getElementById("settingsStudyTime");
-     const settingsStudyGoal     = document.getElementById("settingsStudyGoal");
-     const settingsSubjectFocus  = document.getElementById("settingsSubjectFocus");
-
-     const settingsToggles       = document.querySelectorAll(".settings-toggle-item input[type='checkbox']");
-
-     const changePhotoBtn        = document.getElementById("changePhotoBtn");
-     const profilePhotoInput     = document.getElementById("profilePhotoInput");
-     const settingsProfileImage  = document.getElementById("settingsProfileImage");
-     const headerProfileImage    = document.getElementById("headerProfileImage");
-     const avatarOverlay         = document.getElementById("avatarOverlay");
-
-     const changePasswordBtn     = document.getElementById("changePasswordBtn");
-     const twoFactorBtn          = document.getElementById("twoFactorBtn");
-     const deleteAccountBtn      = document.getElementById("deleteAccountBtn");
-
-     const changePasswordForm    = document.getElementById("changePasswordForm");
-     const currentPasswordInput  = document.getElementById("currentPassword");
-     const newPasswordInput      = document.getElementById("newPassword");
+     const changePasswordBtn       = document.getElementById("changePasswordBtn");
+     const twoFactorBtn            = document.getElementById("twoFactorBtn");
+     const deleteAccountBtn        = document.getElementById("deleteAccountBtn");
+     const changePasswordForm      = document.getElementById("changePasswordForm");
+     const currentPasswordInput    = document.getElementById("currentPassword");
+     const newPasswordInput        = document.getElementById("newPassword");
      const confirmNewPasswordInput = document.getElementById("confirmNewPassword");
-     const cancelPasswordBtn     = document.getElementById("cancelPasswordBtn");
-     const updatePasswordBtn     = document.getElementById("updatePasswordBtn");
+     const cancelPasswordBtn       = document.getElementById("cancelPasswordBtn");
+     const updatePasswordBtn       = document.getElementById("updatePasswordBtn");
 
-     // 2FA modal
-     const twofaModalOverlay     = document.getElementById("twofaModalOverlay");
-     const twofaModalClose       = document.getElementById("twofaModalClose");
-     const twofaModalCancel      = document.getElementById("twofaModalCancel");
-     const verify2FABtn          = document.getElementById("verify2FABtn");
-     const secretKeyBox          = document.getElementById("secretKeyBox");
-     const secretKeyText         = document.getElementById("secretKeyText");
-     const otpErrorMsg           = document.getElementById("otpErrorMsg");
-     const otpBoxes              = document.querySelectorAll(".otp-box");
+     // 2FA modal refs
+     const twofaModalOverlay  = document.getElementById("twofaModalOverlay");
+     const twofaModalClose    = document.getElementById("twofaModalClose");
+     const twofaModalCancel   = document.getElementById("twofaModalCancel");
+     const verify2FABtn       = document.getElementById("verify2FABtn");
+     const sendOtpBtn         = document.getElementById("sendOtpBtn");
+     const secretKeyBox       = document.getElementById("secretKeyBox");
+     const otpErrorMsg        = document.getElementById("otpErrorMsg");
+     const otpBoxes           = document.querySelectorAll(".otp-box");
+     const maskedEmailDisplay = document.getElementById("maskedEmailDisplay");
 
      // 2FA status elements
-     const twofaStatusBanner     = document.getElementById("twofaStatusBanner");
-     const twofaDot              = document.getElementById("twofaDot");
-     const twofaStatusLabel      = document.getElementById("twofaStatusLabel");
-     const twofaBadge            = document.getElementById("twofaBadge");
+     const twofaStatusBanner = document.getElementById("twofaStatusBanner");
+     const twofaStatusLabel  = document.getElementById("twofaStatusLabel");
+     const twofaBadge        = document.getElementById("twofaBadge");
 
-     const DEFAULT_PROFILE_IMAGE             = "../assets/avatar/default-user.png";
-     const LEGACY_PROFILE_PHOTO_STORAGE_KEY  = "edumind_profile_photo";
+     const DEFAULT_PROFILE_IMAGE            = "../assets/avatar/default-user.png";
+     const LEGACY_PROFILE_PHOTO_STORAGE_KEY = "edumind_profile_photo";
 
      /* =============================================
-        TOAST — replaces showSaveStatus for user-facing messages
+        JWT HELPER — reads token from localStorage
+        ============================================= */
+     function getAccessToken() {
+          // localStorage mein 'token' key se save hota hai (confirmed from console)
+          const directToken = localStorage.getItem("token");
+          if (directToken) return directToken;
+
+          // Fallback: user object ke andar bhi check karo
+          const user = getLoggedInUser();
+          return user?.accessToken || user?.token || null;
+     }
+
+     // Builds headers with JWT — use this for ALL protected API calls
+     function authHeaders(extraHeaders = {}) {
+          const token = getAccessToken();
+          return {
+               "Content-Type": "application/json",
+               ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+               ...extraHeaders
+          };
+     }
+
+     /* =============================================
+        TOAST
         ============================================= */
      function showToast(message, type = "success") {
-          const toast   = document.getElementById("toastNotification");
-          const msgEl   = document.getElementById("toastMsg");
-          const iconEl  = document.getElementById("toastIcon");
-
+          const toast  = document.getElementById("toastNotification");
+          const msgEl  = document.getElementById("toastMsg");
+          const iconEl = document.getElementById("toastIcon");
           if (!toast) return;
 
           msgEl.textContent = message;
@@ -77,27 +94,19 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           toast.classList.add("show");
-          clearTimeout(window._toastHideTimer);
-
-          window._toastHideTimer = setTimeout(() => {
+          clearTimeout(window._toastTimer);
+          window._toastTimer = setTimeout(() => {
                toast.classList.remove("show");
                toast.classList.add("hide");
-               setTimeout(() => toast.className = "toast-notification", 350);
-          }, 3000);
-     }
-
-     // Kept for backward compat with any internal callers
-     function showSaveStatus(message, isSuccess = true) {
-          showToast(message, isSuccess ? "success" : "error");
+               setTimeout(() => { toast.className = "toast-notification"; }, 350);
+          }, 3500);
      }
 
      /* =============================================
         AUTH / STORAGE HELPERS
         ============================================= */
      function getLoggedInUser() {
-          const rawUser = localStorage.getItem("edumind_logged_in_user");
-          if (!rawUser) return null;
-          try { return JSON.parse(rawUser); }
+          try { return JSON.parse(localStorage.getItem("edumind_logged_in_user")); }
           catch { return null; }
      }
 
@@ -108,50 +117,47 @@ document.addEventListener("DOMContentLoaded", function () {
      function clearAuthStorage() {
           localStorage.removeItem("edumind_logged_in_user");
           localStorage.removeItem("edumind_is_logged_in");
+          localStorage.removeItem("edumind_access_token");
      }
 
-     function getProfilePhotoStorageKey(user = getLoggedInUser()) {
+     function getProfilePhotoKey(user = getLoggedInUser()) {
           return user?.id ? `edumind_profile_photo_${user.id}` : LEGACY_PROFILE_PHOTO_STORAGE_KEY;
      }
 
      function getSavedProfilePhoto(user = getLoggedInUser()) {
-          const key   = getProfilePhotoStorageKey(user);
-          return localStorage.getItem(key) || localStorage.getItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
+          return localStorage.getItem(getProfilePhotoKey(user))
+               || localStorage.getItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
      }
 
-     function saveProfilePhoto(photoUrl, user = getLoggedInUser()) {
-          localStorage.setItem(getProfilePhotoStorageKey(user), photoUrl);
+     function saveProfilePhoto(url, user = getLoggedInUser()) {
+          localStorage.setItem(getProfilePhotoKey(user), url);
      }
 
-     function removeSavedProfilePhoto(user = getLoggedInUser()) {
-          localStorage.removeItem(getProfilePhotoStorageKey(user));
-     }
-
-     function applyProfilePhoto(photoUrl) {
-          const final = photoUrl || DEFAULT_PROFILE_IMAGE;
-          if (settingsProfileImage) settingsProfileImage.src = final;
-          if (headerProfileImage)   headerProfileImage.src   = final;
+     function applyProfilePhoto(url) {
+          const src = url || DEFAULT_PROFILE_IMAGE;
+          if (settingsProfileImage) settingsProfileImage.src = src;
+          if (headerProfileImage)   headerProfileImage.src   = src;
      }
 
      function loadSavedProfilePhoto() {
-          applyProfilePhoto(getSavedProfilePhoto(getLoggedInUser()));
+          applyProfilePhoto(getSavedProfilePhoto());
      }
 
      /* =============================================
-        FILL FIELDS
+        FILL FIELDS FROM USER OBJECT
         ============================================= */
      function fillProfileFields(user) {
           if (!user) return;
-          if (settingsFullName) settingsFullName.value = user.fullName || "";
-          if (settingsEmail)    settingsEmail.value    = user.email    || "";
-          if (settingsCourse)   settingsCourse.value   = user.course   || "";
-          if (settingsCollege)  settingsCollege.value  = user.college  || "";
+          if (settingsFullName)     settingsFullName.value     = user.fullName || "";
+          if (settingsEmail)        settingsEmail.value        = user.email    || "";
+          if (settingsCourse)       settingsCourse.value       = user.course   || "";
+          if (settingsCollege)      settingsCollege.value      = user.college  || "";
      }
 
      function fillStudyPreferenceFields(user) {
           if (!user) return;
-          if (settingsStudyTime)    settingsStudyTime.value    = user.preferredStudyTime   || "Morning";
-          if (settingsStudyGoal)    settingsStudyGoal.value    = user.dailyStudyGoal       || "2 Hours";
+          if (settingsStudyTime)    settingsStudyTime.value    = user.preferredStudyTime     || "Morning";
+          if (settingsStudyGoal)    settingsStudyGoal.value    = user.dailyStudyGoal         || "2 Hours";
           if (settingsSubjectFocus) settingsSubjectFocus.value = user.preferredSubjectsFocus || "";
      }
 
@@ -173,24 +179,16 @@ document.addEventListener("DOMContentLoaded", function () {
      }
 
      /* =============================================
-        2FA UI UPDATE
+        2FA UI
         ============================================= */
      function updateTwoFactorUI(user) {
           if (!user) return;
           const enabled = Boolean(user.twoFactorEnabled);
 
-          // Banner
-          if (twofaStatusBanner) {
-               twofaStatusBanner.classList.toggle("enabled", enabled);
-          }
-          if (twofaStatusLabel) {
-               twofaStatusLabel.textContent = enabled ? "2FA Enabled" : "2FA Disabled";
-          }
-          if (twofaBadge) {
-               twofaBadge.textContent = enabled ? "ON" : "OFF";
-          }
+          if (twofaStatusBanner) twofaStatusBanner.classList.toggle("enabled", enabled);
+          if (twofaStatusLabel)  twofaStatusLabel.textContent = enabled ? "2FA Enabled"   : "2FA Disabled";
+          if (twofaBadge)        twofaBadge.textContent       = enabled ? "ON"            : "OFF";
 
-          // Button text
           if (twoFactorBtn) {
                const span = twoFactorBtn.querySelector("span");
                if (span) span.textContent = enabled ? "Disable Two-Factor Auth" : "Enable Two-Factor Auth";
@@ -198,111 +196,86 @@ document.addEventListener("DOMContentLoaded", function () {
      }
 
      /* =============================================
-        API HELPER
+        API RESPONSE PARSER
         ============================================= */
-     async function parseResponse(response) {
-          const ct = response.headers.get("content-type") || "";
-          return ct.includes("application/json") ? await response.json() : await response.text();
+     async function parseResponse(res) {
+          const ct = res.headers.get("content-type") || "";
+          return ct.includes("application/json") ? await res.json() : await res.text();
      }
 
      /* =============================================
-        PHOTO UPLOAD
+        PHOTO UPLOAD (localStorage — no backend change needed)
         ============================================= */
-     function handleProfilePhotoSelection(file) {
+     function handlePhotoChange(file) {
           if (!file) return;
-          if (!file.type.startsWith("image/")) {
-               showToast("Please select a valid image file.", "error");
-               return;
-          }
-          if (file.size > 2 * 1024 * 1024) {
-               showToast("Image size should be less than 2 MB.", "error");
-               return;
-          }
+          if (!file.type.startsWith("image/")) { showToast("Valid image file select karo.", "error"); return; }
+          if (file.size > 2 * 1024 * 1024)     { showToast("Image 2MB se choti honi chahiye.", "error"); return; }
 
           const reader = new FileReader();
-          reader.onload = function (e) {
+          reader.onload = e => {
                const dataUrl = e.target?.result;
-               if (!dataUrl) { showToast("Failed to load image.", "error"); return; }
-               saveProfilePhoto(dataUrl, getLoggedInUser());
+               if (!dataUrl) { showToast("Image load nahi hui.", "error"); return; }
+               saveProfilePhoto(dataUrl);
                applyProfilePhoto(dataUrl);
-               showToast("Profile photo updated!", "success");
+               showToast("Profile photo update ho gayi!", "success");
           };
-          reader.onerror = () => showToast("Failed to read image.", "error");
+          reader.onerror = () => showToast("Image read nahi hui.", "error");
           reader.readAsDataURL(file);
      }
 
      /* =============================================
         PASSWORD FORM
         ============================================= */
-     function clearPasswordFields() {
-          if (currentPasswordInput)   currentPasswordInput.value   = "";
-          if (newPasswordInput)       newPasswordInput.value       = "";
-          if (confirmNewPasswordInput) confirmNewPasswordInput.value = "";
-     }
-
-     function openChangePasswordForm() {
+     function openPasswordForm() {
           if (!changePasswordForm) return;
           changePasswordForm.style.display = "block";
           changePasswordForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
      }
 
-     function closeChangePasswordForm() {
+     function closePasswordForm() {
           if (!changePasswordForm) return;
           changePasswordForm.style.display = "none";
-          clearPasswordFields();
+          if (currentPasswordInput)    currentPasswordInput.value    = "";
+          if (newPasswordInput)        newPasswordInput.value        = "";
+          if (confirmNewPasswordInput) confirmNewPasswordInput.value = "";
      }
 
      /* =============================================
-        OTP INPUT LOGIC
+        OTP INPUT SETUP
         ============================================= */
      function setupOTPInputs() {
           otpBoxes.forEach((box, idx) => {
-               // Only allow digits
                box.addEventListener("input", () => {
                     box.value = box.value.replace(/[^0-9]/g, "").slice(-1);
-                    if (box.value) {
-                         box.classList.add("filled");
-                         box.classList.remove("error");
-                         if (idx < otpBoxes.length - 1) otpBoxes[idx + 1].focus();
-                    } else {
-                         box.classList.remove("filled");
-                    }
+                    box.classList.toggle("filled", !!box.value);
+                    box.classList.remove("error");
+                    if (box.value && idx < otpBoxes.length - 1) otpBoxes[idx + 1].focus();
                });
 
-               // Backspace to previous
-               box.addEventListener("keydown", (e) => {
+               box.addEventListener("keydown", e => {
                     if (e.key === "Backspace" && !box.value && idx > 0) {
-                         otpBoxes[idx - 1].focus();
                          otpBoxes[idx - 1].value = "";
                          otpBoxes[idx - 1].classList.remove("filled");
+                         otpBoxes[idx - 1].focus();
                     }
                });
 
-               // Handle paste
-               box.addEventListener("paste", (e) => {
+               box.addEventListener("paste", e => {
                     e.preventDefault();
-                    const pasted = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "");
-                    [...pasted].forEach((char, i) => {
-                         if (otpBoxes[i]) {
-                              otpBoxes[i].value = char;
-                              otpBoxes[i].classList.add("filled");
-                         }
+                    const pasted = (e.clipboardData || window.clipboardData)
+                         .getData("text").replace(/\D/g, "");
+                    [...pasted].forEach((ch, i) => {
+                         if (otpBoxes[i]) { otpBoxes[i].value = ch; otpBoxes[i].classList.add("filled"); }
                     });
-                    const next = Math.min(pasted.length, otpBoxes.length - 1);
-                    otpBoxes[next].focus();
+                    otpBoxes[Math.min(pasted.length, otpBoxes.length - 1)].focus();
                });
           });
      }
 
-     function getOTPValue() {
-          return [...otpBoxes].map(b => b.value).join("");
-     }
+     function getOTPValue() { return [...otpBoxes].map(b => b.value).join(""); }
 
      function clearOTPInputs() {
-          otpBoxes.forEach(b => {
-               b.value = "";
-               b.classList.remove("filled", "error");
-          });
+          otpBoxes.forEach(b => { b.value = ""; b.classList.remove("filled", "error"); });
           if (otpErrorMsg) otpErrorMsg.textContent = "";
      }
 
@@ -314,20 +287,12 @@ document.addEventListener("DOMContentLoaded", function () {
      }
 
      /* =============================================
-        2FA MODAL
+        2FA MODAL OPEN / CLOSE
         ============================================= */
      function open2FAModal() {
           clearOTPInputs();
-          if (twofaModalOverlay) twofaModalOverlay.classList.add("open");
-          setTimeout(() => otpBoxes[0]?.focus(), 200);
-
-          // In production: fetch QR + secret from backend then set:
-          // fetch(`/api/auth/two-factor/${user.id}/setup`)
-          //   .then(r => r.json())
-          //   .then(data => {
-          //     secretKeyText.textContent = data.secret;
-          //     document.getElementById('qrCodeImg').innerHTML = `<img src="${data.qrCodeUrl}" />`;
-          //   });
+          if (maskedEmailDisplay) maskedEmailDisplay.textContent = "";
+          if (twofaModalOverlay)  twofaModalOverlay.classList.add("open");
      }
 
      function close2FAModal() {
@@ -335,250 +300,317 @@ document.addEventListener("DOMContentLoaded", function () {
           clearOTPInputs();
      }
 
-     if (twofaModalClose)  twofaModalClose.addEventListener("click",  close2FAModal);
-     if (twofaModalCancel) twofaModalCancel.addEventListener("click", close2FAModal);
-
-     // Close on backdrop click
-     if (twofaModalOverlay) {
-          twofaModalOverlay.addEventListener("click", function (e) {
-               if (e.target === twofaModalOverlay) close2FAModal();
-          });
-     }
-
-     // Copy secret key
-     if (secretKeyBox) {
-          secretKeyBox.addEventListener("click", () => {
-               navigator.clipboard.writeText(secretKeyText?.textContent || "")
-                    .then(() => showToast("Secret key copied to clipboard!", "success"))
-                    .catch(() => showToast("Copy failed. Please copy manually.", "error"));
-          });
-     }
-
      /* =============================================
-        BACKEND CALLS
+        ── BACKEND API CALLS ──
+        All use JWT via authHeaders()
+        Endpoints match AuthController.java exactly
         ============================================= */
-     async function loadProfileFromBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return; }
 
+     // GET /api/auth/profile — load profile on page open
+     async function loadProfileFromBackend() {
           try {
-               const res    = await fetch(`/api/auth/profile/${user.id}`);
+               const res    = await fetch("/api/auth/profile", { headers: authHeaders() });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    showToast(typeof result === "string" ? result : result.message || "Failed to load profile.", "error");
+                    // Token expired? Try refresh silently
+                    if (res.status === 401) { await tryRefreshToken(); return; }
+                    console.warn("Profile load failed:", result?.message || result);
+                    // Fall back to localStorage data
+                    const localUser = getLoggedInUser();
+                    if (localUser) {
+                         fillProfileFields(localUser);
+                         fillStudyPreferenceFields(localUser);
+                         fillNotificationToggleFields(localUser);
+                         updateHeaderProfileMini(localUser);
+                         updateTwoFactorUI(localUser);
+                    }
                     return;
                }
 
-               const latest = { ...user, ...result };
-               setLoggedInUser(latest);
-               fillProfileFields(latest);
-               fillStudyPreferenceFields(latest);
-               fillNotificationToggleFields(latest);
-               updateHeaderProfileMini(latest);
-               updateTwoFactorUI(latest);
+               // Merge with local (keep accessToken etc.)
+               const localUser = getLoggedInUser() || {};
+               const merged    = { ...localUser, ...result };
+               setLoggedInUser(merged);
+               fillProfileFields(merged);
+               fillStudyPreferenceFields(merged);
+               fillNotificationToggleFields(merged);
+               updateHeaderProfileMini(merged);
+               updateTwoFactorUI(merged);
                loadSavedProfilePhoto();
+
           } catch (err) {
                console.error("Profile load error:", err);
-               // Silently fall back to local data on load
-               const user = getLoggedInUser();
-               if (user) {
-                    fillProfileFields(user);
-                    fillStudyPreferenceFields(user);
-                    fillNotificationToggleFields(user);
-                    updateHeaderProfileMini(user);
-                    updateTwoFactorUI(user);
+               // Silently use local data
+               const localUser = getLoggedInUser();
+               if (localUser) {
+                    fillProfileFields(localUser);
+                    fillStudyPreferenceFields(localUser);
+                    fillNotificationToggleFields(localUser);
+                    updateHeaderProfileMini(localUser);
+                    updateTwoFactorUI(localUser);
                     loadSavedProfilePhoto();
                }
           }
      }
 
+     // PUT /api/auth/profile — save all settings
      async function updateProfileOnBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return false; }
-
           const payload = {
-               fullName:                   settingsFullName?.value.trim()        || "",
-               email:                      settingsEmail?.value.trim()            || "",
-               course:                     settingsCourse?.value.trim()           || "",
-               college:                    settingsCollege?.value.trim()          || "",
-               preferredStudyTime:         settingsStudyTime?.value               || "Morning",
-               dailyStudyGoal:             settingsStudyGoal?.value               || "2 Hours",
-               preferredSubjectsFocus:     settingsSubjectFocus?.value.trim()     || "",
-               taskRemindersEnabled:       settingsToggles[0]?.checked            ?? true,
-               revisionAlertsEnabled:      settingsToggles[1]?.checked            ?? true,
-               testNotificationsEnabled:   settingsToggles[2]?.checked            ?? true,
-               assistantSuggestionsEnabled: settingsToggles[3]?.checked           ?? false
+               fullName:                    settingsFullName?.value.trim()     || "",
+               email:                       settingsEmail?.value.trim()         || "",
+               course:                      settingsCourse?.value.trim()        || "",
+               college:                     settingsCollege?.value.trim()       || "",
+               preferredStudyTime:          settingsStudyTime?.value            || "Morning",
+               dailyStudyGoal:              settingsStudyGoal?.value            || "2 Hours",
+               preferredSubjectsFocus:      settingsSubjectFocus?.value.trim()  || "",
+               taskRemindersEnabled:        settingsToggles[0]?.checked         ?? true,
+               revisionAlertsEnabled:       settingsToggles[1]?.checked         ?? true,
+               testNotificationsEnabled:    settingsToggles[2]?.checked         ?? true,
+               assistantSuggestionsEnabled: settingsToggles[3]?.checked         ?? false
           };
 
           if (!payload.fullName || !payload.email || !payload.course || !payload.college) {
-               showToast("Please fill in all profile fields.", "error");
+               showToast("Saare profile fields bharo.", "error");
                return false;
           }
 
           try {
-               const res    = await fetch(`/api/auth/profile/${user.id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+               const res    = await fetch("/api/auth/profile", {
+                    method:  "PUT",
+                    headers: authHeaders(),
+                    body:    JSON.stringify(payload)
                });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    showToast(typeof result === "string" ? result : result.message || "Failed to update settings.", "error");
+                    if (res.status === 401) { showToast("Session expire ho gayi. Dobara login karo.", "error"); return false; }
+                    showToast(result?.message || result || "Profile update nahi hua.", "error");
                     return false;
                }
 
-               const updated = { ...user, ...result };
-               setLoggedInUser(updated);
-               fillProfileFields(updated);
-               fillStudyPreferenceFields(updated);
-               fillNotificationToggleFields(updated);
-               updateHeaderProfileMini(updated);
-               updateTwoFactorUI(updated);
-               loadSavedProfilePhoto();
+               const localUser = getLoggedInUser() || {};
+               const merged    = { ...localUser, ...result };
+               setLoggedInUser(merged);
+               fillProfileFields(merged);
+               fillStudyPreferenceFields(merged);
+               fillNotificationToggleFields(merged);
+               updateHeaderProfileMini(merged);
+               updateTwoFactorUI(merged);
                return true;
+
           } catch (err) {
                console.error("Profile update error:", err);
-               showToast("Something went wrong while updating settings.", "error");
+               showToast("Network error — profile update nahi hua.", "error");
                return false;
           }
      }
 
-     async function updatePasswordOnBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return false; }
+     // PUT /api/auth/change-password — FIXED: no user.id, JWT se email milta hai backend ko
+     async function changePasswordOnBackend() {
+          const current = currentPasswordInput?.value.trim()       || "";
+          const newP    = newPasswordInput?.value.trim()            || "";
+          const confirm = confirmNewPasswordInput?.value.trim()     || "";
 
-          const current  = currentPasswordInput?.value.trim()       || "";
-          const newP     = newPasswordInput?.value.trim()            || "";
-          const confirm  = confirmNewPasswordInput?.value.trim()     || "";
-
-          if (!current || !newP || !confirm) { showToast("Please fill in all password fields.", "error"); return false; }
-          if (newP.length < 6)               { showToast("New password must be at least 6 characters.", "error"); return false; }
-          if (newP !== confirm)              { showToast("New passwords do not match.", "error"); return false; }
+          if (!current || !newP || !confirm) {
+               showToast("Saare password fields bharo.", "error");
+               return false;
+          }
+          // Backend strong password regex se match karo (AuthService.java line 44)
+          const strongRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#$%&*!^()_+=\-]).{8,}$/;
+          if (!strongRegex.test(newP)) {
+               showToast("Password mein chahiye: 8+ chars, ek uppercase, ek number, ek special char (@#$%&*!^)", "error");
+               return false;
+          }
+          if (newP !== confirm) {
+               showToast("New password aur confirm password match nahi kar rahe.", "error");
+               return false;
+          }
 
           try {
-               const res    = await fetch(`/api/auth/change-password/${user.id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ currentPassword: current, newPassword: newP, confirmNewPassword: confirm })
+               const res    = await fetch("/api/auth/change-password", {
+                    method:  "PUT",
+                    headers: authHeaders(),
+                    body:    JSON.stringify({
+                         currentPassword:    current,
+                         newPassword:        newP,
+                         confirmNewPassword: confirm
+                    })
                });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    showToast(typeof result === "string" ? result : result.message || "Failed to update password.", "error");
+                    if (res.status === 401) { showToast("Session expire ho gayi. Dobara login karo.", "error"); return false; }
+                    showToast(result?.message || result || "Password change nahi hua.", "error");
                     return false;
                }
 
-               closeChangePasswordForm();
-               showToast(typeof result === "string" ? result : result.message || "Password updated successfully.", "success");
+               closePasswordForm();
+               showToast(result?.message || "Password successfully change ho gaya!", "success");
                return true;
+
           } catch (err) {
-               console.error("Password update error:", err);
-               showToast("Something went wrong while updating password.", "error");
+               console.error("Password change error:", err);
+               showToast("Network error — password change nahi hua.", "error");
                return false;
           }
      }
 
-     async function updateTwoFactorOnBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return false; }
-
-          const nextStatus = !Boolean(user.twoFactorEnabled);
-
+     // POST /api/otp/send — send OTP to user's email
+     async function sendOtpToEmail() {
           try {
-               const res    = await fetch(`/api/auth/two-factor/${user.id}?enabled=${nextStatus}`, { method: "PUT" });
+               const res    = await fetch("/api/otp/send", {
+                    method:  "POST",
+                    headers: authHeaders()
+               });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    showToast(typeof result === "string" ? result : result.message || "Failed to update 2FA.", "error");
+                    showToast(result?.message || "OTP send nahi hua.", "error");
                     return false;
                }
 
-               const updated = { ...user, ...result };
-               setLoggedInUser(updated);
-               updateHeaderProfileMini(updated);
-               updateTwoFactorUI(updated);
-               showToast(
-                    updated.twoFactorEnabled
-                         ? "Two-factor authentication enabled successfully."
-                         : "Two-factor authentication disabled successfully.",
-                    "success"
-               );
+               // Show masked email in modal
+               if (maskedEmailDisplay && result.maskedEmail) {
+                    maskedEmailDisplay.textContent = result.maskedEmail;
+               }
+               showToast(result?.message || "OTP aapki email pe bheja gaya!", "success");
                return true;
+
           } catch (err) {
-               console.error("2FA update error:", err);
-               showToast("Something went wrong while updating 2FA.", "error");
+               console.error("OTP send error:", err);
+               showToast("OTP send nahi hua. Network check karo.", "error");
                return false;
           }
      }
 
-     async function verify2FAOnBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return false; }
-
-          const token = getOTPValue();
-          if (token.length !== 6) {
-               if (otpErrorMsg) otpErrorMsg.textContent = "Please enter the complete 6-digit code.";
+     // POST /api/otp/verify — verify OTP, backend sets twoFactorEnabled = true
+     async function verifyOtpAndEnable2FA() {
+          const otp = getOTPValue();
+          if (otp.length !== 6) {
+               if (otpErrorMsg) otpErrorMsg.textContent = "Pura 6-digit code enter karo.";
                shakeOTPInputs();
                return false;
           }
 
           try {
-               const res    = await fetch(`/api/auth/two-factor/${user.id}/verify`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token })
+               const res    = await fetch("/api/otp/verify", {
+                    method:  "POST",
+                    headers: authHeaders(),
+                    body:    JSON.stringify({ otp })
                });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    const msg = typeof result === "string" ? result : result.message || "Invalid code. Please try again.";
+                    const msg = result?.message || "Invalid OTP. Dobara try karo.";
                     if (otpErrorMsg) otpErrorMsg.textContent = msg;
                     shakeOTPInputs();
                     return false;
                }
 
-               const updated = { ...user, twoFactorEnabled: true, ...result };
+               // Update local user
+               const localUser = getLoggedInUser() || {};
+               const updated   = { ...localUser, twoFactorEnabled: true };
                setLoggedInUser(updated);
                updateTwoFactorUI(updated);
                close2FAModal();
-               showToast("Two-factor authentication enabled!", "success");
+               showToast("2FA successfully enable ho gayi!", "success");
                return true;
+
           } catch (err) {
-               console.error("2FA verify error:", err);
-               if (otpErrorMsg) otpErrorMsg.textContent = "Something went wrong. Please try again.";
+               console.error("OTP verify error:", err);
+               if (otpErrorMsg) otpErrorMsg.textContent = "Network error. Dobara try karo.";
                shakeOTPInputs();
                return false;
           }
      }
 
-     async function deleteAccountOnBackend() {
-          const user = getLoggedInUser();
-          if (!user?.id) { showToast("Logged-in user not found.", "error"); return false; }
-
-          const confirmed = window.confirm("Are you sure you want to delete your account? This cannot be undone.");
-          if (!confirmed) return false;
-
+     // POST /api/otp/disable — disable 2FA
+     async function disable2FAOnBackend() {
           try {
-               const res    = await fetch(`/api/auth/delete-account/${user.id}`, { method: "DELETE" });
+               const res    = await fetch("/api/otp/disable", {
+                    method:  "POST",
+                    headers: authHeaders()
+               });
                const result = await parseResponse(res);
 
                if (!res.ok) {
-                    showToast(typeof result === "string" ? result : result.message || "Failed to delete account.", "error");
+                    showToast(result?.message || "2FA disable nahi hua.", "error");
                     return false;
                }
 
-               removeSavedProfilePhoto(user);
+               const localUser = getLoggedInUser() || {};
+               const updated   = { ...localUser, twoFactorEnabled: false };
+               setLoggedInUser(updated);
+               updateTwoFactorUI(updated);
+               showToast("2FA disable ho gayi.", "success");
+               return true;
+
+          } catch (err) {
+               console.error("2FA disable error:", err);
+               showToast("Network error — 2FA disable nahi hua.", "error");
+               return false;
+          }
+     }
+
+     // DELETE /api/auth/delete-account
+     async function deleteAccountOnBackend() {
+          const confirmed = window.confirm(
+               "Kya aap sure hain? Yeh action undo nahi ho sakta. Account permanently delete ho jayega."
+          );
+          if (!confirmed) return false;
+
+          try {
+               const res    = await fetch("/api/auth/delete-account", {
+                    method:  "DELETE",
+                    headers: authHeaders()
+               });
+               const result = await parseResponse(res);
+
+               if (!res.ok) {
+                    showToast(result?.message || "Account delete nahi hua.", "error");
+                    return false;
+               }
+
+               localStorage.removeItem(getProfilePhotoKey());
                localStorage.removeItem(LEGACY_PROFILE_PHOTO_STORAGE_KEY);
                clearAuthStorage();
-               alert(typeof result === "string" ? result : "Account deleted successfully.");
+               alert(result?.message || "Account delete ho gaya.");
                window.location.href = "login.html";
                return true;
+
           } catch (err) {
                console.error("Delete account error:", err);
-               showToast("Something went wrong while deleting account.", "error");
+               showToast("Network error — account delete nahi hua.", "error");
                return false;
+          }
+     }
+
+     // Silent token refresh helper
+     async function tryRefreshToken() {
+          try {
+               const localUser    = getLoggedInUser();
+               const refreshToken = localUser?.refreshToken || localStorage.getItem("edumind_refresh_token");
+               if (!refreshToken) { window.location.href = "login.html"; return; }
+
+               const res = await fetch("/api/auth/refresh-token", {
+                    method:  "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body:    JSON.stringify({ refreshToken })
+               });
+
+               if (!res.ok) { window.location.href = "login.html"; return; }
+
+               const data = await res.json();
+               if (data.accessToken) {
+                    const updated = { ...(localUser || {}), accessToken: data.accessToken };
+                    setLoggedInUser(updated);
+                    localStorage.setItem("edumind_access_token", data.accessToken);
+                    // Retry profile load
+                    await loadProfileFromBackend();
+               }
+          } catch {
+               window.location.href = "login.html";
           }
      }
 
@@ -586,58 +618,81 @@ document.addEventListener("DOMContentLoaded", function () {
         EVENT LISTENERS
         ============================================= */
 
-     // Photo
-     if (changePhotoBtn && profilePhotoInput) {
-          changePhotoBtn.addEventListener("click", () => profilePhotoInput.click());
-          if (avatarOverlay) avatarOverlay.addEventListener("click", () => profilePhotoInput.click());
-
-          profilePhotoInput.addEventListener("change", function (e) {
-               handleProfilePhotoSelection(e.target.files?.[0]);
+     // Photo upload
+     if (changePhotoBtn)  changePhotoBtn.addEventListener("click",  () => profilePhotoInput?.click());
+     if (avatarOverlay)   avatarOverlay.addEventListener("click",   () => profilePhotoInput?.click());
+     if (profilePhotoInput) {
+          profilePhotoInput.addEventListener("change", e => {
+               handlePhotoChange(e.target.files?.[0]);
                profilePhotoInput.value = "";
           });
      }
 
-     // Password
-     if (changePasswordBtn) {
-          changePasswordBtn.addEventListener("click", openChangePasswordForm);
-     }
-     if (cancelPasswordBtn) {
-          cancelPasswordBtn.addEventListener("click", closeChangePasswordForm);
-     }
+     // Password form
+     if (changePasswordBtn) changePasswordBtn.addEventListener("click", openPasswordForm);
+     if (cancelPasswordBtn) cancelPasswordBtn.addEventListener("click", closePasswordForm);
      if (updatePasswordBtn) {
           updatePasswordBtn.addEventListener("click", async function () {
                this.disabled = true;
-               await updatePasswordOnBackend();
+               const span = this.querySelector("span");
+               if (span) span.textContent = "Updating…";
+               await changePasswordOnBackend();
+               if (span) span.textContent = "Update Password";
                this.disabled = false;
           });
      }
 
-     // 2FA button — if already enabled → call disable directly; if disabled → open modal
+     // 2FA button
      if (twoFactorBtn) {
           twoFactorBtn.addEventListener("click", async function () {
                const user    = getLoggedInUser();
                const enabled = Boolean(user?.twoFactorEnabled);
 
                if (enabled) {
-                    // Disable directly (no OTP needed for disable in this flow)
+                    // Disable
                     this.disabled = true;
-                    await updateTwoFactorOnBackend();
+                    await disable2FAOnBackend();
                     this.disabled = false;
                } else {
+                    // Open modal
                     open2FAModal();
                }
           });
      }
 
-     // Verify 2FA
+     // Send OTP button (inside modal)
+     if (sendOtpBtn) {
+          sendOtpBtn.addEventListener("click", async function () {
+               this.disabled = true;
+               const span = this.querySelector("span") || this;
+               const orig = span.textContent;
+               span.textContent = "Sending…";
+               await sendOtpToEmail();
+               span.textContent = "Resend OTP";
+               this.disabled = false;
+               // Focus first OTP box
+               otpBoxes[0]?.focus();
+          });
+     }
+
+     // Verify OTP button
      if (verify2FABtn) {
           verify2FABtn.addEventListener("click", async function () {
                this.disabled = true;
                const span = this.querySelector("span");
                if (span) span.textContent = "Verifying…";
-               await verify2FAOnBackend();
+               await verifyOtpAndEnable2FA();
                if (span) span.textContent = "Verify & Enable";
                this.disabled = false;
+          });
+     }
+
+     // Close modal
+     if (twofaModalClose)  twofaModalClose.addEventListener("click",  close2FAModal);
+     if (twofaModalCancel) twofaModalCancel.addEventListener("click", close2FAModal);
+     if (twofaModalOverlay) {
+          twofaModalOverlay.addEventListener("click", e => {
+               if (e.target === twofaModalOverlay) close2FAModal();
           });
      }
 
@@ -653,20 +708,20 @@ document.addEventListener("DOMContentLoaded", function () {
      // Save all settings
      if (saveSettingsBtn) {
           saveSettingsBtn.addEventListener("click", async function () {
+               this.disabled = true;
                const icon = this.querySelector("i");
                if (icon) icon.className = "fa-solid fa-spinner fa-spin";
-               this.disabled = true;
 
                const ok = await updateProfileOnBackend();
-               if (ok) showToast("All settings saved successfully!", "success");
+               if (ok) showToast("Saari settings save ho gayi!", "success");
 
                if (icon) icon.className = "fa-solid fa-floppy-disk";
                this.disabled = false;
           });
      }
 
-     // Keyboard: Escape closes modal
-     document.addEventListener("keydown", (e) => {
+     // Keyboard ESC closes modal
+     document.addEventListener("keydown", e => {
           if (e.key === "Escape") close2FAModal();
      });
 

@@ -4,945 +4,28 @@
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Pomodoro Timer — EduMind AI</title>
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+     <title>Pomodoro & Study Library | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/pomodoro.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
-     <link rel="stylesheet" href="../assets/css/dark-fix.css">
-     <style>
-          :root {
-               --primary: #7c3aed;
-               --primary-light: #8b5cf6;
-               --primary-dark: #6d28d9;
-               --primary-glow: rgba(124, 58, 237, 0.15);
-               --accent: #a78bfa;
-               --green: #059669;
-               --blue: #0284c7;
-               --bg: #f5f3ff;
-               --bg-card: #ffffff;
-               --bg-sidebar: #1e1b2e;
-               --bg-sidebar-hover: rgba(139, 92, 246, 0.15);
-               --text-primary: #1e1b4b;
-               --text-secondary: #6b7280;
-               --text-sidebar: #c4b5fd;
-               --border: #ede9fe;
-               --shadow-md: 0 4px 16px rgba(124, 58, 237, 0.10);
-               --shadow-lg: 0 8px 32px rgba(124, 58, 237, 0.15);
-               --radius: 16px;
-               --radius-sm: 10px;
-               --sidebar-width: 240px;
-               --transition: 0.22s cubic-bezier(.4, 0, .2, 1);
-          }
-
-          body.dark-mode {
-               --bg: #0f0d1a;
-               --bg-card: #1a1728;
-               --bg-sidebar: #12101f;
-               --text-primary: #ede9fe;
-               --text-secondary: #a78bfa;
-               --border: #2d2a45;
-               --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.35);
-               --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.45);
-          }
-
-          * {
-               margin: 0;
-               padding: 0;
-               box-sizing: border-box;
-          }
-
-          body {
-               font-family: 'Segoe UI', system-ui, sans-serif;
-               background: var(--bg);
-               color: var(--text-primary);
-               min-height: 100vh;
-               transition: background var(--transition), color var(--transition);
-          }
-
-          .dashboard-layout {
-               display: flex;
-               min-height: 100vh;
-          }
-
-          /* SIDEBAR */
-          .sidebar {
-               width: var(--sidebar-width);
-               background: var(--bg-sidebar);
-               display: flex;
-               flex-direction: column;
-               position: fixed;
-               top: 0;
-               left: 0;
-               height: 100vh;
-               z-index: 100;
-               overflow: hidden;
-          }
-
-          .sidebar-top {
-               padding: 28px 20px 20px;
-               border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          }
-
-          .sidebar-logo {
-               display: flex;
-               align-items: center;
-               gap: 10px;
-               color: #fff;
-               font-size: 1.2rem;
-               font-weight: 700;
-               white-space: nowrap;
-          }
-
-          .sidebar-logo i {
-               color: var(--accent);
-               font-size: 1.3rem;
-          }
-
-          .sidebar-nav {
-               flex: 1;
-               padding: 16px 12px;
-               display: flex;
-               flex-direction: column;
-               gap: 4px;
-               overflow-y: auto;
-          }
-
-          .nav-item {
-               display: flex;
-               align-items: center;
-               gap: 12px;
-               padding: 11px 14px;
-               border-radius: var(--radius-sm);
-               color: var(--text-sidebar);
-               text-decoration: none;
-               font-size: 0.92rem;
-               font-weight: 500;
-               transition: all var(--transition);
-               white-space: nowrap;
-          }
-
-          .nav-item:hover {
-               background: var(--bg-sidebar-hover);
-               color: #fff;
-               transform: translateX(2px);
-          }
-
-          .nav-item.active {
-               background: var(--primary);
-               color: #fff;
-               box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
-          }
-
-          .nav-item i {
-               width: 18px;
-               text-align: center;
-               font-size: 0.95rem;
-          }
-
-          .sidebar-bottom {
-               padding: 16px 12px 24px;
-               border-top: 1px solid rgba(255, 255, 255, 0.06);
-          }
-
-          .logout-btn {
-               display: flex;
-               align-items: center;
-               gap: 12px;
-               padding: 11px 14px;
-               border-radius: var(--radius-sm);
-               color: #f87171;
-               text-decoration: none;
-               font-size: 0.92rem;
-               font-weight: 500;
-               transition: all var(--transition);
-          }
-
-          .logout-btn:hover {
-               background: rgba(248, 113, 113, 0.10);
-          }
-
-          /* MAIN */
-          .main-content {
-               margin-left: var(--sidebar-width);
-               flex: 1;
-               padding: 32px;
-               max-width: calc(100vw - var(--sidebar-width));
-               overflow-x: hidden;
-          }
-
-          /* TOPBAR */
-          .topbar {
-               display: flex;
-               align-items: center;
-               justify-content: space-between;
-               margin-bottom: 32px;
-               flex-wrap: wrap;
-               gap: 16px;
-          }
-
-          .topbar-left h1 {
-               font-size: 1.6rem;
-               font-weight: 700;
-               display: flex;
-               align-items: center;
-               gap: 10px;
-          }
-
-          .topbar-left h1 i {
-               color: var(--primary);
-          }
-
-          .topbar-left p {
-               color: var(--text-secondary);
-               font-size: 0.9rem;
-               margin-top: 4px;
-          }
-
-          .topbar-right {
-               display: flex;
-               align-items: center;
-               gap: 12px;
-          }
-
-          .btn-icon {
-               background: var(--bg-card);
-               border: 1.5px solid var(--border);
-               border-radius: 50px;
-               padding: 8px 16px;
-               cursor: pointer;
-               color: var(--text-secondary);
-               font-size: 0.85rem;
-               display: flex;
-               align-items: center;
-               gap: 8px;
-               transition: all var(--transition);
-               font-family: inherit;
-          }
-
-          .btn-icon:hover {
-               border-color: var(--primary);
-               color: var(--primary);
-          }
-
-          /* GRID */
-          .pomodoro-grid {
-               display: grid;
-               grid-template-columns: 1fr 360px;
-               gap: 24px;
-               align-items: start;
-          }
-
-          /* CARD */
-          .card {
-               background: var(--bg-card);
-               border-radius: var(--radius);
-               border: 1.5px solid var(--border);
-               padding: 26px;
-               box-shadow: var(--shadow-md);
-               transition: background var(--transition), border var(--transition);
-          }
-
-          .card-title {
-               font-size: 0.95rem;
-               font-weight: 700;
-               color: var(--text-primary);
-               margin-bottom: 18px;
-               display: flex;
-               align-items: center;
-               gap: 8px;
-          }
-
-          .card-title i {
-               color: var(--primary);
-          }
-
-          /* MODE TABS */
-          .mode-tabs {
-               display: flex;
-               gap: 6px;
-               background: var(--bg);
-               border-radius: 50px;
-               padding: 5px;
-               margin-bottom: 28px;
-               border: 1.5px solid var(--border);
-          }
-
-          .mode-tab {
-               flex: 1;
-               padding: 10px 6px;
-               border-radius: 50px;
-               border: none;
-               background: transparent;
-               color: var(--text-secondary);
-               font-size: 0.82rem;
-               font-weight: 600;
-               cursor: pointer;
-               transition: all var(--transition);
-               font-family: inherit;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               gap: 5px;
-               white-space: nowrap;
-          }
-
-          .mode-tab.active {
-               color: #fff;
-          }
-
-          .mode-tab.active[data-mode="FOCUS"] {
-               background: var(--primary);
-               box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
-          }
-
-          .mode-tab.active[data-mode="SHORT_BREAK"] {
-               background: var(--green);
-               box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-          }
-
-          .mode-tab.active[data-mode="LONG_BREAK"] {
-               background: var(--blue);
-               box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-          }
-
-          /* TIMER */
-          .timer-wrapper {
-               display: flex;
-               flex-direction: column;
-               align-items: center;
-               gap: 24px;
-               padding: 8px 0 16px;
-          }
-
-          .timer-circle-container {
-               position: relative;
-               width: 240px;
-               height: 240px;
-          }
-
-          .timer-svg {
-               width: 240px;
-               height: 240px;
-               transform: rotate(-90deg);
-          }
-
-          .timer-track {
-               fill: none;
-               stroke: var(--border);
-               stroke-width: 10;
-          }
-
-          .timer-progress {
-               fill: none;
-               stroke: var(--primary);
-               stroke-width: 10;
-               stroke-linecap: round;
-               stroke-dasharray: 691;
-               stroke-dashoffset: 0;
-               transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
-          }
-
-          .timer-center {
-               position: absolute;
-               top: 50%;
-               left: 50%;
-               transform: translate(-50%, -50%);
-               text-align: center;
-          }
-
-          .timer-display {
-               font-size: 3rem;
-               font-weight: 800;
-               color: var(--primary);
-               letter-spacing: -2px;
-               line-height: 1;
-               font-variant-numeric: tabular-nums;
-          }
-
-          .timer-mode-label {
-               font-size: 0.75rem;
-               font-weight: 600;
-               color: var(--text-secondary);
-               text-transform: uppercase;
-               letter-spacing: 1.5px;
-               margin-top: 6px;
-          }
-
-          .timer-status {
-               font-size: 0.9rem;
-               color: var(--text-secondary);
-               font-weight: 500;
-               text-align: center;
-               min-height: 20px;
-          }
-
-          .timer-status.running {
-               color: var(--primary);
-          }
-
-          .timer-status.paused {
-               color: #f59e0b;
-          }
-
-          .timer-status.done {
-               color: var(--green);
-          }
-
-          /* CONTROLS */
-          .timer-controls {
-               display: flex;
-               align-items: center;
-               gap: 14px;
-          }
-
-          .btn-main {
-               width: 64px;
-               height: 64px;
-               border-radius: 50%;
-               border: none;
-               background: var(--primary);
-               color: #fff;
-               font-size: 1.3rem;
-               cursor: pointer;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               transition: all var(--transition);
-               box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-          }
-
-          .btn-main:hover {
-               background: var(--primary-dark);
-               transform: scale(1.06);
-          }
-
-          .btn-main:active {
-               transform: scale(0.96);
-          }
-
-          .btn-secondary {
-               width: 44px;
-               height: 44px;
-               border-radius: 50%;
-               border: 1.5px solid var(--border);
-               background: var(--bg-card);
-               color: var(--text-secondary);
-               font-size: 0.95rem;
-               cursor: pointer;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               transition: all var(--transition);
-          }
-
-          .btn-secondary:hover {
-               border-color: var(--primary);
-               color: var(--primary);
-               transform: scale(1.05);
-          }
-
-          /* CYCLE DOTS */
-          .cycle-section {
-               text-align: center;
-               width: 100%;
-          }
-
-          .cycle-label {
-               font-size: 0.78rem;
-               color: var(--text-secondary);
-               font-weight: 600;
-               text-transform: uppercase;
-               letter-spacing: 1px;
-               margin-bottom: 10px;
-          }
-
-          .cycle-dots {
-               display: flex;
-               justify-content: center;
-               gap: 10px;
-          }
-
-          .cycle-dot {
-               width: 13px;
-               height: 13px;
-               border-radius: 50%;
-               background: var(--border);
-               transition: all 0.3s ease;
-          }
-
-          .cycle-dot.completed {
-               background: var(--primary);
-               box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
-          }
-
-          .cycle-dot.current {
-               background: var(--accent);
-               animation: pulseDot 1.2s infinite;
-          }
-
-          @keyframes pulseDot {
-
-               0%,
-               100% {
-                    transform: scale(1);
-               }
-
-               50% {
-                    transform: scale(1.2);
-               }
-          }
-
-          /* FORM */
-          .form-group {
-               margin-bottom: 14px;
-          }
-
-          .form-label {
-               display: block;
-               font-size: 0.8rem;
-               font-weight: 600;
-               color: var(--text-secondary);
-               margin-bottom: 6px;
-               text-transform: uppercase;
-               letter-spacing: 0.5px;
-          }
-
-          .form-select,
-          .form-input {
-               width: 100%;
-               padding: 10px 14px;
-               border-radius: var(--radius-sm);
-               border: 1.5px solid var(--border);
-               background: var(--bg);
-               color: var(--text-primary);
-               font-size: 0.88rem;
-               font-family: inherit;
-               outline: none;
-               transition: border-color var(--transition);
-          }
-
-          .form-select:focus,
-          .form-input:focus {
-               border-color: var(--primary);
-               box-shadow: 0 0 0 3px var(--primary-glow);
-          }
-
-          .duration-row {
-               display: grid;
-               grid-template-columns: 1fr 1fr 1fr;
-               gap: 10px;
-               margin-bottom: 14px;
-          }
-
-          .duration-item {
-               text-align: center;
-          }
-
-          .duration-item .form-label {
-               text-align: center;
-               font-size: 0.72rem;
-          }
-
-          .duration-input {
-               width: 100%;
-               padding: 8px 4px;
-               border-radius: var(--radius-sm);
-               border: 1.5px solid var(--border);
-               background: var(--bg);
-               color: var(--text-primary);
-               font-size: 0.95rem;
-               font-weight: 700;
-               text-align: center;
-               font-family: inherit;
-               outline: none;
-               transition: border-color var(--transition);
-          }
-
-          .duration-input:focus {
-               border-color: var(--primary);
-          }
-
-          /* RIGHT COL */
-          .right-col {
-               display: flex;
-               flex-direction: column;
-               gap: 20px;
-          }
-
-          .stats-grid {
-               display: grid;
-               grid-template-columns: 1fr 1fr;
-               gap: 12px;
-          }
-
-          .stat-mini {
-               background: var(--bg);
-               border-radius: var(--radius-sm);
-               padding: 14px;
-               border: 1.5px solid var(--border);
-               text-align: center;
-               transition: all var(--transition);
-          }
-
-          .stat-mini:hover {
-               border-color: var(--primary);
-          }
-
-          .stat-mini-value {
-               font-size: 1.6rem;
-               font-weight: 800;
-               color: var(--primary);
-               line-height: 1;
-          }
-
-          .stat-mini-label {
-               font-size: 0.73rem;
-               color: var(--text-secondary);
-               font-weight: 500;
-               margin-top: 4px;
-          }
-
-          /* HISTORY */
-          .history-list {
-               display: flex;
-               flex-direction: column;
-               gap: 10px;
-               max-height: 300px;
-               overflow-y: auto;
-               padding-right: 2px;
-          }
-
-          .history-list::-webkit-scrollbar {
-               width: 4px;
-          }
-
-          .history-list::-webkit-scrollbar-thumb {
-               background: var(--border);
-               border-radius: 4px;
-          }
-
-          .history-item {
-               display: flex;
-               align-items: center;
-               gap: 12px;
-               padding: 11px 14px;
-               background: var(--bg);
-               border-radius: var(--radius-sm);
-               border: 1.5px solid var(--border);
-               transition: all var(--transition);
-               animation: slideIn 0.3s ease;
-          }
-
-          @keyframes slideIn {
-               from {
-                    opacity: 0;
-                    transform: translateY(-6px);
-               }
-
-               to {
-                    opacity: 1;
-                    transform: translateY(0);
-               }
-          }
-
-          .history-item:hover {
-               border-color: var(--primary);
-          }
-
-          .history-dot {
-               width: 9px;
-               height: 9px;
-               border-radius: 50%;
-               flex-shrink: 0;
-          }
-
-          .history-dot.FOCUS {
-               background: var(--primary);
-          }
-
-          .history-dot.SHORT_BREAK {
-               background: var(--green);
-          }
-
-          .history-dot.LONG_BREAK {
-               background: var(--blue);
-          }
-
-          .history-info {
-               flex: 1;
-               min-width: 0;
-          }
-
-          .history-title {
-               font-size: 0.84rem;
-               font-weight: 600;
-               color: var(--text-primary);
-               white-space: nowrap;
-               overflow: hidden;
-               text-overflow: ellipsis;
-          }
-
-          .history-meta {
-               font-size: 0.74rem;
-               color: var(--text-secondary);
-               margin-top: 2px;
-          }
-
-          .history-badge {
-               font-size: 0.70rem;
-               font-weight: 700;
-               padding: 3px 8px;
-               border-radius: 50px;
-               flex-shrink: 0;
-          }
-
-          .history-badge.COMPLETED {
-               background: rgba(5, 150, 105, 0.12);
-               color: #059669;
-          }
-
-          .history-badge.INTERRUPTED {
-               background: rgba(245, 158, 11, 0.12);
-               color: #d97706;
-          }
-
-          .history-badge.CANCELLED {
-               background: rgba(220, 38, 38, 0.12);
-               color: #dc2626;
-          }
-
-          .history-badge.IN_PROGRESS {
-               background: rgba(124, 58, 237, 0.12);
-               color: var(--primary);
-          }
-
-          .history-empty {
-               text-align: center;
-               padding: 28px 16px;
-               color: var(--text-secondary);
-               font-size: 0.87rem;
-          }
-
-          .history-empty i {
-               font-size: 2rem;
-               display: block;
-               margin-bottom: 10px;
-               opacity: 0.35;
-          }
-
-          /* OVERLAY */
-          .overlay {
-               display: none;
-               position: fixed;
-               inset: 0;
-               background: rgba(0, 0, 0, 0.5);
-               backdrop-filter: blur(4px);
-               z-index: 500;
-               align-items: center;
-               justify-content: center;
-          }
-
-          .overlay.show {
-               display: flex;
-          }
-
-          .overlay-card {
-               background: var(--bg-card);
-               border-radius: var(--radius);
-               padding: 40px 32px;
-               text-align: center;
-               max-width: 360px;
-               width: 90%;
-               border: 1.5px solid var(--border);
-               box-shadow: var(--shadow-lg);
-               animation: popIn 0.4s cubic-bezier(.34, 1.56, .64, 1);
-          }
-
-          @keyframes popIn {
-               from {
-                    transform: scale(0.8);
-                    opacity: 0;
-               }
-
-               to {
-                    transform: scale(1);
-                    opacity: 1;
-               }
-          }
-
-          .overlay-emoji {
-               font-size: 3.2rem;
-               display: block;
-               margin-bottom: 14px;
-          }
-
-          .overlay-title {
-               font-size: 1.35rem;
-               font-weight: 800;
-               color: var(--text-primary);
-               margin-bottom: 8px;
-          }
-
-          .overlay-sub {
-               font-size: 0.88rem;
-               color: var(--text-secondary);
-               margin-bottom: 24px;
-               line-height: 1.5;
-          }
-
-          .overlay-actions {
-               display: flex;
-               gap: 12px;
-               justify-content: center;
-               flex-wrap: wrap;
-          }
-
-          .btn-primary {
-               padding: 11px 24px;
-               border-radius: 50px;
-               border: none;
-               background: var(--primary);
-               color: #fff;
-               font-size: 0.87rem;
-               font-weight: 700;
-               cursor: pointer;
-               transition: all var(--transition);
-               font-family: inherit;
-          }
-
-          .btn-primary:hover {
-               background: var(--primary-dark);
-               transform: translateY(-1px);
-          }
-
-          .btn-outline {
-               padding: 11px 24px;
-               border-radius: 50px;
-               border: 1.5px solid var(--border);
-               background: transparent;
-               color: var(--text-secondary);
-               font-size: 0.87rem;
-               font-weight: 600;
-               cursor: pointer;
-               transition: all var(--transition);
-               font-family: inherit;
-          }
-
-          .btn-outline:hover {
-               border-color: var(--primary);
-               color: var(--primary);
-          }
-
-          /* TOAST */
-          .toast {
-               position: fixed;
-               bottom: 24px;
-               right: 24px;
-               background: var(--bg-card);
-               border: 1.5px solid var(--border);
-               border-radius: var(--radius-sm);
-               padding: 12px 18px;
-               box-shadow: var(--shadow-lg);
-               display: flex;
-               align-items: center;
-               gap: 10px;
-               font-size: 0.86rem;
-               font-weight: 600;
-               z-index: 9999;
-               transform: translateY(80px);
-               opacity: 0;
-               transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
-          }
-
-          .toast.show {
-               transform: translateY(0);
-               opacity: 1;
-          }
-
-          .toast.success {
-               border-color: #059669;
-               color: #059669;
-          }
-
-          .toast.error {
-               border-color: #dc2626;
-               color: #dc2626;
-          }
-
-          .toast.info {
-               border-color: var(--primary);
-               color: var(--primary);
-          }
-
-          /* RESPONSIVE */
-          @media (max-width: 1100px) {
-               .pomodoro-grid {
-                    grid-template-columns: 1fr;
-               }
-
-               .right-col {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-               }
-          }
-
-          @media (max-width: 768px) {
-               .sidebar {
-                    transform: translateX(-100%);
-               }
-
-               .main-content {
-                    margin-left: 0;
-                    padding: 20px 16px;
-               }
-
-               .right-col {
-                    grid-template-columns: 1fr;
-               }
-
-               .timer-circle-container {
-                    width: 200px;
-                    height: 200px;
-               }
-
-               .timer-svg {
-                    width: 200px;
-                    height: 200px;
-               }
-
-               .timer-display {
-                    font-size: 2.5rem;
-               }
-          }
-     </style>
+     <link rel="stylesheet" href=" ../assets/css/dark-mode.css">
 </head>
 
 <body>
-
-     <!-- OVERLAY -->
-     <div class="overlay" id="overlay">
-          <div class="overlay-card">
-               <span class="overlay-emoji" id="overlayEmoji">🎉</span>
-               <div class="overlay-title" id="overlayTitle">Session Complete!</div>
-               <div class="overlay-sub" id="overlaySub">Great focus! Take a well-deserved break.</div>
-               <div class="overlay-actions">
-                    <button class="btn-primary" onclick="startNextSession()"><i class="fa-solid fa-forward-step"></i>
-                         Next Session</button>
-                    <button class="btn-outline" onclick="closeOverlay()"><i class="fa-solid fa-pause"></i> Take
-                         Rest</button>
-               </div>
-          </div>
-     </div>
-
-     <!-- TOAST -->
-     <div class="toast" id="toast">
-          <i class="fa-solid fa-circle-info" id="toastIcon"></i>
-          <span id="toastMsg">—</span>
-     </div>
-
      <div class="dashboard-layout">
 
-          <!-- SIDEBAR -->
+          <!-- ═══════════════ SIDEBAR ═══════════════ -->
           <aside class="sidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -950,177 +33,360 @@
                          <span>EduMind AI</span>
                     </h2>
                </div>
+
                <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item"><i
-                              class="fa-solid fa-house"></i><span>Dashboard</span></a>
-                    <a href="planner.html" class="nav-item"><i
-                              class="fa-solid fa-calendar-days"></i><span>Planner</span></a>
-                    <a href="subjects.html" class="nav-item"><i class="fa-solid fa-book"></i><span>Subjects</span></a>
-                    <a href="tasks.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
-                    <a href="revision.html" class="nav-item"><i class="fa-solid fa-rotate"></i><span>Revision</span></a>
-                    <a href="tests.html" class="nav-item"><i class="fa-solid fa-file-lines"></i><span>Tests</span></a>
-                    <a href="analytics.html" class="nav-item"><i
-                              class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
-                    <a href="pomodoro.html" class="nav-item active"><i
-                              class="fa-solid fa-clock"></i><span>Pomodoro</span></a>
-                    <a href="assistant.html" class="nav-item"><i
-                              class="fa-solid fa-robot"></i><span>Assistant</span></a>
-                    <a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+                    <a href="pomodoro.html" class="nav-item active">
+                         <i class="fa-solid fa-stopwatch"></i>
+                         <span>Study Timer</span>
+                    </a>
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
                </nav>
+
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn" onclick="handleLogout()">
-                         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
                     </a>
                </div>
           </aside>
 
-          <!-- MAIN -->
-          <main class="main-content">
+          <!-- ═══════════════ MAIN ═══════════════ -->
+          <main class="dashboard-main">
 
-               <div class="topbar">
-                    <div class="topbar-left">
-                         <h1><i class="fa-solid fa-clock"></i> Pomodoro Timer</h1>
-                         <p>Stay focused, study smarter — one session at a time</p>
+               <!-- Header -->
+               <header class="dashboard-header">
+                    <div class="header-left">
+                         <div>
+                              <h1>Study Timer & Library</h1>
+                              <p>Start a Pomodoro session and track your study videos.</p>
+                         </div>
                     </div>
-                    <div class="topbar-right">
-                         <button class="btn-icon" onclick="toggleDark()">
-                              <i class="fa-solid fa-moon" id="darkIcon"></i>
-                              <span id="darkLabel">Dark Mode</span>
+                    <div class="header-actions">
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                              <i class="fa-solid fa-moon"></i>
                          </button>
+                         <div class="profile-mini" id="profileMenuToggle">
+                              <img src="../assets/avatar/default-user.png" alt="User" id="pomProfileAvatar">
+                              <div>
+                                   <h4 id="pomProfileName">Student</h4>
+                                   <p>Student</p>
+                              </div>
+                         </div>
                     </div>
-               </div>
+               </header>
 
-               <div class="pomodoro-grid">
+               <section class="pomodoro-content">
 
-                    <!-- LEFT: TIMER + CONTEXT -->
-                    <div>
-                         <div class="card" id="timerCard">
-                              <div class="mode-tabs">
-                                   <button class="mode-tab active" data-mode="FOCUS" onclick="switchMode('FOCUS')"><i
-                                             class="fa-solid fa-brain"></i> Focus</button>
-                                   <button class="mode-tab" data-mode="SHORT_BREAK"
-                                        onclick="switchMode('SHORT_BREAK')"><i class="fa-solid fa-mug-hot"></i> Short
-                                        Break</button>
-                                   <button class="mode-tab" data-mode="LONG_BREAK" onclick="switchMode('LONG_BREAK')"><i
-                                             class="fa-solid fa-couch"></i> Long Break</button>
+                    <!-- ── TOP ROW: Timer + Quick Stats ── -->
+                    <div class="pom-top-row">
+
+                         <!-- Pomodoro Timer Card -->
+                         <div class="pom-timer-card">
+                              <div class="pom-timer-header">
+                                   <h3><i class="fa-solid fa-stopwatch"></i> Pomodoro Timer</h3>
+                                   <p>Select subject and topic, then start your focus session.</p>
                               </div>
 
-                              <div class="timer-wrapper">
-                                   <div class="timer-circle-container">
-                                        <svg class="timer-svg" viewBox="0 0 240 240">
-                                             <circle class="timer-track" cx="120" cy="120" r="110" />
-                                             <circle class="timer-progress" cx="120" cy="120" r="110"
-                                                  id="progressCircle" />
+                              <!-- Subject & Video Select -->
+                              <div class="pom-selects">
+                                   <div class="pom-select-group">
+                                        <label>Subject <span class="req">*</span></label>
+                                        <select id="pomSubjectSelect">
+                                             <option value="">-- Select Subject --</option>
+                                        </select>
+                                        <span class="pom-field-error hidden" id="pomSubjectError">
+                                             Please select a subject.
+                                        </span>
+                                   </div>
+                                   <div class="pom-select-group">
+                                        <label>Topic / Video <span class="pom-optional">(optional)</span></label>
+                                        <select id="pomVideoSelect">
+                                             <option value="">-- Select Topic --</option>
+                                        </select>
+                                   </div>
+                              </div>
+
+                              <!-- Timer Display -->
+                              <div class="pom-timer-display">
+                                   <div class="pom-timer-ring">
+                                        <svg viewBox="0 0 200 200" class="pom-ring-svg">
+                                             <circle cx="100" cy="100" r="88" class="pom-ring-bg" />
+                                             <circle cx="100" cy="100" r="88" class="pom-ring-progress"
+                                                  id="pomRingProgress" />
                                         </svg>
-                                        <div class="timer-center">
-                                             <div class="timer-display" id="timerDisplay">25:00</div>
-                                             <div class="timer-mode-label" id="modeLabel">FOCUS</div>
+                                        <div class="pom-timer-center">
+                                             <span class="pom-time-text" id="pomTimeDisplay">25:00</span>
+                                             <span class="pom-status-text" id="pomStatusText">Ready</span>
                                         </div>
                                    </div>
+                              </div>
 
-                                   <div class="timer-status" id="timerStatus">Ready to focus? Hit Start! 🎯</div>
+                              <!-- Session Mode Tabs -->
+                              <div class="pom-mode-tabs">
+                                   <button class="pom-mode-btn active" data-minutes="25" id="modeFocus">
+                                        Focus 25m
+                                   </button>
+                                   <button class="pom-mode-btn" data-minutes="5" id="modeShortBreak">
+                                        Break 5m
+                                   </button>
+                                   <button class="pom-mode-btn" data-minutes="15" id="modeLongBreak">
+                                        Long Break 15m
+                                   </button>
+                              </div>
 
-                                   <div class="timer-controls">
-                                        <button class="btn-secondary" onclick="resetTimer()" title="Reset"><i
-                                                  class="fa-solid fa-rotate-left"></i></button>
-                                        <button class="btn-main" id="mainBtn" onclick="handleMainBtn()"><i
-                                                  class="fa-solid fa-play" id="mainBtnIcon"></i></button>
-                                        <button class="btn-secondary" onclick="skipSession()" title="Skip"><i
-                                                  class="fa-solid fa-forward-step"></i></button>
-                                   </div>
+                              <!-- Controls -->
+                              <div class="pom-controls">
+                                   <button class="pom-btn pom-btn-start" id="pomStartBtn">
+                                        <i class="fa-solid fa-play"></i> Start Session
+                                   </button>
+                                   <button class="pom-btn pom-btn-pause hidden" id="pomPauseBtn">
+                                        <i class="fa-solid fa-pause"></i> Pause
+                                   </button>
+                                   <button class="pom-btn pom-btn-resume hidden" id="pomResumeBtn">
+                                        <i class="fa-solid fa-play"></i> Resume
+                                   </button>
+                                   <button class="pom-btn pom-btn-cancel hidden" id="pomCancelBtn">
+                                        <i class="fa-solid fa-xmark"></i> Cancel
+                                   </button>
+                              </div>
 
-                                   <div class="cycle-section">
-                                        <div class="cycle-label">Pomodoro Cycle</div>
-                                        <div class="cycle-dots" id="cycleDots">
-                                             <div class="cycle-dot current"></div>
-                                             <div class="cycle-dot"></div>
-                                             <div class="cycle-dot"></div>
-                                             <div class="cycle-dot"></div>
-                                        </div>
-                                   </div>
+                              <!-- Active session info -->
+                              <div class="pom-session-info hidden" id="pomSessionInfo">
+                                   <i class="fa-solid fa-circle-dot pom-pulse"></i>
+                                   <span id="pomSessionInfoText">Session active</span>
                               </div>
                          </div>
 
-                         <div class="card" style="margin-top:20px;">
-                              <div class="card-title"><i class="fa-solid fa-link"></i> Link Session (Optional)</div>
+                         <!-- Quick Stats Card -->
+                         <div class="pom-stats-col">
 
-                              <label class="form-label">Custom Durations (minutes)</label>
-                              <div class="duration-row">
-                                   <div class="duration-item">
-                                        <label class="form-label">🧠 Focus</label>
-                                        <input type="number" class="duration-input" id="focusDur" value="25" min="1"
-                                             max="90" onchange="updateDurations()" />
+                              <div class="pom-stat-card">
+                                   <div class="pom-stat-icon" style="background:#f5f3ff;color:#6c63ff">
+                                        <i class="fa-solid fa-fire"></i>
                                    </div>
-                                   <div class="duration-item">
-                                        <label class="form-label">☕ Short</label>
-                                        <input type="number" class="duration-input" id="shortDur" value="5" min="1"
-                                             max="30" onchange="updateDurations()" />
-                                   </div>
-                                   <div class="duration-item">
-                                        <label class="form-label">🛋️ Long</label>
-                                        <input type="number" class="duration-input" id="longDur" value="15" min="1"
-                                             max="60" onchange="updateDurations()" />
+                                   <div class="pom-stat-body">
+                                        <span class="pom-stat-label">Current Streak</span>
+                                        <span class="pom-stat-value" id="statCurrentStreak">0</span>
+                                        <span class="pom-stat-sub">days</span>
                                    </div>
                               </div>
 
-                              <div class="form-group">
-                                   <label class="form-label">📚 Subject</label>
-                                   <select class="form-select" id="linkedSubject">
-                                        <option value="">— No Subject —</option>
-                                   </select>
+                              <div class="pom-stat-card">
+                                   <div class="pom-stat-icon" style="background:#ecfdf5;color:#059669">
+                                        <i class="fa-solid fa-clock"></i>
+                                   </div>
+                                   <div class="pom-stat-body">
+                                        <span class="pom-stat-label">Today's Focus</span>
+                                        <span class="pom-stat-value" id="statTodayFocus">0</span>
+                                        <span class="pom-stat-sub">minutes</span>
+                                   </div>
                               </div>
 
-                              <div class="form-group">
-                                   <label class="form-label">📝 Notes (optional)</label>
-                                   <input type="text" class="form-input" id="sessionNotes"
-                                        placeholder="What are you studying?" />
+                              <div class="pom-stat-card">
+                                   <div class="pom-stat-icon" style="background:#fffbeb;color:#d97706">
+                                        <i class="fa-solid fa-video"></i>
+                                   </div>
+                                   <div class="pom-stat-body">
+                                        <span class="pom-stat-label">Videos Today</span>
+                                        <span class="pom-stat-value" id="statVideosToday">0</span>
+                                        <span class="pom-stat-sub" id="statDailyTarget">of 3 target</span>
+                                   </div>
+                              </div>
+
+                              <div class="pom-stat-card">
+                                   <div class="pom-stat-icon" style="background:#eff6ff;color:#2563eb">
+                                        <i class="fa-solid fa-stopwatch"></i>
+                                   </div>
+                                   <div class="pom-stat-body">
+                                        <span class="pom-stat-label">Sessions Today</span>
+                                        <span class="pom-stat-value" id="statSessionsToday">0</span>
+                                        <span class="pom-stat-sub">completed</span>
+                                   </div>
+                              </div>
+
+                              <!-- Daily Target Progress -->
+                              <div class="pom-target-card">
+                                   <div class="pom-target-header">
+                                        <span><i class="fa-solid fa-bullseye"></i> Daily Target</span>
+                                        <span id="pomTargetText">0 / 3 videos</span>
+                                   </div>
+                                   <div class="pom-target-bar">
+                                        <div class="pom-target-fill" id="pomTargetFill" style="width: 0%"></div>
+                                   </div>
+                                   <span class="pom-target-pct" id="pomTargetPct">0% complete</span>
+                              </div>
+
+                         </div>
+                    </div>
+
+                    <!-- ── STUDY LIBRARY ── -->
+                    <div class="pom-library-card">
+                         <div class="pom-library-header">
+                              <div>
+                                   <h3><i class="fa-solid fa-photo-film"></i> Study Library</h3>
+                                   <p>Add and track your study videos and topics.</p>
+                              </div>
+                              <button class="pom-add-video-btn" id="openAddVideoBtn">
+                                   <i class="fa-solid fa-plus"></i> Add Content
+                              </button>
+                         </div>
+
+                         <!-- Library Filter -->
+                         <div class="pom-library-filter">
+                              <select id="librarySubjectFilter">
+                                   <option value="all">All Subjects</option>
+                              </select>
+                              <div class="pom-filter-tabs">
+                                   <button class="pom-filter-tab active" data-filter="all">All</button>
+                                   <button class="pom-filter-tab" data-filter="pending">Pending</button>
+                                   <button class="pom-filter-tab" data-filter="completed">Completed</button>
+                              </div>
+                         </div>
+
+                         <!-- Video List -->
+                         <div class="pom-video-list" id="pomVideoList">
+                              <div class="pom-library-empty" id="pomLibraryEmpty">
+                                   <i class="fa-solid fa-photo-film"></i>
+                                   <p>No study content yet. Add your first video or topic.</p>
                               </div>
                          </div>
                     </div>
 
-                    <!-- RIGHT COL -->
-                    <div class="right-col">
-                         <div class="card">
-                              <div class="card-title"><i class="fa-solid fa-chart-simple"></i> Today's Stats</div>
-                              <div class="stats-grid">
-                                   <div class="stat-mini">
-                                        <div class="stat-mini-value" id="statMinutes">0</div>
-                                        <div class="stat-mini-label">Focus Minutes</div>
-                                   </div>
-                                   <div class="stat-mini">
-                                        <div class="stat-mini-value" id="statSessions">0</div>
-                                        <div class="stat-mini-label">Sessions Done</div>
-                                   </div>
-                                   <div class="stat-mini">
-                                        <div class="stat-mini-value" id="statCycle">1</div>
-                                        <div class="stat-mini-label">Current Cycle</div>
-                                   </div>
-                                   <div class="stat-mini">
-                                        <div class="stat-mini-value" id="statStreak">0🔥</div>
-                                        <div class="stat-mini-label">Active Days</div>
-                                   </div>
-                              </div>
-                         </div>
-
-                         <div class="card">
-                              <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Sessions
-                              </div>
-                              <div class="history-list" id="historyList">
-                                   <div class="history-empty">
-                                        <i class="fa-regular fa-clock"></i>
-                                        No sessions yet. Start your first Pomodoro! 🍅
-                                   </div>
-                              </div>
-                         </div>
-                    </div>
-               </div>
+               </section>
           </main>
      </div>
 
-          <script src="../assets/js/pomodoro.js"></script>
-          <script src="../assets/js/theme.js"></script>
-          <script src="../assets/js/sidebar.js"></script>
+     <!-- ═══════════════ ADD VIDEO MODAL ═══════════════ -->
+     <div class="pom-modal-overlay hidden" id="addVideoModalOverlay">
+          <div class="pom-modal">
+               <div class="pom-modal-header">
+                    <div>
+                         <h2>Add Study Content</h2>
+                         <p>Add a video or topic to your study library.</p>
+                    </div>
+                    <button class="pom-modal-close" id="closeAddVideoModal">
+                         <i class="fa-solid fa-xmark"></i>
+                    </button>
+               </div>
 
+               <div class="pom-modal-body">
+                    <div class="pom-form-group">
+                         <label>Subject <span class="req">*</span></label>
+                         <select id="addVideoSubject">
+                              <option value="">-- Select Subject --</option>
+                         </select>
+                         <span class="pom-field-error hidden" id="addVideoSubjectError">
+                              Subject is required.
+                         </span>
+                    </div>
+
+                    <div class="pom-form-group">
+                         <label>Title <span class="req">*</span></label>
+                         <input type="text" id="addVideoTitle" placeholder="e.g. Introduction to OOP">
+                         <span class="pom-field-error hidden" id="addVideoTitleError">
+                              Title is required.
+                         </span>
+                    </div>
+
+                    <div class="pom-form-group">
+                         <label>Video URL <span class="pom-optional">(optional)</span></label>
+                         <input type="url" id="addVideoUrl" placeholder="https://youtube.com/...">
+                    </div>
+
+                    <div class="pom-form-row">
+                         <div class="pom-form-group">
+                              <label>Tag <span class="pom-optional">(optional)</span></label>
+                              <input type="text" id="addVideoTag" placeholder="e.g. Basics, OOP">
+                         </div>
+                         <div class="pom-form-group">
+                              <label>Duration (minutes)</label>
+                              <input type="number" id="addVideoDuration" placeholder="25" min="1">
+                         </div>
+                    </div>
+               </div>
+
+               <div class="pom-modal-footer">
+                    <button class="pom-btn-secondary" id="cancelAddVideoModal">Cancel</button>
+                    <button class="pom-btn-primary" id="saveVideoBtn">
+                         <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <!-- ═══════════════ SESSION COMPLETE MODAL ═══════════════ -->
+     <div class="pom-modal-overlay hidden" id="sessionCompleteModal">
+          <div class="pom-modal pom-modal-sm">
+               <div class="pom-complete-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+               </div>
+               <h2>Session Complete!</h2>
+               <p id="sessionCompleteMsg">Great work! Did you finish the topic?</p>
+
+               <div class="pom-complete-actions">
+                    <button class="pom-btn-primary" id="markVideoCompleteBtn">
+                         <i class="fa-solid fa-check"></i> Yes, Mark Completed
+                    </button>
+                    <button class="pom-btn-secondary" id="skipMarkCompleteBtn">
+                         Continue Later
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <!-- ═══════════════ BADGE UNLOCK POPUP ═══════════════ -->
+     <div class="pom-badge-popup hidden" id="badgeUnlockPopup">
+          <div class="pom-badge-popup-inner">
+               <i class="fa-solid fa-trophy pom-badge-icon"></i>
+               <div>
+                    <strong>Badge Unlocked!</strong>
+                    <span id="badgeUnlockName">First Steps</span>
+               </div>
+               <button class="pom-badge-close" id="closeBadgePopup">
+                    <i class="fa-solid fa-xmark"></i>
+               </button>
+          </div>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/theme.js"></script>
+     <script src="../assets/js/sidebar.js"></script>
+     <script src="../assets/js/pomodoro.js"></script>
 </body>
 
 </html>

@@ -384,13 +384,20 @@ public class AuthService {
       * Password is NEVER included.
       * refreshToken is included on login/register, null on other endpoints.
       */
+     /**
+      * REPLACE karo yeh method AuthService.java mein (line ~290 ke paas)
+      * 
+      * Fix: refreshToken ab constructor mein pass ho raha hai
+      * Pehle sirf token pass hota tha, refreshToken null rehta tha
+      * Isliye profile/update endpoints pe 500 aa raha tha
+      */
      private AuthResponseDto mapToAuthResponse(User user, String token,
                String refreshToken, String message) {
-          return new AuthResponseDto(
+
+          AuthResponseDto dto = new AuthResponseDto(
                     user.getId(),
                     user.getFullName(),
                     user.getEmail(),
-                    // PASSWORD NOT MAPPED — never returned to frontend
                     user.getCourse(),
                     user.getCollege(),
                     user.isTwoFactorEnabled(),
@@ -403,10 +410,13 @@ public class AuthService {
                     user.isAssistantSuggestionsEnabled(),
                     token,
                     message);
-          // Note: refreshToken is stored in localStorage by frontend separately
-          // We need to add refreshToken field to AuthResponseDto — see that file
-     }
 
+          // refreshToken set karo (null hoga profile endpoints pe — @JsonInclude skip
+          // karega)
+          dto.setRefreshToken(refreshToken);
+
+          return dto;
+     }
      // ─────────────────────────────────────────
      // INNER EXCEPTION CLASS
      // ─────────────────────────────────────────
