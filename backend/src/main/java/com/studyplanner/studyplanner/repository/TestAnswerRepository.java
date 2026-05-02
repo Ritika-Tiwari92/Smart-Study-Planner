@@ -10,4 +10,8 @@ public interface TestAnswerRepository extends JpaRepository<TestAnswer, Long> {
      List<TestAnswer> findByAttemptId(Long attemptId);
 
      void deleteByAttemptId(Long attemptId);
+
+     // Needed before deleting a question, because answers may reference that
+     // question.
+     void deleteByQuestion_Id(Long questionId);
 }

@@ -73,4 +73,12 @@ public class TestEngineController {
                @RequestBody TestQuestionCreateRequestDto request) {
           return testEngineService.updateQuestion(userId, testId, questionId, request);
      }
+
+     @DeleteMapping("/{testId}/questions/{questionId}")
+     public String deleteQuestion(@PathVariable Long testId,
+               @PathVariable Long questionId,
+               @RequestParam Long userId) {
+          testEngineService.deleteQuestion(userId, testId, questionId);
+          return "Question deleted successfully";
+     }
 }

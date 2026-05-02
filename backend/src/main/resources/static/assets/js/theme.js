@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = "login.html";
         });
     });
-
+ 
     /* =====================================================
    COMMON THEME TOGGLE SPIN
    File: theme.js

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Settings | EduMind AI Admin</title>
+     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+          rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --border: rgba(20, 184, 166, 0.12);
+               --border2: rgba(255, 255, 255, 0.06);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #475569;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --radius: 14px;
+               --radius-sm: 10px;
+               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          [data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               font-family: 'DM Sans', sans-serif;
+               background: var(--bg);
+               color: var(--text);
+               display: flex;
+               min-height: 100vh;
+          }
+
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               background: var(--bg2);
+               border-right: 1px solid var(--border);
+               display: flex;
+               flex-direction: column;
+               position: fixed;
+               left: 0;
+               top: 0;
+               z-index: 200;
+               transition: width var(--tr);
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               padding: 20px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+               min-height: var(--header-h);
+               flex-shrink: 0;
+          }
+
+          .brand-text h2 {
+               font-family: 'Syne', sans-serif;
+               font-size: 16px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               right: -14px;
+               top: 24px;
+               width: 28px;
+               height: 28px;
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--teal);
+               font-size: 11px;
+               transition: all var(--tr);
+               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               z-index: 10;
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: #fff;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               overflow-y: auto;
+               overflow-x: hidden;
+               padding: 12px 10px;
+          }
+
+          .nav-section-label {
+               font-size: 10px;
+               font-weight: 600;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+               color: var(--text3);
+               padding: 10px 8px 6px;
+               white-space: nowrap;
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed .nav-section-label {
+               opacity: 0;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               white-space: nowrap;
+               margin-bottom: 2px;
+          }
+
+          .nav-item:hover {
+               background: rgba(20, 184, 166, 0.08);
+               color: var(--teal);
+          }
+
+          .nav-item.active {
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
+               color: var(--teal);
+               border-left: 2px solid var(--teal);
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+               font-size: 15px;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .nav-item span,
+          .sidebar.collapsed .nav-section-label {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+               flex-shrink: 0;
+          }
+
+          .admin-profile-bar {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               background: rgba(255, 255, 255, 0.04);
+               margin-bottom: 8px;
+               overflow: hidden;
+          }
+
+          .admin-avatar-sm {
+               width: 34px;
+               height: 34px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+               font-weight: 700;
+               color: #fff;
+               flex-shrink: 0;
+          }
+
+          .admin-info-sm p {
+               font-size: 13px;
+               font-weight: 600;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .admin-info-sm span {
+               font-size: 11px;
+               color: var(--teal);
+          }
+
+          .sidebar.collapsed .admin-info-sm {
+               display: none;
+          }
+
+          .logout-btn {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--rose);
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               border: none;
+               background: none;
+               width: 100%;
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, 0.1);
+          }
+
+          .logout-btn i {
+               width: 20px;
+               text-align: center;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .main {
+               margin-left: var(--sidebar-w);
+               flex: 1;
+               transition: margin-left var(--tr);
+               min-height: 100vh;
+               display: flex;
+               flex-direction: column;
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+          }
+
+          .topbar {
+               height: var(--header-h);
+               background: var(--bg2);
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               padding: 0 28px;
+               gap: 16px;
+               position: sticky;
+               top: 0;
+               z-index: 100;
+          }
+
+          .topbar-left {
+               flex: 1;
+          }
+
+          .topbar-left h1 {
+               font-family: 'Syne', sans-serif;
+               font-size: 20px;
+               font-weight: 700;
+          }
+
+          .topbar-left p {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .topbar-btn {
+               width: 38px;
+               height: 38px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--text2);
+               font-size: 15px;
+               transition: all var(--tr);
+          }
+
+          .topbar-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .mobile-toggle {
+               display: none;
+               background: none;
+               border: none;
+               color: var(--text);
+               font-size: 20px;
+               cursor: pointer;
+               padding: 4px;
+          }
+
+          .content {
+               padding: 28px;
+               flex: 1;
+          }
+
+          .settings-grid {
+               display: grid;
+               grid-template-columns: 1fr 1fr;
+               gap: 24px;
+          }
+
+          .settings-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               padding: 24px;
+          }
+
+          .settings-card.full {
+               grid-column: 1/-1;
+          }
+
+          .card-title {
+               font-family: 'Syne', sans-serif;
+               font-size: 15px;
+               font-weight: 700;
+               margin-bottom: 20px;
+               display: flex;
+               align-items: center;
+               gap: 8px;
+          }
+
+          .card-title i {
+               color: var(--teal);
+          }
+
+          .profile-header {
+               display: flex;
+               align-items: center;
+               gap: 16px;
+               margin-bottom: 22px;
+          }
+
+          .profile-avatar {
+               width: 64px;
+               height: 64px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 24px;
+               font-weight: 800;
+               color: #fff;
+               flex-shrink: 0;
+          }
+
+          .profile-name {
+               font-family: 'Syne', sans-serif;
+               font-size: 18px;
+               font-weight: 700;
+          }
+
+          .profile-role {
+               font-size: 12px;
+               color: var(--teal);
+               margin-top: 3px;
+          }
+
+          .form-group {
+               margin-bottom: 16px;
+          }
+
+          .form-label {
+               display: block;
+               font-size: 13px;
+               font-weight: 500;
+               color: var(--text2);
+               margin-bottom: 8px;
+          }
+
+          .form-input {
+               width: 100%;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px;
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13.5px;
+               color: var(--text);
+               outline: none;
+               transition: border-color 0.2s;
+          }
+
+          .form-input:focus {
+               border-color: var(--teal);
+          }
+
+          .form-input::placeholder {
+               color: var(--text3);
+          }
+
+          .form-input:disabled {
+               opacity: 0.5;
+               cursor: not-allowed;
+          }
+
+          .pw-wrap {
+               position: relative;
+          }
+
+          .pw-eye {
+               position: absolute;
+               right: 12px;
+               top: 50%;
+               transform: translateY(-50%);
+               background: none;
+               border: none;
+               color: var(--text3);
+               cursor: pointer;
+               font-size: 14px;
+               transition: color 0.2s;
+          }
+
+          .pw-eye:hover {
+               color: var(--teal);
+          }
+
+          .btn-save {
+               padding: 10px 22px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border: none;
+               border-radius: 10px;
+               color: #fff;
+               font-family: 'Syne', sans-serif;
+               font-size: 13px;
+               font-weight: 700;
+               cursor: pointer;
+               transition: opacity 0.2s;
+          }
+
+          .btn-save:hover {
+               opacity: 0.88;
+          }
+
+          .btn-outline {
+               padding: 10px 22px;
+               background: none;
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               color: var(--text2);
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13px;
+               font-weight: 500;
+               cursor: pointer;
+               transition: all var(--tr);
+          }
+
+          .btn-outline:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .btn-danger {
+               padding: 10px 22px;
+               background: rgba(244, 63, 94, 0.1);
+               border: 1px solid rgba(244, 63, 94, 0.25);
+               border-radius: 10px;
+               color: var(--rose);
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13px;
+               font-weight: 500;
+               cursor: pointer;
+               transition: all var(--tr);
+          }
+
+          .btn-danger:hover {
+               background: rgba(244, 63, 94, 0.2);
+          }
+
+          .btn-row {
+               display: flex;
+               gap: 10px;
+               margin-top: 6px;
+               flex-wrap: wrap;
+          }
+
+          .divider {
+               border: none;
+               border-top: 1px solid var(--border2);
+               margin: 16px 0;
+          }
+
+          .toggle-row {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               padding: 12px 0;
+               border-bottom: 1px solid var(--border2);
+          }
+
+          .toggle-row:last-child {
+               border-bottom: none;
+          }
+
+          .toggle-label p {
+               font-size: 13.5px;
+               font-weight: 500;
+          }
+
+          .toggle-label span {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .toggle {
+               position: relative;
+               width: 42px;
+               height: 24px;
+               flex-shrink: 0;
+          }
+
+          .toggle input {
+               opacity: 0;
+               width: 0;
+               height: 0;
+          }
+
+          .toggle-slider {
+               position: absolute;
+               inset: 0;
+               background: var(--bg3);
+               border-radius: 100px;
+               cursor: pointer;
+               transition: background 0.2s;
+          }
+
+          .toggle-slider::before {
+               content: '';
+               position: absolute;
+               width: 18px;
+               height: 18px;
+               background: #fff;
+               border-radius: 50%;
+               left: 3px;
+               top: 3px;
+               transition: transform 0.2s;
+          }
+
+          .toggle input:checked+.toggle-slider {
+               background: var(--teal);
+          }
+
+          .toggle input:checked+.toggle-slider::before {
+               transform: translateX(18px);
+          }
+
+          .info-row {
+               display: flex;
+               justify-content: space-between;
+               padding: 10px 0;
+               border-bottom: 1px solid var(--border2);
+               font-size: 13px;
+          }
+
+          .info-row:last-child {
+               border-bottom: none;
+          }
+
+          .info-row span:first-child {
+               color: var(--text2);
+          }
+
+          .info-row span:last-child {
+               font-weight: 500;
+          }
+
+          .alert {
+               padding: 10px 14px;
+               border-radius: 9px;
+               font-size: 13px;
+               display: none;
+               align-items: center;
+               gap: 8px;
+               margin-top: 10px;
+               border: 1px solid;
+          }
+
+          .alert.show {
+               display: flex;
+          }
+
+          .alert.success {
+               background: rgba(16, 185, 129, 0.1);
+               border-color: rgba(16, 185, 129, 0.3);
+               color: var(--green);
+          }
+
+          .alert.error {
+               background: rgba(244, 63, 94, 0.08);
+               border-color: rgba(244, 63, 94, 0.25);
+               color: var(--rose);
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, 0.6);
+               z-index: 150;
+          }
+
+          @media(max-width:900px) {
+               .settings-grid {
+                    grid-template-columns: 1fr;
+               }
+
+               .settings-card.full {
+                    grid-column: 1;
+               }
+          }
+
+          @media(max-width:768px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .mobile-overlay.show {
+                    display: block;
+               }
+
+               .main {
+                    margin-left: 0 !important;
+               }
+
+               .mobile-toggle {
+                    display: block;
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+               }
+
+               .topbar {
+                    padding: 0 16px;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <svg width="34" height="34" viewBox="0 0 42 42" fill="none" style="flex-shrink:0">
+                    <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6" stroke-width="2" />
+                    <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)" stroke="#14b8a6"
+                         stroke-width="1" /><text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold"
+                         fill="#14b8a6" font-family="sans-serif">AI</text>
+               </svg>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2><span>Admin Panel</span>
+               </div>
+          </div>
+          <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+               <a href="admin-dashboard.html" class="nav-item"><i
+                         class="fas fa-chart-tree-map"></i><span>Dashboard</span></a>
+               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
+               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span>Subjects</span></a>
+               <div class="nav-section-label">Content</div>
+               <a href="admin-planner.html" class="nav-item"><i
+                         class="fas fa-calendar-days"></i><span>Planner</span></a>
+               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span>Tasks</span></a>
+               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span>Revisions</span></a>
+               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span>Tests</span></a>
+               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span>Question
+                         Bank</span></a>
+               <div class="nav-section-label">Insights</div>
+               <a href="admin-analytics.html" class="nav-item"><i
+                         class="fas fa-chart-line"></i><span>Analytics</span></a>
+               <a href="admin-notifications.html" class="nav-item"><i
+                         class="fas fa-bell"></i><span>Notifications</span></a>
+               <a href="admin-settings.html" class="nav-item active"><i
+                         class="fas fa-gear"></i><span>Settings</span></a>
+               <a href="admin-security.html" class="nav-item"><i class="fas fa-shield-halved"></i><span>Security
+                         Logs</span></a>
+          </div>
+          <div class="sidebar-bottom">
+               <div class="admin-profile-bar">
+                    <div class="admin-avatar-sm" id="adminAvatar">A</div>
+                    <div class="admin-info-sm">
+                         <p id="adminName">Admin</p><span>Administrator</span>
+                    </div>
+               </div>
+               <button class="logout-btn" onclick="handleLogout()"><i
+                         class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+          </div>
+     </nav>
+     <div class="main" id="main">
+          <div class="topbar">
+               <button class="mobile-toggle" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+               <div class="topbar-left">
+                    <h1>Settings</h1>
+                    <p>Manage your admin profile and system preferences.</p>
+               </div>
+               <div class="topbar-right">
+                    <div class="topbar-btn" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></div>
+               </div>
+          </div>
+          <div class="content">
+               <div class="settings-grid">
+                    <!-- Profile -->
+                    <div class="settings-card">
+                         <div class="card-title"><i class="fas fa-user-circle"></i> Admin Profile</div>
+                         <div class="profile-header">
+                              <div class="profile-avatar" id="profileAvatar">A</div>
+                              <div>
+                                   <div class="profile-name" id="profileName">Admin</div>
+                                   <div class="profile-role">🔐 Administrator</div>
+                              </div>
+                         </div>
+                         <div class="form-group"><label class="form-label">Full Name</label><input type="text"
+                                   class="form-input" id="settingName" placeholder="Admin Name" /></div>
+                         <div class="form-group"><label class="form-label">Email</label><input type="email"
+                                   class="form-input" id="settingEmail" disabled /></div>
+                         <div class="btn-row"><button class="btn-save" onclick="saveProfile()"><i
+                                        class="fas fa-check"></i> Save Changes</button></div>
+                         <div class="alert" id="profileAlert"><i id="pIcon"></i><span id="pMsg"></span></div>
+                    </div>
+                    <!-- Change Password -->
+                    <div class="settings-card">
+                         <div class="card-title"><i class="fas fa-key"></i> Change Password</div>
+                         <div
+                              style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--amber);margin-bottom:16px;line-height:1.6;">
+                              <i class="fas fa-triangle-exclamation"></i> To change password, use MySQL Workbench to
+                              update the BCrypt hash directly in the users table.
+                         </div>
+                         <div class="form-group"><label class="form-label">New Password</label>
+                              <div class="pw-wrap"><input type="password" class="form-input" id="newPw"
+                                        placeholder="Enter new password" /><button class="pw-eye"
+                                        onclick="toggleEye('newPw','eye1')"><i class="fas fa-eye"
+                                             id="eye1"></i></button></div>
+                         </div>
+                         <div class="form-group"><label class="form-label">Confirm Password</label>
+                              <div class="pw-wrap"><input type="password" class="form-input" id="confirmPw"
+                                        placeholder="Re-enter new password" /><button class="pw-eye"
+                                        onclick="toggleEye('confirmPw','eye2')"><i class="fas fa-eye"
+                                             id="eye2"></i></button></div>
+                         </div>
+                         <div class="btn-row"><button class="btn-save" onclick="showPwInstructions()"><i
+                                        class="fas fa-info-circle"></i> How to Reset</button></div>
+                         <div class="alert" id="pwAlert"><i id="pwIcon"></i><span id="pwMsg"></span></div>
+                    </div>
+                    <!-- System Info -->
+                    <div class="settings-card">
+                         <div class="card-title"><i class="fas fa-server"></i> System Information</div>
+                         <div class="info-row"><span>Project</span><span>EduMind AI</span></div>
+                         <div class="info-row"><span>Version</span><span>1.0.0 — Final Year</span></div>
+                         <div class="info-row"><span>Backend</span><span>Spring Boot 3</span></div>
+                         <div class="info-row"><span>Database</span><span>MySQL</span></div>
+                         <div class="info-row"><span>Auth</span><span>JWT (15 min access token)</span></div>
+                         <div class="info-row"><span>Admin Role</span><span style="color:var(--teal)">ADMIN</span></div>
+                         <div class="info-row"><span>Frontend</span><span>HTML + CSS + JS</span></div>
+                         <div class="info-row"><span>Last Login</span><span id="lastLogin">–</span></div>
+                    </div>
+                    <!-- Preferences -->
+                    <div class="settings-card">
+                         <div class="card-title"><i class="fas fa-sliders"></i> Preferences</div>
+                         <div class="toggle-row">
+                              <div class="toggle-label">
+                                   <p>Dark Mode</p><span>Switch between dark and light theme</span>
+                              </div>
+                              <label class="toggle"><input type="checkbox" id="darkToggle"
+                                        onchange="applyThemeToggle()" /><span class="toggle-slider"></span></label>
+                         </div>
+                         <div class="toggle-row">
+                              <div class="toggle-label">
+                                   <p>Compact Sidebar</p><span>Collapse sidebar by default</span>
+                              </div>
+                              <label class="toggle"><input type="checkbox" id="compactToggle"
+                                        onchange="applyCompact()" /><span class="toggle-slider"></span></label>
+                         </div>
+                         <div class="toggle-row">
+                              <div class="toggle-label">
+                                   <p>Show Overdue Highlights</p><span>Highlight overdue tasks in red</span>
+                              </div>
+                              <label class="toggle"><input type="checkbox" id="overdueToggle" checked /><span
+                                        class="toggle-slider"></span></label>
+                         </div>
+                    </div>
+                    <!-- Danger Zone -->
+                    <div class="settings-card full">
+                         <div class="card-title" style="color:var(--rose)"><i class="fas fa-triangle-exclamation"></i>
+                              Danger Zone</div>
+                         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+                              <div style="flex:1;min-width:220px">
+                                   <p style="font-size:13.5px;font-weight:600">Clear Notification History</p>
+                                   <p style="font-size:12px;color:var(--text2);margin-top:3px">Remove all locally stored
+                                        notification history.</p>
+                              </div>
+                              <button class="btn-danger" onclick="clearNotifHistory()"><i class="fas fa-trash"></i>
+                                   Clear History</button>
+                         </div>
+                         <hr class="divider" />
+                         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+                              <div style="flex:1;min-width:220px">
+                                   <p style="font-size:13.5px;font-weight:600">Logout from All Sessions</p>
+                                   <p style="font-size:12px;color:var(--text2);margin-top:3px">Clear all tokens and
+                                        logout from admin panel.</p>
+                              </div>
+                              <button class="btn-danger" onclick="handleLogout()"><i
+                                        class="fas fa-right-from-bracket"></i> Logout Now</button>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+     <script>
+          const API = `http://localhost:8080`; const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin'; const email = localStorage.getItem('adminEmail') || '';
+          if (!token || role !== 'ADMIN') window.location.href = '/pages/admin/admin-login.html';
+          document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+          document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+          document.getElementById('profileName').textContent = name;
+          document.getElementById('settingName').value = name;
+          document.getElementById('settingEmail').value = email;
+          document.getElementById('lastLogin').textContent = new Date().toLocaleString('en-IN');
+          // Theme
+          const isLight = localStorage.getItem('adminTheme') === 'light';
+          document.getElementById('darkToggle').checked = !isLight;
+          if (isLight) { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; }
+          function applyThemeToggle() { const dark = document.getElementById('darkToggle').checked; if (dark) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } }
+          function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); document.getElementById('darkToggle').checked = true; } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); document.getElementById('darkToggle').checked = false; } }
+          function applyCompact() { const v = document.getElementById('compactToggle').checked; localStorage.setItem('adminSidebarCompact', v); }
+          (function () { if (localStorage.getItem('adminSidebarCompact') === 'true') document.getElementById('compactToggle').checked = true; })();
+          function toggleEye(inputId, iconId) { const i = document.getElementById(inputId); const ic = document.getElementById(iconId); if (i.type === 'password') { i.type = 'text'; ic.className = 'fas fa-eye-slash'; } else { i.type = 'password'; ic.className = 'fas fa-eye'; } }
+          function saveProfile() {
+               const newName = document.getElementById('settingName').value.trim();
+               if (!newName) { showAlert('profileAlert', 'pIcon', 'pMsg', 'error', 'Name cannot be empty.'); return; }
+               localStorage.setItem('adminName', newName);
+               document.getElementById('adminName').textContent = newName;
+               document.getElementById('profileName').textContent = newName;
+               document.getElementById('adminAvatar').textContent = newName.charAt(0).toUpperCase();
+               document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
+               showAlert('profileAlert', 'pIcon', 'pMsg', 'success', 'Profile updated successfully!');
+          }
+          function showPwInstructions() { showAlert('pwAlert', 'pwIcon', 'pwMsg', 'success', 'Visit bcrypt-generator.com → generate hash → run SQL: UPDATE users SET password=\'hash\' WHERE role=\'ADMIN\''); }
+          function showAlert(alertId, iconId, msgId, type, msg) { const a = document.getElementById(alertId); a.className = `alert show ${type}`; document.getElementById(iconId).className = type === 'success' ? 'fas fa-circle-check' : 'fas fa-circle-xmark'; document.getElementById(msgId).textContent = msg; setTimeout(() => a.className = 'alert', 5000); }
+          function clearNotifHistory() { if (confirm('Clear all notification history?')) { localStorage.removeItem('adminNotifHistory'); alert('Notification history cleared!'); } }
+          let collapsed = false;
+          function toggleSidebar() { collapsed = !collapsed; document.getElementById('sidebar').classList.toggle('collapsed', collapsed); document.getElementById('main').classList.toggle('expanded', collapsed); document.getElementById('toggleIcon').className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'; }
+          function openMobile() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+          function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/admin-login.html'; } }
+     </script>
+</body>
+
+</html>

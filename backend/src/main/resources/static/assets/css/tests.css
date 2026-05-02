@@ -1814,3 +1814,6 @@ body.preview-dark .attempt-theory-wrap textarea:focus {
 .test-result-overlay.hidden {
   display: none !important;
 }
+.tests-empty-state.hidden {
+  display: none !important;
+}

@@ -8,8 +8,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Loads user from DB by email for Spring Security.
- * Spring Security calls this during JWT validation.
+ * CustomUserDetailsService
+ *
+ * Loads user from database by email during JWT validation.
+ *
+ * Important:
+ * - STUDENT user gets ROLE_STUDENT
+ * - ADMIN user gets ROLE_ADMIN
+ *
+ * This is required for:
+ * - hasRole("STUDENT")
+ * - hasRole("ADMIN")
+ * - hasAnyRole("STUDENT", "ADMIN")
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -22,14 +32,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 
      @Override
      public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-          User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-          // Build Spring Security UserDetails from our User entity
+          User user = userRepository.findByEmail(email.trim().toLowerCase())
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                              "User not found with email: " + email));
+
+          String authority = "ROLE_" + user.getRole().name();
+
           return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
                     .password(user.getPassword())
-                    .roles("USER")
+                    .authorities(authority)
+                    .accountLocked(user.isAccountLocked())
+                    .accountExpired(false)
+                    .credentialsExpired(false)
+                    .disabled(false)
                     .build();
      }
 }

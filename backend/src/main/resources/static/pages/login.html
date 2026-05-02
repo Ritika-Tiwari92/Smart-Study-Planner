@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
@@ -10,30 +10,987 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
+
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/auth.css">
+     <!-- Theme must apply before page paint -->
+     <script>
+          (function () {
+               const savedTheme =
+                    localStorage.getItem("edumind-theme") ||
+                    localStorage.getItem("edumind_theme") ||
+                    "dark";
+
+               document.documentElement.setAttribute("data-theme", savedTheme);
+          })();
+     </script>
+
+     <style>
+          /* ======================================================
+             EduMind AI Login Page
+             Self-contained CSS: no dependency on auth.css for UI
+             Student/Admin role selector preserved
+          ====================================================== */
+
+          :root {
+               --bg: #071113;
+               --bg2: #0a1f22;
+               --card: rgba(9, 28, 32, 0.78);
+               --card2: rgba(255, 255, 255, 0.075);
+               --text: #f8fafc;
+               --text2: #b6c9ce;
+               --text3: #8da3aa;
+               --border: rgba(20, 184, 166, 0.20);
+               --border2: rgba(255, 255, 255, 0.10);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --rose: #fb7185;
+               --input-bg: rgba(255, 255, 255, 0.08);
+               --input-border: rgba(255, 255, 255, 0.14);
+               --shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+          }
+
+          html[data-theme="light"] {
+               --bg: #eef7f8;
+               --bg2: #ffffff;
+               --card: rgba(255, 255, 255, 0.86);
+               --card2: rgba(13, 79, 79, 0.055);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #64748b;
+               --border: rgba(20, 184, 166, 0.22);
+               --border2: rgba(15, 23, 42, 0.10);
+               --input-bg: rgba(255, 255, 255, 0.92);
+               --input-border: rgba(15, 23, 42, 0.13);
+               --shadow: 0 26px 70px rgba(15, 23, 42, 0.14);
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               min-height: 100vh;
+               font-family: "DM Sans", sans-serif;
+               color: var(--text);
+               background:
+                    radial-gradient(circle at 12% 12%, rgba(20, 184, 166, 0.30), transparent 34%),
+                    radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.20), transparent 32%),
+                    radial-gradient(circle at 72% 86%, rgba(139, 92, 246, 0.16), transparent 32%),
+                    linear-gradient(135deg, #031516, var(--bg) 42%, #0b3340);
+               overflow-x: hidden;
+          }
+
+          html[data-theme="light"] body {
+               background:
+                    radial-gradient(circle at 12% 12%, rgba(20, 184, 166, 0.18), transparent 34%),
+                    radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.14), transparent 32%),
+                    radial-gradient(circle at 72% 86%, rgba(139, 92, 246, 0.09), transparent 32%),
+                    linear-gradient(135deg, #f8fdff, #eef7f8 48%, #dff7f3);
+          }
+
+          body::before {
+               content: "";
+               position: fixed;
+               inset: 0;
+               pointer-events: none;
+               background-image:
+                    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+               background-size: 54px 54px;
+               mask-image: radial-gradient(circle at center, #000, transparent 82%);
+               opacity: 0.65;
+               z-index: 0;
+          }
+
+          html[data-theme="light"] body::before {
+               background-image:
+                    linear-gradient(rgba(13, 79, 79, 0.075) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(13, 79, 79, 0.075) 1px, transparent 1px);
+               opacity: 0.52;
+          }
+
+          a {
+               color: inherit;
+          }
+
+          button,
+          input {
+               font-family: inherit;
+          }
+
+          .auth-page {
+               position: relative;
+               z-index: 1;
+               min-height: 100vh;
+               display: grid;
+               grid-template-columns: minmax(0, 1.03fr) minmax(410px, 0.97fr);
+               gap: 34px;
+               align-items: center;
+               padding: 34px;
+          }
+
+          .auth-left,
+          .auth-right {
+               min-height: calc(100vh - 68px);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+          }
+
+          .auth-left {
+               position: relative;
+               overflow: hidden;
+               border-radius: 34px;
+               padding: 64px;
+               background:
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035)),
+                    radial-gradient(circle at 28% 20%, rgba(20, 184, 166, 0.25), transparent 40%);
+               border: 1px solid var(--border2);
+               box-shadow: var(--shadow);
+               backdrop-filter: blur(20px);
+          }
+
+          html[data-theme="light"] .auth-left {
+               background:
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.64)),
+                    radial-gradient(circle at 28% 20%, rgba(20, 184, 166, 0.15), transparent 40%);
+          }
+
+          .auth-left::before {
+               content: "";
+               position: absolute;
+               width: 320px;
+               height: 320px;
+               top: -110px;
+               left: -110px;
+               border-radius: 50%;
+               background: rgba(20, 184, 166, 0.16);
+               filter: blur(10px);
+          }
+
+          .auth-left::after {
+               content: "";
+               position: absolute;
+               width: 360px;
+               height: 360px;
+               right: -160px;
+               bottom: -150px;
+               border-radius: 50%;
+               border: 1px solid rgba(6, 182, 212, 0.20);
+               box-shadow: inset 0 0 44px rgba(6, 182, 212, 0.10);
+          }
+
+          .auth-brand {
+               width: 100%;
+               max-width: 640px;
+               position: relative;
+               z-index: 2;
+          }
+
+          .auth-logo {
+               display: inline-flex;
+               align-items: center;
+               gap: 13px;
+               text-decoration: none;
+               margin-bottom: 36px;
+          }
+
+          .auth-logo-text {
+               font-family: "Syne", sans-serif;
+               font-size: 1.42rem;
+               font-weight: 800;
+               letter-spacing: -0.045em;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .auth-logo-svg {
+               width: 58px;
+               height: 58px;
+               overflow: visible;
+               filter: drop-shadow(0 0 18px rgba(20, 184, 166, 0.55));
+          }
+
+          .auth-brand h1 {
+               max-width: 640px;
+               margin: 0 0 18px;
+               font-family: "Syne", sans-serif;
+               font-size: clamp(2.35rem, 5vw, 4.7rem);
+               line-height: 1.02;
+               letter-spacing: -0.07em;
+               color: var(--text);
+          }
+
+          .auth-brand p {
+               max-width: 600px;
+               color: var(--text2);
+               font-size: 1rem;
+               line-height: 1.78;
+          }
+
+          .auth-feature-list {
+               display: grid;
+               gap: 14px;
+               margin-top: 34px;
+               max-width: 590px;
+          }
+
+          .auth-feature-item {
+               display: flex;
+               align-items: center;
+               gap: 13px;
+               padding: 15px 16px;
+               border-radius: 18px;
+               background: var(--card2);
+               border: 1px solid var(--border2);
+               backdrop-filter: blur(14px);
+               color: var(--text);
+          }
+
+          .auth-feature-item i {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+               border-radius: 14px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #ffffff;
+               box-shadow: 0 12px 24px rgba(20, 184, 166, 0.18);
+          }
+
+          .auth-feature-item span {
+               font-size: 0.94rem;
+               line-height: 1.45;
+               color: var(--text);
+          }
+
+          .auth-card {
+               width: 100%;
+               max-width: 520px;
+               position: relative;
+               overflow: hidden;
+               padding: 36px;
+               border-radius: 30px;
+               background: var(--card);
+               border: 1px solid var(--border);
+               box-shadow: var(--shadow);
+               backdrop-filter: blur(22px);
+               transition: border-color 0.25s ease, box-shadow 0.25s ease;
+          }
+
+          .auth-card::before {
+               content: "";
+               position: absolute;
+               inset: 0;
+               background: linear-gradient(120deg, transparent, rgba(20, 184, 166, 0.08), transparent);
+               transform: translateX(-125%);
+               animation: cardShine 6s ease-in-out infinite;
+               pointer-events: none;
+          }
+
+          @keyframes cardShine {
+
+               0%,
+               55% {
+                    transform: translateX(-125%);
+               }
+
+               78%,
+               100% {
+                    transform: translateX(125%);
+               }
+          }
+
+          .auth-card.admin-mode {
+               border-color: rgba(20, 184, 166, 0.48);
+               box-shadow: 0 28px 78px rgba(20, 184, 166, 0.18);
+          }
+
+          .admin-mode-badge {
+               display: none;
+               align-items: center;
+               gap: 8px;
+               width: fit-content;
+               margin-bottom: 16px;
+               padding: 6px 13px;
+               border-radius: 999px;
+               color: #5eead4;
+               background: rgba(20, 184, 166, 0.12);
+               border: 1px solid rgba(20, 184, 166, 0.30);
+               font-size: 0.68rem;
+               font-weight: 800;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+          }
+
+          html[data-theme="light"] .admin-mode-badge {
+               color: #0f766e;
+          }
+
+          .admin-mode-badge::before {
+               content: "";
+               width: 7px;
+               height: 7px;
+               border-radius: 50%;
+               background: var(--teal);
+               box-shadow: 0 0 12px rgba(20, 184, 166, 0.9);
+               animation: adminPulse 2s ease-in-out infinite;
+          }
+
+          .admin-mode-badge.visible {
+               display: inline-flex;
+          }
+
+          @keyframes adminPulse {
+
+               0%,
+               100% {
+                    opacity: 1;
+                    transform: scale(1);
+               }
+
+               50% {
+                    opacity: 0.42;
+                    transform: scale(0.72);
+               }
+          }
+
+          .auth-card-top {
+               margin-bottom: 24px;
+          }
+
+          .auth-card-top h2 {
+               margin-bottom: 8px;
+               font-family: "Syne", sans-serif;
+               font-size: 2rem;
+               font-weight: 800;
+               letter-spacing: -0.05em;
+               color: var(--text);
+          }
+
+          .auth-card-top p {
+               color: var(--text2);
+               font-size: 0.95rem;
+               line-height: 1.65;
+          }
+
+          .role-selector {
+               display: flex;
+               gap: 10px;
+               margin-bottom: 24px;
+               padding: 6px;
+               border-radius: 16px;
+               background: rgba(255, 255, 255, 0.065);
+               border: 1px solid var(--border2);
+          }
+
+          html[data-theme="light"] .role-selector {
+               background: rgba(13, 79, 79, 0.06);
+          }
+
+          .role-btn {
+               flex: 1;
+               min-height: 44px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               gap: 8px;
+               padding: 11px 14px;
+               border: none;
+               border-radius: 12px;
+               background: transparent;
+               color: var(--text3);
+               font-size: 0.88rem;
+               font-weight: 800;
+               cursor: pointer;
+               transition: 0.22s ease;
+               white-space: nowrap;
+          }
+
+          .role-btn.active {
+               color: #042325;
+               background: linear-gradient(135deg, #22d3ee, #5eead4);
+               box-shadow: 0 12px 25px rgba(6, 182, 212, 0.22);
+          }
+
+          .role-btn.active-admin {
+               color: #ffffff;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               box-shadow: 0 12px 25px rgba(20, 184, 166, 0.26);
+          }
+
+          .role-btn:not(.active):not(.active-admin):hover {
+               color: var(--text);
+               background: rgba(255, 255, 255, 0.08);
+          }
+
+          html[data-theme="light"] .role-btn:not(.active):not(.active-admin):hover {
+               background: rgba(13, 79, 79, 0.08);
+          }
+
+          .auth-form {
+               display: grid;
+               gap: 18px;
+               position: relative;
+               z-index: 2;
+          }
+
+          .auth-form-group {
+               display: grid;
+               gap: 8px;
+          }
+
+          .auth-flex-between {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 12px;
+          }
+
+          .auth-form-group label,
+          .auth-flex-between label {
+               display: inline-flex;
+               align-items: center;
+               gap: 4px;
+               color: var(--text);
+               font-size: 0.88rem;
+               font-weight: 800;
+          }
+
+          .req-star {
+               color: var(--rose);
+          }
+
+          .auth-forgot-link,
+          .auth-bottom-text a {
+               color: var(--cyan);
+               text-decoration: none;
+               font-size: 0.84rem;
+               font-weight: 800;
+          }
+
+          .auth-forgot-link:hover,
+          .auth-bottom-text a:hover {
+               text-decoration: underline;
+          }
+
+          .auth-form-group input {
+               width: 100%;
+               min-height: 52px;
+               padding: 0 15px;
+               border-radius: 16px;
+               border: 1px solid var(--input-border);
+               outline: none;
+               background: var(--input-bg);
+               color: var(--text);
+               font-size: 0.94rem;
+               transition: 0.22s ease;
+          }
+
+          .auth-form-group input::placeholder {
+               color: var(--text3);
+          }
+
+          .auth-form-group input:focus {
+               border-color: rgba(6, 182, 212, 0.75);
+               box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.13);
+               background: rgba(255, 255, 255, 0.105);
+          }
+
+          html[data-theme="light"] .auth-form-group input:focus {
+               background: #ffffff;
+               border-color: rgba(20, 184, 166, 0.72);
+               box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+          }
+
+          .auth-input-wrapper {
+               position: relative;
+          }
+
+          .auth-input-wrapper input {
+               padding-right: 50px;
+          }
+
+          .auth-eye-btn {
+               position: absolute;
+               top: 50%;
+               right: 10px;
+               transform: translateY(-50%);
+               width: 36px;
+               height: 36px;
+               border: none;
+               border-radius: 12px;
+               background: transparent;
+               color: var(--text3);
+               display: grid;
+               place-items: center;
+               cursor: pointer;
+               transition: 0.2s ease;
+          }
+
+          .auth-eye-btn:hover {
+               color: var(--cyan);
+               background: rgba(6, 182, 212, 0.10);
+          }
+
+          .auth-field-error {
+               min-height: 16px;
+               color: var(--rose);
+               font-size: 0.76rem;
+               line-height: 1.35;
+          }
+
+          .auth-submit-btn {
+               width: 100%;
+               min-height: 54px;
+               margin-top: 2px;
+               border: none;
+               border-radius: 17px;
+               color: #042325;
+               background: linear-gradient(135deg, #22d3ee, #5eead4);
+               box-shadow: 0 18px 36px rgba(6, 182, 212, 0.24);
+               font-size: 0.96rem;
+               font-weight: 900;
+               cursor: pointer;
+               transition: 0.22s ease;
+          }
+
+          .auth-submit-btn:hover {
+               transform: translateY(-2px);
+               filter: brightness(1.04);
+               box-shadow: 0 22px 44px rgba(6, 182, 212, 0.30);
+          }
+
+          .admin-mode .auth-submit-btn {
+               color: #ffffff;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+          }
+
+          .auth-bottom-text {
+               text-align: center;
+               color: var(--text2);
+               font-size: 0.88rem;
+               margin-top: 4px;
+          }
+
+          .auth-theme-btn {
+               position: fixed;
+               top: 22px;
+               right: 22px;
+               z-index: 20;
+               width: 48px;
+               height: 48px;
+               border-radius: 17px;
+               border: 1px solid var(--border2);
+               color: var(--text);
+               background: rgba(255, 255, 255, 0.09);
+               box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+               backdrop-filter: blur(16px);
+               display: grid;
+               place-items: center;
+               cursor: pointer;
+               transition: 0.22s ease;
+          }
+
+          html[data-theme="light"] .auth-theme-btn {
+               background: rgba(255, 255, 255, 0.86);
+          }
+
+          .auth-theme-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+               transform: translateY(-2px);
+          }
+
+          .auth-theme-btn svg {
+               width: 20px;
+               height: 20px;
+          }
+
+          .auth-theme-sun {
+               display: none;
+          }
+
+          html[data-theme="light"] .auth-theme-moon {
+               display: none;
+          }
+
+          html[data-theme="light"] .auth-theme-sun {
+               display: inline-flex;
+          }
+
+          /* Logo animation same style as admin neural SVG */
+          @keyframes nodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.6;
+               }
+          }
+
+          @keyframes nodePulse2 {
+
+               0%,
+               100% {
+                    opacity: 0.80;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.4;
+               }
+          }
+
+          @keyframes centerPulse {
+
+               0%,
+               100% {
+                    opacity: 0.90;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.6;
+               }
+          }
+
+          @keyframes hexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes lineFlow {
+               0% {
+                    stroke-dashoffset: 20;
+               }
+
+               100% {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .auth-logo-svg .node-top {
+               animation: nodePulse 2.4s ease-in-out infinite;
+          }
+
+          .auth-logo-svg .node-left {
+               animation: nodePulse2 2.4s ease-in-out infinite 0.4s;
+          }
+
+          .auth-logo-svg .node-right {
+               animation: nodePulse2 2.4s ease-in-out infinite 0.8s;
+          }
+
+          .auth-logo-svg .node-bottom {
+               animation: nodePulse 2.4s ease-in-out infinite 1.2s;
+          }
+
+          .auth-logo-svg .center-dot {
+               animation: centerPulse 2s ease-in-out infinite;
+          }
+
+          .auth-logo-svg .hex-outer {
+               animation: hexRotate 18s linear infinite;
+          }
+
+          .auth-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: lineFlow 3s linear infinite;
+          }
+
+          @media (max-width: 1060px) {
+               .auth-page {
+                    grid-template-columns: 1fr;
+                    padding: 24px;
+               }
+
+               .auth-left,
+               .auth-right {
+                    min-height: auto;
+               }
+
+               .auth-left {
+                    padding: 42px;
+               }
+
+               .auth-card {
+                    max-width: 100%;
+               }
+          }
+
+          @media (max-width: 620px) {
+               .auth-page {
+                    padding: 16px;
+                    gap: 18px;
+               }
+
+               .auth-left {
+                    padding: 30px 22px;
+                    border-radius: 26px;
+               }
+
+               .auth-card {
+                    padding: 26px 20px;
+                    border-radius: 24px;
+               }
+
+               .auth-brand h1 {
+                    font-size: 2.18rem;
+               }
+
+               .auth-feature-item {
+                    align-items: flex-start;
+               }
+
+               .auth-theme-btn {
+                    top: 14px;
+                    right: 14px;
+               }
+          }
+
+          /* ======================================================
+             REGISTER FONT MATCH PATCH
+             Keep existing login animations/layout as-is.
+             Only font style, font weights, colors and role selector tone changed.
+          ====================================================== */
+
+          body,
+          button,
+          input,
+          label,
+          p,
+          span,
+          a,
+          h1,
+          h2,
+          .auth-logo-text,
+          .auth-brand h1,
+          .auth-card-top h2,
+          .role-btn,
+          .auth-submit-btn,
+          .auth-feature-item span,
+          .auth-form-group input,
+          .auth-field-error {
+               font-family: "Poppins", sans-serif !important;
+          }
+
+          .auth-logo-text {
+               font-weight: 700 !important;
+               letter-spacing: -0.03em !important;
+               background: linear-gradient(135deg, #00E5FF, #7C3AED) !important;
+               -webkit-background-clip: text !important;
+               -webkit-text-fill-color: transparent !important;
+               background-clip: text !important;
+          }
+
+          .auth-brand h1 {
+               font-weight: 700 !important;
+               letter-spacing: -0.045em !important;
+               line-height: 1.12 !important;
+          }
+
+          .auth-card-top h2 {
+               font-weight: 700 !important;
+               letter-spacing: -0.035em !important;
+          }
+
+          .auth-brand p,
+          .auth-card-top p,
+          .auth-bottom-text,
+          .auth-feature-item span {
+               font-weight: 400 !important;
+          }
+
+          .auth-form-group label,
+          .auth-flex-between label,
+          .role-btn,
+          .auth-submit-btn {
+               font-weight: 600 !important;
+          }
+
+          .role-selector {
+               background: rgba(255, 255, 255, 0.04) !important;
+               border: 1px solid rgba(255, 255, 255, 0.08) !important;
+               border-radius: 16px !important;
+               padding: 6px !important;
+          }
+
+          [data-theme="light"] .role-selector {
+               background: rgba(255, 255, 255, 0.68) !important;
+               border-color: rgba(182, 217, 231, 0.95) !important;
+          }
+
+          .role-btn.active,
+          .role-btn.active-admin {
+               background: linear-gradient(135deg, #00E5FF, #7C3AED) !important;
+               color: #ffffff !important;
+               box-shadow: 0 4px 14px rgba(0, 229, 255, 0.22) !important;
+          }
+
+          .auth-submit-btn,
+          .admin-mode .auth-submit-btn {
+               background: linear-gradient(135deg, #00E5FF, #7C3AED) !important;
+               color: #ffffff !important;
+          }
+
+
+          /* ======================================================
+             FINAL SMALL TYPOGRAPHY ALIGNMENT
+             Requested:
+             - Left heading weight/size slightly reduced
+             - Sign In heading + subtitle centered
+          ====================================================== */
+
+          .auth-brand h1 {
+               font-weight: 600 !important;
+               font-size: clamp(2.35rem, 4.4vw, 4.25rem) !important;
+               line-height: 1.12 !important;
+               letter-spacing: -0.04em !important;
+          }
+
+          .auth-card-top {
+               text-align: center !important;
+          }
+
+          .auth-card-top h2 {
+               text-align: center !important;
+               margin-left: auto !important;
+               margin-right: auto !important;
+          }
+
+          .auth-card-top p {
+               text-align: center !important;
+               margin-left: auto !important;
+               margin-right: auto !important;
+          }
+
+          @media (max-width: 620px) {
+               .auth-brand h1 {
+                    font-size: 2.15rem !important;
+               }
+          }
+
+
+          /* ======================================================
+             SIGN IN / ADMIN SIGN IN PURPLE-BLUE GRADIENT
+             Match register page Create Account heading style
+          ====================================================== */
+
+          .auth-card-top h2,
+          .auth-card.admin-mode .auth-card-top h2 {
+               background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 45%, #7c3aed 100%) !important;
+               -webkit-background-clip: text !important;
+               -webkit-text-fill-color: transparent !important;
+               background-clip: text !important;
+               color: transparent !important;
+          }
+     </style>
 </head>
 
 <body>
+
+     <!-- Theme Toggle -->
+     <button class="auth-theme-btn" id="authThemeToggle" type="button" aria-label="Toggle theme">
+          <span class="auth-theme-moon">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+               </svg>
+          </span>
+          <span class="auth-theme-sun">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="2" x2="12" y2="4" />
+                    <line x1="12" y1="20" x2="12" y2="22" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="2" y1="12" x2="4" y2="12" />
+                    <line x1="20" y1="12" x2="22" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+               </svg>
+          </span>
+     </button>
+
      <div class="auth-page">
+
+          <!-- Left Panel -->
           <div class="auth-left">
                <div class="auth-brand">
-                    <div class="auth-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </div>
 
-                    <h1>Welcome Back to EduMind AI</h1>
-                    <p>
-                         Sign in to continue managing your study plans, tasks, revision schedules,
-                         tests, and learning progress in one smart place.
+                    <a href="landing-page.html" class="auth-logo" aria-label="EduMind AI Home">
+                         <svg class="auth-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true">
+                              <defs>
+                                   <linearGradient id="loginLogoGrad" x1="6" y1="2" x2="38" y2="42"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#14b8a6" />
+                                        <stop offset="50%" stop-color="#06b6d4" />
+                                        <stop offset="100%" stop-color="#8b5cf6" />
+                                   </linearGradient>
+                                   <linearGradient id="loginLogoBg" x1="6" y1="2" x2="38" y2="42"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#14b8a6" />
+                                        <stop offset="100%" stop-color="#06b6d4" />
+                                   </linearGradient>
+                              </defs>
+
+                              <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                                   stroke="url(#loginLogoGrad)" stroke-width="1.5" fill="none" opacity="0.60" />
+                              <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#loginLogoBg)"
+                                   opacity="0.15" />
+
+                              <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#loginLogoGrad)"
+                                   stroke-width="1" opacity="0.70" />
+                              <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#loginLogoGrad)"
+                                   stroke-width="1" opacity="0.70" />
+                              <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#loginLogoGrad)"
+                                   stroke-width="1" opacity="0.70" />
+                              <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#loginLogoGrad)"
+                                   stroke-width="1" opacity="0.70" />
+                              <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6"
+                                   stroke-width="0.8" opacity="0.45" />
+
+                              <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#loginLogoGrad)" />
+                              <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" opacity="0.90" />
+                              <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" opacity="0.90" />
+                              <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" opacity="0.95" />
+                              <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" opacity="0.95" />
+                         </svg>
+
+                         <span class="auth-logo-text">EduMind AI</span>
+                    </a>
+
+                    <h1 id="leftPanelTitle">Welcome Back to EduMind AI</h1>
+                    <p id="leftPanelDesc">
+                         Sign in to continue managing your study plans, tasks, revision schedules, tests, and learning
+                         progress in one smart place.
                     </p>
 
-                    <div class="auth-feature-list">
+                    <div class="auth-feature-list" id="leftPanelFeatures">
                          <div class="auth-feature-item">
                               <i class="fa-solid fa-book"></i>
                               <span>Access your subjects and study plans</span>
@@ -50,65 +1007,196 @@
                </div>
           </div>
 
+          <!-- Right Panel -->
           <div class="auth-right">
-               <div class="auth-card" style="max-width: 520px;">
+               <div class="auth-card" id="loginCard">
+
+                    <div class="admin-mode-badge" id="adminModeBadge">Admin Portal</div>
+
                     <div class="auth-card-top">
-                         <h2>Sign In</h2>
-                         <p>Login with your registered email and password.</p>
+                         <h2 id="cardTitle">Sign In</h2>
+                         <p id="cardDesc">Login with your registered email and password.</p>
+                    </div>
+
+                    <!-- Role Selector -->
+                    <div class="role-selector" role="group" aria-label="Select login role">
+                         <button class="role-btn active" id="btnStudent" onclick="selectRole('student')" type="button">
+                              <i class="fa-solid fa-user-graduate"></i>
+                              Student
+                         </button>
+
+                         <button class="role-btn" id="btnAdmin" onclick="selectRole('admin')" type="button">
+                              <i class="fa-solid fa-shield-halved"></i>
+                              Admin
+                         </button>
                     </div>
 
                     <form class="auth-form" id="loginForm" novalidate>
 
-                         <!-- Email Field -->
                          <div class="auth-form-group">
                               <label for="loginEmail">
                                    Email Address
                                    <span class="req-star" aria-hidden="true">*</span>
                               </label>
+
                               <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="email"
                                    required />
+
                               <span class="auth-field-error" id="loginEmailError" role="alert"></span>
                          </div>
 
-                         <!-- Password Field -->
                          <div class="auth-form-group">
                               <div class="auth-flex-between">
                                    <label for="loginPassword">
                                         Password
                                         <span class="req-star" aria-hidden="true">*</span>
                                    </label>
-                                   <!-- ✅ FORGOT PASSWORD LINK -->
-                                   <a href="forgot-password.html" class="auth-forgot-link">
-                                        Forgot Password?
-                                   </a>
+
+                                   <a href="forgot-password.html" class="auth-forgot-link">Forgot Password?</a>
                               </div>
+
                               <div class="auth-input-wrapper">
                                    <input type="password" id="loginPassword" placeholder="Enter your password"
                                         autocomplete="current-password" required />
+
                                    <button type="button" class="auth-eye-btn" id="loginPasswordEye"
                                         aria-label="Toggle password visibility" tabindex="-1">
                                         <i class="fa-solid fa-eye" id="loginPasswordEyeIcon"></i>
                                    </button>
                               </div>
+
                               <span class="auth-field-error" id="loginPasswordError" role="alert"></span>
                          </div>
 
-                         <!-- Submit -->
-                         <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
-                              Sign In
-                         </button>
+                         <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">Sign In</button>
 
-                         <p class="auth-bottom-text">
-                              Don't have an account?
-                              <a href="register.html">Create Account</a>
+                         <p class="auth-bottom-text" id="registerLink">
+                              Don't have an account? <a href="register.html">Create Account</a>
                          </p>
                     </form>
                </div>
           </div>
      </div>
 
+     <!-- Keep your project login logic. If this file is in project root, change ../assets to ./assets -->
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/login.js"></script>
+
+     <script>
+          /* ======================================================
+             Theme Toggle
+          ====================================================== */
+          const themeToggle = document.getElementById("authThemeToggle");
+
+          function applyTheme(theme) {
+               document.documentElement.setAttribute("data-theme", theme);
+               localStorage.setItem("edumind-theme", theme);
+               localStorage.setItem("edumind_theme", theme);
+               themeToggle.setAttribute(
+                    "aria-label",
+                    theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+               );
+          }
+
+          themeToggle.addEventListener("click", function () {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               applyTheme(current === "dark" ? "light" : "dark");
+          });
+
+          applyTheme(document.documentElement.getAttribute("data-theme") || "dark");
+
+          /* ======================================================
+             Role Selector
+          ====================================================== */
+          let currentRole = "student";
+
+          function selectRole(role) {
+               currentRole = role;
+
+               const btnStudent = document.getElementById("btnStudent");
+               const btnAdmin = document.getElementById("btnAdmin");
+               const card = document.getElementById("loginCard");
+               const badge = document.getElementById("adminModeBadge");
+               const cardTitle = document.getElementById("cardTitle");
+               const cardDesc = document.getElementById("cardDesc");
+               const submitBtn = document.getElementById("loginSubmitBtn");
+               const registerLink = document.getElementById("registerLink");
+               const leftTitle = document.getElementById("leftPanelTitle");
+               const leftDesc = document.getElementById("leftPanelDesc");
+               const leftFeatures = document.getElementById("leftPanelFeatures");
+
+               if (role === "admin") {
+                    btnStudent.classList.remove("active");
+                    btnAdmin.classList.add("active-admin");
+
+                    card.classList.add("admin-mode");
+                    badge.classList.add("visible");
+
+                    cardTitle.textContent = "Admin Sign In";
+                    cardDesc.textContent = "Restricted area — authorized administrators only.";
+                    submitBtn.textContent = "Sign In to Admin Panel";
+                    registerLink.style.display = "none";
+
+                    leftTitle.textContent = "Admin Control Panel";
+                    leftDesc.textContent =
+                         "Sign in to manage students, tests, subjects, analytics, and platform settings from one secure admin portal.";
+
+                    leftFeatures.innerHTML = `
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-users-gear"></i>
+                              <span>Manage all registered students</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-file-pen"></i>
+                              <span>Create and publish tests and questions</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-chart-bar"></i>
+                              <span>View platform-wide analytics and reports</span>
+                         </div>
+                    `;
+               } else {
+                    btnAdmin.classList.remove("active-admin");
+                    btnStudent.classList.add("active");
+
+                    card.classList.remove("admin-mode");
+                    badge.classList.remove("visible");
+
+                    cardTitle.textContent = "Sign In";
+                    cardDesc.textContent = "Login with your registered email and password.";
+                    submitBtn.textContent = "Sign In";
+                    registerLink.style.display = "";
+
+                    leftTitle.textContent = "Welcome Back to EduMind AI";
+                    leftDesc.textContent =
+                         "Sign in to continue managing your study plans, tasks, revision schedules, tests, and learning progress in one smart place.";
+
+                    leftFeatures.innerHTML = `
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-book"></i>
+                              <span>Access your subjects and study plans</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-list-check"></i>
+                              <span>Track pending tasks and revision topics</span>
+                         </div>
+                         <div class="auth-feature-item">
+                              <i class="fa-solid fa-chart-line"></i>
+                              <span>Continue from your saved progress</span>
+                         </div>
+                    `;
+               }
+          }
+
+          /* login.js can read this selected role before submit */
+          document.getElementById("loginForm").addEventListener(
+               "submit",
+               function () {
+                    window.__selectedRole = currentRole;
+               },
+               true
+          );
+     </script>
 </body>
 
 </html>

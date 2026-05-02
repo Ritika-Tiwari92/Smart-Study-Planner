@@ -24,6 +24,7 @@
 </head>
 
 <body>
+     <body data-page-role="student"></body>
      <div class="dashboard-layout">
           <aside class="sidebar">
                <div class="sidebar-top">
@@ -655,9 +656,53 @@
                </div>
           </main>
      </div>
+     <script>
+          (function () {
+               "use strict";
+               const LOGIN_PAGE = "login.html";
+               const STUDENT_HOME = "dashboard.html";
+               const ADMIN_HOME = "admin-dashboard.html";
+               const token = localStorage.getItem("token");
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+               const userRole = localStorage.getItem("userRole") || "STUDENT";
+               function goTo(page) {
+                    // Already on that page? Skip redirect to avoid loop
+                    if (window.location.href.includes(page)) return;
+                    window.location.href = page;
+               }
+               if (!token || !isLoggedIn) {
+                    goTo(LOGIN_PAGE);
+                    return; // script execution rok do
+               }
+               document.addEventListener("DOMContentLoaded", function () {
 
+                    const body = document.body;
+                    const pageRole = body ? body.getAttribute("data-page-role") : null;
+
+                    // data-page-role set nahi hai toh guard kuch nahi karega
+                    if (!pageRole) return;
+
+                    if (pageRole === "admin" && userRole !== "ADMIN") {
+                         // Student admin page pe aaya → student home pe bhejo
+                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
+                         goTo(STUDENT_HOME);
+                         return;
+                    }
+
+                    if (pageRole === "student" && userRole === "ADMIN") {
+                         // Admin student page pe aaya → admin home pe bhejo
+                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
+                         goTo(ADMIN_HOME);
+                         return;
+                    }
+
+                    // Role sahi hai → page load hone do
+                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
+               });
+
+          })();
+     </script>
      <script src="../assets/js/auth-guard.js"></script>
-     <!-- <script src="../assets/js/theme.js"></script> -->
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/tests.js"></script>

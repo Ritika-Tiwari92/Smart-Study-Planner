@@ -34,7 +34,8 @@ public class JwtUtil {
 
      // Access token expiry: 15 minutes (900,000 ms)
      // Override jwt.expiration property with this constant
-     private static final long ACCESS_TOKEN_EXPIRY_MS = 15 * 60 * 1000L; // 15 min
+     @Value("${jwt.expiration}")
+     private long expiration; // properties se aayega
 
      // Refresh token expiry: 7 days in minutes (for DB storage)
      public static final int REFRESH_TOKEN_EXPIRY_DAYS = 7;
@@ -58,7 +59,7 @@ public class JwtUtil {
                     .subject(email)
                     .claim("userId", userId)
                     .issuedAt(new Date())
-                    .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRY_MS))
+                    .expiration(new Date(System.currentTimeMillis() + expiration))
                     .signWith(getSigningKey())
                     .compact();
      }

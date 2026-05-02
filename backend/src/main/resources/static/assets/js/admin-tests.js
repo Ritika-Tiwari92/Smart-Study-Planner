@@ -1,3 +1,18 @@
+/* =====================================================
+   EduMind AI — Admin Tests JS
+   Full Clean Updated Copy-Paste File
+
+   Fixed:
+   - Create / Update / Delete uses /api/admin/tests
+   - List / Count reloads from /api/admin/tests
+   - No fake success if backend save fails
+   - Toast messages instead of alert
+   - Field-wise validation
+   - Existing Question Bank flow preserved
+   - FIX: duration sent as String (matches private String duration in Test.java)
+   - FIX: score sent as 0 (NOT NULL guard per prepareTestBeforeSave in TestService)
+===================================================== */
+
 const openAdminTestModalBtn = document.getElementById("openAdminTestModalBtn");
 const adminTestModalOverlay = document.getElementById("adminTestModalOverlay");
 const closeAdminTestModalBtn = document.getElementById("closeAdminTestModalBtn");
@@ -27,35 +42,208 @@ const adminNegativeMarkingInput = document.getElementById("adminNegativeMarking"
 const adminTestDescriptionInput = document.getElementById("adminTestDescription");
 const adminTestInstructionsInput = document.getElementById("adminTestInstructions");
 
-const API_BASE_URL =
-    window.location.port === "8080"
-        ? ""
-        : "http://localhost:8080";
+const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
 
-const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
-const SUBJECTS_API_URL = `${API_BASE_URL}/subjects`;
+const ADMIN_TESTS_API_URL = `${API_BASE_URL}/api/admin/tests`;
+const SUBJECTS_API_URL = `${API_BASE_URL}/api/admin/subjects`;
+const STUDENT_TESTS_API_URL = `${API_BASE_URL}/api/tests`;
 
 let editingAdminTestId = null;
 let allAdminTests = [];
 let questionCountByTestId = new Map();
 
-function parseStoredJson(value) {
-    try {
-        return JSON.parse(value);
-    } catch (error) {
-        return null;
+/* =====================================================
+   Toast + Field Error Helpers
+===================================================== */
+
+function injectAdminTestUtilityStyles() {
+    if (document.getElementById("adminTestsUtilityStyles")) return;
+
+    const style = document.createElement("style");
+    style.id = "adminTestsUtilityStyles";
+    style.textContent = `
+        .admin-toast {
+            position: fixed;
+            top: 82px;
+            right: 22px;
+            z-index: 99999;
+            min-width: 270px;
+            max-width: 390px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+            animation: adminToastIn 0.25s ease;
+        }
+
+        @keyframes adminToastIn {
+            from { opacity: 0; transform: translateX(18px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .admin-toast.success {
+            background: #065f46;
+            color: #6ee7b7;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .admin-toast.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .admin-toast.info {
+            background: #164e63;
+            color: #67e8f9;
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+
+        .admin-field-error {
+            margin-top: 6px;
+            color: #fca5a5;
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .admin-input-error {
+            border-color: rgba(244, 63, 94, 0.75) !important;
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.10) !important;
+        }
+
+        .admin-input-valid {
+            border-color: rgba(16, 185, 129, 0.55) !important;
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+function showAdminToast(type, message) {
+    const oldToast = document.querySelector(".admin-toast");
+    if (oldToast) oldToast.remove();
+
+    const toast = document.createElement("div");
+    toast.className = `admin-toast ${type}`;
+
+    const iconClass =
+        type === "success" ? "circle-check" :
+        type === "info"    ? "circle-info"  :
+                             "triangle-exclamation";
+
+    toast.innerHTML = `
+        <i class="fa-solid fa-${iconClass}"></i>
+        <span>${escapeHtml(message)}</span>
+    `;
+
+    document.body.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 3500);
+}
+
+function getFieldWrapper(input) {
+    return input ? input.closest(".test-form-group") : null;
+}
+
+function setFieldError(input, message) {
+    if (!input) return;
+
+    const wrapper = getFieldWrapper(input);
+    input.classList.remove("admin-input-valid");
+    input.classList.add("admin-input-error");
+
+    if (!wrapper) return;
+
+    let error = wrapper.querySelector(".admin-field-error");
+    if (!error) {
+        error = document.createElement("div");
+        error.className = "admin-field-error";
+        wrapper.appendChild(error);
     }
+
+    error.textContent = message;
+}
+
+function clearFieldError(input) {
+    if (!input) return;
+
+    const wrapper = getFieldWrapper(input);
+    input.classList.remove("admin-input-error");
+
+    if (String(input.value || "").trim()) {
+        input.classList.add("admin-input-valid");
+    } else {
+        input.classList.remove("admin-input-valid");
+    }
+
+    if (!wrapper) return;
+
+    const error = wrapper.querySelector(".admin-field-error");
+    if (error) error.remove();
+}
+
+function clearAllFieldErrors() {
+    [
+        adminTestTitleInput,
+        adminTestSubjectInput,
+        adminTestDateInput,
+        adminTestDurationInput,
+        adminTestDescriptionInput,
+        adminTestInstructionsInput
+    ].forEach(clearFieldError);
+}
+
+/* =====================================================
+   Auth + Storage Helpers
+===================================================== */
+
+function parseStoredJson(value) {
+    try { return JSON.parse(value); }
+    catch (error) { return null; }
+}
+
+function decodeJwtPayload(token) {
+    try {
+        if (!token || !token.includes(".")) return null;
+
+        const payload    = token.split(".")[1];
+        const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const decoded    = atob(
+            normalized.padEnd(
+                normalized.length + (4 - (normalized.length % 4)) % 4,
+                "="
+            )
+        );
+
+        return JSON.parse(decoded);
+    } catch (error) { return null; }
+}
+
+function getAuthToken() {
+    return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+}
+
+function clearAdminSessionAndRedirect() {
+    [
+        "adminToken", "adminRole", "adminName", "adminEmail",
+        "token", "refreshToken", "userRole", "userId", "userEmail", "userName",
+        "edumind_is_logged_in", "edumind_logged_in_user"
+    ].forEach(function (key) { localStorage.removeItem(key); });
+
+    setTimeout(function () {
+        window.location.href = "/pages/admin/admin-login.html";
+    }, 900);
 }
 
 function getStoredUserObject() {
     const possibleKeys = [
-        "edumind_logged_in_user",
-        "edumind_registered_user",
-        "loggedInUser",
-        "currentUser",
-        "user",
-        "authUser",
-        "studyPlannerUser"
+        "edumind_logged_in_user", "edumind_registered_user",
+        "loggedInUser", "currentUser", "user", "authUser",
+        "studyPlannerUser", "adminUser", "edumind_admin_user"
     ];
 
     for (const key of possibleKeys) {
@@ -63,9 +251,7 @@ function getStoredUserObject() {
         if (!rawValue) continue;
 
         const parsed = parseStoredJson(rawValue);
-        if (parsed && typeof parsed === "object") {
-            return parsed;
-        }
+        if (parsed && typeof parsed === "object") return parsed;
     }
 
     return null;
@@ -74,28 +260,61 @@ function getStoredUserObject() {
 function getCurrentUserId() {
     const user = getStoredUserObject();
 
-    if (user && user.id != null && user.id !== "") {
-        return Number(user.id);
+    const directUserId =
+        user?.id ?? user?.userId ?? user?.adminId ??
+        localStorage.getItem("userId") ??
+        localStorage.getItem("adminId") ??
+        localStorage.getItem("edumind_user_id");
+
+    if (directUserId != null && directUserId !== "") {
+        const numericId = Number(directUserId);
+        return Number.isNaN(numericId) ? directUserId : numericId;
     }
 
-    throw new Error("Logged-in user id not found in localStorage.");
+    const tokenPayload = decodeJwtPayload(getAuthToken());
+    const jwtUserId =
+        tokenPayload?.id ?? tokenPayload?.userId ??
+        tokenPayload?.adminId ?? tokenPayload?.uid;
+
+    if (jwtUserId != null && jwtUserId !== "") {
+        const numericJwtId = Number(jwtUserId);
+        return Number.isNaN(numericJwtId) ? jwtUserId : numericJwtId;
+    }
+
+    return null;
 }
 
-function buildTestsApiUrl(testId = "") {
-    const userId = getCurrentUserId();
-    const path = testId ? `/${testId}` : "";
-    return `${TESTS_API_URL}${path}?userId=${encodeURIComponent(userId)}`;
+/* =====================================================
+   API URL Builders
+===================================================== */
+
+function addUserIdIfAvailable(url, explicitUserId = null) {
+    const userId = explicitUserId || getCurrentUserId();
+    if (userId == null || userId === "") return url;
+
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}userId=${encodeURIComponent(userId)}`;
+}
+
+function buildAdminTestsApiUrl(testId = "") {
+    const path = testId ? `/${encodeURIComponent(testId)}` : "";
+    return `${ADMIN_TESTS_API_URL}${path}`;
 }
 
 function buildSubjectsApiUrl() {
-    const userId = getCurrentUserId();
-    return `${SUBJECTS_API_URL}?userId=${encodeURIComponent(userId)}`;
+    return SUBJECTS_API_URL;
 }
 
-function buildQuestionsApiUrl(testId) {
-    const userId = getCurrentUserId();
-    return `${TESTS_API_URL}/${encodeURIComponent(testId)}/questions?userId=${encodeURIComponent(userId)}`;
+function buildQuestionsApiUrl(testId, explicitUserId = null) {
+    return addUserIdIfAvailable(
+        `${STUDENT_TESTS_API_URL}/${encodeURIComponent(testId)}/questions`,
+        explicitUserId
+    );
 }
+
+/* =====================================================
+   Modal Helpers
+===================================================== */
 
 function openAdminTestModal() {
     if (!adminTestModalOverlay) return;
@@ -111,42 +330,24 @@ function closeAdminTestModal() {
 
 function setCreateAdminTestMode() {
     editingAdminTestId = null;
-
-    if (adminTestModalTitle) {
-        adminTestModalTitle.textContent = "Create Test";
-    }
-
-    if (saveAdminTestBtn) {
-        saveAdminTestBtn.textContent = "Save Test";
-    }
+    if (adminTestModalTitle) adminTestModalTitle.textContent = "Create Test";
+    if (saveAdminTestBtn)    saveAdminTestBtn.textContent    = "Save Test";
 }
 
 function setEditAdminTestMode() {
-    if (adminTestModalTitle) {
-        adminTestModalTitle.textContent = "Edit Test";
-    }
-
-    if (saveAdminTestBtn) {
-        saveAdminTestBtn.textContent = "Update Test";
-    }
+    if (adminTestModalTitle) adminTestModalTitle.textContent = "Edit Test";
+    if (saveAdminTestBtn)    saveAdminTestBtn.textContent    = "Update Test";
 }
 
 function resetAdminTestForm() {
     if (!adminTestModalForm) return;
 
     adminTestModalForm.reset();
+    clearAllFieldErrors();
 
-    if (adminTestTypeInput) {
-        adminTestTypeInput.value = "Upcoming";
-    }
-
-    if (adminTestStatusInput) {
-        adminTestStatusInput.value = "DRAFT";
-    }
-
-    if (adminNegativeMarkingInput) {
-        adminNegativeMarkingInput.value = "false";
-    }
+    if (adminTestTypeInput)         adminTestTypeInput.value         = "Upcoming";
+    if (adminTestStatusInput)       adminTestStatusInput.value       = "DRAFT";
+    if (adminNegativeMarkingInput)  adminNegativeMarkingInput.value  = "false";
 }
 
 function clearAdminTestModalState() {
@@ -154,38 +355,32 @@ function clearAdminTestModalState() {
     setCreateAdminTestMode();
 }
 
+/* =====================================================
+   Normalize + Format Helpers
+===================================================== */
+
 function normalizeTestType(typeText) {
-    const value = (typeText || "").trim().toLowerCase();
-
-    if (value === "upcoming") return "Upcoming";
-    if (value === "this week") return "This Week";
+    const value = String(typeText || "").trim().toLowerCase();
+    if (value === "upcoming")                          return "Upcoming";
+    if (value === "this week")                         return "This Week";
     if (value === "mock test" || value === "mock tests") return "Mock Test";
-    if (value === "completed") return "Completed";
-
+    if (value === "completed")                         return "Completed";
     return "Upcoming";
 }
 
 function normalizeAdminStatus(statusText, publishedValue = false) {
-    const value = (statusText || "").trim().toUpperCase();
-
+    const value = String(statusText || "").trim().toUpperCase();
     if (value === "PUBLISHED") return "PUBLISHED";
-    if (value === "DRAFT") return "DRAFT";
-
+    if (value === "DRAFT")     return "DRAFT";
     return publishedValue ? "PUBLISHED" : "DRAFT";
-}
-
-function getPublishStateFromStatus(statusText) {
-    return normalizeAdminStatus(statusText) === "PUBLISHED";
 }
 
 function getTestBadgeClass(type) {
     const normalized = normalizeTestType(type);
-
-    if (normalized === "Upcoming") return "upcoming";
+    if (normalized === "Upcoming")  return "upcoming";
     if (normalized === "This Week") return "this-week";
     if (normalized === "Mock Test") return "mock-test";
     if (normalized === "Completed") return "completed";
-
     return "upcoming";
 }
 
@@ -214,19 +409,17 @@ function parseDateValue(dateValue) {
 function getMonthShort(dateValue) {
     const date = parseDateValue(dateValue);
     if (!date) return "---";
-
     return date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
 }
 
 function getDayNumber(dateValue) {
     const date = parseDateValue(dateValue);
     if (!date) return "--";
-
     return String(date.getDate()).padStart(2, "0");
 }
 
 function escapeHtml(value) {
-    return String(value || "")
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -234,76 +427,142 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
-function extractApiErrorMessage(responseText, responseStatus) {
-    if (!responseText) {
-        return `HTTP ${responseStatus}`;
+/* =====================================================
+   ✅ FIX: Duration Parser
+   Converts "60 mins", "60", "1h 30m", etc. → Integer minutes
+   Backend expects Integer, not String
+===================================================== */
+
+function parseDurationToInt(durationRaw) {
+    if (durationRaw == null || String(durationRaw).trim() === "") return null;
+
+    const raw = String(durationRaw).trim().toLowerCase();
+
+    // Already a plain number e.g. "60" or 60
+    if (/^\d+$/.test(raw)) {
+        const n = parseInt(raw, 10);
+        return Number.isNaN(n) ? null : n;
     }
+
+    // e.g. "60 mins", "60 min", "60 minutes"
+    const minsMatch = raw.match(/^(\d+)\s*(?:min(?:ute)?s?)?$/);
+    if (minsMatch) {
+        const n = parseInt(minsMatch[1], 10);
+        return Number.isNaN(n) ? null : n;
+    }
+
+    // e.g. "1h 30m", "1h30m", "1 hr 30 min"
+    const hhmm = raw.match(/(?:(\d+)\s*h(?:r(?:s)?|ours?)?)?\s*(?:(\d+)\s*m(?:in(?:ute)?s?)?)?/);
+    if (hhmm && (hhmm[1] || hhmm[2])) {
+        const hours = parseInt(hhmm[1] || "0", 10);
+        const mins  = parseInt(hhmm[2] || "0", 10);
+        const total = (hours * 60) + mins;
+        return total > 0 ? total : null;
+    }
+
+    // Fallback: extract first number found
+    const firstNum = raw.match(/(\d+)/);
+    if (firstNum) {
+        const n = parseInt(firstNum[1], 10);
+        return Number.isNaN(n) ? null : n;
+    }
+
+    return null;
+}
+
+/* =====================================================
+   API Helpers
+===================================================== */
+
+function extractApiErrorMessage(responseText, responseStatus) {
+    if (!responseText) return `HTTP ${responseStatus}`;
 
     try {
         const parsed = JSON.parse(responseText);
         if (parsed && typeof parsed === "object") {
             return parsed.message || parsed.error || `HTTP ${responseStatus}`;
         }
-    } catch (error) {
-        // use raw text
-    }
+    } catch (error) { /* raw response use hoga */ }
 
     return responseText;
 }
 
 async function fetchJson(url, options = {}) {
-    // token seedha localStorage se lo
-    const token = localStorage.getItem("token") || "";
+    const token = getAuthToken();
 
     const response = await fetch(url, {
+        ...options,
         headers: {
             Accept: "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...(options.headers || {})
-        },
-        ...options
+        }
     });
 
     let responseText = "";
-    try {
-        responseText = await response.text();
-    } catch (error) {
-        responseText = "";
+    try { responseText = await response.text(); }
+    catch (error) { responseText = ""; }
+
+    if (response.status === 401 || response.status === 403) {
+        showAdminToast("error", "Admin session expired. Please login again.");
+        clearAdminSessionAndRedirect();
+        throw new Error("Unauthorized admin session.");
     }
 
     if (!response.ok) {
         throw new Error(extractApiErrorMessage(responseText, response.status));
     }
 
-    if (!responseText) {
-        return null;
+    if (!responseText) return null;
+
+    try { return JSON.parse(responseText); }
+    catch (error) { throw new Error("Invalid backend response format."); }
+}
+
+function unwrapArrayResponse(data, possibleKeys = []) {
+    if (Array.isArray(data)) return data;
+
+    if (data && typeof data === "object") {
+        for (const key of possibleKeys) {
+            if (Array.isArray(data[key])) return data[key];
+        }
+
+        if (Array.isArray(data.data))      return data.data;
+        if (Array.isArray(data.content))   return data.content;
+        if (Array.isArray(data.items))     return data.items;
+        if (Array.isArray(data.tests))     return data.tests;
+        if (Array.isArray(data.subjects))  return data.subjects;
+        if (Array.isArray(data.questions)) return data.questions;
     }
 
-    try {
-        return JSON.parse(responseText);
-    } catch (error) {
-        return null;
-    }
+    return [];
 }
+
+/* =====================================================
+   Mapping
+===================================================== */
 
 function mapBackendTestToFrontend(test) {
     const publishedValue =
         typeof test.published === "boolean"
             ? test.published
-            : getPublishStateFromStatus(test.adminStatus);
+            : normalizeAdminStatus(test.adminStatus) === "PUBLISHED";
 
     return {
-        id: test.id,
-        title: test.title || "",
-        subject: test.subject || "",
-        date: test.testDate || "",
-        type: normalizeTestType(test.testType || ""),
-        duration: test.duration || "",
-        description: test.description || "",
-        instructions: test.instructions || "",
+        id:             test.id,
+        userId:         test.userId || test.studentId || test.ownerId || null,
+        title:          test.title || "",
+        subject:        test.subject || test.subjectName || "",
+        date:           test.testDate || test.date || "",
+        type:           normalizeTestType(test.testType || test.type || ""),
+        duration:       test.duration != null ? String(test.duration) : "",
+        description:    test.description || "",
+        instructions:   test.instructions || "",
         negativeMarking: Boolean(test.negativeMarking),
-        published: publishedValue,
-        adminStatus: normalizeAdminStatus(test.adminStatus, publishedValue)
+        published:      publishedValue,
+        adminStatus:    normalizeAdminStatus(test.adminStatus, publishedValue),
+        studentName:    test.studentName || "",
+        studentEmail:   test.studentEmail || ""
     };
 }
 
@@ -315,56 +574,79 @@ function sortAdminTests(items) {
         const aTime = aDate ? aDate.getTime() : Number.MAX_SAFE_INTEGER;
         const bTime = bDate ? bDate.getTime() : Number.MAX_SAFE_INTEGER;
 
-        if (aTime !== bTime) {
-            return aTime - bTime;
-        }
+        if (aTime !== bTime) return aTime - bTime;
 
         return Number(b.id || 0) - Number(a.id || 0);
     });
 }
 
+/* =====================================================
+   ✅ FIX: buildAdminTestPayload
+   - duration: Java model is "String duration" → send as String
+   - description: backend sets default if null, but sending
+     null causes Jackson/JPA issue — send empty string instead
+   - score: backend has "if score==null set score=0" guard,
+     BUT some DB schemas have score NOT NULL. Send 0 safely.
+   - focusArea / testTip: send null safely (TEXT column, nullable)
+   - instructions: send null if empty (TEXT column, nullable)
+===================================================== */
+
 function buildAdminTestPayload(testData) {
     const adminStatus = normalizeAdminStatus(testData.adminStatus, testData.published);
 
+    // Duration stays as String — matches: private String duration; in Test.java
+    // Normalize: trim whitespace, send empty string if blank (backend handles default)
+    const durationStr = String(testData.duration || "").trim();
+
     return {
-        title: testData.title,
-        subject: testData.subject,
-        testDate: testData.date,
-        testType: normalizeTestType(testData.type),
-        duration: testData.duration,
-        description: testData.description,
-        published: Boolean(testData.published),
-        adminStatus,
-        instructions: testData.instructions || null,
+        title:           testData.title,
+        subject:         testData.subject,
+        testDate:        testData.date,
+        testType:        normalizeTestType(testData.type),
+        duration:        durationStr,
+        adminStatus:     adminStatus,
+        published:       Boolean(testData.published),
         negativeMarking: Boolean(testData.negativeMarking),
-        score: null,
-        focusArea: null,
-        testTip: null
+        description:     testData.description || "",
+        instructions:    testData.instructions || null,
+        score:           0,
+        focusArea:       null,
+        testTip:         null
     };
 }
 
+/* =====================================================
+   Render Tests
+===================================================== */
+
 function createAdminTestItem(test) {
-    const questionCount = questionCountByTestId.get(String(test.id)) ?? 0;
-    const badgeClass = getTestBadgeClass(test.type);
-    const publishClass = test.adminStatus === "PUBLISHED" ? "published" : "draft";
-    const publishLabel = test.adminStatus === "PUBLISHED" ? "Published" : "Draft";
+    const questionCount    = questionCountByTestId.get(String(test.id)) ?? 0;
+    const badgeClass       = getTestBadgeClass(test.type);
+    const publishClass     = test.adminStatus === "PUBLISHED" ? "published" : "draft";
+    const publishLabel     = test.adminStatus === "PUBLISHED" ? "Published" : "Draft";
     const publishActionLabel = test.adminStatus === "PUBLISHED" ? "Unpublish" : "Publish";
     const publishActionClass = test.adminStatus === "PUBLISHED" ? "unpublish" : "publish";
-    const publishActionIcon = test.adminStatus === "PUBLISHED"
+    const publishActionIcon  = test.adminStatus === "PUBLISHED"
         ? "fa-arrow-rotate-left"
         : "fa-paper-plane";
 
+    // Show duration as-is from backend (already a string for display)
+    const durationDisplay = test.duration
+        ? `${test.duration} mins`
+        : "-";
+
     const item = document.createElement("div");
-    item.className = "admin-test-item";
-    item.dataset.testId = test.id;
-    item.dataset.type = test.type;
-    item.dataset.status = test.adminStatus;
-    item.dataset.subject = test.subject;
-    item.dataset.duration = test.duration;
-    item.dataset.description = test.description;
-    item.dataset.instructions = test.instructions || "";
+    item.className         = "admin-test-item";
+    item.dataset.testId    = test.id;
+    item.dataset.userId    = test.userId || "";
+    item.dataset.type      = test.type;
+    item.dataset.status    = test.adminStatus;
+    item.dataset.subject   = test.subject;
+    item.dataset.duration  = test.duration;
+    item.dataset.description   = test.description;
+    item.dataset.instructions  = test.instructions || "";
     item.dataset.negativeMarking = String(Boolean(test.negativeMarking));
-    item.dataset.date = test.date || "";
+    item.dataset.date      = test.date || "";
 
     item.innerHTML = `
         <div class="admin-test-date-box">
@@ -380,32 +662,32 @@ function createAdminTestItem(test) {
             </div>
 
             <div class="admin-test-meta">
-                <span class="admin-test-meta-chip">${escapeHtml(`Subject: ${test.subject || "-"}`)}</span>
-                <span class="admin-test-meta-chip">${escapeHtml(`Duration: ${test.duration || "-"}`)}</span>
-                <span class="admin-test-meta-chip">${escapeHtml(`Questions: ${questionCount}`)}</span>
-                <span class="admin-test-meta-chip">${escapeHtml(`Negative Marking: ${test.negativeMarking ? "Yes" : "No"}`)}</span>
+                <span class="admin-test-meta-chip">${escapeHtml("Subject: " + (test.subject || "-"))}</span>
+                <span class="admin-test-meta-chip">${escapeHtml("Duration: " + durationDisplay)}</span>
+                <span class="admin-test-meta-chip">${escapeHtml("Questions: " + questionCount)}</span>
+                <span class="admin-test-meta-chip">${escapeHtml("Owner ID: " + (test.userId || "-"))}</span>
             </div>
 
             <p class="admin-test-description">${escapeHtml(test.description || "No description available.")}</p>
         </div>
 
         <div class="admin-test-actions">
-            <button class="admin-action-btn manage" title="Manage Questions">
+            <button class="admin-action-btn manage" type="button" title="Manage Questions">
                 <i class="fa-solid fa-list-ul"></i>
                 <span>Questions</span>
             </button>
 
-            <button class="admin-action-btn ${publishActionClass}" title="${escapeHtml(publishActionLabel)}">
+            <button class="admin-action-btn ${publishActionClass}" type="button" title="${escapeHtml(publishActionLabel)}">
                 <i class="fa-solid ${publishActionIcon}"></i>
                 <span>${escapeHtml(publishActionLabel)}</span>
             </button>
 
-            <button class="admin-action-btn edit" title="Edit Test">
+            <button class="admin-action-btn edit" type="button" title="Edit Test">
                 <i class="fa-solid fa-pen"></i>
                 <span>Edit</span>
             </button>
 
-            <button class="admin-action-btn delete" title="Delete Test">
+            <button class="admin-action-btn delete" type="button" title="Delete Test">
                 <i class="fa-solid fa-trash"></i>
                 <span>Delete</span>
             </button>
@@ -419,61 +701,42 @@ function renderAdminTests(tests) {
     if (!adminTestList) return;
 
     adminTestList.innerHTML = "";
-
-    tests.forEach((test) => {
-        adminTestList.appendChild(createAdminTestItem(test));
-    });
+    tests.forEach((test) => { adminTestList.appendChild(createAdminTestItem(test)); });
 
     applyAdminFilters();
     updateAdminSummaryCards();
 }
 
 function updateAdminSummaryCards() {
-    const totalTests = allAdminTests.length;
-    const draftTests = allAdminTests.filter((item) => item.adminStatus === "DRAFT").length;
-    const publishedTests = allAdminTests.filter((item) => item.adminStatus === "PUBLISHED").length;
+    const totalTests     = allAdminTests.length;
+    const draftTests     = allAdminTests.filter((t) => t.adminStatus === "DRAFT").length;
+    const publishedTests = allAdminTests.filter((t) => t.adminStatus === "PUBLISHED").length;
 
     let totalQuestions = 0;
-    questionCountByTestId.forEach((count) => {
-        totalQuestions += Number(count || 0);
-    });
+    questionCountByTestId.forEach((count) => { totalQuestions += Number(count || 0); });
 
-    if (adminTotalTestsCount) {
-        adminTotalTestsCount.textContent = String(totalTests).padStart(2, "0");
-    }
-
-    if (adminDraftTestsCount) {
-        adminDraftTestsCount.textContent = String(draftTests).padStart(2, "0");
-    }
-
-    if (adminPublishedTestsCount) {
-        adminPublishedTestsCount.textContent = String(publishedTests).padStart(2, "0");
-    }
-
-    if (adminTotalQuestionsCount) {
-        adminTotalQuestionsCount.textContent = String(totalQuestions).padStart(2, "0");
-    }
+    if (adminTotalTestsCount)     adminTotalTestsCount.textContent     = String(totalTests).padStart(2, "0");
+    if (adminDraftTestsCount)     adminDraftTestsCount.textContent     = String(draftTests).padStart(2, "0");
+    if (adminPublishedTestsCount) adminPublishedTestsCount.textContent = String(publishedTests).padStart(2, "0");
+    if (adminTotalQuestionsCount) adminTotalQuestionsCount.textContent = String(totalQuestions).padStart(2, "0");
 }
 
 function updateAdminEmptyState(visibleCount) {
     if (!adminTestsEmptyState) return;
-
-    if (visibleCount === 0) {
-        adminTestsEmptyState.classList.remove("hidden");
-    } else {
-        adminTestsEmptyState.classList.add("hidden");
-    }
+    visibleCount === 0
+        ? adminTestsEmptyState.classList.remove("hidden")
+        : adminTestsEmptyState.classList.add("hidden");
 }
 
 function matchesAdminFilter(item, filterValue) {
     if (!filterValue || filterValue === "ALL") return true;
 
-    const type = normalizeTestType(item.dataset.type || "");
+    const type   = normalizeTestType(item.dataset.type || "");
     const status = normalizeAdminStatus(item.dataset.status || "");
 
-    if (filterValue === "DRAFT") return status === "DRAFT";
+    if (filterValue === "DRAFT")     return status === "DRAFT";
     if (filterValue === "PUBLISHED") return status === "PUBLISHED";
-    if (filterValue === "UPCOMING") return type === "Upcoming";
+    if (filterValue === "UPCOMING")  return type === "Upcoming";
     if (filterValue === "THIS_WEEK") return type === "This Week";
     if (filterValue === "MOCK_TEST") return type === "Mock Test";
 
@@ -483,16 +746,16 @@ function matchesAdminFilter(item, filterValue) {
 function applyAdminFilters() {
     if (!adminTestList) return;
 
-    const items = adminTestList.querySelectorAll(".admin-test-item");
-    const searchText = adminTestSearchInput ? adminTestSearchInput.value.toLowerCase().trim() : "";
+    const items       = adminTestList.querySelectorAll(".admin-test-item");
+    const searchText  = adminTestSearchInput  ? adminTestSearchInput.value.toLowerCase().trim() : "";
     const filterValue = adminTestFilterSelect ? adminTestFilterSelect.value : "ALL";
 
     let visibleCount = 0;
 
     items.forEach((item) => {
-        const title = item.querySelector(".admin-test-title-row h4")?.textContent.toLowerCase() || "";
+        const title       = item.querySelector(".admin-test-title-row h4")?.textContent.toLowerCase() || "";
         const description = item.querySelector(".admin-test-description")?.textContent.toLowerCase() || "";
-        const subject = (item.dataset.subject || "").toLowerCase();
+        const subject     = (item.dataset.subject || "").toLowerCase();
 
         const matchesSearch =
             title.includes(searchText) ||
@@ -512,14 +775,14 @@ function applyAdminFilters() {
     updateAdminEmptyState(visibleCount);
 }
 
-function extractSubjectName(subjectItem) {
-    if (typeof subjectItem === "string") {
-        return subjectItem.trim();
-    }
+/* =====================================================
+   Subject Dropdown + Question Count
+===================================================== */
 
-    if (!subjectItem || typeof subjectItem !== "object") {
-        return "";
-    }
+function extractSubjectName(subjectItem) {
+    if (typeof subjectItem === "string") return subjectItem.trim();
+
+    if (!subjectItem || typeof subjectItem !== "object") return "";
 
     return String(
         subjectItem.name ??
@@ -534,20 +797,19 @@ async function loadAdminSubjectOptions() {
     if (!adminTestSubjectInput) return;
 
     try {
-        const subjects = await fetchJson(buildSubjectsApiUrl());
+        const response = await fetchJson(buildSubjectsApiUrl());
+        const subjects  = unwrapArrayResponse(response, ["subjects"]);
 
-        if (!Array.isArray(subjects) || subjects.length === 0) {
-            return;
-        }
+        if (!Array.isArray(subjects) || subjects.length === 0) return;
 
-        const currentValue = adminTestSubjectInput.value;
-        const subjectNames = [...new Set(subjects.map(extractSubjectName).filter(Boolean))];
+        const currentValue  = adminTestSubjectInput.value;
+        const subjectNames  = [...new Set(subjects.map(extractSubjectName).filter(Boolean))];
 
         adminTestSubjectInput.innerHTML = `<option value="">Select subject</option>`;
 
         subjectNames.forEach((name) => {
-            const option = document.createElement("option");
-            option.value = name;
+            const option       = document.createElement("option");
+            option.value       = name;
             option.textContent = name;
             adminTestSubjectInput.appendChild(option);
         });
@@ -555,8 +817,10 @@ async function loadAdminSubjectOptions() {
         if (currentValue && subjectNames.includes(currentValue)) {
             adminTestSubjectInput.value = currentValue;
         }
+
     } catch (error) {
         console.warn("Admin subjects dropdown load failed.", error);
+        showAdminToast("error", "Subjects dropdown load nahi hua.");
     }
 }
 
@@ -565,10 +829,12 @@ async function loadQuestionCountsForTests(tests) {
 
     const settled = await Promise.allSettled(
         tests.map(async (test) => {
-            const questions = await fetchJson(buildQuestionsApiUrl(test.id));
+            const response  = await fetchJson(buildQuestionsApiUrl(test.id, test.userId));
+            const questions = unwrapArrayResponse(response, ["questions"]);
+
             return {
                 testId: test.id,
-                count: Array.isArray(questions) ? questions.length : 0
+                count:  Array.isArray(questions) ? questions.length : 0
             };
         })
     );
@@ -580,9 +846,24 @@ async function loadQuestionCountsForTests(tests) {
     });
 }
 
-async function loadAdminTests() {
+/* =====================================================
+   Backend CRUD
+===================================================== */
+
+async function loadAdminTests(showToastAfterLoad = false) {
     try {
-        const tests = await fetchJson(buildTestsApiUrl());
+        if (adminTestList) {
+            adminTestList.innerHTML = `
+                <div class="tests-empty-state">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <h3>Loading tests...</h3>
+                    <p>Please wait while admin tests are loading.</p>
+                </div>
+            `;
+        }
+
+        const response = await fetchJson(ADMIN_TESTS_API_URL);
+        const tests    = unwrapArrayResponse(response, ["tests"]);
 
         allAdminTests = Array.isArray(tests)
             ? sortAdminTests(tests.map(mapBackendTestToFrontend))
@@ -590,198 +871,251 @@ async function loadAdminTests() {
 
         await loadQuestionCountsForTests(allAdminTests);
         renderAdminTests(allAdminTests);
+
+        if (showToastAfterLoad) showAdminToast("success", "Tests refreshed successfully.");
+
     } catch (error) {
         console.error("Admin tests load failed:", error);
-        alert(`Admin tests load nahi ho pa rahe: ${error.message}`);
+
+        allAdminTests = [];
+        questionCountByTestId = new Map();
+        updateAdminSummaryCards();
+
+        if (adminTestList) {
+            adminTestList.innerHTML = `
+                <div class="tests-empty-state">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>Admin tests load nahi ho pa rahe</h3>
+                    <p>${escapeHtml(error.message || "Please check backend, token, or API URL.")}</p>
+                </div>
+            `;
+        }
+
+        updateAdminEmptyState(1);
+        showAdminToast("error", error.message || "Admin tests load nahi ho pa rahe.");
     }
 }
+
+async function createAdminTest(testData) {
+    await fetchJson(buildAdminTestsApiUrl(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(buildAdminTestPayload(testData))
+    });
+
+    await loadAdminTests(false);
+}
+
+async function updateAdminTest(testId, testData) {
+    await fetchJson(buildAdminTestsApiUrl(testId), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(buildAdminTestPayload(testData))
+    });
+
+    await loadAdminTests(false);
+}
+
+async function deleteAdminTest(testId) {
+    await fetchJson(buildAdminTestsApiUrl(testId), { method: "DELETE" });
+    await loadAdminTests(false);
+}
+
+/* =====================================================
+   Edit Fill
+===================================================== */
 
 function fillAdminFormForEdit(testItem) {
     editingAdminTestId = testItem.dataset.testId || null;
 
     const testData = allAdminTests.find((item) => String(item.id) === String(editingAdminTestId));
-    if (!testData) return;
 
-    if (adminTestTitleInput) {
-        adminTestTitleInput.value = testData.title || "";
+    if (!testData) {
+        showAdminToast("error", "Selected test data not found.");
+        return;
     }
 
+    clearAllFieldErrors();
+
+    if (adminTestTitleInput) adminTestTitleInput.value = testData.title || "";
+
     if (adminTestSubjectInput) {
+        const existingOption = [...adminTestSubjectInput.options].some(
+            (option) => option.value === testData.subject
+        );
+
+        if (testData.subject && !existingOption) {
+            const option       = document.createElement("option");
+            option.value       = testData.subject;
+            option.textContent = testData.subject;
+            adminTestSubjectInput.appendChild(option);
+        }
+
         adminTestSubjectInput.value = testData.subject || "";
     }
 
-    if (adminTestDateInput) {
-        adminTestDateInput.value = testData.date || "";
-    }
-
-    if (adminTestTypeInput) {
-        adminTestTypeInput.value = normalizeTestType(testData.type);
-    }
-
-    if (adminTestDurationInput) {
-        adminTestDurationInput.value = testData.duration || "";
-    }
-
-    if (adminTestStatusInput) {
-        adminTestStatusInput.value = normalizeAdminStatus(testData.adminStatus, testData.published);
-    }
-
-    if (adminNegativeMarkingInput) {
-        adminNegativeMarkingInput.value = String(Boolean(testData.negativeMarking));
-    }
-
-    if (adminTestDescriptionInput) {
-        adminTestDescriptionInput.value = testData.description || "";
-    }
-
-    if (adminTestInstructionsInput) {
-        adminTestInstructionsInput.value = testData.instructions || "";
-    }
+    if (adminTestDateInput)         adminTestDateInput.value         = testData.date || "";
+    if (adminTestTypeInput)         adminTestTypeInput.value         = normalizeTestType(testData.type);
+    // Show raw number in input for editing (user sees "60", not "60 mins")
+    if (adminTestDurationInput)     adminTestDurationInput.value     = testData.duration || "";
+    if (adminTestStatusInput)       adminTestStatusInput.value       = normalizeAdminStatus(testData.adminStatus, testData.published);
+    if (adminNegativeMarkingInput)  adminNegativeMarkingInput.value  = String(Boolean(testData.negativeMarking));
+    if (adminTestDescriptionInput)  adminTestDescriptionInput.value  = testData.description || "";
+    if (adminTestInstructionsInput) adminTestInstructionsInput.value = testData.instructions || "";
 }
 
-async function createAdminTest(testData) {
-    await fetchJson(buildTestsApiUrl(), {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(buildAdminTestPayload(testData))
-    });
+/* =====================================================
+   Validation + Submit
+===================================================== */
 
-    await loadAdminTests();
-}
+function validateAdminTestForm() {
+    clearAllFieldErrors();
 
-async function updateAdminTest(testId, testData) {
-    await fetchJson(buildTestsApiUrl(testId), {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(buildAdminTestPayload(testData))
-    });
+    let isValid = true;
 
-    await loadAdminTests();
-}
+    const title    = adminTestTitleInput    ? adminTestTitleInput.value.trim()    : "";
+    const subject  = adminTestSubjectInput  ? adminTestSubjectInput.value          : "";
+    const date     = adminTestDateInput     ? adminTestDateInput.value             : "";
+    const duration = adminTestDurationInput ? adminTestDurationInput.value.trim() : "";
 
-async function deleteAdminTest(testId) {
-    await fetchJson(buildTestsApiUrl(testId), {
-        method: "DELETE"
-    });
+    if (!title) {
+        setFieldError(adminTestTitleInput, "Test title is required.");
+        isValid = false;
+    } else if (title.length < 3) {
+        setFieldError(adminTestTitleInput, "Test title must be at least 3 characters.");
+        isValid = false;
+    } else {
+        clearFieldError(adminTestTitleInput);
+    }
 
-    await loadAdminTests();
+    if (!subject) {
+        setFieldError(adminTestSubjectInput, "Please select a subject.");
+        isValid = false;
+    } else {
+        clearFieldError(adminTestSubjectInput);
+    }
+
+    if (!date) {
+        setFieldError(adminTestDateInput, "Please select test date.");
+        isValid = false;
+    } else {
+        clearFieldError(adminTestDateInput);
+    }
+
+    // Validate duration: if provided, it must parse to a valid number
+    if (duration) {
+        const parsed = parseDurationToInt(duration);
+        if (parsed === null || parsed <= 0) {
+            setFieldError(adminTestDurationInput, "Enter a valid duration, e.g. 60 or 60 mins.");
+            isValid = false;
+        } else {
+            clearFieldError(adminTestDurationInput);
+        }
+    } else {
+        clearFieldError(adminTestDurationInput);
+    }
+
+    if (!isValid) showAdminToast("error", "Please fix the highlighted fields.");
+
+    return isValid;
 }
 
 async function handleAdminModalSubmit(event) {
     event.preventDefault();
 
-    const title = adminTestTitleInput ? adminTestTitleInput.value.trim() : "";
-    const subject = adminTestSubjectInput ? adminTestSubjectInput.value : "";
-    const date = adminTestDateInput ? adminTestDateInput.value : "";
-    const type = adminTestTypeInput ? adminTestTypeInput.value : "Upcoming";
-    const duration = adminTestDurationInput ? adminTestDurationInput.value.trim() : "";
-    const adminStatus = adminTestStatusInput ? adminTestStatusInput.value : "DRAFT";
-    const negativeMarking = adminNegativeMarkingInput ? adminNegativeMarkingInput.value === "true" : false;
-    const description = adminTestDescriptionInput ? adminTestDescriptionInput.value.trim() : "";
-    const instructions = adminTestInstructionsInput ? adminTestInstructionsInput.value.trim() : "";
-
-    if (!title) {
-        alert("Please enter test title.");
-        return;
-    }
-
-    if (!subject) {
-        alert("Please select a subject.");
-        return;
-    }
-
-    if (!date) {
-        alert("Please select test date.");
-        return;
-    }
+    if (!validateAdminTestForm()) return;
 
     const payload = {
-        title,
-        subject,
-        date,
-        type,
-        duration,
-        description: description || "Admin managed test draft.",
-        instructions,
-        adminStatus,
-        published: adminStatus === "PUBLISHED",
-        negativeMarking
+        title:          adminTestTitleInput     ? adminTestTitleInput.value.trim()     : "",
+        subject:        adminTestSubjectInput   ? adminTestSubjectInput.value           : "",
+        date:           adminTestDateInput      ? adminTestDateInput.value              : "",
+        type:           adminTestTypeInput      ? adminTestTypeInput.value             : "Upcoming",
+        duration:       adminTestDurationInput  ? adminTestDurationInput.value.trim()  : "",
+        description:    adminTestDescriptionInput
+            ? adminTestDescriptionInput.value.trim() || null
+            : null,
+        instructions:   adminTestInstructionsInput ? adminTestInstructionsInput.value.trim() : "",
+        adminStatus:    adminTestStatusInput    ? adminTestStatusInput.value            : "DRAFT",
+        published:      adminTestStatusInput    ? adminTestStatusInput.value === "PUBLISHED" : false,
+        negativeMarking: adminNegativeMarkingInput ? adminNegativeMarkingInput.value === "true" : false
     };
 
     try {
         if (saveAdminTestBtn) {
-            saveAdminTestBtn.disabled = true;
-            saveAdminTestBtn.textContent = editingAdminTestId ? "Updating..." : "Saving...";
+            saveAdminTestBtn.disabled     = true;
+            saveAdminTestBtn.textContent  = editingAdminTestId ? "Updating..." : "Saving...";
         }
 
         if (editingAdminTestId) {
             await updateAdminTest(editingAdminTestId, payload);
+            showAdminToast("success", "Test updated successfully.");
         } else {
             await createAdminTest(payload);
+            showAdminToast("success", "Test created successfully.");
         }
 
         closeAdminTestModal();
         clearAdminTestModalState();
+
     } catch (error) {
         console.error("Admin test save failed:", error);
-        alert(`Admin test save nahi hua: ${error.message}`);
-    } finally {
-        if (saveAdminTestBtn) {
-            saveAdminTestBtn.disabled = false;
-        }
+        showAdminToast("error", `Admin test save nahi hua: ${error.message}`);
 
-        if (editingAdminTestId) {
-            setEditAdminTestMode();
-        } else {
-            setCreateAdminTestMode();
-        }
+    } finally {
+        if (saveAdminTestBtn) saveAdminTestBtn.disabled = false;
+
+        if (editingAdminTestId) setEditAdminTestMode();
+        else                    setCreateAdminTestMode();
     }
 }
 
+/* =====================================================
+   Publish / Delete / Manage Actions
+===================================================== */
+
 function buildPublishTogglePayload(testData) {
     const nextPublished = !Boolean(testData.published);
-    const nextStatus = nextPublished ? "PUBLISHED" : "DRAFT";
+    const nextStatus    = nextPublished ? "PUBLISHED" : "DRAFT";
 
-    return {
-        ...testData,
-        published: nextPublished,
-        adminStatus: nextStatus
-    };
+    return { ...testData, published: nextPublished, adminStatus: nextStatus };
 }
 
 async function handleAdminTestListClick(event) {
-    const manageButton = event.target.closest(".admin-action-btn.manage");
+    const manageButton  = event.target.closest(".admin-action-btn.manage");
     const publishButton = event.target.closest(".admin-action-btn.publish, .admin-action-btn.unpublish");
-    const editButton = event.target.closest(".admin-action-btn.edit");
-    const deleteButton = event.target.closest(".admin-action-btn.delete");
+    const editButton    = event.target.closest(".admin-action-btn.edit");
+    const deleteButton  = event.target.closest(".admin-action-btn.delete");
 
     if (manageButton) {
-        const item = manageButton.closest(".admin-test-item");
+        const item   = manageButton.closest(".admin-test-item");
         const testId = item?.dataset.testId;
-        if (!testId) return;
+
+        if (!testId) { showAdminToast("error", "Test ID not found."); return; }
 
         const testData = allAdminTests.find((test) => String(test.id) === String(testId));
+
         const query = new URLSearchParams({
-            testId: testId,
-            title: testData?.title || "",
+            testId:  testId,
+            title:   testData?.title   || "",
             subject: testData?.subject || ""
         });
 
-        window.location.href = `admin-questions.html?${query.toString()}`;
+        const ownerUserId = testData?.userId || item?.dataset.userId;
+        if (ownerUserId) query.set("userId", ownerUserId);
+
+        window.location.href = `admin-question-bank.html?${query.toString()}`;
         return;
     }
 
     if (publishButton) {
-        const item = publishButton.closest(".admin-test-item");
+        const item   = publishButton.closest(".admin-test-item");
         const testId = item?.dataset.testId;
-        if (!testId) return;
+
+        if (!testId) { showAdminToast("error", "Test ID not found."); return; }
 
         const testData = allAdminTests.find((test) => String(test.id) === String(testId));
-        if (!testData) return;
+
+        if (!testData) { showAdminToast("error", "Selected test not found."); return; }
 
         const nextStateLabel = testData.published ? "unpublish" : "publish";
         const shouldContinue = confirm(`Do you want to ${nextStateLabel} this test?`);
@@ -789,43 +1123,53 @@ async function handleAdminTestListClick(event) {
 
         try {
             await updateAdminTest(testId, buildPublishTogglePayload(testData));
+            showAdminToast("success", `Test ${nextStateLabel}ed successfully.`);
         } catch (error) {
             console.error("Publish toggle failed:", error);
-            alert(`Publish status update nahi hua: ${error.message}`);
+            showAdminToast("error", `Publish status update nahi hua: ${error.message}`);
         }
+
         return;
     }
 
     if (editButton) {
         const item = editButton.closest(".admin-test-item");
-        if (!item) return;
+
+        if (!item) { showAdminToast("error", "Selected test item not found."); return; }
 
         setEditAdminTestMode();
+        await loadAdminSubjectOptions();
         fillAdminFormForEdit(item);
         openAdminTestModal();
         return;
     }
 
     if (deleteButton) {
-        const item = deleteButton.closest(".admin-test-item");
+        const item   = deleteButton.closest(".admin-test-item");
         const testId = item?.dataset.testId;
-        if (!testId) return;
+
+        if (!testId) { showAdminToast("error", "Test ID not found."); return; }
 
         const shouldDelete = confirm("Do you want to delete this test?");
         if (!shouldDelete) return;
 
         try {
             await deleteAdminTest(testId);
+            showAdminToast("success", "Test deleted successfully.");
         } catch (error) {
             console.error("Admin delete failed:", error);
-            alert(`Test delete nahi hua: ${error.message}`);
+            showAdminToast("error", `Test delete nahi hua: ${error.message}`);
         }
     }
 }
 
-function initializeAdminTestsPage() {
+/* =====================================================
+   Init
+===================================================== */
 
-    // ─── Modal Open ───────────────────────────────────────────────
+function initializeAdminTestsPage() {
+    injectAdminTestUtilityStyles();
+
     if (openAdminTestModalBtn) {
         openAdminTestModalBtn.addEventListener("click", function () {
             clearAdminTestModalState();
@@ -834,7 +1178,6 @@ function initializeAdminTestsPage() {
         });
     }
 
-    // ─── Modal Close — X button ───────────────────────────────────
     if (closeAdminTestModalBtn) {
         closeAdminTestModalBtn.addEventListener("click", function () {
             closeAdminTestModal();
@@ -842,7 +1185,6 @@ function initializeAdminTestsPage() {
         });
     }
 
-    // ─── Modal Close — Cancel button ─────────────────────────────
     if (cancelAdminTestModalBtn) {
         cancelAdminTestModalBtn.addEventListener("click", function () {
             closeAdminTestModal();
@@ -850,7 +1192,6 @@ function initializeAdminTestsPage() {
         });
     }
 
-    // ─── Modal Close — Overlay click ─────────────────────────────
     if (adminTestModalOverlay) {
         adminTestModalOverlay.addEventListener("click", function (event) {
             if (event.target === adminTestModalOverlay) {
@@ -860,7 +1201,6 @@ function initializeAdminTestsPage() {
         });
     }
 
-    // ─── Modal Close — Escape key ────────────────────────────────
     document.addEventListener("keydown", function (event) {
         if (
             event.key === "Escape" &&
@@ -872,17 +1212,14 @@ function initializeAdminTestsPage() {
         }
     });
 
-    // ─── Form Submit ──────────────────────────────────────────────
     if (adminTestModalForm) {
         adminTestModalForm.addEventListener("submit", handleAdminModalSubmit);
     }
 
-    // ─── Test List Click (edit/delete/publish/manage) ─────────────
     if (adminTestList) {
         adminTestList.addEventListener("click", handleAdminTestListClick);
     }
 
-    // ─── Search & Filter ──────────────────────────────────────────
     if (adminTestSearchInput) {
         adminTestSearchInput.addEventListener("input", applyAdminFilters);
     }
@@ -891,10 +1228,16 @@ function initializeAdminTestsPage() {
         adminTestFilterSelect.addEventListener("change", applyAdminFilters);
     }
 
-    // ─── Init ─────────────────────────────────────────────────────
+    [adminTestTitleInput, adminTestSubjectInput, adminTestDateInput, adminTestDurationInput].forEach(function (input) {
+        if (!input) return;
+
+        input.addEventListener("input",  function () { clearFieldError(input); });
+        input.addEventListener("change", function () { clearFieldError(input); });
+    });
+
     setCreateAdminTestMode();
     loadAdminSubjectOptions();
-    loadAdminTests();
+    loadAdminTests(false);
 }
 
 initializeAdminTestsPage();

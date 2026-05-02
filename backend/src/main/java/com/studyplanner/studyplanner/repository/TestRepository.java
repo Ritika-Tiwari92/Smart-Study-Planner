@@ -11,4 +11,10 @@ public interface TestRepository extends JpaRepository<Test, Long> {
      List<Test> findByUserId(Long userId);
 
      Optional<Test> findByIdAndUserId(Long id, Long userId);
+
+     // ADD THIS — published tests for students
+     List<Test> findByPublishedTrue();
+
+     // ADD THIS — user's own tests + all published tests
+     List<Test> findByUserIdOrPublishedTrue(Long userId);
 }

@@ -17,8 +17,8 @@ const chartLabelsContainer = document.getElementById("chartLabels");
 const exportReportBtn = document.querySelector(".export-report-btn");
 
 const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
-const SUBJECTS_API_URL = `${API_BASE_URL}/subjects`;
-const TASKS_API_URL = `${API_BASE_URL}/tasks`;
+const SUBJECTS_API_URL = `${API_BASE_URL}/api/subjects`;
+const TASKS_API_URL    = `${API_BASE_URL}/api/tasks`;
 const REVISIONS_API_URL = `${API_BASE_URL}/api/revisions`;
 const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
 const PLANS_API_URL = `${API_BASE_URL}/api/plans`;
@@ -713,6 +713,14 @@ function isWeakRevision(topic) {
 // ─────────────────────────────────────────────────────────────
 
 async function fetchJson(url) {
+
+    const token = (localStorage.getItem("token") || "").trim();
+    const response = await fetch(url, {
+        headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Request failed: ${url} (${response.status})`);
     if (response.status === 204) return null;
@@ -726,11 +734,11 @@ async function fetchJson(url) {
 
 async function loadAllAnalyticsData() {
     const results = await Promise.allSettled([
-        fetchJson(buildApiUrlWithUserId(SUBJECTS_API_URL)),
-        fetchJson(buildApiUrlWithUserId(TASKS_API_URL)),
-        fetchJson(buildApiUrlWithUserId(REVISIONS_API_URL)),
-        fetchJson(buildApiUrlWithUserId(TESTS_API_URL)),
-        fetchJson(buildApiUrlWithUserId(PLANS_API_URL))
+         fetchJson(SUBJECTS_API_URL),    
+         fetchJson(TASKS_API_URL),
+         fetchJson(REVISIONS_API_URL),
+         fetchJson(TESTS_API_URL),
+        fetchJson(PLANS_API_URL)
     ]);
 
     const [subR, taskR, revR, testR, planR] = results;

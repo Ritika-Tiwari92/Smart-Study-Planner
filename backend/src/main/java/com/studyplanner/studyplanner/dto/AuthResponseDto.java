@@ -3,14 +3,22 @@ package com.studyplanner.studyplanner.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Auth Response DTO — updated with refreshToken field.
+ * Auth Response DTO
  *
- * @JsonInclude(NON_NULL) means null fields are NOT sent in JSON response.
- *                        So refreshToken only appears in login/register
- *                        responses, not profile fetch.
+ * Used for:
+ * - Login response
+ * - Register response
+ * - Profile response
+ * - Settings/profile update response
  *
- *                        IMPORTANT: password field does NOT exist here — never
- *                        returned to frontend.
+ * Security:
+ * - Password is never returned.
+ *
+ * Role:
+ * - STUDENT or ADMIN
+ * - Frontend uses this role to redirect:
+ * ADMIN -> admin-dashboard.html
+ * STUDENT -> dashboard.html
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponseDto {
@@ -18,29 +26,69 @@ public class AuthResponseDto {
      private Long id;
      private String fullName;
      private String email;
-     // NO password field — intentional security measure
 
+     // Role field for role-based frontend redirect
+     private String role;
+
+     // NO password field — intentional security measure
      private String course;
      private String college;
+
      private boolean twoFactorEnabled;
      private String preferredStudyTime;
      private String dailyStudyGoal;
      private String preferredSubjectsFocus;
+
      private boolean taskRemindersEnabled;
      private boolean revisionAlertsEnabled;
      private boolean testNotificationsEnabled;
      private boolean assistantSuggestionsEnabled;
 
-     // JWT access token (short-lived: 15 min)
+     // JWT access token
      private String token;
 
-     // NEW: Refresh token (long-lived: 7 days)
-     // null on profile/settings endpoints → not included in JSON (@JsonInclude)
+     // Refresh token
      private String refreshToken;
 
      private String message;
 
-     // ── Constructor (matches existing mapToAuthResponse calls) ──
+     public AuthResponseDto() {
+     }
+
+     /**
+      * New constructor with role.
+      */
+     public AuthResponseDto(Long id, String fullName, String email, String role,
+               String course, String college,
+               boolean twoFactorEnabled, String preferredStudyTime,
+               String dailyStudyGoal, String preferredSubjectsFocus,
+               boolean taskRemindersEnabled, boolean revisionAlertsEnabled,
+               boolean testNotificationsEnabled,
+               boolean assistantSuggestionsEnabled,
+               String token, String message) {
+
+          this.id = id;
+          this.fullName = fullName;
+          this.email = email;
+          this.role = role;
+          this.course = course;
+          this.college = college;
+          this.twoFactorEnabled = twoFactorEnabled;
+          this.preferredStudyTime = preferredStudyTime;
+          this.dailyStudyGoal = dailyStudyGoal;
+          this.preferredSubjectsFocus = preferredSubjectsFocus;
+          this.taskRemindersEnabled = taskRemindersEnabled;
+          this.revisionAlertsEnabled = revisionAlertsEnabled;
+          this.testNotificationsEnabled = testNotificationsEnabled;
+          this.assistantSuggestionsEnabled = assistantSuggestionsEnabled;
+          this.token = token;
+          this.message = message;
+     }
+
+     /**
+      * Old constructor kept for backward compatibility.
+      * This prevents compile errors if any old service method still uses it.
+      */
      public AuthResponseDto(Long id, String fullName, String email,
                String course, String college,
                boolean twoFactorEnabled, String preferredStudyTime,
@@ -49,6 +97,7 @@ public class AuthResponseDto {
                boolean testNotificationsEnabled,
                boolean assistantSuggestionsEnabled,
                String token, String message) {
+
           this.id = id;
           this.fullName = fullName;
           this.email = email;
@@ -66,10 +115,6 @@ public class AuthResponseDto {
           this.message = message;
      }
 
-     public AuthResponseDto() {
-     }
-
-     // Getters & Setters
      public Long getId() {
           return id;
      }
@@ -92,6 +137,14 @@ public class AuthResponseDto {
 
      public void setEmail(String email) {
           this.email = email;
+     }
+
+     public String getRole() {
+          return role;
+     }
+
+     public void setRole(String role) {
+          this.role = role;
      }
 
      public String getCourse() {

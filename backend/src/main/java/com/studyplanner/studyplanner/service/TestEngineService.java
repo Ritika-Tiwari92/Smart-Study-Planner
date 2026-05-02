@@ -137,6 +137,27 @@ public class TestEngineService {
      }
 
      @Transactional
+     public void deleteQuestion(Long userId, Long testId, Long questionId) {
+          Test test = getOwnedTest(userId, testId);
+
+          TestQuestion question = testQuestionRepository.findByIdAndTestId(questionId, test.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                              "Question not found with id: " + questionId + " for testId: " + testId));
+
+          // First remove saved answers linked with this question.
+          // Otherwise DB foreign key can block question deletion.
+          testAnswerRepository.deleteByQuestion_Id(question.getId());
+
+          // Then remove options linked with this question.
+          if (question.getOptions() != null) {
+               question.getOptions().clear();
+          }
+
+          // Finally delete question.
+          testQuestionRepository.delete(question);
+     }
+
+     @Transactional
      public StartTestResponseDto startTest(Long userId, Long testId) {
           Test test = getOwnedTest(userId, testId);
 

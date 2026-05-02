@@ -5,6 +5,8 @@
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Pomodoro & Study Library | EduMind AI</title>
+     <link rel="icon" type="image/svg+xml"
+          href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2716%27 fill=%27%236c63ff%27/%3E%3Ctext x=%2750%25%27 y=%2758%25%27 text-anchor=%27middle%27 font-size=%2738%27 fill=%27white%27 font-family=%27Arial%27%3E⏱%3C/text%3E%3C/svg%3E">
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,13 +21,12 @@
      <link rel="stylesheet" href="../assets/css/dashboard.css">
      <link rel="stylesheet" href="../assets/css/pomodoro.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
-     <link rel="stylesheet" href=" ../assets/css/dark-mode.css">
+     <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 
 <body>
      <div class="dashboard-layout">
 
-          <!-- ═══════════════ SIDEBAR ═══════════════ -->
           <aside class="sidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -33,62 +34,46 @@
                          <span>EduMind AI</span>
                     </h2>
                </div>
-
                <nav class="sidebar-nav">
                     <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
+                         <i class="fa-solid fa-house"></i><span>Dashboard</span>
                     </a>
                     <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
+                         <i class="fa-solid fa-calendar-days"></i><span>Planner</span>
                     </a>
                     <a href="subjects.html" class="nav-item">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
+                         <i class="fa-solid fa-book"></i><span>Subjects</span>
                     </a>
                     <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
+                         <i class="fa-solid fa-list-check"></i><span>Tasks</span>
                     </a>
                     <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
+                         <i class="fa-solid fa-rotate"></i><span>Revision</span>
                     </a>
                     <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
+                         <i class="fa-solid fa-file-lines"></i><span>Tests</span>
                     </a>
                     <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
+                         <i class="fa-solid fa-chart-line"></i><span>Analytics</span>
                     </a>
                     <a href="pomodoro.html" class="nav-item active">
-                         <i class="fa-solid fa-stopwatch"></i>
-                         <span>Study Timer</span>
+                         <i class="fa-solid fa-stopwatch"></i><span>Study Timer</span>
                     </a>
                     <a href="assistant.html" class="nav-item">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
+                         <i class="fa-solid fa-robot"></i><span>Assistant</span>
                     </a>
                     <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
+                         <i class="fa-solid fa-gear"></i><span>Settings</span>
                     </a>
                </nav>
-
                <div class="sidebar-bottom">
                     <a href="login.html" class="logout-btn" id="logoutBtn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
+                         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
                     </a>
                </div>
           </aside>
 
-          <!-- ═══════════════ MAIN ═══════════════ -->
           <main class="dashboard-main">
-
-               <!-- Header -->
                <header class="dashboard-header">
                     <div class="header-left">
                          <div>
@@ -112,17 +97,16 @@
 
                <section class="pomodoro-content">
 
-                    <!-- ── TOP ROW: Timer + Quick Stats ── -->
-                    <div class="pom-top-row">
+                    <!-- ── TOP ROW: Timer + Stats/YouTube ── -->
+                    <div class="pom-top-row" id="pomTopRow">
 
-                         <!-- Pomodoro Timer Card -->
+                         <!-- LEFT: Timer Card -->
                          <div class="pom-timer-card">
                               <div class="pom-timer-header">
                                    <h3><i class="fa-solid fa-stopwatch"></i> Pomodoro Timer</h3>
                                    <p>Select subject and topic, then start your focus session.</p>
                               </div>
 
-                              <!-- Subject & Video Select -->
                               <div class="pom-selects">
                                    <div class="pom-select-group">
                                         <label>Subject <span class="req">*</span></label>
@@ -141,7 +125,6 @@
                                    </div>
                               </div>
 
-                              <!-- Timer Display -->
                               <div class="pom-timer-display">
                                    <div class="pom-timer-ring">
                                         <svg viewBox="0 0 200 200" class="pom-ring-svg">
@@ -156,20 +139,29 @@
                                    </div>
                               </div>
 
-                              <!-- Session Mode Tabs -->
+                              <div class="pom-rounds-row">
+                                   <span class="pom-round-dot active" id="round1"></span>
+                                   <span class="pom-round-dot" id="round2"></span>
+                                   <span class="pom-round-dot" id="round3"></span>
+                                   <span class="pom-round-dot" id="round4"></span>
+                                   <span class="pom-rounds-label" id="pomRoundsLabel">Round 1 of 4</span>
+                              </div>
+
                               <div class="pom-mode-tabs">
                                    <button class="pom-mode-btn active" data-minutes="25" id="modeFocus">
-                                        Focus 25m
+                                        <i class="fa-solid fa-brain"></i> Focus 25m
                                    </button>
                                    <button class="pom-mode-btn" data-minutes="5" id="modeShortBreak">
-                                        Break 5m
+                                        <i class="fa-solid fa-mug-hot"></i> Break 5m
                                    </button>
                                    <button class="pom-mode-btn" data-minutes="15" id="modeLongBreak">
-                                        Long Break 15m
+                                        <i class="fa-solid fa-couch"></i> Long 15m
+                                   </button>
+                                   <button class="pom-mode-btn" id="pomCustomTimerBtn" title="Custom Timer">
+                                        <i class="fa-solid fa-gear"></i>
                                    </button>
                               </div>
 
-                              <!-- Controls -->
                               <div class="pom-controls">
                                    <button class="pom-btn pom-btn-start" id="pomStartBtn">
                                         <i class="fa-solid fa-play"></i> Start Session
@@ -185,72 +177,185 @@
                                    </button>
                               </div>
 
-                              <!-- Active session info -->
                               <div class="pom-session-info hidden" id="pomSessionInfo">
                                    <i class="fa-solid fa-circle-dot pom-pulse"></i>
                                    <span id="pomSessionInfoText">Session active</span>
                               </div>
                          </div>
 
-                         <!-- Quick Stats Card -->
-                         <div class="pom-stats-col">
+                         <!-- RIGHT: Stats + YouTube -->
+                         <div class="pom-yt-panel" id="pomYtPanel">
 
-                              <div class="pom-stat-card">
-                                   <div class="pom-stat-icon" style="background:#f5f3ff;color:#6c63ff">
-                                        <i class="fa-solid fa-fire"></i>
+                              <div class="pom-stats-col" id="pomStatsCol">
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#f5f3ff;color:#6c63ff">
+                                             <i class="fa-solid fa-fire"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Current Streak</span>
+                                             <span class="pom-stat-value" id="statCurrentStreak">0</span>
+                                             <span class="pom-stat-sub">days</span>
+                                        </div>
                                    </div>
-                                   <div class="pom-stat-body">
-                                        <span class="pom-stat-label">Current Streak</span>
-                                        <span class="pom-stat-value" id="statCurrentStreak">0</span>
-                                        <span class="pom-stat-sub">days</span>
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#ecfdf5;color:#059669">
+                                             <i class="fa-solid fa-clock"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Today's Focus</span>
+                                             <span class="pom-stat-value" id="statTodayFocus">0</span>
+                                             <span class="pom-stat-sub">minutes</span>
+                                        </div>
+                                   </div>
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#fffbeb;color:#d97706">
+                                             <i class="fa-solid fa-video"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Videos Today</span>
+                                             <span class="pom-stat-value" id="statVideosToday">0</span>
+                                             <span class="pom-stat-sub" id="statDailyTarget">of 3 target</span>
+                                        </div>
+                                   </div>
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#eff6ff;color:#2563eb">
+                                             <i class="fa-solid fa-stopwatch"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Sessions Today</span>
+                                             <span class="pom-stat-value" id="statSessionsToday">0</span>
+                                             <span class="pom-stat-sub">completed</span>
+                                        </div>
+                                   </div>
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#fdf4ff;color:#a21caf">
+                                             <i class="fa-solid fa-hourglass-half"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Total Hours</span>
+                                             <span class="pom-stat-value" id="statTotalHours">0</span>
+                                             <span class="pom-stat-sub">all time</span>
+                                        </div>
+                                   </div>
+                                   <div class="pom-stat-card">
+                                        <div class="pom-stat-icon" style="background:#fff7ed;color:#ea580c">
+                                             <i class="fa-solid fa-sun"></i>
+                                        </div>
+                                        <div class="pom-stat-body">
+                                             <span class="pom-stat-label">Best Study Time</span>
+                                             <span class="pom-stat-value pom-stat-value-sm" id="statBestTime">—</span>
+                                             <span class="pom-stat-sub" id="statBestPeriod">loading...</span>
+                                        </div>
+                                   </div>
+
+                                   <!-- Daily Target Card with Edit -->
+                                   <div class="pom-target-card">
+                                        <div class="pom-target-header">
+                                             <span>
+                                                  <i class="fa-solid fa-bullseye"></i>
+                                                  Daily Target
+                                             </span>
+                                             <div style="display:flex;align-items:center;gap:8px;">
+                                                  <span id="pomTargetText">0 / 3 videos</span>
+                                                  <button class="pom-target-edit-btn" id="pomEditTargetBtn"
+                                                       title="Change daily target">
+                                                       <i class="fa-solid fa-pen"></i>
+                                                  </button>
+                                             </div>
+                                        </div>
+                                        <div class="pom-target-bar">
+                                             <div class="pom-target-fill" id="pomTargetFill" style="width: 0%"></div>
+                                        </div>
+                                        <span class="pom-target-pct" id="pomTargetPct">0% complete</span>
                                    </div>
                               </div>
 
-                              <div class="pom-stat-card">
-                                   <div class="pom-stat-icon" style="background:#ecfdf5;color:#059669">
-                                        <i class="fa-solid fa-clock"></i>
+                              <!-- YouTube Player -->
+                              <div class="pom-yt-player-wrap hidden" id="pomYtPlayerWrap">
+                                   <div class="pom-yt-player-header">
+                                        <div class="pom-yt-header-left">
+                                             <i class="fa-brands fa-youtube pom-yt-logo"></i>
+                                             <span id="pomYtVideoTitle" class="pom-yt-title">
+                                                  Playing video...
+                                             </span>
+                                        </div>
+                                        <button class="pom-yt-close-btn" id="pomYtCloseBtn">
+                                             <i class="fa-solid fa-xmark"></i>
+                                        </button>
                                    </div>
-                                   <div class="pom-stat-body">
-                                        <span class="pom-stat-label">Today's Focus</span>
-                                        <span class="pom-stat-value" id="statTodayFocus">0</span>
-                                        <span class="pom-stat-sub">minutes</span>
+                                   <div class="pom-yt-frame-wrap">
+                                        <div class="pom-yt-pause-overlay hidden" id="pomYtPauseOverlay">
+                                             <i class="fa-solid fa-pause"></i>
+                                        </div>
+                                        <iframe id="pomYtFrame" src="" title="YouTube Study Video" frameborder="0"
+                                             allow="accelerometer; autoplay; clipboard-write;
+                                                    encrypted-media; gyroscope; picture-in-picture;
+                                                    web-share" allowfullscreen></iframe>
+                                   </div>
+                                   <div class="pom-yt-footer">
+                                        <div class="pom-yt-footer-left">
+                                             <i class="fa-solid fa-circle-dot pom-pulse" style="color:#ef4444"></i>
+                                             <span>Timer running while you study</span>
+                                        </div>
+                                        <button class="pom-yt-pip-btn" id="pomYtPipBtn">
+                                             <i class="fa-solid fa-up-right-from-square"></i> Pop out
+                                        </button>
                                    </div>
                               </div>
 
-                              <div class="pom-stat-card">
-                                   <div class="pom-stat-icon" style="background:#fffbeb;color:#d97706">
-                                        <i class="fa-solid fa-video"></i>
+                         </div>
+                    </div>
+
+                    <!-- ── ANALYTICS ROW ── -->
+                    <div class="pom-analytics-row">
+
+                         <!-- Weekly Focus Chart -->
+                         <div class="pom-chart-card">
+                              <div class="pom-chart-header">
+                                   <div>
+                                        <h3><i class="fa-solid fa-chart-bar"></i> Weekly Focus</h3>
+                                        <p>Focus minutes per day this week</p>
                                    </div>
-                                   <div class="pom-stat-body">
-                                        <span class="pom-stat-label">Videos Today</span>
-                                        <span class="pom-stat-value" id="statVideosToday">0</span>
-                                        <span class="pom-stat-sub" id="statDailyTarget">of 3 target</span>
+                                   <span class="pom-chart-badge" id="weeklyTotalBadge">0 min</span>
+                              </div>
+                              <div class="pom-bar-chart" id="weeklyFocusChart">
+                                   <div class="pom-chart-loading">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                    </div>
                               </div>
+                         </div>
 
-                              <div class="pom-stat-card">
-                                   <div class="pom-stat-icon" style="background:#eff6ff;color:#2563eb">
-                                        <i class="fa-solid fa-stopwatch"></i>
-                                   </div>
-                                   <div class="pom-stat-body">
-                                        <span class="pom-stat-label">Sessions Today</span>
-                                        <span class="pom-stat-value" id="statSessionsToday">0</span>
-                                        <span class="pom-stat-sub">completed</span>
+                         <!-- Subject Progress Chart -->
+                         <div class="pom-chart-card">
+                              <div class="pom-chart-header">
+                                   <div>
+                                        <h3><i class="fa-solid fa-book-open"></i> Subject Progress</h3>
+                                        <p>Videos completed per subject</p>
                                    </div>
                               </div>
-
-                              <!-- Daily Target Progress -->
-                              <div class="pom-target-card">
-                                   <div class="pom-target-header">
-                                        <span><i class="fa-solid fa-bullseye"></i> Daily Target</span>
-                                        <span id="pomTargetText">0 / 3 videos</span>
+                              <div class="pom-subject-chart" id="subjectProgressChart">
+                                   <div class="pom-chart-loading">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                    </div>
-                                   <div class="pom-target-bar">
-                                        <div class="pom-target-fill" id="pomTargetFill" style="width: 0%"></div>
-                                   </div>
-                                   <span class="pom-target-pct" id="pomTargetPct">0% complete</span>
                               </div>
+                         </div>
 
+                    </div>
+
+                    <!-- ── RECOMMENDED VIDEOS ── -->
+                    <div class="pom-recommend-card">
+                         <div class="pom-library-header">
+                              <div>
+                                   <h3><i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        Recommended Next
+                                   </h3>
+                                   <p>Pending videos based on your subjects — study these next.</p>
+                              </div>
+                         </div>
+                         <div class="pom-recommend-list" id="pomRecommendList">
+                              <div class="pom-chart-loading">
+                                   <i class="fa-solid fa-spinner fa-spin"></i> Loading recommendations...
+                              </div>
                          </div>
                     </div>
 
@@ -265,8 +370,6 @@
                                    <i class="fa-solid fa-plus"></i> Add Content
                               </button>
                          </div>
-
-                         <!-- Library Filter -->
                          <div class="pom-library-filter">
                               <select id="librarySubjectFilter">
                                    <option value="all">All Subjects</option>
@@ -277,8 +380,6 @@
                                    <button class="pom-filter-tab" data-filter="completed">Completed</button>
                               </div>
                          </div>
-
-                         <!-- Video List -->
                          <div class="pom-video-list" id="pomVideoList">
                               <div class="pom-library-empty" id="pomLibraryEmpty">
                                    <i class="fa-solid fa-photo-film"></i>
@@ -291,7 +392,7 @@
           </main>
      </div>
 
-     <!-- ═══════════════ ADD VIDEO MODAL ═══════════════ -->
+     <!-- ADD VIDEO MODAL -->
      <div class="pom-modal-overlay hidden" id="addVideoModalOverlay">
           <div class="pom-modal">
                <div class="pom-modal-header">
@@ -303,31 +404,30 @@
                          <i class="fa-solid fa-xmark"></i>
                     </button>
                </div>
-
                <div class="pom-modal-body">
                     <div class="pom-form-group">
                          <label>Subject <span class="req">*</span></label>
                          <select id="addVideoSubject">
                               <option value="">-- Select Subject --</option>
                          </select>
-                         <span class="pom-field-error hidden" id="addVideoSubjectError">
-                              Subject is required.
-                         </span>
+                         <span class="pom-field-error hidden" id="addVideoSubjectError">Subject is required.</span>
                     </div>
-
                     <div class="pom-form-group">
                          <label>Title <span class="req">*</span></label>
                          <input type="text" id="addVideoTitle" placeholder="e.g. Introduction to OOP">
-                         <span class="pom-field-error hidden" id="addVideoTitleError">
-                              Title is required.
+                         <span class="pom-field-error hidden" id="addVideoTitleError">Title is required.</span>
+                    </div>
+                    <div class="pom-form-group">
+                         <label>YouTube / Video URL <span class="pom-optional">(optional)</span></label>
+                         <div class="pom-url-input-wrap">
+                              <i class="fa-brands fa-youtube pom-url-icon"></i>
+                              <input type="url" id="addVideoUrl" placeholder="https://youtube.com/watch?v=...">
+                         </div>
+                         <span class="pom-url-hint">
+                              <i class="fa-solid fa-circle-info"></i>
+                              Paste YouTube link — video will play inside the timer page
                          </span>
                     </div>
-
-                    <div class="pom-form-group">
-                         <label>Video URL <span class="pom-optional">(optional)</span></label>
-                         <input type="url" id="addVideoUrl" placeholder="https://youtube.com/...">
-                    </div>
-
                     <div class="pom-form-row">
                          <div class="pom-form-group">
                               <label>Tag <span class="pom-optional">(optional)</span></label>
@@ -339,7 +439,6 @@
                          </div>
                     </div>
                </div>
-
                <div class="pom-modal-footer">
                     <button class="pom-btn-secondary" id="cancelAddVideoModal">Cancel</button>
                     <button class="pom-btn-primary" id="saveVideoBtn">
@@ -349,7 +448,7 @@
           </div>
      </div>
 
-     <!-- ═══════════════ SESSION COMPLETE MODAL ═══════════════ -->
+     <!-- SESSION COMPLETE MODAL -->
      <div class="pom-modal-overlay hidden" id="sessionCompleteModal">
           <div class="pom-modal pom-modal-sm">
                <div class="pom-complete-icon">
@@ -357,19 +456,16 @@
                </div>
                <h2>Session Complete!</h2>
                <p id="sessionCompleteMsg">Great work! Did you finish the topic?</p>
-
                <div class="pom-complete-actions">
                     <button class="pom-btn-primary" id="markVideoCompleteBtn">
                          <i class="fa-solid fa-check"></i> Yes, Mark Completed
                     </button>
-                    <button class="pom-btn-secondary" id="skipMarkCompleteBtn">
-                         Continue Later
-                    </button>
+                    <button class="pom-btn-secondary" id="skipMarkCompleteBtn">Continue Later</button>
                </div>
           </div>
      </div>
 
-     <!-- ═══════════════ BADGE UNLOCK POPUP ═══════════════ -->
+     <!-- BADGE UNLOCK POPUP -->
      <div class="pom-badge-popup hidden" id="badgeUnlockPopup">
           <div class="pom-badge-popup-inner">
                <i class="fa-solid fa-trophy pom-badge-icon"></i>

@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Revisions | EduMind AI Admin</title>
+     <link rel="icon" href="data:," />
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --card2: #162032;
+               --border: rgba(20, 184, 166, 0.14);
+               --border2: rgba(255, 255, 255, 0.07);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #64748b;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --radius: 14px;
+               --tr: 0.25s ease;
+          }
+
+          html[data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #ffffff;
+               --bg3: #e8eef7;
+               --card: #ffffff;
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.18);
+               --border2: rgba(15, 23, 42, 0.08);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               min-height: 100vh;
+               font-family: "Poppins", sans-serif;
+               background: var(--bg);
+               color: var(--text);
+               display: flex;
+               overflow-x: hidden;
+          }
+
+          button,
+          input,
+          select {
+               font-family: inherit;
+          }
+
+          button {
+               cursor: pointer;
+          }
+
+          .brand-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .sidebar-logo-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, 0.45));
+          }
+
+          @keyframes nodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.82;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.7;
+               }
+          }
+
+          @keyframes centerPulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.7;
+               }
+          }
+
+          @keyframes hexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes lineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .sidebar-logo-svg .hex-outer {
+               animation: hexRotate 18s linear infinite;
+          }
+
+          .sidebar-logo-svg .node-top,
+          .sidebar-logo-svg .node-left,
+          .sidebar-logo-svg .node-right,
+          .sidebar-logo-svg .node-bottom {
+               animation: nodePulse 2.4s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .center-dot {
+               animation: centerPulse 2s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: lineFlow 3s linear infinite;
+          }
+
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               position: fixed;
+               top: 0;
+               left: 0;
+               z-index: 1000;
+               background: var(--bg2);
+               border-right: 1px solid var(--border);
+               display: flex;
+               flex-direction: column;
+               transition: width var(--tr), transform var(--tr);
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               height: var(--header-h);
+               padding: 14px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+          }
+
+          .brand-text {
+               white-space: nowrap;
+               overflow: hidden;
+          }
+
+          .brand-text h2 {
+               font-size: 16px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               right: -14px;
+               top: 24px;
+               width: 28px;
+               height: 28px;
+               border-radius: 50%;
+               border: 1px solid var(--border);
+               background: var(--card);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               z-index: 5;
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: white;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               padding: 12px 10px;
+               overflow-y: auto;
+          }
+
+          .nav-section-label {
+               padding: 10px 8px 6px;
+               font-size: 10px;
+               font-weight: 700;
+               letter-spacing: 0.12em;
+               color: var(--text3);
+               text-transform: uppercase;
+               white-space: nowrap;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 10px 12px;
+               border-radius: 10px;
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               margin-bottom: 2px;
+               white-space: nowrap;
+          }
+
+          .nav-item:hover {
+               background: rgba(20, 184, 166, 0.08);
+               color: var(--teal);
+          }
+
+          .nav-item.active {
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
+               color: var(--teal);
+               border-left: 2px solid var(--teal);
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+          }
+
+          .sidebar.collapsed .brand-text,
+          .sidebar.collapsed .nav-label,
+          .sidebar.collapsed .nav-section-label,
+          .sidebar.collapsed .admin-info,
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+          }
+
+          .admin-profile {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: 12px;
+               background: rgba(255, 255, 255, 0.04);
+               margin-bottom: 8px;
+          }
+
+          .admin-avatar {
+               width: 34px;
+               height: 34px;
+               border-radius: 50%;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+               font-weight: 800;
+               color: white;
+          }
+
+          .admin-info p {
+               font-size: 13px;
+               font-weight: 700;
+          }
+
+          .admin-info span {
+               font-size: 11px;
+               color: var(--teal);
+          }
+
+          .logout-btn {
+               width: 100%;
+               border: none;
+               background: transparent;
+               color: var(--rose);
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: 10px;
+               font-size: 13px;
+               font-weight: 600;
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, 0.1);
+          }
+
+          .main {
+               margin-left: var(--sidebar-w);
+               min-height: 100vh;
+               flex: 1;
+               transition: margin-left var(--tr);
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+          }
+
+          .topbar {
+               height: var(--header-h);
+               background: var(--bg2);
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               gap: 16px;
+               padding: 0 28px;
+               position: sticky;
+               top: 0;
+               z-index: 100;
+          }
+
+          .mobile-topbar-toggle {
+               display: none;
+               background: transparent;
+               border: none;
+               color: var(--text);
+               font-size: 20px;
+          }
+
+          .topbar-left {
+               flex: 1;
+          }
+
+          .topbar-left h1 {
+               font-size: 20px;
+               font-weight: 800;
+          }
+
+          .topbar-left p {
+               font-size: 12px;
+               color: var(--text2);
+               margin-top: 2px;
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .topbar-time,
+          .topbar-btn {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               color: var(--text2);
+          }
+
+          .topbar-time {
+               padding: 8px 14px;
+               border-radius: 10px;
+               font-size: 12px;
+               font-weight: 600;
+          }
+
+          .topbar-btn {
+               width: 38px;
+               height: 38px;
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+          }
+
+          .topbar-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .content {
+               padding: 28px;
+          }
+
+          .welcome-banner {
+               background: linear-gradient(135deg, var(--card2), var(--card));
+               border: 1px solid var(--border);
+               border-radius: var(--radius);
+               padding: 24px 28px;
+               display: flex;
+               align-items: center;
+               gap: 18px;
+               margin-bottom: 24px;
+               position: relative;
+               overflow: hidden;
+          }
+
+          .welcome-banner::before {
+               content: "";
+               position: absolute;
+               right: -40px;
+               top: -40px;
+               width: 170px;
+               height: 170px;
+               background: radial-gradient(circle, rgba(20, 184, 166, 0.18), transparent 70%);
+          }
+
+          .welcome-icon {
+               width: 56px;
+               height: 56px;
+               border-radius: 18px;
+               background: rgba(20, 184, 166, 0.12);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 26px;
+          }
+
+          .welcome-text {
+               position: relative;
+               z-index: 1;
+          }
+
+          .welcome-text h2 {
+               font-size: 22px;
+               font-weight: 800;
+          }
+
+          .welcome-text p {
+               margin-top: 4px;
+               font-size: 13px;
+               color: var(--text2);
+               line-height: 1.6;
+          }
+
+          .welcome-text span {
+               color: var(--teal);
+               font-weight: 700;
+          }
+
+          .section-label {
+               font-size: 11px;
+               font-weight: 700;
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+               color: var(--text3);
+               margin-bottom: 14px;
+          }
+
+          .stats-row {
+               display: grid;
+               grid-template-columns: repeat(5, minmax(150px, 1fr));
+               gap: 16px;
+               margin-bottom: 20px;
+          }
+
+          .stat-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               padding: 18px;
+               display: flex;
+               align-items: center;
+               gap: 14px;
+          }
+
+          .stat-card:hover {
+               border-color: var(--border);
+               transform: translateY(-2px);
+          }
+
+          .stat-icon {
+               width: 44px;
+               height: 44px;
+               border-radius: 12px;
+               display: grid;
+               place-items: center;
+               font-size: 18px;
+          }
+
+          .icon-teal {
+               background: rgba(20, 184, 166, 0.15);
+               color: var(--teal);
+          }
+
+          .icon-purple {
+               background: rgba(139, 92, 246, 0.15);
+               color: var(--purple);
+          }
+
+          .icon-green {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .icon-amber {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .icon-rose {
+               background: rgba(244, 63, 94, 0.15);
+               color: var(--rose);
+          }
+
+          .stat-info p {
+               font-size: 11px;
+               color: var(--text2);
+               font-weight: 600;
+               margin-bottom: 4px;
+          }
+
+          .stat-info h3 {
+               font-size: 26px;
+               font-weight: 800;
+          }
+
+          .quick-filters {
+               display: flex;
+               gap: 10px;
+               flex-wrap: wrap;
+               margin-bottom: 16px;
+          }
+
+          .quick-filter-btn {
+               border: 1px solid var(--border2);
+               background: var(--card);
+               color: var(--text2);
+               border-radius: 999px;
+               padding: 8px 14px;
+               font-size: 12px;
+               font-weight: 700;
+               display: inline-flex;
+               align-items: center;
+               gap: 7px;
+          }
+
+          .quick-filter-btn:hover,
+          .quick-filter-btn.active {
+               border-color: var(--teal);
+               color: var(--teal);
+               background: rgba(20, 184, 166, 0.12);
+          }
+
+          .toolbar {
+               display: grid;
+               grid-template-columns: 1.3fr 220px 220px;
+               gap: 14px;
+               margin-bottom: 20px;
+          }
+
+          .search-wrap,
+          .filter-wrap {
+               height: 54px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 0 16px;
+          }
+
+          .search-wrap:focus-within,
+          .filter-wrap:focus-within {
+               border-color: var(--teal);
+          }
+
+          .search-wrap i,
+          .filter-wrap i {
+               color: var(--text2);
+          }
+
+          .search-input,
+          .filter-select {
+               width: 100%;
+               border: none;
+               outline: none;
+               background: transparent;
+               color: var(--text);
+               font-size: 14px;
+          }
+
+          .search-input::placeholder {
+               color: var(--text3);
+          }
+
+          .filter-select option {
+               background: #111827;
+               color: #f8fafc;
+          }
+
+          html[data-theme="light"] .filter-select option {
+               background: #ffffff;
+               color: #0f172a;
+          }
+
+          .table-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               overflow: hidden;
+          }
+
+          .table-header {
+               padding: 20px 24px;
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+          }
+
+          .table-header h3 {
+               font-size: 16px;
+               font-weight: 800;
+          }
+
+          .table-header span {
+               font-size: 12px;
+               color: var(--text2);
+               background: var(--bg3);
+               padding: 5px 11px;
+               border-radius: 999px;
+               font-weight: 700;
+          }
+
+          .table-wrap {
+               overflow-x: auto;
+          }
+
+          table {
+               width: 100%;
+               border-collapse: collapse;
+          }
+
+          thead th {
+               padding: 13px 16px;
+               text-align: left;
+               font-size: 11px;
+               font-weight: 800;
+               text-transform: uppercase;
+               letter-spacing: 0.08em;
+               color: var(--text3);
+               background: var(--bg3);
+               white-space: nowrap;
+          }
+
+          tbody tr {
+               border-bottom: 1px solid var(--border2);
+          }
+
+          tbody tr:hover {
+               background: rgba(20, 184, 166, 0.04);
+          }
+
+          tbody td {
+               padding: 16px;
+               font-size: 13px;
+               color: var(--text);
+               vertical-align: middle;
+               white-space: nowrap;
+          }
+
+          .revision-title {
+               font-weight: 800;
+          }
+
+          .revision-desc {
+               max-width: 340px;
+               white-space: normal;
+               font-size: 11.5px;
+               color: var(--text2);
+               margin-top: 4px;
+               line-height: 1.5;
+          }
+
+          .weak-area {
+               font-size: 11.5px;
+               color: var(--rose);
+               margin-top: 4px;
+               white-space: normal;
+          }
+
+          .student-cell strong {
+               display: block;
+               font-size: 13px;
+          }
+
+          .student-cell span {
+               display: block;
+               font-size: 11px;
+               color: var(--text2);
+               margin-top: 2px;
+          }
+
+          .badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 5px;
+               padding: 5px 10px;
+               border-radius: 999px;
+               font-size: 11px;
+               font-weight: 800;
+          }
+
+          .badge-completed {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .badge-pending {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .badge-overdue {
+               background: rgba(244, 63, 94, 0.12);
+               color: var(--rose);
+          }
+
+          .badge-today {
+               background: rgba(139, 92, 246, 0.15);
+               color: var(--purple);
+          }
+
+          .badge-high {
+               background: rgba(244, 63, 94, 0.12);
+               color: var(--rose);
+          }
+
+          .badge-medium {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .badge-low {
+               background: rgba(148, 163, 184, 0.12);
+               color: var(--text2);
+          }
+
+          .overdue-row {
+               box-shadow: inset 3px 0 0 var(--rose);
+               background: rgba(244, 63, 94, 0.05);
+          }
+
+          .today-row {
+               box-shadow: inset 3px 0 0 var(--purple);
+          }
+
+          .btn-icon {
+               width: 30px;
+               height: 30px;
+               border-radius: 8px;
+               border: 1px solid var(--border2);
+               background: transparent;
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+          }
+
+          .btn-icon:hover {
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, 0.12);
+          }
+
+          .empty-state {
+               text-align: center;
+               padding: 44px 24px;
+               color: var(--text2);
+          }
+
+          .empty-state i {
+               font-size: 36px;
+               color: var(--text3);
+               margin-bottom: 12px;
+          }
+
+          .skel {
+               height: 16px;
+               border-radius: 6px;
+               background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+               background-size: 200% 100%;
+               animation: shimmer 1.5s infinite;
+          }
+
+          @keyframes shimmer {
+               from {
+                    background-position: 200% 0;
+               }
+
+               to {
+                    background-position: -200% 0;
+               }
+          }
+
+          .modal-overlay {
+               position: fixed;
+               inset: 0;
+               z-index: 9999;
+               background: rgba(0, 0, 0, 0.7);
+               backdrop-filter: blur(6px);
+               display: none;
+               align-items: center;
+               justify-content: center;
+               padding: 20px;
+          }
+
+          .modal-overlay.open {
+               display: flex;
+          }
+
+          .modal {
+               width: min(600px, 100%);
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               padding: 28px;
+          }
+
+          .modal-head {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               margin-bottom: 20px;
+          }
+
+          .modal-head h2 {
+               font-size: 18px;
+               font-weight: 800;
+          }
+
+          .modal-close {
+               border: none;
+               background: transparent;
+               color: var(--text3);
+               font-size: 18px;
+          }
+
+          .modal-close:hover {
+               color: var(--rose);
+          }
+
+          .modal-grid {
+               display: grid;
+               grid-template-columns: 1fr 1fr;
+               gap: 12px;
+               margin-bottom: 16px;
+          }
+
+          .modal-field {
+               background: var(--bg3);
+               border-radius: 10px;
+               padding: 12px 14px;
+          }
+
+          .modal-field label {
+               display: block;
+               font-size: 11px;
+               color: var(--text3);
+               text-transform: uppercase;
+               letter-spacing: 0.08em;
+               margin-bottom: 4px;
+          }
+
+          .modal-field span {
+               font-size: 13.5px;
+               font-weight: 600;
+               word-break: break-word;
+          }
+
+          .modal-footer {
+               display: flex;
+               justify-content: flex-end;
+               margin-top: 16px;
+          }
+
+          .btn-modal {
+               border: none;
+               border-radius: 9px;
+               padding: 9px 18px;
+               background: var(--bg3);
+               color: var(--text2);
+               font-weight: 700;
+          }
+
+          .toast {
+               position: fixed;
+               right: 22px;
+               top: 82px;
+               z-index: 10000;
+               min-width: 260px;
+               max-width: 380px;
+               padding: 14px 16px;
+               border-radius: 14px;
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-size: 13px;
+               font-weight: 700;
+               box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+          }
+
+          .toast.success {
+               background: #065f46;
+               color: #6ee7b7;
+          }
+
+          .toast.error {
+               background: #7f1d1d;
+               color: #fca5a5;
+          }
+
+          .toast.info {
+               background: #164e63;
+               color: #67e8f9;
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, 0.6);
+               z-index: 900;
+          }
+
+          @media(max-width: 1180px) {
+               .stats-row {
+                    grid-template-columns: repeat(2, 1fr);
+               }
+
+               .toolbar {
+                    grid-template-columns: 1fr;
+               }
+          }
+
+          @media(max-width: 768px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .mobile-overlay.show {
+                    display: block;
+               }
+
+               .main,
+               .main.expanded {
+                    margin-left: 0;
+               }
+
+               .mobile-topbar-toggle {
+                    display: block;
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+               }
+
+               .topbar {
+                    padding: 0 16px;
+               }
+
+               .topbar-left p,
+               .topbar-time {
+                    display: none;
+               }
+
+               .modal-grid {
+                    grid-template-columns: 1fr;
+               }
+          }
+     </style>
+</head>
+
+<body data-page-role="admin">
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <div class="brand-logo-wrap">
+                    <svg class="sidebar-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#revisionLogoGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#revisionLogoBg)"
+                              opacity="0.15" />
+
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#revisionLogoGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#revisionLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#revisionLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#revisionLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#revisionLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+
+                         <defs>
+                              <linearGradient id="revisionLogoGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="revisionLogoBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="revisionLogoLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
+               <div class="brand-text">
+                    <h2>EduMind AI</h2>
+                    <span>Admin Panel</span>
+               </div>
+          </div>
+
+          <button class="sidebar-toggle" onclick="toggleSidebar()" type="button">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </button>
+
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+
+               <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+               </a>
+
+               <a href="admin-students.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-label">Students</span>
+               </a>
+
+               <a href="admin-subjects.html" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-label">Subjects</span>
+               </a>
+
+               <div class="nav-section-label">Content</div>
+
+               <a href="admin-planner.html" class="nav-item">
+                    <i class="fas fa-calendar-days"></i>
+                    <span class="nav-label">Planner</span>
+               </a>
+
+               <a href="admin-tasks.html" class="nav-item">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="nav-label">Tasks</span>
+               </a>
+
+               <a href="admin-revisions.html" class="nav-item active">
+                    <i class="fas fa-rotate"></i>
+                    <span class="nav-label">Revisions</span>
+               </a>
+
+               <a href="admin-tests.html" class="nav-item">
+                    <i class="fas fa-file-pen"></i>
+                    <span class="nav-label">Tests</span>
+               </a>
+
+               <a href="admin-question-bank.html" class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-label">Question Bank</span>
+               </a>
+
+               <div class="nav-section-label">Insights</div>
+
+               <a href="admin-analytics.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-label">Analytics</span>
+               </a>
+
+               <a href="admin-assistant.html" class="nav-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="nav-label">Assistant Logs</span>
+               </a>
+
+               <a href="admin-pomodoro.html" class="nav-item">
+                    <i class="fas fa-stopwatch"></i>
+                    <span class="nav-label">Pomodoro</span>
+               </a>
+
+               <div class="nav-section-label">Manage</div>
+
+               <a href="admin-notifications.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-label">Notifications</span>
+               </a>
+
+               <a href="admin-reports.html" class="nav-item">
+                    <i class="fas fa-file-lines"></i>
+                    <span class="nav-label">Reports</span>
+               </a>
+
+               <a href="admin-settings.html" class="nav-item">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Settings</span>
+               </a>
+
+               <a href="admin-security.html" class="nav-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="nav-label">Security Logs</span>
+               </a>
+          </div>
+
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="sidebarAdminName">Admin</p>
+                         <span>Administrator</span>
+                    </div>
+               </div>
+
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+               </button>
+          </div>
+     </nav>
+
+     <main class="main" id="main">
+          <header class="topbar">
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
+
+               <div class="topbar-left">
+                    <h1>Revision Monitoring</h1>
+                    <p>Monitor every student revision schedule, priority and completion status.</p>
+               </div>
+
+               <div class="topbar-right">
+                    <div class="topbar-time" id="liveTime">--:--</div>
+
+                    <button class="topbar-btn" type="button" onclick="toggleAdminTheme()" title="Toggle theme"
+                         id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="refreshRevisionsPage()" title="Refresh revisions">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
+               </div>
+          </header>
+
+          <section class="content">
+               <section class="welcome-banner">
+                    <div class="welcome-icon">
+                         <i class="fas fa-rotate"></i>
+                    </div>
+
+                    <div class="welcome-text">
+                         <h2>Revision Control Center</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. Track revision topics, overdue schedules,
+                              priorities and student progress from one place.</p>
+                    </div>
+               </section>
+
+               <div class="section-label">Revision Overview</div>
+
+               <div class="stats-row">
+                    <div class="stat-card">
+                         <div class="stat-icon icon-teal">
+                              <i class="fas fa-rotate"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Total Revisions</p>
+                              <h3 id="statTotal">00</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-purple">
+                              <i class="fas fa-calendar-day"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Due Today</p>
+                              <h3 id="statToday">00</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-green">
+                              <i class="fas fa-circle-check"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Completed</p>
+                              <h3 id="statCompleted">00</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-amber">
+                              <i class="fas fa-hourglass-half"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Pending</p>
+                              <h3 id="statPending">00</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-rose">
+                              <i class="fas fa-triangle-exclamation"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Overdue</p>
+                              <h3 id="statOverdue">00</h3>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all" type="button">
+                         <i class="fas fa-list"></i> All
+                    </button>
+
+                    <button class="quick-filter-btn" data-filter="today" type="button">
+                         <i class="fas fa-calendar-day"></i> Today
+                    </button>
+
+                    <button class="quick-filter-btn" data-filter="overdue" type="button">
+                         <i class="fas fa-triangle-exclamation"></i> Overdue
+                    </button>
+
+                    <button class="quick-filter-btn" data-filter="completed" type="button">
+                         <i class="fas fa-check"></i> Completed
+                    </button>
+
+                    <button class="quick-filter-btn" data-filter="pending" type="button">
+                         <i class="fas fa-clock"></i> Pending
+                    </button>
+
+                    <button class="quick-filter-btn" data-filter="high" type="button">
+                         <i class="fas fa-fire"></i> High Priority
+                    </button>
+               </div>
+
+               <div class="toolbar">
+                    <div class="search-wrap">
+                         <i class="fas fa-magnifying-glass"></i>
+                         <input type="text" class="search-input" id="searchInput"
+                              placeholder="Search topic, student, email, subject, weak area or description..." />
+                    </div>
+
+                    <div class="filter-wrap">
+                         <i class="fas fa-filter"></i>
+                         <select class="filter-select" id="statusFilter">
+                              <option value="all">All Status</option>
+                              <option value="completed">Completed</option>
+                              <option value="pending">Pending</option>
+                              <option value="overdue">Overdue</option>
+                              <option value="today">Today</option>
+                         </select>
+                    </div>
+
+                    <div class="filter-wrap">
+                         <i class="fas fa-flag"></i>
+                         <select class="filter-select" id="priorityFilter">
+                              <option value="all">All Priority</option>
+                              <option value="high">High</option>
+                              <option value="medium">Medium</option>
+                              <option value="low">Low</option>
+                         </select>
+                    </div>
+               </div>
+
+               <div class="table-card">
+                    <div class="table-header">
+                         <h3>All Student Revisions</h3>
+                         <span id="tableCount">Loading...</span>
+                    </div>
+
+                    <div class="table-wrap">
+                         <table>
+                              <thead>
+                                   <tr>
+                                        <th>#</th>
+                                        <th>Revision Topic</th>
+                                        <th>Student</th>
+                                        <th>Subject</th>
+                                        <th>Priority</th>
+                                        <th>Revision Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                   </tr>
+                              </thead>
+
+                              <tbody id="tableBody"></tbody>
+                         </table>
+                    </div>
+               </div>
+          </section>
+     </main>
+
+     <div class="modal-overlay" id="viewModal">
+          <div class="modal">
+               <div class="modal-head">
+                    <h2>Revision Details</h2>
+
+                    <button class="modal-close" onclick="closeModal('viewModal')" type="button">
+                         <i class="fas fa-xmark"></i>
+                    </button>
+               </div>
+
+               <div class="modal-grid">
+                    <div class="modal-field">
+                         <label>Revision Topic</label>
+                         <span id="mTopic">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Student</label>
+                         <span id="mStudent">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Email</label>
+                         <span id="mEmail">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Subject</label>
+                         <span id="mSubject">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Priority</label>
+                         <span id="mPriority">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Revision Date</label>
+                         <span id="mRevisionDate">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Status</label>
+                         <span id="mStatus">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Revision ID</label>
+                         <span id="mId">–</span>
+                    </div>
+               </div>
+
+               <div class="modal-field">
+                    <label>Weak Area / Focus Area</label>
+                    <span id="mWeakArea">–</span>
+               </div>
+
+               <div class="modal-field" style="margin-top:12px;">
+                    <label>Description</label>
+                    <span id="mDesc">–</span>
+               </div>
+
+               <div class="modal-footer">
+                    <button class="btn-modal" onclick="closeModal('viewModal')" type="button">
+                         Close
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <script>
+          const API_BASE_URL = window.location.origin;
+          const ADMIN_REVISIONS_API_URL = API_BASE_URL + "/api/admin/revisions";
+
+          let allRevisions = [];
+          let visibleRevisions = [];
+          let sidebarCollapsed = false;
+          let activeQuickFilter = "all";
+
+          document.addEventListener("DOMContentLoaded", function () {
+               if (!requireAdminAuth()) return;
+
+               setupAdminIdentity();
+               applySavedTheme();
+               restoreSidebarState();
+               updateClock();
+               setInterval(updateClock, 1000);
+               initFilters();
+               renderSkeletonRows();
+               loadData(false);
+          });
+
+          function getAuthToken() {
+               return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+          }
+
+          function getAdminRole() {
+               return normalizeRole(localStorage.getItem("adminRole") || localStorage.getItem("userRole"));
+          }
+
+          function normalizeRole(value) {
+               return String(value || "").replace("ROLE_", "").trim().toUpperCase();
+          }
+
+          function requireAdminAuth() {
+               const token = getAuthToken();
+               const role = getAdminRole();
+
+               if (!token || role !== "ADMIN") {
+                    showToast("error", "Admin session expired. Please login again.");
+
+                    setTimeout(function () {
+                         clearAdminSession();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+
+                    return false;
+               }
+
+               return true;
+          }
+
+          function clearAdminSession() {
+               [
+                    "adminToken",
+                    "adminRole",
+                    "adminName",
+                    "adminEmail",
+                    "token",
+                    "refreshToken",
+                    "userRole",
+                    "userId",
+                    "userEmail",
+                    "userName",
+                    "edumind_is_logged_in",
+                    "edumind_logged_in_user"
+               ].forEach(function (key) {
+                    localStorage.removeItem(key);
+               });
+          }
+
+          function parseSafeJson(value) {
+               try {
+                    return JSON.parse(value);
+               } catch (error) {
+                    return null;
+               }
+          }
+
+          function getAdminDisplayName() {
+               const adminName = localStorage.getItem("adminName");
+
+               if (adminName) return adminName;
+
+               const storedUser = parseSafeJson(localStorage.getItem("edumind_logged_in_user"));
+
+               return storedUser?.fullName || storedUser?.name || storedUser?.email || "Admin";
+          }
+
+          function setupAdminIdentity() {
+               const adminName = getAdminDisplayName();
+
+               document.getElementById("sidebarAdminName").textContent = adminName;
+               document.getElementById("adminAvatar").textContent = adminName.charAt(0).toUpperCase();
+               document.getElementById("welcomeName").textContent = adminName.split(" ")[0] || "Admin";
+          }
+
+          function updateClock() {
+               const liveTime = document.getElementById("liveTime");
+
+               if (!liveTime) return;
+
+               liveTime.textContent = new Date().toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("edumind-admin-theme")
+                    || localStorage.getItem("adminTheme")
+                    || "dark";
+
+               document.documentElement.setAttribute("data-theme", theme);
+               updateThemeIcon(theme);
+          }
+
+          function toggleAdminTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               updateThemeIcon(next);
+               showToast("info", next === "dark" ? "Dark mode enabled." : "Light mode enabled.");
+          }
+
+          function updateThemeIcon(theme) {
+               const icon = document.querySelector("#themeBtn i");
+
+               if (!icon) return;
+
+               icon.className = theme === "dark" ? "fas fa-moon" : "fas fa-sun";
+          }
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+
+               sidebar.classList.toggle("collapsed", sidebarCollapsed);
+               main.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) {
+                    icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+               }
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebarState() {
+               const saved = localStorage.getItem("adminSidebarCollapsed") === "true";
+
+               if (!saved) return;
+
+               sidebarCollapsed = true;
+               document.getElementById("sidebar").classList.add("collapsed");
+               document.getElementById("main").classList.add("expanded");
+               document.getElementById("toggleIcon").className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar").classList.add("mobile-open");
+               document.getElementById("mobileOverlay").classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar").classList.remove("mobile-open");
+               document.getElementById("mobileOverlay").classList.remove("show");
+          }
+
+          function handleLogout() {
+               if (!confirm("Logout from admin panel?")) return;
+
+               clearAdminSession();
+               showToast("success", "Logged out successfully.");
+
+               setTimeout(function () {
+                    window.location.href = "/pages/admin/admin-login.html";
+               }, 700);
+          }
+
+          function showToast(type, message) {
+               const oldToast = document.querySelector(".toast");
+
+               if (oldToast) oldToast.remove();
+
+               const toast = document.createElement("div");
+               toast.className = "toast " + type;
+
+               const iconClass = type === "success"
+                    ? "circle-check"
+                    : type === "info"
+                         ? "circle-info"
+                         : "triangle-exclamation";
+
+               toast.innerHTML = `
+                    <i class="fas fa-${iconClass}"></i>
+                    <span>${escapeHtml(message)}</span>
+               `;
+
+               document.body.appendChild(toast);
+
+               setTimeout(function () {
+                    toast.remove();
+               }, 3500);
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? "")
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+          }
+
+          function normalizeStatus(value) {
+               const status = String(value || "").trim().toLowerCase();
+
+               if (["completed", "complete", "done"].includes(status)) return "completed";
+               if (["pending", "incomplete", "todo", "to-do"].includes(status)) return "pending";
+
+               return "pending";
+          }
+
+          function normalizePriority(value) {
+               const priority = String(value || "").trim().toLowerCase();
+
+               if (priority === "high") return "high";
+               if (priority === "medium") return "medium";
+               if (priority === "low") return "low";
+
+               return "low";
+          }
+
+          function parseDateOnly(value) {
+               if (!value) return null;
+
+               const raw = String(value);
+
+               if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+                    const parts = raw.substring(0, 10).split("-");
+                    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+               }
+
+               const parsed = new Date(raw);
+
+               if (Number.isNaN(parsed.getTime())) return null;
+
+               return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+          }
+
+          function getTodayDateOnly() {
+               const now = new Date();
+               return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          }
+
+          function isToday(revision) {
+               const date = parseDateOnly(revision.revisionDate);
+               const today = getTodayDateOnly();
+
+               if (!date) return false;
+
+               return date.getTime() === today.getTime();
+          }
+
+          function isOverdue(revision) {
+               if (revision.status === "completed") return false;
+
+               const revisionDate = parseDateOnly(revision.revisionDate);
+               const today = getTodayDateOnly();
+
+               if (!revisionDate) return false;
+
+               return revisionDate.getTime() < today.getTime();
+          }
+
+          function formatDate(value) {
+               const date = parseDateOnly(value);
+
+               if (!date) return "–";
+
+               return date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+               });
+          }
+
+          function unwrapRevisionsResponse(data) {
+               if (Array.isArray(data)) return data;
+
+               if (data && typeof data === "object") {
+                    if (Array.isArray(data.revisions)) return data.revisions;
+                    if (Array.isArray(data.data)) return data.data;
+                    if (Array.isArray(data.content)) return data.content;
+                    if (Array.isArray(data.items)) return data.items;
+               }
+
+               return [];
+          }
+
+          function mapRevision(revision) {
+               const subjectValue =
+                    revision.subjectName ||
+                    revision.subjectTitle ||
+                    (typeof revision.subject === "object"
+                         ? revision.subject.subjectName || revision.subject.name
+                         : revision.subject) ||
+                    "–";
+
+               const studentName =
+                    revision.studentName ||
+                    revision.fullName ||
+                    revision.userName ||
+                    revision.user?.fullName ||
+                    revision.user?.name ||
+                    "–";
+
+               const studentEmail =
+                    revision.studentEmail ||
+                    revision.email ||
+                    revision.userEmail ||
+                    revision.user?.email ||
+                    "";
+
+               return {
+                    id: revision.id || revision.revisionId || "",
+                    topic: revision.topic || revision.title || revision.revisionTopic || "Untitled Revision",
+                    description: revision.description || "",
+                    weakArea: revision.weakArea || revision.focusArea || revision.focus || "",
+                    studentName: studentName,
+                    studentEmail: studentEmail,
+                    subject: subjectValue,
+                    priority: normalizePriority(revision.priority),
+                    revisionDate: revision.revisionDate || revision.date || revision.dueDate || "",
+                    status: normalizeStatus(revision.status),
+                    raw: revision
+               };
+          }
+
+          async function fetchJson(url, options = {}) {
+               const token = getAuthToken();
+
+               const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                         "Accept": "application/json",
+                         "Content-Type": "application/json",
+                         "Authorization": "Bearer " + token,
+                         ...(options.headers || {})
+                    }
+               });
+
+               const text = await response.text();
+
+               if (response.status === 401 || response.status === 403) {
+                    showToast("error", "Unauthorized access. Please login again.");
+
+                    setTimeout(function () {
+                         clearAdminSession();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+
+                    return null;
+               }
+
+               if (!response.ok) {
+                    let message = "HTTP " + response.status;
+
+                    try {
+                         const errorData = JSON.parse(text);
+                         message = errorData.message || errorData.error || message;
+                    } catch (error) {
+                         message = text || message;
+                    }
+
+                    throw new Error(message);
+               }
+
+               if (!text) return [];
+
+               try {
+                    return JSON.parse(text);
+               } catch (error) {
+                    throw new Error("Invalid backend response format.");
+               }
+          }
+
+          function updateStats(revisions) {
+               const total = revisions.length;
+               const today = revisions.filter(isToday).length;
+               const completed = revisions.filter(function (revision) {
+                    return revision.status === "completed";
+               }).length;
+               const pending = revisions.filter(function (revision) {
+                    return revision.status === "pending";
+               }).length;
+               const overdue = revisions.filter(isOverdue).length;
+
+               document.getElementById("statTotal").textContent = String(total).padStart(2, "0");
+               document.getElementById("statToday").textContent = String(today).padStart(2, "0");
+               document.getElementById("statCompleted").textContent = String(completed).padStart(2, "0");
+               document.getElementById("statPending").textContent = String(pending).padStart(2, "0");
+               document.getElementById("statOverdue").textContent = String(overdue).padStart(2, "0");
+          }
+
+          function priorityBadge(priority) {
+               if (priority === "high") {
+                    return '<span class="badge badge-high"><i class="fas fa-fire"></i> High</span>';
+               }
+
+               if (priority === "medium") {
+                    return '<span class="badge badge-medium"><i class="fas fa-minus"></i> Medium</span>';
+               }
+
+               return '<span class="badge badge-low"><i class="fas fa-arrow-down"></i> Low</span>';
+          }
+
+          function statusBadge(revision) {
+               if (isOverdue(revision)) {
+                    return '<span class="badge badge-overdue"><i class="fas fa-triangle-exclamation"></i> Overdue</span>';
+               }
+
+               if (isToday(revision) && revision.status !== "completed") {
+                    return '<span class="badge badge-today"><i class="fas fa-calendar-day"></i> Today</span>';
+               }
+
+               if (revision.status === "completed") {
+                    return '<span class="badge badge-completed"><i class="fas fa-check"></i> Completed</span>';
+               }
+
+               return '<span class="badge badge-pending"><i class="fas fa-clock"></i> Pending</span>';
+          }
+
+          function renderSkeletonRows() {
+               const tbody = document.getElementById("tableBody");
+
+               tbody.innerHTML = Array.from({ length: 4 }).map(function () {
+                    return `
+                         <tr>
+                              <td><div class="skel" style="width:20px"></div></td>
+                              <td><div class="skel" style="width:220px"></div></td>
+                              <td><div class="skel" style="width:140px"></div></td>
+                              <td><div class="skel" style="width:90px"></div></td>
+                              <td><div class="skel" style="width:70px"></div></td>
+                              <td><div class="skel" style="width:90px"></div></td>
+                              <td><div class="skel" style="width:80px"></div></td>
+                              <td><div class="skel" style="width:40px"></div></td>
+                         </tr>
+                    `;
+               }).join("");
+          }
+
+          function renderTable(revisions) {
+               const tbody = document.getElementById("tableBody");
+               const count = document.getElementById("tableCount");
+
+               count.textContent = revisions.length + " revision" + (revisions.length === 1 ? "" : "s");
+
+               if (!revisions.length) {
+                    tbody.innerHTML = `
+                         <tr>
+                              <td colspan="8">
+                                   <div class="empty-state">
+                                        <i class="fas fa-rotate"></i>
+                                        <p>No revisions found.</p>
+                                   </div>
+                              </td>
+                         </tr>
+                    `;
+                    return;
+               }
+
+               tbody.innerHTML = revisions.map(function (revision, index) {
+                    const overdue = isOverdue(revision);
+                    const today = isToday(revision);
+
+                    return `
+                         <tr class="${overdue ? "overdue-row" : today ? "today-row" : ""}">
+                              <td style="color:var(--text3);font-size:12px">${index + 1}</td>
+
+                              <td>
+                                   <div class="revision-title">${escapeHtml(revision.topic)}</div>
+                                   ${revision.description ? `<div class="revision-desc">${escapeHtml(revision.description)}</div>` : ""}
+                                   ${revision.weakArea ? `<div class="weak-area"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(revision.weakArea)}</div>` : ""}
+                              </td>
+
+                              <td>
+                                   <div class="student-cell">
+                                        <strong>${escapeHtml(revision.studentName || "–")}</strong>
+                                        <span>${escapeHtml(revision.studentEmail || "")}</span>
+                                   </div>
+                              </td>
+
+                              <td>${escapeHtml(revision.subject || "–")}</td>
+                              <td>${priorityBadge(revision.priority)}</td>
+
+                              <td style="font-size:12px;color:${overdue ? "var(--rose)" : today ? "var(--purple)" : "var(--text2)"}">
+                                   ${escapeHtml(formatDate(revision.revisionDate))}
+                              </td>
+
+                              <td>${statusBadge(revision)}</td>
+
+                              <td>
+                                   <button class="btn-icon" onclick="viewRevision(${index})" type="button" title="View revision details">
+                                        <i class="fas fa-eye"></i>
+                                   </button>
+                              </td>
+                         </tr>
+                    `;
+               }).join("");
+          }
+
+          function matchesQuickFilter(revision, filter) {
+               if (filter === "all") return true;
+               if (filter === "today") return isToday(revision);
+               if (filter === "overdue") return isOverdue(revision);
+               if (filter === "completed") return revision.status === "completed";
+               if (filter === "pending") return revision.status === "pending";
+               if (filter === "high") return revision.priority === "high";
+
+               return true;
+          }
+
+          function filterData() {
+               const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
+               const statusValue = document.getElementById("statusFilter").value;
+               const priorityValue = document.getElementById("priorityFilter").value;
+
+               let filtered = [...allRevisions];
+
+               if (searchValue) {
+                    filtered = filtered.filter(function (revision) {
+                         return (
+                              revision.topic.toLowerCase().includes(searchValue) ||
+                              revision.description.toLowerCase().includes(searchValue) ||
+                              revision.weakArea.toLowerCase().includes(searchValue) ||
+                              revision.studentName.toLowerCase().includes(searchValue) ||
+                              revision.studentEmail.toLowerCase().includes(searchValue) ||
+                              revision.subject.toLowerCase().includes(searchValue)
+                         );
+                    });
+               }
+
+               filtered = filtered.filter(function (revision) {
+                    return matchesQuickFilter(revision, activeQuickFilter);
+               });
+
+               if (statusValue !== "all") {
+                    filtered = filtered.filter(function (revision) {
+                         if (statusValue === "overdue") return isOverdue(revision);
+                         if (statusValue === "today") return isToday(revision);
+                         return revision.status === statusValue;
+                    });
+               }
+
+               if (priorityValue !== "all") {
+                    filtered = filtered.filter(function (revision) {
+                         return revision.priority === priorityValue;
+                    });
+               }
+
+               visibleRevisions = filtered;
+               renderTable(visibleRevisions);
+          }
+
+          function viewRevision(index) {
+               const revision = visibleRevisions[index];
+
+               if (!revision) {
+                    showToast("error", "Revision details not found. Please refresh the page.");
+                    return;
+               }
+
+               document.getElementById("mTopic").textContent = revision.topic || "–";
+               document.getElementById("mStudent").textContent = revision.studentName || "–";
+               document.getElementById("mEmail").textContent = revision.studentEmail || "–";
+               document.getElementById("mSubject").textContent = revision.subject || "–";
+               document.getElementById("mPriority").innerHTML = priorityBadge(revision.priority);
+               document.getElementById("mRevisionDate").textContent = formatDate(revision.revisionDate);
+               document.getElementById("mStatus").innerHTML = statusBadge(revision);
+               document.getElementById("mId").textContent = revision.id || "–";
+               document.getElementById("mWeakArea").textContent = revision.weakArea || "–";
+               document.getElementById("mDesc").textContent = revision.description || "No description";
+
+               openModal("viewModal");
+          }
+
+          function openModal(id) {
+               const modal = document.getElementById(id);
+
+               if (!modal) {
+                    showToast("error", "Modal not found: " + id);
+                    return;
+               }
+
+               modal.classList.add("open");
+          }
+
+          function closeModal(id) {
+               const modal = document.getElementById(id);
+
+               if (!modal) {
+                    showToast("error", "Modal not found: " + id);
+                    return;
+               }
+
+               modal.classList.remove("open");
+          }
+
+          async function loadData(showSuccessToast = false) {
+               try {
+                    const refreshIcon = document.getElementById("refreshIcon");
+
+                    if (refreshIcon) refreshIcon.classList.add("fa-spin");
+
+                    const data = await fetchJson(ADMIN_REVISIONS_API_URL);
+
+                    if (!data) return;
+
+                    const rawRevisions = unwrapRevisionsResponse(data);
+
+                    allRevisions = rawRevisions.map(mapRevision);
+
+                    updateStats(allRevisions);
+                    filterData();
+
+                    if (showSuccessToast) {
+                         showToast("success", "Revisions refreshed successfully.");
+                    } else if (allRevisions.length) {
+                         showToast("success", "Revisions loaded successfully.");
+                    } else {
+                         showToast("info", "No revisions found in database.");
+                    }
+
+               } catch (error) {
+                    console.error("Admin revisions load failed:", error);
+
+                    allRevisions = [];
+                    visibleRevisions = [];
+                    updateStats(allRevisions);
+                    renderTable([]);
+
+                    showToast("error", error.message || "Cannot load admin revisions.");
+
+               } finally {
+                    const refreshIcon = document.getElementById("refreshIcon");
+
+                    if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+               }
+          }
+
+          function refreshRevisionsPage() {
+               renderSkeletonRows();
+               loadData(true);
+          }
+
+          function initFilters() {
+               document.getElementById("searchInput").addEventListener("input", filterData);
+
+               document.getElementById("statusFilter").addEventListener("change", function () {
+                    activeQuickFilter = this.value;
+                    syncQuickButtons();
+                    filterData();
+               });
+
+               document.getElementById("priorityFilter").addEventListener("change", filterData);
+
+               document.querySelectorAll(".quick-filter-btn").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                         activeQuickFilter = this.dataset.filter || "all";
+
+                         const statusFilter = document.getElementById("statusFilter");
+
+                         if (["all", "today", "overdue", "completed", "pending"].includes(activeQuickFilter)) {
+                              statusFilter.value = activeQuickFilter;
+                         } else {
+                              statusFilter.value = "all";
+                         }
+
+                         syncQuickButtons();
+                         filterData();
+                    });
+               });
+
+               document.querySelectorAll(".modal-overlay").forEach(function (modal) {
+                    modal.addEventListener("click", function (event) {
+                         if (event.target === this) {
+                              this.classList.remove("open");
+                         }
+                    });
+               });
+          }
+
+          function syncQuickButtons() {
+               document.querySelectorAll(".quick-filter-btn").forEach(function (btn) {
+                    btn.classList.toggle("active", btn.dataset.filter === activeQuickFilter);
+               });
+          }
+     </script>
+</body>
+
+</html>

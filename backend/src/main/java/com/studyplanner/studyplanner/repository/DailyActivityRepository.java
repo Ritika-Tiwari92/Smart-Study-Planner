@@ -2,6 +2,7 @@ package com.studyplanner.studyplanner.repository;
 
 import com.studyplanner.studyplanner.model.DailyActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,4 +22,10 @@ public interface DailyActivityRepository extends JpaRepository<DailyActivity, Lo
 
      // Only active days — for streak
      List<DailyActivity> findByUserIdAndActiveDayTrueOrderByActivityDateDesc(Long userId);
+
+     // Target update karna
+     @org.springframework.data.jpa.repository.Modifying
+     @org.springframework.transaction.annotation.Transactional
+     @org.springframework.data.jpa.repository.Query("UPDATE DailyActivity d SET d.targetVideos = :target WHERE d.user.id = :userId")
+     void updateTargetForUser(@Param("userId") Long userId, @Param("target") int target);
 }

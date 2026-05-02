@@ -1,6 +1,7 @@
 package com.studyplanner.studyplanner.service;
 
 import com.studyplanner.studyplanner.model.DailyActivity;
+import com.studyplanner.studyplanner.model.StudySession;
 import com.studyplanner.studyplanner.model.User;
 import com.studyplanner.studyplanner.repository.DailyActivityRepository;
 import com.studyplanner.studyplanner.repository.StudySessionRepository;
@@ -226,6 +227,94 @@ public class ActivityService {
           result.put("currentStreak", currentStreak);
           result.put("longestStreak", longestStreak);
           result.put("lastActiveDate", lastActiveDate.toString());
+          return result;
+     }
+
+     // ── Best Study Time of Day ────────────────────
+     public Map<String, Object> getBestStudyTime(String email) {
+          User user = getUser(email);
+
+          // Last 7 days ki sessions fetch karo
+          LocalDateTime weekStart = LocalDateTime.of(
+                    LocalDate.now().minusDays(6), LocalTime.MIDNIGHT);
+          LocalDateTime now = LocalDateTime.now();
+
+          List<StudySession> sessions = studySessionRepository
+                    .findByUserIdAndStatusAndStartTimeBetween(
+                              user.getId(),
+                              com.studyplanner.studyplanner.model.StudySession.Status.COMPLETED,
+                              weekStart, now);
+
+          // Hour-wise count
+          int[] hourCount = new int[24];
+          for (StudySession s : sessions) {
+               if (s.getStartTime() != null) {
+                    int hour = s.getStartTime().getHour();
+                    hourCount[hour]++;
+               }
+          }
+
+          // Best hour find karo
+          int bestHour = 0;
+          for (int i = 1; i < 24; i++) {
+               if (hourCount[i] > hourCount[bestHour])
+                    bestHour = i;
+          }
+
+          String timeLabel = formatHour(bestHour);
+          String period = bestHour < 12 ? "Morning" : bestHour < 17 ? "Afternoon" : bestHour < 21 ? "Evening" : "Night";
+
+          // Total focus hours
+          Long totalSeconds = studySessionRepository.sumFocusSecondsByUserId(user.getId());
+          double totalHours = totalSeconds != null ? totalSeconds / 3600.0 : 0;
+
+          Map<String, Object> result = new LinkedHashMap<>();
+          result.put("bestHour", bestHour);
+          result.put("bestTimeLabel", timeLabel);
+          result.put("bestPeriod", period);
+          result.put("totalFocusHours", Math.round(totalHours * 10.0) / 10.0);
+          result.put("totalFocusSeconds", totalSeconds != null ? totalSeconds : 0);
+          result.put("weeklySessions", sessions.size());
+          return result;
+     }
+
+     private String formatHour(int hour) {
+          if (hour == 0)
+               return "12:00 AM";
+          if (hour < 12)
+               return hour + ":00 AM";
+          if (hour == 12)
+               return "12:00 PM";
+          return (hour - 12) + ":00 PM";
+     }
+
+     public Map<String, Object> updateDailyTarget(String email, int target) {
+          User user = getUser(email);
+          if (target < 1 || target > 20) {
+               throw new IllegalArgumentException("Target must be between 1 and 20.");
+          }
+
+          // Aaj ka record update karo
+          LocalDate today = LocalDate.now();
+          DailyActivity activity = dailyActivityRepository
+                    .findByUserIdAndActivityDate(user.getId(), today)
+                    .orElseGet(() -> {
+                         DailyActivity da = new DailyActivity();
+                         da.setUser(user);
+                         da.setActivityDate(today);
+                         return da;
+                    });
+
+          activity.setTargetVideos(target);
+          dailyActivityRepository.save(activity);
+
+          // Sab future records ke liye bhi update karo
+          dailyActivityRepository.updateTargetForUser(user.getId(), target);
+
+          // LocalStorage mein bhi save karenge frontend se
+          Map<String, Object> result = new LinkedHashMap<>();
+          result.put("target", target);
+          result.put("message", "Daily target updated to " + target);
           return result;
      }
 }

@@ -116,4 +116,31 @@ public class ActivityController {
                          .body(Map.of("error", ex.getMessage()));
           }
      }
+
+     @GetMapping("/api/activity/best-time")
+     public ResponseEntity<?> getBestStudyTime(
+               @AuthenticationPrincipal UserDetails userDetails) {
+          try {
+               return ResponseEntity.ok(
+                         activityService.getBestStudyTime(userDetails.getUsername()));
+          } catch (IllegalArgumentException ex) {
+               return ResponseEntity.badRequest()
+                         .body(Map.of("error", ex.getMessage()));
+          }
+     }
+
+     @PutMapping("/api/activity/target")
+     public ResponseEntity<?> updateDailyTarget(
+               @AuthenticationPrincipal UserDetails userDetails,
+               @RequestBody Map<String, Object> body) {
+          try {
+               int target = Integer.valueOf(body.get("target").toString());
+               return ResponseEntity.ok(
+                         activityService.updateDailyTarget(
+                                   userDetails.getUsername(), target));
+          } catch (IllegalArgumentException ex) {
+               return ResponseEntity.badRequest()
+                         .body(Map.of("error", ex.getMessage()));
+          }
+     }
 }

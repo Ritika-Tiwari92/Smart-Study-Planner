@@ -1,133 +1,455 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Admin Tests | EduMind AI</title>
+     <link rel="icon" href="data:," />
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet" />
 
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/admin-tests.css">
+     <link rel="stylesheet" href="../../assets/css/admin-tests.css" />
+
+     <style>
+          body,
+          button,
+          input,
+          select,
+          textarea {
+               font-family: "Poppins", sans-serif !important;
+          }
+
+          .brand-text h2,
+          .loader-logo-text,
+          .topbar-left h1,
+          .welcome-text h2,
+          .admin-summary-card h3,
+          .section-title h3,
+          .admin-test-title-row h4,
+          .tests-empty-state h3,
+          .admin-test-modal-header h2,
+          .admin-test-date-box span {
+               font-family: "Poppins", sans-serif !important;
+          }
+
+          html[data-theme="light"] body {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          .brand-logo-wrap,
+          .loader-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .loader-logo-wrap {
+               width: 46px;
+               height: 46px;
+          }
+
+          .sidebar-logo-svg,
+          .loader-logo-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, 0.45));
+          }
+
+          .loader-logo {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+          }
+
+          .loader-logo-text {
+               font-size: 22px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .welcome-icon {
+               width: 56px;
+               height: 56px;
+               border-radius: 18px;
+               background: rgba(20, 184, 166, 0.12);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 26px;
+               flex-shrink: 0;
+          }
+
+          @keyframes testNodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.82;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.7;
+               }
+          }
+
+          @keyframes testCenterPulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.7;
+               }
+          }
+
+          @keyframes testHexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes testLineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .sidebar-logo-svg .hex-outer,
+          .loader-logo-svg .hex-outer {
+               animation: testHexRotate 18s linear infinite;
+          }
+
+          .sidebar-logo-svg .node-top,
+          .sidebar-logo-svg .node-left,
+          .sidebar-logo-svg .node-right,
+          .sidebar-logo-svg .node-bottom,
+          .loader-logo-svg .node-top,
+          .loader-logo-svg .node-left,
+          .loader-logo-svg .node-right,
+          .loader-logo-svg .node-bottom {
+               animation: testNodePulse 2.4s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .center-dot,
+          .loader-logo-svg .center-dot {
+               animation: testCenterPulse 2s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .conn-line,
+          .loader-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: testLineFlow 3s linear infinite;
+          }
+     </style>
 </head>
 
-<body>
-     <div class="dashboard-layout">
-          <aside class="sidebar">
-               <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </h2>
+<body data-page-role="admin">
+
+     <!-- Page Loader -->
+     <div id="pageLoader">
+          <div class="loader-logo">
+               <div class="loader-logo-wrap">
+                    <svg class="loader-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#testLoaderGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#testLoaderBg)"
+                              opacity="0.15" />
+
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#testLoaderGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#testLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#testLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#testLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#testLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+
+                         <defs>
+                              <linearGradient id="testLoaderGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="testLoaderBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="testLoaderLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
                </div>
 
-               <nav class="sidebar-nav">
-                    <a href="admin-dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-table-columns"></i>
-                         <span>Admin Dashboard</span>
-                    </a>
+               <span class="loader-logo-text">EduMind AI</span>
+          </div>
 
-                    <a href="admin-tests.html" class="nav-item active">
-                         <i class="fa-solid fa-file-circle-plus"></i>
-                         <span>Admin Tests</span>
-                    </a>
+          <div class="loader-bar">
+               <div class="loader-bar-fill"></div>
+          </div>
+     </div>
 
-                    <a href="admin-questions.html" class="nav-item">
-                         <i class="fa-solid fa-list-ul"></i>
-                         <span>Question Bank</span>
-                    </a>
+     <!-- Mobile Overlay -->
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
 
-                    <a href="admin-results.html" class="nav-item">
-                         <i class="fa-solid fa-square-poll-vertical"></i>
-                         <span>Admin Results</span>
-                    </a>
+     <!-- SIDEBAR -->
+     <nav class="sidebar" id="sidebar">
 
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Student Dashboard</span>
-                    </a>
+          <div class="sidebar-brand">
+               <div class="brand-logo-wrap">
+                    <svg class="sidebar-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#testLogoGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#testLogoBg)" opacity="0.15" />
 
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Student Tests</span>
-                    </a>
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#testLogoGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
 
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#testLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#testLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#testLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#testLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
 
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
-               </nav>
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
 
-               <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
-                    </a>
+                         <defs>
+                              <linearGradient id="testLogoGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="testLogoBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="testLogoLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
                </div>
-          </aside>
 
-          <main class="dashboard-main">
-               <header class="dashboard-header">
-                    <div class="header-left">
-                         <div>
-                              <h1>Admin Test Management</h1>
-                              <p>Create, manage, publish, and organize tests from one place.</p>
-                         </div>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2>
+                    <span>Admin Panel</span>
+               </div>
+          </div>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Collapse sidebar">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+
+          <div class="sidebar-nav">
+
+               <div class="nav-section-label">Main</div>
+
+               <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+               </a>
+
+               <a href="admin-students.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-label">Students</span>
+               </a>
+
+               <a href="admin-subjects.html" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-label">Subjects</span>
+               </a>
+
+               <div class="nav-section-label">Content</div>
+
+               <a href="admin-planner.html" class="nav-item">
+                    <i class="fas fa-calendar-days"></i>
+                    <span class="nav-label">Planner</span>
+               </a>
+
+               <a href="admin-tasks.html" class="nav-item">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="nav-label">Tasks</span>
+               </a>
+
+               <a href="admin-revisions.html" class="nav-item">
+                    <i class="fas fa-rotate"></i>
+                    <span class="nav-label">Revisions</span>
+               </a>
+
+               <a href="admin-tests.html" class="nav-item active">
+                    <i class="fas fa-file-pen"></i>
+                    <span class="nav-label">Tests</span>
+               </a>
+
+               <a href="admin-question-bank.html" class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-label">Question Bank</span>
+               </a>
+
+               <div class="nav-section-label">Insights</div>
+
+               <a href="admin-analytics.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-label">Analytics</span>
+               </a>
+
+               <a href="admin-assistant.html" class="nav-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="nav-label">Assistant Logs</span>
+               </a>
+
+               <a href="admin-pomodoro.html" class="nav-item">
+                    <i class="fas fa-stopwatch"></i>
+                    <span class="nav-label">Pomodoro</span>
+               </a>
+
+               <div class="nav-section-label">Manage</div>
+
+               <a href="admin-notifications.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-label">Notifications</span>
+               </a>
+
+               <a href="admin-reports.html" class="nav-item">
+                    <i class="fas fa-file-lines"></i>
+                    <span class="nav-label">Reports</span>
+               </a>
+
+               <a href="admin-settings.html" class="nav-item">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Settings</span>
+               </a>
+
+               <a href="admin-security.html" class="nav-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="nav-label">Security Logs</span>
+               </a>
+
+          </div>
+
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="sidebarAdminName">Admin</p>
+                         <span>Administrator</span>
                     </div>
+               </div>
 
-                    <div class="header-actions">
-                         <button class="add-test-btn" id="openAdminTestModalBtn">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>Create Test</span>
-                         </button>
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+               </button>
+          </div>
 
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
-                              <i class="fa-solid fa-moon"></i>
-                         </button>
+     </nav>
 
-                         <div class="profile-mini" id="profileMenuToggle">
-                              <img src="../assets/avatar/default-user.png" alt="Admin">
-                              <div>
-                                   <h4>Admin</h4>
-                                   <p>EduMind Manager</p>
-                              </div>
-                         </div>
+     <!-- MAIN -->
+     <div class="main" id="main">
 
-                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="admin-results.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-square-poll-vertical"></i>
-                                   <span>Manage Results</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
-                         </div>
+          <!-- TOPBAR -->
+          <div class="topbar">
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
+
+               <div class="topbar-left">
+                    <h1>Admin Test Management</h1>
+                    <p>Create, manage, publish, and organize tests from one place.</p>
+               </div>
+
+               <div class="topbar-right">
+                    <div class="topbar-time" id="liveTime">--:--</div>
+
+                    <button class="topbar-primary-btn" type="button" id="openAdminTestModalBtn">
+                         <i class="fas fa-plus"></i>
+                         <span>Create Test</span>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="toggleAdminTheme()" title="Toggle theme"
+                         id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="refreshAdminTestsPage()" title="Refresh tests">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
+               </div>
+          </div>
+
+          <!-- CONTENT -->
+          <main class="content">
+
+               <section class="welcome-banner">
+                    <div class="welcome-icon">
+                         <i class="fas fa-flask-vial"></i>
                     </div>
-               </header>
+                    <div class="welcome-text">
+                         <h2>Test Control Center</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. Manage test drafts, publishing status,
+                              questions, and student-ready exams from here.</p>
+                    </div>
+               </section>
 
                <section class="admin-tests-content">
+
+                    <div class="section-label">Test Overview</div>
+
                     <div class="admin-tests-summary-grid">
-                         <div class="admin-summary-card">
+                         <div class="admin-summary-card card-purple">
                               <div class="admin-summary-icon total">
                                    <i class="fa-solid fa-file-lines"></i>
                               </div>
@@ -137,7 +459,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-summary-card">
+                         <div class="admin-summary-card card-amber">
                               <div class="admin-summary-icon draft">
                                    <i class="fa-solid fa-pen-to-square"></i>
                               </div>
@@ -147,7 +469,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-summary-card">
+                         <div class="admin-summary-card card-green">
                               <div class="admin-summary-icon published">
                                    <i class="fa-solid fa-paper-plane"></i>
                               </div>
@@ -157,7 +479,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-summary-card">
+                         <div class="admin-summary-card card-cyan">
                               <div class="admin-summary-icon questions">
                                    <i class="fa-solid fa-list-check"></i>
                               </div>
@@ -172,7 +494,7 @@
                          <div class="tests-search">
                               <i class="fa-solid fa-magnifying-glass"></i>
                               <input type="text" id="adminTestSearchInput"
-                                   placeholder="Search tests by title or subject...">
+                                   placeholder="Search tests by title or subject..." />
                          </div>
 
                          <div class="tests-filter">
@@ -190,8 +512,10 @@
 
                     <div class="admin-tests-main-card">
                          <div class="section-title">
-                              <h3>Manage Tests</h3>
-                              <p>Create tests, update details, manage questions, and publish when ready.</p>
+                              <div>
+                                   <h3>Manage Tests</h3>
+                                   <p>Create tests, update details, manage questions, and publish when ready.</p>
+                              </div>
                          </div>
 
                          <div class="admin-test-list" id="adminTestList"></div>
@@ -202,8 +526,10 @@
                               <p>Create your first test or change the current filter.</p>
                          </div>
                     </div>
+
                </section>
 
+               <!-- MODAL -->
                <div class="admin-test-modal-overlay hidden" id="adminTestModalOverlay">
                     <div class="admin-test-modal">
                          <div class="admin-test-modal-header">
@@ -220,21 +546,24 @@
                          <form class="admin-test-modal-form" id="adminTestModalForm">
                               <div class="test-form-grid">
                                    <div class="test-form-group full-width">
-                                        <label for="adminTestTitle">Test Title</label>
+                                        <label for="adminTestTitle">Test Title <span
+                                                  style="color:var(--rose)">*</span></label>
                                         <input type="text" id="adminTestTitle"
-                                             placeholder="e.g. CUET General Test Mock 01">
+                                             placeholder="e.g. CUET General Test Mock 01" />
                                    </div>
 
                                    <div class="test-form-group">
-                                        <label for="adminTestSubject">Subject</label>
+                                        <label for="adminTestSubject">Subject <span
+                                                  style="color:var(--rose)">*</span></label>
                                         <select id="adminTestSubject">
                                              <option value="">Select subject</option>
                                         </select>
                                    </div>
 
                                    <div class="test-form-group">
-                                        <label for="adminTestDate">Test Date</label>
-                                        <input type="date" id="adminTestDate">
+                                        <label for="adminTestDate">Test Date <span
+                                                  style="color:var(--rose)">*</span></label>
+                                        <input type="date" id="adminTestDate" />
                                    </div>
 
                                    <div class="test-form-group">
@@ -248,7 +577,7 @@
 
                                    <div class="test-form-group">
                                         <label for="adminTestDuration">Duration</label>
-                                        <input type="text" id="adminTestDuration" placeholder="e.g. 60 mins">
+                                        <input type="text" id="adminTestDuration" placeholder="e.g. 60 mins" />
                                    </div>
 
                                    <div class="test-form-group">
@@ -288,12 +617,227 @@
                          </form>
                     </div>
                </div>
+
           </main>
      </div>
 
-     <script src="../assets/js/auth-guard.js"></script>
-     <script src="../assets/js/theme.js"></script>
-     <script src="../assets/js/admin-tests.js"></script>
+     <script>
+          function parseSafeJson(value) {
+               try {
+                    return JSON.parse(value);
+               } catch (error) {
+                    return null;
+               }
+          }
+
+          function getAdminDisplayName() {
+               const adminName = localStorage.getItem("adminName");
+               if (adminName) return adminName;
+
+               const storedUser =
+                    parseSafeJson(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseSafeJson(localStorage.getItem("loggedInUser")) ||
+                    parseSafeJson(localStorage.getItem("currentUser"));
+
+               return storedUser?.fullName || storedUser?.name || storedUser?.email || "Admin";
+          }
+
+          function setupAdminIdentity() {
+               const adminName = getAdminDisplayName();
+
+               const sidebarName = document.getElementById("sidebarAdminName");
+               const avatar = document.getElementById("adminAvatar");
+               const welcomeName = document.getElementById("welcomeName");
+
+               if (sidebarName) sidebarName.textContent = adminName;
+               if (avatar) avatar.textContent = adminName.charAt(0).toUpperCase();
+               if (welcomeName) welcomeName.textContent = adminName.split(" ")[0] || "Admin";
+          }
+
+          function updateClock() {
+               const liveTime = document.getElementById("liveTime");
+               if (!liveTime) return;
+
+               const now = new Date();
+
+               liveTime.textContent = now.toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
+          }
+
+          let sidebarCollapsed = false;
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+
+               sidebar.classList.toggle("collapsed", sidebarCollapsed);
+               main.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) {
+                    icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+               }
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebarState() {
+               const saved = localStorage.getItem("adminSidebarCollapsed") === "true";
+               if (!saved) return;
+
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = true;
+               sidebar.classList.add("collapsed");
+               main.classList.add("expanded");
+
+               if (icon) icon.className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar")?.classList.add("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar")?.classList.remove("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("edumind-admin-theme")
+                    || localStorage.getItem("adminTheme")
+                    || "dark";
+
+               document.documentElement.setAttribute("data-theme", theme);
+
+               if (theme === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(theme);
+          }
+
+          function updateThemeIcon(theme) {
+               const themeBtn = document.getElementById("themeBtn");
+               if (!themeBtn) return;
+
+               themeBtn.innerHTML = theme === "light"
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
+          }
+
+          function toggleAdminTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               if (next === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(next);
+          }
+
+          function refreshAdminTestsPage() {
+               const refreshIcon = document.getElementById("refreshIcon");
+
+               if (refreshIcon) {
+                    refreshIcon.classList.add("spin-now");
+               }
+
+               if (typeof loadAdminSubjectOptions === "function") {
+                    loadAdminSubjectOptions();
+               }
+
+               if (typeof loadAdminTests === "function") {
+                    Promise.resolve(loadAdminTests()).finally(function () {
+                         if (refreshIcon) refreshIcon.classList.remove("spin-now");
+                    });
+               } else if (refreshIcon) {
+                    setTimeout(function () {
+                         refreshIcon.classList.remove("spin-now");
+                    }, 700);
+               }
+          }
+
+          function handleLogout() {
+               const confirmLogout = confirm("Logout from admin panel?");
+               if (!confirmLogout) return;
+
+               localStorage.removeItem("adminToken");
+               localStorage.removeItem("adminRole");
+               localStorage.removeItem("adminName");
+               localStorage.removeItem("adminEmail");
+
+               localStorage.removeItem("token");
+               localStorage.removeItem("userRole");
+               localStorage.removeItem("edumind_is_logged_in");
+               localStorage.removeItem("edumind_logged_in_user");
+
+               window.location.href = "/pages/admin/admin-login.html";
+          }
+
+          function hidePageLoader() {
+               const loader = document.getElementById("pageLoader");
+               if (!loader) return;
+
+               setTimeout(function () {
+                    loader.classList.add("hidden");
+
+                    setTimeout(function () {
+                         loader.remove();
+                    }, 400);
+               }, 500);
+          }
+
+          function softAdminGuard() {
+               const adminToken = localStorage.getItem("adminToken");
+               const adminRole = localStorage.getItem("adminRole");
+
+               const token = localStorage.getItem("token");
+               const legacyRole = localStorage.getItem("userRole");
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+
+               const hasNewAdminSession = adminToken && adminRole === "ADMIN";
+               const hasLegacySession = token && isLoggedIn;
+
+               if (!hasNewAdminSession && !hasLegacySession) {
+                    window.location.href = "/pages/admin/admin-login.html";
+                    return;
+               }
+
+               if (legacyRole && legacyRole !== "ADMIN" && !hasNewAdminSession) {
+                    window.location.href = "/pages/dashboard.html";
+               }
+          }
+
+          document.addEventListener("DOMContentLoaded", function () {
+               softAdminGuard();
+               setupAdminIdentity();
+               applySavedTheme();
+               restoreSidebarState();
+               updateClock();
+               setInterval(updateClock, 1000);
+               hidePageLoader();
+          });
+     </script>
+
+     <script src="../../assets/js/admin-tests.js"></script>
 </body>
 
 </html>

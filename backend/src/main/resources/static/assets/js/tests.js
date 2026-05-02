@@ -93,9 +93,8 @@ function getCurrentUserId() {
 
 // ─── URL BUILDERS ────────────────────────────────────────
 function buildTestsApiUrl(testId = "") {
-    const userId = getCurrentUserId();
-    const path   = testId ? `/${testId}` : "";
-    return `${TESTS_API_URL}${path}?userId=${encodeURIComponent(userId)}`;
+    const path = testId ? `/${testId}` : "";
+    return `${TESTS_API_URL}${path}`;
 }
 
 // ✅ Subjects JWT se milega — userId nahi chahiye
@@ -197,7 +196,7 @@ function isPublishedForStudent(test) {
 }
 
 function shouldShowTestOnStudentPage(test) {
-    return isPublishedForStudent(test) || latestSubmittedAttemptByTestId.has(String(test.id));
+    return isPublishedForStudent(test);
 }
 
 function getTestBadgeClass(type) {
@@ -311,7 +310,7 @@ function getLatestSubmittedAttempt(testId) {
 
 // ─── RENDER: TEST LIST ───────────────────────────────────
 function getDisplayTypeForStudent(test) {
-    return getLatestSubmittedAttempt(test.id) ? "Completed" : normalizeTestType(test.type);
+    return normalizeTestType(test.type);
 }
 
 function createTestItem(test) {
@@ -349,18 +348,30 @@ function createTestItem(test) {
         <div class="test-actions">${startBtn}${reviewBtn}</div>`;
     return item;
 }
-
 function updateTestsCounts() {
-    const submitted = attemptHistory.filter(i => String(i.status||"").toUpperCase() === "SUBMITTED");
-    const upcoming  = allTests.filter(t => !getLatestSubmittedAttempt(t.id) && isPublishedForStudent(t)).length;
-    const thisWeek  = allTests.filter(t => !getLatestSubmittedAttempt(t.id) && normalizeTestType(t.type) === "This Week" && isPublishedForStudent(t)).length;
-    const completed = latestSubmittedAttemptByTestId.size;
-    const pcts      = submitted.map(i => Number(i.percentage)).filter(Number.isFinite);
-    const avg       = pcts.length > 0 ? Math.round(pcts.reduce((s,v)=>s+v,0)/pcts.length) : 0;
+    const completed = allTests.filter(t =>
+        normalizeTestType(t.type) === "Completed"
+    ).length;
 
-    if (upcomingTestsCount)  upcomingTestsCount.textContent  = String(upcoming).padStart(2,"0");
-    if (thisWeekTestsCount)  thisWeekTestsCount.textContent  = String(thisWeek).padStart(2,"0");
-    if (completedTestsCount) completedTestsCount.textContent = String(completed).padStart(2,"0");
+    const upcoming = allTests.filter(t =>
+        normalizeTestType(t.type) === "Upcoming"
+    ).length;
+
+    const thisWeek = allTests.filter(t =>
+        normalizeTestType(t.type) === "This Week"
+    ).length;
+
+    const scores = allTests
+        .filter(t => t.score != null)
+        .map(t => Number(t.score))
+        .filter(Number.isFinite);
+    const avg = scores.length > 0
+        ? Math.round(scores.reduce((s, v) => s + v, 0) / scores.length)
+        : 0;
+
+    if (upcomingTestsCount)  upcomingTestsCount.textContent  = String(upcoming).padStart(2, "0");
+    if (thisWeekTestsCount)  thisWeekTestsCount.textContent  = String(thisWeek).padStart(2, "0");
+    if (completedTestsCount) completedTestsCount.textContent = String(completed).padStart(2, "0");
     if (averageScoreCount)   averageScoreCount.textContent   = `${avg}%`;
 }
 

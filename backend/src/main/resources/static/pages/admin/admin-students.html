@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Students | EduMind AI Admin</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --card2: #162032;
+               --border: rgba(20, 184, 166, 0.12);
+               --border2: rgba(255, 255, 255, 0.06);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #64748b;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --radius: 14px;
+               --radius-sm: 10px;
+               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          html[data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               font-family: "Poppins", sans-serif;
+               background: var(--bg);
+               color: var(--text);
+               display: flex;
+               min-height: 100vh;
+               overflow-x: hidden;
+          }
+
+          button,
+          input,
+          select {
+               font-family: inherit;
+          }
+
+          button {
+               cursor: pointer;
+          }
+
+          .hidden {
+               display: none !important;
+          }
+
+          /* ─────────────────────────────
+             Animated Neural Logo
+          ───────────────────────────── */
+          .brand-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .sidebar-logo-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, 0.45));
+          }
+
+          @keyframes nodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.6;
+               }
+          }
+
+          @keyframes nodePulse2 {
+
+               0%,
+               100% {
+                    opacity: 0.80;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.4;
+               }
+          }
+
+          @keyframes centerPulse {
+
+               0%,
+               100% {
+                    opacity: 0.90;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.6;
+               }
+          }
+
+          @keyframes hexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes lineFlow {
+               0% {
+                    stroke-dashoffset: 20;
+               }
+
+               100% {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .sidebar-logo-svg .node-top {
+               animation: nodePulse 2.4s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .node-left {
+               animation: nodePulse2 2.4s ease-in-out infinite 0.4s;
+          }
+
+          .sidebar-logo-svg .node-right {
+               animation: nodePulse2 2.4s ease-in-out infinite 0.8s;
+          }
+
+          .sidebar-logo-svg .node-bottom {
+               animation: nodePulse 2.4s ease-in-out infinite 1.2s;
+          }
+
+          .sidebar-logo-svg .center-dot {
+               animation: centerPulse 2s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .hex-outer {
+               animation: hexRotate 18s linear infinite;
+          }
+
+          .sidebar-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: lineFlow 3s linear infinite;
+          }
+
+          /* ─────────────────────────────
+             Sidebar
+          ───────────────────────────── */
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               background: var(--bg2);
+               border-right: 1px solid var(--border);
+               display: flex;
+               flex-direction: column;
+               position: fixed;
+               left: 0;
+               top: 0;
+               z-index: 200;
+               transition: width var(--tr), transform var(--tr);
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               min-height: var(--header-h);
+               padding: 14px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+               flex-shrink: 0;
+          }
+
+          .brand-text {
+               overflow: hidden;
+               white-space: nowrap;
+          }
+
+          .brand-text h2 {
+               font-size: 16px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               right: -14px;
+               top: 24px;
+               width: 28px;
+               height: 28px;
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--teal);
+               font-size: 11px;
+               transition: all var(--tr);
+               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               z-index: 10;
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: #ffffff;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               overflow-y: auto;
+               overflow-x: hidden;
+               padding: 12px 10px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar {
+               width: 4px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar-thumb {
+               background: var(--border);
+               border-radius: 4px;
+          }
+
+          .nav-section-label {
+               font-size: 10px;
+               font-weight: 600;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+               color: var(--text3);
+               padding: 10px 8px 6px;
+               white-space: nowrap;
+               transition: opacity var(--tr);
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               white-space: nowrap;
+               margin-bottom: 2px;
+          }
+
+          .nav-item:hover {
+               background: rgba(20, 184, 166, 0.08);
+               color: var(--teal);
+          }
+
+          .nav-item.active {
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
+               color: var(--teal);
+               border-left: 2px solid var(--teal);
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+               font-size: 15px;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .brand-text,
+          .sidebar.collapsed .nav-label,
+          .sidebar.collapsed .nav-section-label,
+          .sidebar.collapsed .admin-info,
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+               flex-shrink: 0;
+          }
+
+          .admin-profile {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               background: rgba(255, 255, 255, 0.04);
+               margin-bottom: 8px;
+               overflow: hidden;
+          }
+
+          .admin-avatar {
+               width: 34px;
+               height: 34px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+               font-weight: 700;
+               color: #ffffff;
+               flex-shrink: 0;
+          }
+
+          .admin-info p {
+               font-size: 13px;
+               font-weight: 600;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .admin-info span {
+               font-size: 11px;
+               color: var(--teal);
+          }
+
+          .logout-btn {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               color: var(--rose);
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               border: none;
+               background: none;
+               width: 100%;
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, 0.1);
+          }
+
+          .logout-btn i {
+               width: 20px;
+               text-align: center;
+               flex-shrink: 0;
+          }
+
+          /* ─────────────────────────────
+             Main
+          ───────────────────────────── */
+          .main {
+               margin-left: var(--sidebar-w);
+               flex: 1;
+               transition: margin-left var(--tr);
+               min-height: 100vh;
+               display: flex;
+               flex-direction: column;
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+          }
+
+          .topbar {
+               height: var(--header-h);
+               background: var(--bg2);
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               padding: 0 28px;
+               gap: 16px;
+               position: sticky;
+               top: 0;
+               z-index: 100;
+          }
+
+          .topbar-left {
+               flex: 1;
+          }
+
+          .topbar-left h1 {
+               font-size: 20px;
+               font-weight: 700;
+          }
+
+          .topbar-left p {
+               font-size: 12px;
+               color: var(--text2);
+               margin-top: 1px;
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .topbar-btn {
+               width: 38px;
+               height: 38px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               color: var(--text2);
+               font-size: 15px;
+               transition: all var(--tr);
+          }
+
+          .topbar-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .mobile-toggle {
+               display: none;
+               background: none;
+               border: none;
+               color: var(--text);
+               font-size: 20px;
+               padding: 4px;
+          }
+
+          .content {
+               padding: 28px;
+               flex: 1;
+          }
+
+          .stats-row {
+               display: grid;
+               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+               gap: 16px;
+               margin-bottom: 28px;
+          }
+
+          .stat-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               padding: 18px 20px;
+               display: flex;
+               align-items: center;
+               gap: 14px;
+               transition: all var(--tr);
+          }
+
+          .stat-card:hover {
+               border-color: var(--border);
+               transform: translateY(-2px);
+          }
+
+          .stat-icon {
+               width: 44px;
+               height: 44px;
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 18px;
+               flex-shrink: 0;
+          }
+
+          .stat-info p {
+               font-size: 11px;
+               color: var(--text2);
+               margin-bottom: 3px;
+               font-weight: 500;
+          }
+
+          .stat-info h3 {
+               font-size: 24px;
+               font-weight: 800;
+          }
+
+          .icon-teal {
+               background: rgba(20, 184, 166, 0.15);
+               color: var(--teal);
+          }
+
+          .icon-green {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .icon-rose {
+               background: rgba(244, 63, 94, 0.15);
+               color: var(--rose);
+          }
+
+          .icon-amber {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .toolbar {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               margin-bottom: 20px;
+               flex-wrap: wrap;
+          }
+
+          .search-wrap {
+               position: relative;
+               flex: 1;
+               min-width: 220px;
+          }
+
+          .search-wrap i {
+               position: absolute;
+               left: 12px;
+               top: 50%;
+               transform: translateY(-50%);
+               color: var(--text3);
+               font-size: 14px;
+          }
+
+          .search-input {
+               width: 100%;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px 10px 38px;
+               font-size: 13.5px;
+               color: var(--text);
+               outline: none;
+               transition: border-color 0.2s;
+          }
+
+          .search-input:focus {
+               border-color: var(--teal);
+          }
+
+          .search-input::placeholder {
+               color: var(--text3);
+          }
+
+          .filter-select {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px;
+               font-size: 13px;
+               color: var(--text);
+               outline: none;
+               transition: border-color 0.2s;
+          }
+
+          .filter-select:focus {
+               border-color: var(--teal);
+          }
+
+          .table-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               overflow: hidden;
+          }
+
+          .table-header {
+               padding: 18px 22px;
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 12px;
+               flex-wrap: wrap;
+          }
+
+          .table-header h3 {
+               font-size: 15px;
+               font-weight: 700;
+          }
+
+          .table-header span {
+               font-size: 12px;
+               color: var(--text2);
+               background: var(--bg3);
+               padding: 4px 10px;
+               border-radius: 100px;
+          }
+
+          .table-wrap {
+               overflow-x: auto;
+          }
+
+          table {
+               width: 100%;
+               border-collapse: collapse;
+          }
+
+          thead th {
+               padding: 12px 16px;
+               text-align: left;
+               font-size: 11px;
+               font-weight: 600;
+               text-transform: uppercase;
+               letter-spacing: 0.08em;
+               color: var(--text3);
+               background: var(--bg3);
+               white-space: nowrap;
+          }
+
+          tbody tr {
+               border-bottom: 1px solid var(--border2);
+               transition: background var(--tr);
+          }
+
+          tbody tr:last-child {
+               border-bottom: none;
+          }
+
+          tbody tr:hover {
+               background: rgba(20, 184, 166, 0.04);
+          }
+
+          tbody td {
+               padding: 14px 16px;
+               font-size: 13.5px;
+               white-space: nowrap;
+          }
+
+          .student-info {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .student-avatar {
+               width: 34px;
+               height: 34px;
+               border-radius: 50%;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 13px;
+               font-weight: 700;
+               color: #ffffff;
+               flex-shrink: 0;
+          }
+
+          .student-name {
+               font-weight: 600;
+               font-size: 14px;
+          }
+
+          .student-email {
+               font-size: 11px;
+               color: var(--text2);
+               margin-top: 1px;
+          }
+
+          .badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 4px;
+               padding: 3px 10px;
+               border-radius: 100px;
+               font-size: 11px;
+               font-weight: 600;
+          }
+
+          .badge-active {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .badge-blocked {
+               background: rgba(244, 63, 94, 0.1);
+               color: var(--rose);
+          }
+
+          .chip {
+               display: inline-flex;
+               align-items: center;
+               gap: 4px;
+               padding: 3px 8px;
+               border-radius: 6px;
+               font-size: 11px;
+               font-weight: 500;
+               background: var(--bg3);
+               color: var(--text2);
+          }
+
+          .action-btns {
+               display: flex;
+               gap: 6px;
+          }
+
+          .btn-icon {
+               width: 30px;
+               height: 30px;
+               border-radius: 8px;
+               border: 1px solid var(--border2);
+               background: none;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 13px;
+               transition: all var(--tr);
+          }
+
+          .btn-view {
+               color: var(--teal);
+          }
+
+          .btn-view:hover {
+               background: rgba(20, 184, 166, 0.15);
+               border-color: var(--teal);
+          }
+
+          .btn-block {
+               color: var(--amber);
+          }
+
+          .btn-block:hover {
+               background: rgba(245, 158, 11, 0.15);
+               border-color: var(--amber);
+          }
+
+          .btn-delete {
+               color: var(--rose);
+          }
+
+          .btn-delete:hover {
+               background: rgba(244, 63, 94, 0.15);
+               border-color: var(--rose);
+          }
+
+          .empty-state {
+               text-align: center;
+               padding: 48px 24px;
+               color: var(--text2);
+          }
+
+          .empty-state i {
+               font-size: 36px;
+               color: var(--text3);
+               display: block;
+               margin-bottom: 12px;
+          }
+
+          .empty-state p {
+               font-size: 14px;
+          }
+
+          .skeleton-row td {
+               padding: 14px 16px;
+          }
+
+          .skel {
+               height: 16px;
+               background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+               background-size: 200% 100%;
+               animation: shimmer 1.5s infinite;
+               border-radius: 6px;
+          }
+
+          @keyframes shimmer {
+               0% {
+                    background-position: 200% 0;
+               }
+
+               100% {
+                    background-position: -200% 0;
+               }
+          }
+
+          .modal-overlay {
+               position: fixed;
+               inset: 0;
+               z-index: 999;
+               background: rgba(0, 0, 0, 0.7);
+               backdrop-filter: blur(6px);
+               display: none;
+               align-items: center;
+               justify-content: center;
+               padding: 20px;
+          }
+
+          .modal-overlay.open {
+               display: flex;
+          }
+
+          .modal {
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               padding: 28px;
+               width: 100%;
+               max-width: 520px;
+               box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+               animation: fadeUp 0.3s ease;
+          }
+
+          @keyframes fadeUp {
+               from {
+                    opacity: 0;
+                    transform: translateY(20px);
+               }
+
+               to {
+                    opacity: 1;
+                    transform: translateY(0);
+               }
+          }
+
+          .modal-head {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               margin-bottom: 20px;
+          }
+
+          .modal-head h2 {
+               font-size: 18px;
+               font-weight: 700;
+          }
+
+          .modal-close {
+               background: none;
+               border: none;
+               color: var(--text3);
+               font-size: 18px;
+               padding: 4px;
+               transition: color var(--tr);
+          }
+
+          .modal-close:hover {
+               color: var(--rose);
+          }
+
+          .modal-profile {
+               display: flex;
+               align-items: center;
+               gap: 14px;
+               padding: 16px;
+               background: var(--bg3);
+               border-radius: 12px;
+               margin-bottom: 18px;
+          }
+
+          .modal-avatar {
+               width: 52px;
+               height: 52px;
+               border-radius: 50%;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 20px;
+               font-weight: 700;
+               color: #ffffff;
+               flex-shrink: 0;
+          }
+
+          .modal-name {
+               font-size: 17px;
+               font-weight: 700;
+          }
+
+          .modal-email {
+               font-size: 13px;
+               color: var(--text2);
+               margin-top: 3px;
+          }
+
+          .modal-grid {
+               display: grid;
+               grid-template-columns: 1fr 1fr;
+               gap: 12px;
+               margin-bottom: 18px;
+          }
+
+          .modal-field {
+               background: var(--bg3);
+               border-radius: 10px;
+               padding: 12px 14px;
+          }
+
+          .modal-field label {
+               font-size: 11px;
+               color: var(--text3);
+               text-transform: uppercase;
+               letter-spacing: 0.08em;
+               display: block;
+               margin-bottom: 4px;
+          }
+
+          .modal-field span {
+               font-size: 13.5px;
+               font-weight: 500;
+          }
+
+          .modal-stats {
+               display: grid;
+               grid-template-columns: repeat(4, 1fr);
+               gap: 10px;
+               margin-bottom: 20px;
+          }
+
+          .modal-stat {
+               background: var(--bg3);
+               border-radius: 10px;
+               padding: 12px;
+               text-align: center;
+          }
+
+          .modal-stat h4 {
+               font-size: 22px;
+               font-weight: 800;
+               color: var(--teal);
+          }
+
+          .modal-stat p {
+               font-size: 11px;
+               color: var(--text2);
+               margin-top: 3px;
+          }
+
+          .modal-footer {
+               display: flex;
+               gap: 10px;
+               justify-content: flex-end;
+          }
+
+          .btn-modal {
+               padding: 9px 18px;
+               border-radius: 9px;
+               border: none;
+               font-size: 13px;
+               font-weight: 600;
+               transition: all var(--tr);
+          }
+
+          .btn-modal-close {
+               background: var(--bg3);
+               color: var(--text2);
+          }
+
+          .btn-modal-close:hover {
+               background: var(--border2);
+          }
+
+          .btn-modal-block {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+               border: 1px solid rgba(245, 158, 11, 0.3);
+          }
+
+          .btn-modal-block:hover {
+               background: rgba(245, 158, 11, 0.25);
+          }
+
+          .btn-modal-delete {
+               background: rgba(244, 63, 94, 0.12);
+               color: var(--rose);
+               border: 1px solid rgba(244, 63, 94, 0.25);
+          }
+
+          .btn-modal-delete:hover {
+               background: rgba(244, 63, 94, 0.22);
+          }
+
+          .confirm-modal {
+               max-width: 390px;
+          }
+
+          .confirm-icon {
+               width: 56px;
+               height: 56px;
+               border-radius: 50%;
+               background: rgba(244, 63, 94, 0.12);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 22px;
+               color: var(--rose);
+               margin: 0 auto 14px;
+          }
+
+          .confirm-title {
+               font-size: 18px;
+               font-weight: 700;
+               text-align: center;
+               margin-bottom: 8px;
+          }
+
+          .confirm-desc {
+               font-size: 13px;
+               color: var(--text2);
+               text-align: center;
+               line-height: 1.6;
+               margin-bottom: 20px;
+          }
+
+          .toast {
+               position: fixed;
+               bottom: 24px;
+               right: 24px;
+               z-index: 9999;
+               padding: 12px 18px;
+               border-radius: 10px;
+               font-size: 13px;
+               font-weight: 500;
+               display: flex;
+               align-items: center;
+               gap: 8px;
+               box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+               animation: toastIn 0.3s ease;
+               max-width: 360px;
+          }
+
+          @keyframes toastIn {
+               from {
+                    opacity: 0;
+                    transform: translateX(20px);
+               }
+
+               to {
+                    opacity: 1;
+                    transform: translateX(0);
+               }
+          }
+
+          .toast.success {
+               background: #065f46;
+               border: 1px solid rgba(52, 211, 153, 0.3);
+               color: #6ee7b7;
+          }
+
+          .toast.error {
+               background: #7f1d1d;
+               border: 1px solid rgba(248, 113, 113, 0.3);
+               color: #fca5a5;
+          }
+
+          .toast.info {
+               background: #164e63;
+               border: 1px solid rgba(34, 211, 238, 0.3);
+               color: #67e8f9;
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, 0.6);
+               z-index: 150;
+          }
+
+          @media(max-width: 768px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .mobile-overlay.show {
+                    display: block;
+               }
+
+               .main,
+               .main.expanded {
+                    margin-left: 0;
+               }
+
+               .mobile-toggle {
+                    display: block;
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+               }
+
+               .stats-row {
+                    grid-template-columns: 1fr 1fr;
+               }
+
+               .topbar {
+                    padding: 0 16px;
+               }
+          }
+
+          @media(max-width: 480px) {
+               .stats-row {
+                    grid-template-columns: 1fr;
+               }
+
+               .modal-grid {
+                    grid-template-columns: 1fr;
+               }
+
+               .modal-stats {
+                    grid-template-columns: repeat(2, 1fr);
+               }
+          }
+     </style>
+</head>
+
+<body data-page-role="admin">
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <div class="brand-logo-wrap">
+                    <svg class="sidebar-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#studentLogoGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#studentLogoBg)"
+                              opacity="0.15" />
+
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#studentLogoGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" opacity="0.90" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" opacity="0.90" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" opacity="0.95" />
+
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#studentLogoLine)"
+                              stroke-width="1" opacity="0.70" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#studentLogoLine)"
+                              stroke-width="1" opacity="0.70" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#studentLogoLine)"
+                              stroke-width="1" opacity="0.70" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#studentLogoLine)"
+                              stroke-width="1" opacity="0.70" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" opacity="0.95" />
+
+                         <defs>
+                              <linearGradient id="studentLogoGrad" x1="6" y1="2" x2="38" y2="42"
+                                   gradientUnits="userSpaceOnUse">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="studentLogoBg" x1="6" y1="2" x2="38" y2="42"
+                                   gradientUnits="userSpaceOnUse">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="studentLogoLine" x1="0" y1="0" x2="44" y2="44"
+                                   gradientUnits="userSpaceOnUse">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
+               <div class="brand-text">
+                    <h2>EduMind AI</h2>
+                    <span>Admin Panel</span>
+               </div>
+          </div>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+
+               <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+               </a>
+
+               <a href="admin-students.html" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-label">Students</span>
+               </a>
+
+               <a href="admin-subjects.html" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-label">Subjects</span>
+               </a>
+
+               <div class="nav-section-label">Content</div>
+
+               <a href="admin-planner.html" class="nav-item">
+                    <i class="fas fa-calendar-days"></i>
+                    <span class="nav-label">Planner</span>
+               </a>
+
+               <a href="admin-tasks.html" class="nav-item">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="nav-label">Tasks</span>
+               </a>
+
+               <a href="admin-revisions.html" class="nav-item">
+                    <i class="fas fa-rotate"></i>
+                    <span class="nav-label">Revisions</span>
+               </a>
+
+               <a href="admin-tests.html" class="nav-item">
+                    <i class="fas fa-file-pen"></i>
+                    <span class="nav-label">Tests</span>
+               </a>
+
+               <a href="admin-question-bank.html" class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-label">Question Bank</span>
+               </a>
+
+               <div class="nav-section-label">Insights</div>
+
+               <a href="admin-analytics.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-label">Analytics</span>
+               </a>
+
+               <a href="admin-assistant.html" class="nav-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="nav-label">Assistant Logs</span>
+               </a>
+
+               <a href="admin-pomodoro.html" class="nav-item">
+                    <i class="fas fa-stopwatch"></i>
+                    <span class="nav-label">Pomodoro</span>
+               </a>
+
+               <div class="nav-section-label">Manage</div>
+
+               <a href="admin-notifications.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-label">Notifications</span>
+               </a>
+
+               <a href="admin-reports.html" class="nav-item">
+                    <i class="fas fa-file-lines"></i>
+                    <span class="nav-label">Reports</span>
+               </a>
+
+               <a href="admin-settings.html" class="nav-item">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Settings</span>
+               </a>
+
+               <a href="admin-security.html" class="nav-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="nav-label">Security Logs</span>
+               </a>
+          </div>
+
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="adminName">Admin</p>
+                         <span>Administrator</span>
+                    </div>
+               </div>
+
+               <button class="logout-btn" onclick="handleLogout()" type="button">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+               </button>
+          </div>
+     </nav>
+
+     <main class="main" id="main">
+          <header class="topbar">
+               <button class="mobile-toggle" onclick="openMobile()" type="button">
+                    <i class="fas fa-bars"></i>
+               </button>
+
+               <div class="topbar-left">
+                    <h1>Student Management</h1>
+                    <p>View, monitor and manage all registered students.</p>
+               </div>
+
+               <div class="topbar-right">
+                    <button class="topbar-btn" onclick="toggleTheme()" id="themeBtn" type="button" title="Toggle theme">
+                         <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="topbar-btn" onclick="loadStudents()" type="button" title="Refresh">
+                         <i class="fas fa-rotate-right"></i>
+                    </button>
+               </div>
+          </header>
+
+          <section class="content">
+
+               <div class="stats-row">
+                    <div class="stat-card">
+                         <div class="stat-icon icon-teal">
+                              <i class="fas fa-users"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Total Students</p>
+                              <h3 id="statTotal">–</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-green">
+                              <i class="fas fa-circle-check"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Active</p>
+                              <h3 id="statActive">–</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-rose">
+                              <i class="fas fa-ban"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>Blocked</p>
+                              <h3 id="statBlocked">–</h3>
+                         </div>
+                    </div>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-amber">
+                              <i class="fas fa-user-plus"></i>
+                         </div>
+                         <div class="stat-info">
+                              <p>New This Month</p>
+                              <h3 id="statNew">–</h3>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="toolbar">
+                    <div class="search-wrap">
+                         <i class="fas fa-magnifying-glass"></i>
+                         <input type="text" class="search-input" id="searchInput"
+                              placeholder="Search by name, email, course or college..." />
+                    </div>
+
+                    <select class="filter-select" id="statusFilter">
+                         <option value="all">All Students</option>
+                         <option value="active">Active Only</option>
+                         <option value="blocked">Blocked Only</option>
+                    </select>
+               </div>
+
+               <div class="table-card">
+                    <div class="table-header">
+                         <h3>Registered Students</h3>
+                         <span id="tableCount">Loading...</span>
+                    </div>
+
+                    <div class="table-wrap">
+                         <table>
+                              <thead>
+                                   <tr>
+                                        <th>#</th>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>College</th>
+                                        <th>Subjects</th>
+                                        <th>Tasks</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                   </tr>
+                              </thead>
+
+                              <tbody id="studentTableBody"></tbody>
+                         </table>
+                    </div>
+               </div>
+          </section>
+     </main>
+
+     <div class="modal-overlay" id="viewModal">
+          <div class="modal">
+               <div class="modal-head">
+                    <h2>Student Profile</h2>
+                    <button class="modal-close" onclick="closeModal('viewModal')" type="button">
+                         <i class="fas fa-xmark"></i>
+                    </button>
+               </div>
+
+               <div class="modal-profile">
+                    <div class="modal-avatar" id="mAvatar">S</div>
+                    <div>
+                         <div class="modal-name" id="mName">–</div>
+                         <div class="modal-email" id="mEmail">–</div>
+                    </div>
+               </div>
+
+               <div class="modal-stats">
+                    <div class="modal-stat">
+                         <h4 id="mSubjects">0</h4>
+                         <p>Subjects</p>
+                    </div>
+
+                    <div class="modal-stat">
+                         <h4 id="mTasks">0</h4>
+                         <p>Tasks</p>
+                    </div>
+
+                    <div class="modal-stat">
+                         <h4 id="mRevisions">0</h4>
+                         <p>Revisions</p>
+                    </div>
+
+                    <div class="modal-stat">
+                         <h4 id="mTests">0</h4>
+                         <p>Tests</p>
+                    </div>
+               </div>
+
+               <div class="modal-grid">
+                    <div class="modal-field">
+                         <label>Course</label>
+                         <span id="mCourse">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>College</label>
+                         <span id="mCollege">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Study Time</label>
+                         <span id="mStudyTime">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Daily Goal</label>
+                         <span id="mGoal">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Joined</label>
+                         <span id="mJoined">–</span>
+                    </div>
+
+                    <div class="modal-field">
+                         <label>Status</label>
+                         <span id="mStatus">–</span>
+                    </div>
+               </div>
+
+               <div class="modal-footer">
+                    <button class="btn-modal btn-modal-close" onclick="closeModal('viewModal')" type="button">
+                         Close
+                    </button>
+
+                    <button class="btn-modal btn-modal-block" id="mBlockBtn" onclick="blockFromModal()" type="button">
+                         <i class="fas fa-ban"></i>
+                         Block
+                    </button>
+
+                    <button class="btn-modal btn-modal-delete" onclick="deleteFromModal()" type="button">
+                         <i class="fas fa-trash"></i>
+                         Delete
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <div class="modal-overlay" id="deleteModal">
+          <div class="modal confirm-modal">
+               <div class="confirm-icon">
+                    <i class="fas fa-trash"></i>
+               </div>
+
+               <div class="confirm-title">Delete Student?</div>
+
+               <div class="confirm-desc" id="deleteDesc">
+                    This action cannot be undone.
+               </div>
+
+               <div class="modal-footer" style="justify-content:center;gap:12px;">
+                    <button class="btn-modal btn-modal-close" onclick="closeModal('deleteModal')" type="button">
+                         Cancel
+                    </button>
+
+                    <button class="btn-modal btn-modal-delete" id="confirmDeleteBtn" onclick="confirmDelete()"
+                         type="button">
+                         <i class="fas fa-trash"></i>
+                         Yes, Delete
+                    </button>
+               </div>
+          </div>
+     </div>
+
+     <script>
+          const API_BASE = window.location.origin;
+
+          let allStudents = [];
+          let selectedStudentId = null;
+          let selectedStudentName = "";
+
+          document.addEventListener("DOMContentLoaded", function () {
+               requireAdminAuth();
+               setupAdminInfo();
+               applySavedTheme();
+               bindEvents();
+               renderSkeletonRows();
+               loadStudents();
+          });
+
+          function getAdminToken() {
+               return localStorage.getItem("adminToken") || localStorage.getItem("token");
+          }
+
+          function getAdminRole() {
+               return normalizeRole(localStorage.getItem("adminRole") || localStorage.getItem("userRole"));
+          }
+
+          function normalizeRole(role) {
+               return String(role || "")
+                    .replace("ROLE_", "")
+                    .trim()
+                    .toUpperCase();
+          }
+
+          function requireAdminAuth() {
+               const token = getAdminToken();
+               const role = getAdminRole();
+
+               if (!token || role !== "ADMIN") {
+                    showToast("error", "Admin session expired. Please login again.");
+                    setTimeout(function () {
+                         clearAdminSession();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+
+                    return false;
+               }
+
+               return true;
+          }
+
+          function clearAdminSession() {
+               [
+                    "adminToken",
+                    "adminRole",
+                    "adminName",
+                    "adminEmail",
+                    "token",
+                    "userRole",
+                    "userId",
+                    "userEmail",
+                    "userName",
+                    "edumind_logged_in_user",
+                    "edumind_is_logged_in"
+               ].forEach(function (key) {
+                    localStorage.removeItem(key);
+               });
+          }
+
+          async function adminFetch(url, options = {}) {
+               const token = getAdminToken();
+
+               if (!token) {
+                    showToast("error", "Admin token missing. Please login again.");
+                    setTimeout(function () {
+                         clearAdminSession();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+                    return null;
+               }
+
+               const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": "Bearer " + token,
+                         ...(options.headers || {})
+                    }
+               });
+
+               if (response.status === 401 || response.status === 403) {
+                    showToast("error", "Unauthorized access. Please login again.");
+                    setTimeout(function () {
+                         clearAdminSession();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+                    return null;
+               }
+
+               return response;
+          }
+
+          function setupAdminInfo() {
+               const name = localStorage.getItem("adminName")
+                    || localStorage.getItem("userName")
+                    || "Admin";
+
+               document.getElementById("adminName").textContent = name;
+               document.getElementById("adminAvatar").textContent = name.charAt(0).toUpperCase();
+          }
+
+          function bindEvents() {
+               document.getElementById("searchInput").addEventListener("input", filterStudents);
+               document.getElementById("statusFilter").addEventListener("change", filterStudents);
+
+               document.querySelectorAll(".modal-overlay").forEach(function (modal) {
+                    modal.addEventListener("click", function (event) {
+                         if (event.target === this) {
+                              this.classList.remove("open");
+                         }
+                    });
+               });
+          }
+
+          async function loadStudents() {
+               renderSkeletonRows();
+               document.getElementById("tableCount").textContent = "Loading...";
+
+               try {
+                    const response = await adminFetch(API_BASE + "/api/admin/students");
+
+                    if (!response) return;
+
+                    let data = {};
+                    try {
+                         data = await response.json();
+                    } catch (jsonError) {
+                         showToast("error", "Invalid server response. Please check backend.");
+                         renderEmptyState("Invalid server response.");
+                         return;
+                    }
+
+                    if (!response.ok || data.success === false) {
+                         const message = data.message || "Could not load students.";
+                         showToast("error", message);
+                         renderEmptyState(message);
+                         return;
+                    }
+
+                    allStudents = Array.isArray(data.students) ? data.students : [];
+
+                    updateStats(allStudents);
+                    filterStudents();
+
+                    if (allStudents.length) {
+                         showToast("success", "Students loaded successfully.");
+                    } else {
+                         showToast("info", "No students found in database.");
+                    }
+
+               } catch (error) {
+                    console.error("Students load error:", error);
+                    showToast("error", "Cannot connect to server. Please check backend.");
+                    renderEmptyState("Cannot connect to server.");
+               }
+          }
+
+          function updateStats(students) {
+               const total = students.length;
+               const blocked = students.filter(function (student) {
+                    return Boolean(student.isLocked);
+               }).length;
+
+               const active = total - blocked;
+               const now = new Date();
+
+               const newThisMonth = students.filter(function (student) {
+                    if (!student.createdAt) return false;
+
+                    const date = new Date(student.createdAt);
+
+                    return date.getMonth() === now.getMonth()
+                         && date.getFullYear() === now.getFullYear();
+               }).length;
+
+               document.getElementById("statTotal").textContent = total;
+               document.getElementById("statActive").textContent = active;
+               document.getElementById("statBlocked").textContent = blocked;
+               document.getElementById("statNew").textContent = newThisMonth;
+          }
+
+          function filterStudents() {
+               const query = document.getElementById("searchInput").value.trim().toLowerCase();
+               const status = document.getElementById("statusFilter").value;
+
+               let filtered = [...allStudents];
+
+               if (query) {
+                    filtered = filtered.filter(function (student) {
+                         const haystack = [
+                              student.fullName,
+                              student.email,
+                              student.course,
+                              student.college
+                         ].join(" ").toLowerCase();
+
+                         return haystack.includes(query);
+                    });
+               }
+
+               if (status === "active") {
+                    filtered = filtered.filter(function (student) {
+                         return !student.isLocked;
+                    });
+               }
+
+               if (status === "blocked") {
+                    filtered = filtered.filter(function (student) {
+                         return Boolean(student.isLocked);
+                    });
+               }
+
+               renderTable(filtered);
+          }
+
+          function renderSkeletonRows() {
+               const tbody = document.getElementById("studentTableBody");
+
+               tbody.innerHTML = Array.from({ length: 4 }).map(function () {
+                    return `
+                         <tr class="skeleton-row">
+                              <td><div class="skel" style="width:20px"></div></td>
+                              <td><div class="skel" style="width:180px"></div></td>
+                              <td><div class="skel" style="width:80px"></div></td>
+                              <td><div class="skel" style="width:130px"></div></td>
+                              <td><div class="skel" style="width:40px"></div></td>
+                              <td><div class="skel" style="width:40px"></div></td>
+                              <td><div class="skel" style="width:90px"></div></td>
+                              <td><div class="skel" style="width:80px"></div></td>
+                              <td><div class="skel" style="width:90px"></div></td>
+                         </tr>
+                    `;
+               }).join("");
+          }
+
+          function renderEmptyState(message) {
+               const tbody = document.getElementById("studentTableBody");
+
+               document.getElementById("tableCount").textContent = "0 students";
+
+               tbody.innerHTML = `
+                    <tr>
+                         <td colspan="9">
+                              <div class="empty-state">
+                                   <i class="fas fa-users-slash"></i>
+                                   <p>${escapeHtml(message || "No students found.")}</p>
+                              </div>
+                         </td>
+                    </tr>
+               `;
+          }
+
+          function renderTable(students) {
+               const tbody = document.getElementById("studentTableBody");
+
+               document.getElementById("tableCount").textContent = students.length + " students";
+
+               if (!students.length) {
+                    renderEmptyState("No students matched your search/filter.");
+                    return;
+               }
+
+               tbody.innerHTML = students.map(function (student, index) {
+                    const id = student.id;
+                    const name = student.fullName || "Unnamed Student";
+                    const email = student.email || "No email";
+                    const course = student.course || "–";
+                    const college = student.college || "–";
+                    const subjectCount = student.subjectCount || 0;
+                    const taskCount = student.taskCount || 0;
+                    const isLocked = Boolean(student.isLocked);
+
+                    return `
+                         <tr>
+                              <td style="color:var(--text3);font-size:12px">${index + 1}</td>
+
+                              <td>
+                                   <div class="student-info">
+                                        <div class="student-avatar">${escapeHtml(getInitial(name))}</div>
+                                        <div>
+                                             <div class="student-name">${escapeHtml(name)}</div>
+                                             <div class="student-email">${escapeHtml(email)}</div>
+                                        </div>
+                                   </div>
+                              </td>
+
+                              <td style="color:var(--text2)">${escapeHtml(course)}</td>
+
+                              <td style="color:var(--text2);max-width:150px;overflow:hidden;text-overflow:ellipsis">
+                                   ${escapeHtml(college)}
+                              </td>
+
+                              <td>
+                                   <span class="chip">
+                                        <i class="fas fa-book-open"></i>
+                                        ${subjectCount}
+                                   </span>
+                              </td>
+
+                              <td>
+                                   <span class="chip">
+                                        <i class="fas fa-circle-check"></i>
+                                        ${taskCount}
+                                   </span>
+                              </td>
+
+                              <td style="color:var(--text2);font-size:12px">
+                                   ${formatDate(student.createdAt)}
+                              </td>
+
+                              <td>
+                                   ${isLocked
+                              ? '<span class="badge badge-blocked"><i class="fas fa-ban"></i> Blocked</span>'
+                              : '<span class="badge badge-active"><i class="fas fa-circle"></i> Active</span>'
+                         }
+                              </td>
+
+                              <td>
+                                   <div class="action-btns">
+                                        <button class="btn-icon btn-view" onclick="viewStudent(${Number(id)})"
+                                             type="button" title="View Profile">
+                                             <i class="fas fa-eye"></i>
+                                        </button>
+
+                                        <button class="btn-icon btn-block" onclick="toggleBlock(${Number(id)})"
+                                             type="button" title="${isLocked ? "Unblock" : "Block"}">
+                                             <i class="fas fa-${isLocked ? "lock-open" : "ban"}"></i>
+                                        </button>
+
+                                        <button class="btn-icon btn-delete"
+                                             onclick="openDeleteModal(${Number(id)}, '${escapeJs(name)}')"
+                                             type="button" title="Delete">
+                                             <i class="fas fa-trash"></i>
+                                        </button>
+                                   </div>
+                              </td>
+                         </tr>
+                    `;
+               }).join("");
+          }
+
+          async function viewStudent(id) {
+               if (!id) {
+                    showToast("error", "Student ID missing. Please refresh the page.");
+                    return;
+               }
+
+               selectedStudentId = id;
+
+               try {
+                    const response = await adminFetch(API_BASE + "/api/admin/students/" + id);
+
+                    if (!response) return;
+
+                    let data = {};
+                    try {
+                         data = await response.json();
+                    } catch (jsonError) {
+                         showToast("error", "Invalid student details response.");
+                         return;
+                    }
+
+                    if (!response.ok || data.success === false || !data.student) {
+                         showToast("error", data.message || "Could not load student details.");
+                         return;
+                    }
+
+                    const student = data.student;
+                    selectedStudentName = student.fullName || "Student";
+
+                    document.getElementById("mAvatar").textContent = getInitial(student.fullName);
+                    document.getElementById("mName").textContent = student.fullName || "Unnamed Student";
+                    document.getElementById("mEmail").textContent = student.email || "No email";
+
+                    document.getElementById("mSubjects").textContent = student.subjectCount || 0;
+                    document.getElementById("mTasks").textContent = student.taskCount || 0;
+                    document.getElementById("mRevisions").textContent = student.revisionCount || 0;
+                    document.getElementById("mTests").textContent = student.testCount || 0;
+
+                    document.getElementById("mCourse").textContent = student.course || "–";
+                    document.getElementById("mCollege").textContent = student.college || "–";
+                    document.getElementById("mStudyTime").textContent = student.preferredStudyTime || "–";
+                    document.getElementById("mGoal").textContent = student.dailyStudyGoal || "–";
+                    document.getElementById("mJoined").textContent = formatDate(student.createdAt);
+
+                    document.getElementById("mStatus").innerHTML = student.isLocked
+                         ? '<span class="badge badge-blocked">Blocked</span>'
+                         : '<span class="badge badge-active">Active</span>';
+
+                    const blockBtn = document.getElementById("mBlockBtn");
+
+                    blockBtn.innerHTML = student.isLocked
+                         ? '<i class="fas fa-lock-open"></i> Unblock'
+                         : '<i class="fas fa-ban"></i> Block';
+
+                    openModal("viewModal");
+
+               } catch (error) {
+                    console.error("Student detail error:", error);
+                    showToast("error", "Could not load student details. Please try again.");
+               }
+          }
+
+          async function toggleBlock(id) {
+               if (!id) {
+                    showToast("error", "Student ID missing. Cannot update status.");
+                    return;
+               }
+
+               try {
+                    const response = await adminFetch(API_BASE + "/api/admin/students/" + id + "/block", {
+                         method: "PUT"
+                    });
+
+                    if (!response) return;
+
+                    let data = {};
+                    try {
+                         data = await response.json();
+                    } catch (jsonError) {
+                         showToast("error", "Invalid block/unblock response from server.");
+                         return;
+                    }
+
+                    if (!response.ok || data.success === false) {
+                         showToast("error", data.message || "Could not update student status.");
+                         return;
+                    }
+
+                    showToast("success", data.message || "Student status updated.");
+                    closeModal("viewModal");
+                    await loadStudents();
+
+               } catch (error) {
+                    console.error("Block/unblock error:", error);
+                    showToast("error", "Server error while updating student status.");
+               }
+          }
+
+          async function blockFromModal() {
+               if (!selectedStudentId) {
+                    showToast("error", "No student selected.");
+                    return;
+               }
+
+               await toggleBlock(selectedStudentId);
+          }
+
+          function openDeleteModal(id, name) {
+               if (!id) {
+                    showToast("error", "Student ID missing. Cannot delete.");
+                    return;
+               }
+
+               selectedStudentId = id;
+               selectedStudentName = name || "Student";
+
+               document.getElementById("deleteDesc").textContent =
+                    `Delete "${selectedStudentName}"? This will permanently remove the student and related data. This action cannot be undone.`;
+
+               closeModal("viewModal");
+               openModal("deleteModal");
+          }
+
+          function deleteFromModal() {
+               if (!selectedStudentId) {
+                    showToast("error", "No student selected.");
+                    return;
+               }
+
+               openDeleteModal(selectedStudentId, selectedStudentName);
+          }
+
+          async function confirmDelete() {
+               if (!selectedStudentId) {
+                    showToast("error", "No student selected for deletion.");
+                    return;
+               }
+
+               const deleteBtn = document.getElementById("confirmDeleteBtn");
+               deleteBtn.disabled = true;
+               deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+               try {
+                    const response = await adminFetch(API_BASE + "/api/admin/students/" + selectedStudentId, {
+                         method: "DELETE"
+                    });
+
+                    if (!response) return;
+
+                    let data = {};
+                    try {
+                         data = await response.json();
+                    } catch (jsonError) {
+                         showToast("error", "Invalid delete response from server.");
+                         return;
+                    }
+
+                    if (!response.ok || data.success === false) {
+                         showToast("error", data.message || "Could not delete student.");
+                         return;
+                    }
+
+                    showToast("success", data.message || "Student deleted successfully.");
+                    closeModal("deleteModal");
+
+                    selectedStudentId = null;
+                    selectedStudentName = "";
+
+                    await loadStudents();
+
+               } catch (error) {
+                    console.error("Delete error:", error);
+                    showToast("error", "Server error while deleting student.");
+
+               } finally {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Yes, Delete';
+               }
+          }
+
+          function openModal(id) {
+               const modal = document.getElementById(id);
+
+               if (!modal) {
+                    showToast("error", "Modal not found: " + id);
+                    return;
+               }
+
+               modal.classList.add("open");
+          }
+
+          function closeModal(id) {
+               const modal = document.getElementById(id);
+
+               if (!modal) {
+                    showToast("error", "Modal not found: " + id);
+                    return;
+               }
+
+               modal.classList.remove("open");
+          }
+
+          let collapsed = false;
+
+          function toggleSidebar() {
+               collapsed = !collapsed;
+
+               document.getElementById("sidebar").classList.toggle("collapsed", collapsed);
+               document.getElementById("main").classList.toggle("expanded", collapsed);
+               document.getElementById("toggleIcon").className = collapsed
+                    ? "fas fa-chevron-right"
+                    : "fas fa-chevron-left";
+          }
+
+          function openMobile() {
+               document.getElementById("sidebar").classList.add("mobile-open");
+               document.getElementById("mobileOverlay").classList.add("show");
+          }
+
+          function closeMobile() {
+               document.getElementById("sidebar").classList.remove("mobile-open");
+               document.getElementById("mobileOverlay").classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const savedTheme = localStorage.getItem("edumind-admin-theme")
+                    || localStorage.getItem("adminTheme")
+                    || "dark";
+
+               document.documentElement.setAttribute("data-theme", savedTheme);
+               updateThemeIcon(savedTheme);
+          }
+
+          function toggleTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               updateThemeIcon(next);
+               showToast("info", next === "dark" ? "Dark mode enabled." : "Light mode enabled.");
+          }
+
+          function updateThemeIcon(theme) {
+               const icon = document.querySelector("#themeBtn i");
+
+               if (!icon) return;
+
+               icon.className = theme === "dark"
+                    ? "fas fa-moon"
+                    : "fas fa-sun";
+          }
+
+          function showToast(type, message) {
+               const oldToast = document.querySelector(".toast");
+
+               if (oldToast) {
+                    oldToast.remove();
+               }
+
+               const toast = document.createElement("div");
+               toast.className = "toast " + type;
+
+               const iconClass = type === "success"
+                    ? "circle-check"
+                    : type === "info"
+                         ? "circle-info"
+                         : "circle-xmark";
+
+               toast.innerHTML = `
+                    <i class="fas fa-${iconClass}"></i>
+                    <span>${escapeHtml(message)}</span>
+               `;
+
+               document.body.appendChild(toast);
+
+               setTimeout(function () {
+                    toast.remove();
+               }, 3500);
+          }
+
+          function handleLogout() {
+               if (!confirm("Logout from admin panel?")) return;
+
+               clearAdminSession();
+               showToast("success", "Logged out successfully.");
+
+               setTimeout(function () {
+                    window.location.href = "/pages/admin/admin-login.html";
+               }, 700);
+          }
+
+          function formatDate(value) {
+               if (!value) return "–";
+
+               try {
+                    const date = new Date(value);
+
+                    if (Number.isNaN(date.getTime())) {
+                         return String(value);
+                    }
+
+                    return date.toLocaleDateString("en-IN", {
+                         day: "2-digit",
+                         month: "short",
+                         year: "numeric"
+                    });
+
+               } catch (error) {
+                    return "–";
+               }
+          }
+
+          function getInitial(name) {
+               return String(name || "S").trim().charAt(0).toUpperCase() || "S";
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? "")
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+          }
+
+          function escapeJs(value) {
+               return String(value ?? "")
+                    .replaceAll("\\", "\\\\")
+                    .replaceAll("'", "\\'")
+                    .replaceAll('"', '\\"')
+                    .replaceAll("\n", " ")
+                    .replaceAll("\r", " ");
+          }
+     </script>
+</body>
+
+</html>

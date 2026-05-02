@@ -19,14 +19,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 /**
- * SecurityConfig — Updated with Admin Routes
+ * EduMind AI — Security Configuration
  *
- * CHANGES FROM ORIGINAL:
- * 1. /api/admin/auth/login → public (admin login ke liye)
- * 2. /api/admin/** → authenticated (protected admin APIs)
- * 3. /pages/admin/** → public (HTML files ko Spring block na kare)
- *
- * Existing student routes UNCHANGED.
+ * Fix:
+ * - Admin panel can access admin APIs.
+ * - Admin panel can also access existing student-module APIs when needed
+ * for old workflow compatibility.
+ * - Student APIs remain protected.
  */
 @Configuration
 @EnableWebSecurity
@@ -44,6 +43,7 @@ public class SecurityConfig {
 
      @Bean
      public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
           http
                     .csrf(csrf -> csrf.disable())
 
@@ -57,28 +57,28 @@ public class SecurityConfig {
 
                     .authorizeHttpRequests(auth -> auth
 
+                              // Preflight requests
                               .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                              // ─────────────────────────────────────────
-                              // Student Auth APIs — public
-                              // ─────────────────────────────────────────
-                              .requestMatchers("/api/auth/**").permitAll()
+                              // PUBLIC AUTH APIs
+                              .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                              .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                              .requestMatchers(HttpMethod.POST, "/api/auth/refresh-token").permitAll()
 
-                              // ─────────────────────────────────────────
-                              // NEW: Admin Login API — public
-                              // (Baaki /api/admin/** protected rahenge)
-                              // ─────────────────────────────────────────
-                              .requestMatchers("/api/admin/auth/login").permitAll()
+                              // PUBLIC FORGOT PASSWORD APIs
+                              .requestMatchers(HttpMethod.POST, "/api/auth/forgot-password").permitAll()
+                              .requestMatchers(HttpMethod.POST, "/api/auth/verify-otp").permitAll()
+                              .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
 
-                              // ─────────────────────────────────────────
-                              // Frontend pages — public
-                              // (admin HTML files bhi yahan cover hain)
-                              // ─────────────────────────────────────────
+                              // ADMIN LOGIN API
+                              .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
+
+                              // FRONTEND STATIC FILES
                               .requestMatchers(
                                         "/",
                                         "/index.html",
-                                        "/pages/**", // student pages
                                         "/landing.html",
+                                        "/pages/**",
                                         "/assets/**",
                                         "/css/**",
                                         "/js/**",
@@ -87,19 +87,53 @@ public class SecurityConfig {
                                         "/error")
                               .permitAll()
 
+                              // PUBLIC HEALTH
                               .requestMatchers("/api/syllabus/health").permitAll()
 
-                              // ─────────────────────────────────────────
-                              // NEW: Admin APIs — authentication required
-                              // Role check AdminAuthController mein hoga
-                              // ─────────────────────────────────────────
-                              .requestMatchers("/api/admin/**").authenticated()
+                              // PROTECTED AUTH APIs
+                              .requestMatchers(
+                                        "/api/auth/profile",
+                                        "/api/auth/logout",
+                                        "/api/auth/validate",
+                                        "/api/auth/change-password",
+                                        "/api/auth/delete-account",
+                                        "/api/auth/two-factor")
+                              .hasAnyRole("STUDENT", "ADMIN")
 
-                              // ─────────────────────────────────────────
-                              // All other APIs — authentication required
-                              // ─────────────────────────────────────────
+                              // ADMIN APIs — ADMIN ONLY
+                              .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                              // SHARED MODULE APIs
+                              // Admin panel is using some existing module endpoints,
+                              // so ADMIN must be allowed here too.
+                              .requestMatchers(
+                                        "/api/dashboard/**",
+                                        "/api/subjects/**",
+                                        "/api/tasks/**",
+                                        "/api/plans/**",
+                                        "/api/revisions/**",
+                                        "/api/tests/**",
+                                        "/api/student/**",
+                                        "/api/analytics/**",
+                                        "/api/pomodoro/**",
+                                        "/api/assistant/**",
+                                        "/api/notifications/**",
+                                        "/api/settings/**")
+                              .hasAnyRole("STUDENT", "ADMIN")
+
+                              // OLD ROUTE COMPATIBILITY
+                              .requestMatchers(
+                                        "/subjects/**",
+                                        "/tasks/**",
+                                        "/plans/**",
+                                        "/revisions/**",
+                                        "/tests/**")
+                              .hasAnyRole("STUDENT", "ADMIN")
+
+                              // Any remaining API needs login
                               .requestMatchers("/api/**").authenticated()
 
+                              // Non-API requests allowed
                               .anyRequest().permitAll())
 
                     .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -109,6 +143,7 @@ public class SecurityConfig {
 
      @Bean
      public CorsConfigurationSource corsConfigurationSource() {
+
           CorsConfiguration config = new CorsConfiguration();
 
           config.setAllowedOriginPatterns(List.of("*"));
@@ -119,6 +154,7 @@ public class SecurityConfig {
 
           UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
           source.registerCorsConfiguration("/**", config);
+
           return source;
      }
 

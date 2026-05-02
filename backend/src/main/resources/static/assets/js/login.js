@@ -1,12 +1,16 @@
 /**
- * EduMind AI — Login JS (Final Version)
+ * EduMind AI — Login JS
  * login.js
  *
- * New features:
- *  - Stores refreshToken in localStorage on login
- *  - Handles 423 Locked (account locked error)
- *  - Handles 401 Unauthorized (wrong credentials)
- *  - All inline errors — no alert() used
+ * Cleaned + Fixed:
+ *  - Student/Admin tab selection respected
+ *  - Student login uses /api/auth/login
+ *  - Admin login uses /api/admin/auth/login
+ *  - Admin token keys stored for admin pages
+ *  - Admin no longer redirects back to admin-login.html
+ *  - Password eye button fixed
+ *  - Duplicate inline eye listener conflict handled
+ *  - JWT-compatible localStorage session handling
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -20,94 +24,211 @@ document.addEventListener("DOMContentLoaded", function () {
     const emailError    = document.getElementById("loginEmailError");
     const passwordError = document.getElementById("loginPasswordError");
 
+    const STUDENT_DASHBOARD_URL = "/pages/dashboard.html";
+    const ADMIN_DASHBOARD_URL   = "/pages/admin/admin-dashboard.html";
+
+    const STUDENT_LOGIN_API = "/api/auth/login";
+    const ADMIN_LOGIN_API   = "/api/admin/auth/login";
+
     if (!loginForm) return;
 
-    /* ── Error helpers ── */
+    /* ─────────────────────────────────────────
+       Selected role from login.html tab
+    ───────────────────────────────────────── */
+
+    function getSelectedRole() {
+        const selected = (window.__selectedRole || "student").toString().toLowerCase();
+        return selected === "admin" ? "admin" : "student";
+    }
+
+    function getSubmitLabel() {
+        return getSelectedRole() === "admin"
+            ? "Sign In to Admin Panel"
+            : "Sign In";
+    }
+
+    /* ─────────────────────────────────────────
+       Error helpers
+    ───────────────────────────────────────── */
+
     function showError(input, errEl, msg) {
         if (!input || !errEl) return;
+
         input.classList.remove("input-valid");
         input.classList.add("input-error");
+
         errEl.textContent = msg;
         errEl.style.display = "block";
     }
 
     function clearError(input, errEl) {
         if (!input || !errEl) return;
+
         input.classList.remove("input-error");
         input.classList.add("input-valid");
+
         errEl.textContent = "";
         errEl.style.display = "none";
     }
 
     function resetField(input, errEl) {
         if (!input) return;
+
         input.classList.remove("input-error", "input-valid");
-        if (errEl) { errEl.textContent = ""; errEl.style.display = "none"; }
+
+        if (errEl) {
+            errEl.textContent = "";
+            errEl.style.display = "none";
+        }
     }
 
-    /* ── Validation ── */
+    function showGeneralError(msg) {
+        showError(emailInput, emailError, msg || "Something went wrong.");
+    }
+
+    /* ─────────────────────────────────────────
+       Validation
+    ───────────────────────────────────────── */
+
     function validateEmail() {
         const value = emailInput.value.trim();
-        if (!value) { showError(emailInput, emailError, "This field is required."); return false; }
+
+        if (!value) {
+            showError(emailInput, emailError, "This field is required.");
+            return false;
+        }
+
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
             showError(emailInput, emailError, "Please enter a valid email address.");
             return false;
         }
+
         clearError(emailInput, emailError);
         return true;
     }
 
     function validatePassword() {
         const value = passwordInput.value;
-        if (!value) { showError(passwordInput, passwordError, "This field is required."); return false; }
+
+        if (!value) {
+            showError(passwordInput, passwordError, "This field is required.");
+            return false;
+        }
+
         if (value.length < 8) {
             showError(passwordInput, passwordError, "Password must be at least 8 characters.");
             return false;
         }
+
         clearError(passwordInput, passwordError);
         return true;
     }
 
-    /* ── Real-time validation ── */
+    /* ─────────────────────────────────────────
+       Real-time validation
+    ───────────────────────────────────────── */
+
     emailInput.addEventListener("input", function () {
-        if (this.value.trim()) validateEmail(); else resetField(emailInput, emailError);
+        if (this.value.trim()) {
+            validateEmail();
+        } else {
+            resetField(emailInput, emailError);
+        }
     });
+
     emailInput.addEventListener("blur", validateEmail);
 
     passwordInput.addEventListener("input", function () {
-        if (this.value) validatePassword(); else resetField(passwordInput, passwordError);
+        if (this.value) {
+            validatePassword();
+        } else {
+            resetField(passwordInput, passwordError);
+        }
     });
+
     passwordInput.addEventListener("blur", validatePassword);
 
-    /* ── Eye toggle ── */
-    if (eyeBtn) {
-        eyeBtn.addEventListener("click", function () {
-            const isPassword = passwordInput.type === "password";
-            passwordInput.type = isPassword ? "text" : "password";
-            eyeIcon.classList.toggle("fa-eye",       !isPassword);
-            eyeIcon.classList.toggle("fa-eye-slash",  isPassword);
-            this.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
-            passwordInput.focus();
-        });
+    /* ─────────────────────────────────────────
+       Password eye toggle — FINAL CLEAN FIX
+
+       Reason:
+       login.html also had an inline password-eye listener.
+       Capture phase + stopImmediatePropagation prevents double toggle.
+    ───────────────────────────────────────── */
+
+    if (eyeBtn && passwordInput) {
+        eyeBtn.setAttribute("type", "button");
+
+        document.addEventListener("click", function (event) {
+            const clickedEyeBtn = event.target.closest("#loginPasswordEye");
+
+            if (!clickedEyeBtn) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            const isHidden = passwordInput.type === "password";
+
+            passwordInput.type = isHidden ? "text" : "password";
+
+            if (eyeIcon) {
+                eyeIcon.className = isHidden
+                    ? "fa-solid fa-eye-slash"
+                    : "fa-solid fa-eye";
+            }
+
+            clickedEyeBtn.setAttribute(
+                "aria-label",
+                isHidden ? "Hide password" : "Show password"
+            );
+        }, true);
     }
 
-    /* ── Loading state ── */
+    /* ─────────────────────────────────────────
+       Loading state
+    ───────────────────────────────────────── */
+
     function setLoading(isLoading) {
+        if (!submitBtn) return;
+
         submitBtn.disabled = isLoading;
         submitBtn.innerHTML = isLoading
             ? '<span class="btn-spinner" aria-hidden="true"></span> Signing in...'
-            : "Sign In";
+            : getSubmitLabel();
     }
 
-    /* ── Backend error handler ── */
+    /* ─────────────────────────────────────────
+       Backend response helpers
+    ───────────────────────────────────────── */
+
+    async function parseResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            return await response.json();
+        }
+
+        return await response.text();
+    }
+
     function handleBackendError(status, errorData) {
+        if (typeof errorData === "string") {
+            showGeneralError(errorData || "Invalid email or password.");
+            return;
+        }
+
+        if (errorData && typeof errorData === "object" && errorData.message) {
+            showGeneralError(errorData.message);
+            return;
+        }
+
         const errors = Array.isArray(errorData) ? errorData : [errorData];
 
         errors.forEach(function (err) {
-            const field   = err.field   || "general";
-            const message = err.message || "Something went wrong.";
+            const field = err?.field || "general";
+            const message = err?.message || "Invalid email or password.";
 
-            // 423 = account locked → show under email
             if (status === 423) {
                 showError(emailInput, emailError, message);
                 return;
@@ -123,98 +244,238 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* ── Auth data helpers ── */
-    async function parseResponse(response) {
-        const ct = response.headers.get("content-type") || "";
-        if (ct.includes("application/json")) return await response.json();
-        return await response.text();
-    }
-
     function getTokenFromResponse(result) {
         if (!result || typeof result !== "object") return "";
-        return result.token || result.jwt || result.accessToken || result.access_token || "";
+
+        return result.token
+            || result.jwt
+            || result.accessToken
+            || result.access_token
+            || "";
     }
 
-    function getUserObjectFromResponse(result, email) {
+    function normalizeRole(roleValue) {
+        if (!roleValue) return "STUDENT";
+
+        return String(roleValue)
+            .replace("ROLE_", "")
+            .trim()
+            .toUpperCase();
+    }
+
+    function getUserObjectFromResponse(result, email, selectedRole) {
         if (result && typeof result === "object") {
-            if (result.user && typeof result.user === "object") return result.user;
+
+            if (result.user && typeof result.user === "object") {
+                const nestedRole = normalizeRole(result.user.role || result.role || selectedRole);
+
+                return {
+                    ...result.user,
+                    id: result.user.id ?? result.user.userId ?? result.id ?? result.userId ?? null,
+                    name: result.user.name ?? result.user.fullName ?? result.fullName ?? result.adminName ?? "",
+                    fullName: result.user.fullName ?? result.fullName ?? result.user.name ?? result.adminName ?? "",
+                    email: result.user.email ?? result.email ?? result.adminEmail ?? email ?? "",
+                    role: nestedRole
+                };
+            }
+
             return {
-                id:    result.userId ?? result.id ?? null,
-                name:  result.name   ?? result.userName ?? "",
-                email: result.email  ?? email ?? ""
+                id: result.userId ?? result.id ?? result.adminId ?? null,
+                name: result.name ?? result.userName ?? result.fullName ?? result.adminName ?? "",
+                fullName: result.fullName ?? result.name ?? result.userName ?? result.adminName ?? "",
+                email: result.email ?? result.adminEmail ?? email ?? "",
+                role: normalizeRole(result.role || selectedRole)
             };
         }
-        return { id: null, name: "", email: email || "" };
+
+        return {
+            id: null,
+            name: "",
+            fullName: "",
+            email: email || "",
+            role: selectedRole === "admin" ? "ADMIN" : "STUDENT"
+        };
     }
 
     function clearOldAuthData() {
-        ["token", "refreshToken", "userId", "userEmail", "userName",
-         "edumind_logged_in_user", "edumind_registered_user",
-         "loggedInUser", "currentUser", "user", "authUser",
-         "studyPlannerUser", "edumind_is_logged_in"
-        ].forEach(k => localStorage.removeItem(k));
+        [
+            "token",
+            "refreshToken",
+            "userId",
+            "userEmail",
+            "userName",
+            "userRole",
+            "edumind_logged_in_user",
+            "edumind_registered_user",
+            "loggedInUser",
+            "currentUser",
+            "user",
+            "authUser",
+            "studyPlannerUser",
+            "edumind_is_logged_in",
+
+            "adminToken",
+            "adminRole",
+            "adminName",
+            "adminEmail"
+        ].forEach(function (key) {
+            localStorage.removeItem(key);
+        });
     }
 
-    /* ── Form submit ── */
+    function storeStudentSession(token, refreshToken, user, role) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("edumind_is_logged_in", "true");
+        localStorage.setItem("edumind_logged_in_user", JSON.stringify(user));
+        localStorage.setItem("userRole", role);
+
+        if (refreshToken) {
+            localStorage.setItem("refreshToken", refreshToken);
+        }
+
+        if (user.id != null) {
+            localStorage.setItem("userId", String(user.id));
+        }
+
+        if (user.email) {
+            localStorage.setItem("userEmail", user.email);
+        }
+
+        if (user.name || user.fullName) {
+            localStorage.setItem("userName", user.name || user.fullName);
+        }
+    }
+
+    function storeAdminSession(token, refreshToken, user, role) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("edumind_is_logged_in", "true");
+        localStorage.setItem("edumind_logged_in_user", JSON.stringify(user));
+        localStorage.setItem("userRole", role);
+
+        localStorage.setItem("adminToken", token);
+        localStorage.setItem("adminRole", "ADMIN");
+        localStorage.setItem("adminName", user.name || user.fullName || "Admin");
+        localStorage.setItem("adminEmail", user.email || "");
+
+        if (refreshToken) {
+            localStorage.setItem("refreshToken", refreshToken);
+        }
+
+        if (user.id != null) {
+            localStorage.setItem("userId", String(user.id));
+        }
+
+        if (user.email) {
+            localStorage.setItem("userEmail", user.email);
+        }
+
+        if (user.name || user.fullName) {
+            localStorage.setItem("userName", user.name || user.fullName);
+        }
+    }
+
+    function redirectByRole(role) {
+        const normalizedRole = normalizeRole(role);
+
+        if (normalizedRole === "ADMIN") {
+            window.location.href = ADMIN_DASHBOARD_URL;
+            return;
+        }
+
+        window.location.href = STUDENT_DASHBOARD_URL;
+    }
+
+    /* ─────────────────────────────────────────
+       Form submit
+    ───────────────────────────────────────── */
+
     loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        if (!validateEmail() | !validatePassword()) return;
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePassword();
 
-        const email    = emailInput.value.trim();
+        if (!isEmailValid || !isPasswordValid) return;
+
+        const email = emailInput.value.trim();
         const password = passwordInput.value;
+        const selectedRole = getSelectedRole();
+
+        const loginEndpoint = selectedRole === "admin"
+            ? ADMIN_LOGIN_API
+            : STUDENT_LOGIN_API;
 
         setLoading(true);
 
         try {
-            const response = await fetch("/api/auth/login", {
+            const response = await fetch(loginEndpoint, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ email, password })
             });
 
             const result = await parseResponse(response);
 
-            if (!response.ok) {
-                if (result && typeof result === "object") {
-                    handleBackendError(response.status, result);
-                } else {
-                    showError(emailInput, emailError,
-                        typeof result === "string" ? result : "Invalid email or password.");
-                }
+            if (!response.ok || (result && typeof result === "object" && result.success === false)) {
+                handleBackendError(response.status, result);
                 return;
             }
 
             const token = getTokenFromResponse(result);
+
             if (!token) {
-                showError(passwordInput, passwordError,
-                    "Login successful but session token not received.");
+                showError(
+                    passwordInput,
+                    passwordError,
+                    "Login successful but session token not received."
+                );
                 return;
             }
 
-            const user = getUserObjectFromResponse(result, email);
-            clearOldAuthData();
+            const user = getUserObjectFromResponse(result, email, selectedRole);
+            const role = normalizeRole(user.role);
 
-            // Store access token + refresh token
-            localStorage.setItem("token", token);
-            localStorage.setItem("edumind_is_logged_in", "true");
-            localStorage.setItem("edumind_logged_in_user", JSON.stringify(user));
-
-            // Store refresh token if returned by backend
-            if (result.refreshToken) {
-                localStorage.setItem("refreshToken", result.refreshToken);
+            if (selectedRole === "admin" && role !== "ADMIN") {
+                showGeneralError("Please use an admin account to sign in from the Admin tab.");
+                return;
             }
 
-            if (user.id != null) localStorage.setItem("userId", String(user.id));
-            if (user.email)      localStorage.setItem("userEmail", user.email);
-            if (user.name)       localStorage.setItem("userName", user.name);
+            if (selectedRole === "student" && role === "ADMIN") {
+                showGeneralError("This is an admin account. Please select the Admin tab to continue.");
+                return;
+            }
 
-            window.location.href = "dashboard.html";
+            clearOldAuthData();
+
+            if (role === "ADMIN") {
+                storeAdminSession(
+                    token,
+                    result.refreshToken || result.refresh_token || "",
+                    user,
+                    role
+                );
+            } else {
+                storeStudentSession(
+                    token,
+                    result.refreshToken || result.refresh_token || "",
+                    user,
+                    role
+                );
+            }
+
+            redirectByRole(role);
 
         } catch (error) {
             console.error("Login error:", error.message);
-            showError(emailInput, emailError,
-                "Something went wrong. Please check your connection and try again.");
+
+            showError(
+                emailInput,
+                emailError,
+                "Something went wrong. Please check your connection and try again."
+            );
+
         } finally {
             setLoading(false);
         }
@@ -223,55 +484,68 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /* ══════════════════════════════════════════════════════
-   AUTO REFRESH HELPER — use this in OTHER pages (not here)
-   Call this before any authenticated API request.
+   AUTO REFRESH HELPER
+   Use this before authenticated API requests if needed.
 
-   Usage in any page JS:
+   Example:
      const token = await getValidToken();
-     if (!token) return; // user will be redirected to login
-
-   Paste this function in a shared auth-helper.js file.
+     if (!token) return;
 ══════════════════════════════════════════════════════ */
+
 window.getValidToken = async function () {
-    const token        = localStorage.getItem("token");
+    const userRole = localStorage.getItem("userRole");
+
+    const token = userRole === "ADMIN"
+        ? (localStorage.getItem("adminToken") || localStorage.getItem("token"))
+        : localStorage.getItem("token");
+
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (!token) {
-        window.location.href = "login.html";
+        window.location.href = "/pages/login.html";
         return null;
     }
 
-    // Try a lightweight token validation call
     try {
         const response = await fetch("/api/auth/validate", {
-            headers: { "Authorization": "Bearer " + token }
+            headers: {
+                "Authorization": "Bearer " + token
+            }
         });
 
-        if (response.ok) return token; // token still valid
+        if (response.ok) return token;
 
-        // Token expired (401) → try refresh
         if (response.status === 401 && refreshToken) {
             const refreshResponse = await fetch("/api/auth/refresh-token", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ refreshToken: refreshToken })
             });
 
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
-                // Save new access token
-                localStorage.setItem("token", data.accessToken);
-                return data.accessToken;
+                const newToken = data.accessToken || data.token || "";
+
+                if (newToken) {
+                    localStorage.setItem("token", newToken);
+
+                    if (userRole === "ADMIN") {
+                        localStorage.setItem("adminToken", newToken);
+                    }
+
+                    return newToken;
+                }
             }
         }
 
-        // Refresh failed → force login
         localStorage.clear();
-        window.location.href = "login.html";
+        window.location.href = "/pages/login.html";
         return null;
 
     } catch (err) {
         console.error("Token validation error:", err.message);
-        return token; // Network error — return existing token and let API handle it
+        return token;
     }
 };

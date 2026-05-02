@@ -10,45 +10,40 @@
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
      <style>
           /* ══════════════════════════════════════
-           CSS Variables — Dark Theme (default)
+           CSS Variables
         ══════════════════════════════════════ */
           :root {
                --bg-primary: #0a0e1a;
-               --bg-secondary: #0f1628;
                --bg-card: #111827;
                --bg-card-border: rgba(20, 184, 166, 0.15);
-               --color-teal: #14b8a6;
-               --color-teal-glow: rgba(20, 184, 166, 0.25);
-               --color-teal-dark: #0d9488;
-               --color-cyan: #06b6d4;
-               --color-text: #f1f5f9;
-               --color-text-muted: #94a3b8;
-               --color-text-dim: #64748b;
-               --color-error: #f87171;
-               --color-error-bg: rgba(248, 113, 113, 0.1);
-               --color-success: #34d399;
-               --color-success-bg: rgba(52, 211, 153, 0.1);
-               --color-warning: #fbbf24;
+               --teal: #14b8a6;
+               --teal-glow: rgba(20, 184, 166, 0.25);
+               --cyan: #06b6d4;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #64748b;
+               --error: #f87171;
+               --error-bg: rgba(248, 113, 113, 0.1);
+               --success: #34d399;
+               --success-bg: rgba(52, 211, 153, 0.1);
+               --warning: #fbbf24;
                --input-bg: rgba(255, 255, 255, 0.04);
                --input-border: rgba(148, 163, 184, 0.15);
-               --input-border-focus: var(--color-teal);
-               --shadow-card: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--bg-card-border);
-               --shadow-glow: 0 0 40px rgba(20, 184, 166, 0.12);
+               --shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--bg-card-border);
+               --glow: 0 0 40px rgba(20, 184, 166, 0.12);
           }
 
-          /* Light theme */
           [data-theme="light"] {
                --bg-primary: #f0f4f8;
-               --bg-secondary: #e8edf5;
                --bg-card: #ffffff;
                --bg-card-border: rgba(20, 184, 166, 0.2);
-               --color-text: #0f172a;
-               --color-text-muted: #475569;
-               --color-text-dim: #94a3b8;
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
                --input-bg: rgba(0, 0, 0, 0.03);
                --input-border: rgba(0, 0, 0, 0.12);
-               --shadow-card: 0 25px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--bg-card-border);
-               --shadow-glow: 0 0 40px rgba(20, 184, 166, 0.08);
+               --shadow: 0 25px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--bg-card-border);
+               --glow: 0 0 40px rgba(20, 184, 166, 0.06);
           }
 
           * {
@@ -59,8 +54,8 @@
 
           body {
                font-family: 'DM Sans', sans-serif;
-               background-color: var(--bg-primary);
-               color: var(--color-text);
+               background: var(--bg-primary);
+               color: var(--text);
                min-height: 100vh;
                display: flex;
                align-items: center;
@@ -69,9 +64,7 @@
                position: relative;
           }
 
-          /* ══════════════════════════════════════
-           Animated Background
-        ══════════════════════════════════════ */
+          /* Background */
           .bg-grid {
                position: fixed;
                inset: 0;
@@ -97,7 +90,7 @@
                background: radial-gradient(circle, rgba(20, 184, 166, 0.15), transparent 70%);
                top: -100px;
                left: -100px;
-               animation: orbFloat 8s ease-in-out infinite;
+               animation: float 8s ease-in-out infinite;
           }
 
           .orb-2 {
@@ -106,7 +99,7 @@
                background: radial-gradient(circle, rgba(6, 182, 212, 0.1), transparent 70%);
                bottom: -80px;
                right: -80px;
-               animation: orbFloat 10s ease-in-out infinite reverse;
+               animation: float 10s ease-in-out infinite reverse;
           }
 
           .orb-3 {
@@ -115,10 +108,10 @@
                background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%);
                top: 50%;
                left: 60%;
-               animation: orbFloat 12s ease-in-out infinite;
+               animation: float 12s ease-in-out infinite;
           }
 
-          @keyframes orbFloat {
+          @keyframes float {
 
                0%,
                100% {
@@ -134,19 +127,17 @@
                }
           }
 
-          /* ══════════════════════════════════════
-           Main Layout
-        ══════════════════════════════════════ */
-          .login-wrapper {
+          /* Wrapper */
+          .wrapper {
                position: relative;
                z-index: 10;
                width: 100%;
                max-width: 460px;
                padding: 20px;
-               animation: fadeInUp 0.6s ease both;
+               animation: fadeUp 0.6s ease both;
           }
 
-          @keyframes fadeInUp {
+          @keyframes fadeUp {
                from {
                     opacity: 0;
                     transform: translateY(30px);
@@ -158,73 +149,33 @@
                }
           }
 
-          /* ══════════════════════════════════════
-           Logo / Brand
-        ══════════════════════════════════════ */
+          /* ── BRAND ── */
           .brand {
                text-align: center;
-               margin-bottom: 32px;
+               margin-bottom: 28px;
           }
 
-          .brand-logo {
-               display: inline-flex;
-               align-items: center;
-               gap: 10px;
-               margin-bottom: 12px;
-          }
-
-          .brand-icon {
-               width: 44px;
-               height: 44px;
-               background: linear-gradient(135deg, var(--color-teal), var(--color-cyan));
-               border-radius: 12px;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               font-size: 20px;
-               box-shadow: 0 0 20px var(--color-teal-glow);
-          }
-
-          .brand-name {
-               font-family: 'Syne', sans-serif;
-               font-size: 24px;
-               font-weight: 800;
-               background: linear-gradient(135deg, var(--color-teal), var(--color-cyan));
-               -webkit-background-clip: text;
-               -webkit-text-fill-color: transparent;
-               background-clip: text;
-          }
-
-          .brand-subtitle {
-               font-size: 13px;
-               color: var(--color-text-muted);
-               letter-spacing: 0.05em;
-          }
-
-          /* ══════════════════════════════════════
-           Admin Badge
-        ══════════════════════════════════════ */
           .admin-badge {
                display: inline-flex;
                align-items: center;
                gap: 6px;
                background: rgba(20, 184, 166, 0.1);
                border: 1px solid rgba(20, 184, 166, 0.25);
-               color: var(--color-teal);
+               color: var(--teal);
                font-size: 11px;
                font-weight: 600;
                letter-spacing: 0.12em;
                text-transform: uppercase;
                padding: 5px 14px;
                border-radius: 100px;
-               margin-bottom: 8px;
+               margin-bottom: 12px;
           }
 
           .admin-badge::before {
                content: '';
                width: 6px;
                height: 6px;
-               background: var(--color-teal);
+               background: var(--teal);
                border-radius: 50%;
                animation: pulse 2s infinite;
           }
@@ -243,77 +194,85 @@
                }
           }
 
-          /* ══════════════════════════════════════
-           Card
-        ══════════════════════════════════════ */
+          .brand-logo {
+               display: inline-flex;
+               align-items: center;
+               gap: 10px;
+               margin-bottom: 8px;
+          }
+
+          .brand-name {
+               font-family: 'Syne', sans-serif;
+               font-size: 26px;
+               font-weight: 800;
+               color: var(--teal);
+               letter-spacing: -0.02em;
+          }
+
+          .brand-sub {
+               font-size: 13px;
+               color: var(--text2);
+          }
+
+          /* ── CARD ── */
           .card {
                background: var(--bg-card);
                border: 1px solid var(--bg-card-border);
                border-radius: 20px;
-               padding: 40px;
-               box-shadow: var(--shadow-card), var(--shadow-glow);
+               padding: 36px;
+               box-shadow: var(--shadow), var(--glow);
                backdrop-filter: blur(10px);
-          }
-
-          .card-header {
-               margin-bottom: 32px;
           }
 
           .card-title {
                font-family: 'Syne', sans-serif;
-               font-size: 26px;
+               font-size: 24px;
                font-weight: 700;
-               color: var(--color-text);
                margin-bottom: 6px;
           }
 
           .card-desc {
                font-size: 14px;
-               color: var(--color-text-muted);
+               color: var(--text2);
+               margin-bottom: 24px;
           }
 
-          /* ══════════════════════════════════════
-           Alert Box (Admin Only Warning)
-        ══════════════════════════════════════ */
-          .alert {
+          /* Warning banner */
+          .warning-box {
                display: flex;
                align-items: flex-start;
                gap: 10px;
-               padding: 12px 16px;
+               padding: 12px 14px;
                border-radius: 10px;
                font-size: 13px;
-               margin-bottom: 24px;
-               border: 1px solid;
-          }
-
-          .alert-warning {
                background: rgba(251, 191, 36, 0.08);
-               border-color: rgba(251, 191, 36, 0.2);
-               color: var(--color-warning);
+               border: 1px solid rgba(251, 191, 36, 0.2);
+               color: var(--warning);
+               margin-bottom: 24px;
+               line-height: 1.5;
           }
 
-          .alert i {
+          .warning-box i {
                margin-top: 1px;
                flex-shrink: 0;
           }
 
-          /* ══════════════════════════════════════
-           Form
-        ══════════════════════════════════════ */
+          /* ── FORM ── */
           .form-group {
-               margin-bottom: 20px;
+               margin-bottom: 18px;
           }
 
           .form-label {
-               display: block;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
                font-size: 13px;
                font-weight: 500;
-               color: var(--color-text-muted);
+               color: var(--text2);
                margin-bottom: 8px;
-               letter-spacing: 0.02em;
           }
 
-          .input-wrapper {
+          .input-wrap {
                position: relative;
           }
 
@@ -322,49 +281,77 @@
                left: 14px;
                top: 50%;
                transform: translateY(-50%);
-               color: var(--color-text-dim);
+               color: var(--text3);
                font-size: 14px;
                pointer-events: none;
                transition: color 0.2s;
           }
 
-          .form-input {
+          .input-wrap:focus-within .input-icon {
+               color: var(--teal);
+          }
+
+          input.form-input {
                width: 100%;
                background: var(--input-bg);
-               border: 1px solid var(--input-border);
+               border: 1.5px solid var(--input-border);
                border-radius: 10px;
-               padding: 12px 14px 12px 40px;
+               padding: 12px 42px 12px 40px;
                font-family: 'DM Sans', sans-serif;
                font-size: 14px;
-               color: var(--color-text);
+               color: var(--text);
                outline: none;
                transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
           }
 
-          .form-input::placeholder {
-               color: var(--color-text-dim);
+          input.form-input::placeholder {
+               color: var(--text3);
           }
 
-          .form-input:focus {
-               border-color: var(--color-teal);
-               box-shadow: 0 0 0 3px var(--color-teal-glow);
-               background: rgba(20, 184, 166, 0.04);
+          input.form-input:focus {
+               border-color: var(--teal);
+               box-shadow: 0 0 0 3px var(--teal-glow);
+               background: rgba(20, 184, 166, 0.03);
           }
 
-          .form-input:focus+.input-icon,
-          .input-wrapper:focus-within .input-icon {
-               color: var(--color-teal);
+          input.form-input.valid {
+               border-color: #34d399;
           }
 
-          /* Password eye toggle */
-          .password-toggle {
+          input.form-input.invalid {
+               border-color: var(--error);
+               box-shadow: 0 0 0 3px var(--error-bg);
+          }
+
+          /* Validation tick/cross inside input */
+          .input-status {
                position: absolute;
-               right: 14px;
+               right: 42px;
+               top: 50%;
+               transform: translateY(-50%);
+               font-size: 13px;
+               display: none;
+          }
+
+          .input-status.show-valid {
+               display: block;
+               color: #34d399;
+          }
+
+          .input-status.show-invalid {
+               display: block;
+               color: var(--error);
+          }
+
+          /* Password toggle */
+          .eye-btn {
+               position: absolute;
+               right: 12px;
                top: 50%;
                transform: translateY(-50%);
                background: none;
                border: none;
-               color: var(--color-text-dim);
+               color: var(--text3);
                cursor: pointer;
                font-size: 14px;
                padding: 4px;
@@ -372,70 +359,113 @@
                z-index: 1;
           }
 
-          .password-toggle:hover {
-               color: var(--color-teal);
+          .eye-btn:hover {
+               color: var(--teal);
           }
 
-          /* Input error state */
-          .form-input.error {
-               border-color: var(--color-error);
-               box-shadow: 0 0 0 3px var(--color-error-bg);
-          }
-
-          .error-msg {
-               font-size: 12px;
-               color: var(--color-error);
+          /* Error / hint messages */
+          .field-msg {
+               font-size: 11.5px;
                margin-top: 6px;
                display: none;
                align-items: center;
-               gap: 4px;
+               gap: 5px;
+               line-height: 1.4;
           }
 
-          .error-msg.show {
+          .field-msg.show {
                display: flex;
           }
 
-          /* ══════════════════════════════════════
-           Submit Button
-        ══════════════════════════════════════ */
-          .btn-login {
+          .field-msg.err {
+               color: var(--error);
+          }
+
+          .field-msg.hint {
+               color: var(--text3);
+          }
+
+          /* Password strength bar */
+          .strength-wrap {
+               margin-top: 8px;
+               display: none;
+          }
+
+          .strength-wrap.show {
+               display: block;
+          }
+
+          .strength-bar {
+               height: 4px;
+               border-radius: 4px;
+               background: var(--input-border);
+               overflow: hidden;
+               margin-bottom: 5px;
+          }
+
+          .strength-fill {
+               height: 100%;
+               border-radius: 4px;
+               transition: width 0.3s, background 0.3s;
+               width: 0%;
+          }
+
+          .strength-label {
+               font-size: 11px;
+               color: var(--text3);
+          }
+
+          /* Forgot password link */
+          .forgot-link {
+               font-size: 12px;
+               color: var(--teal);
+               text-decoration: none;
+               cursor: pointer;
+               transition: opacity 0.2s;
+          }
+
+          .forgot-link:hover {
+               opacity: 0.75;
+               text-decoration: underline;
+          }
+
+          /* ── SUBMIT BUTTON ── */
+          .btn-submit {
                width: 100%;
-               padding: 14px;
-               background: linear-gradient(135deg, var(--color-teal), var(--color-cyan));
+               padding: 13px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
                border: none;
                border-radius: 10px;
                color: #fff;
                font-family: 'Syne', sans-serif;
                font-size: 15px;
                font-weight: 700;
-               letter-spacing: 0.03em;
                cursor: pointer;
                transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-               box-shadow: 0 4px 20px var(--color-teal-glow);
+               box-shadow: 0 4px 20px var(--teal-glow);
                display: flex;
                align-items: center;
                justify-content: center;
                gap: 8px;
-               margin-top: 8px;
+               margin-top: 6px;
           }
 
-          .btn-login:hover:not(:disabled) {
+          .btn-submit:hover:not(:disabled) {
                opacity: 0.9;
                transform: translateY(-1px);
-               box-shadow: 0 8px 30px var(--color-teal-glow);
+               box-shadow: 0 8px 28px var(--teal-glow);
           }
 
-          .btn-login:active:not(:disabled) {
+          .btn-submit:active:not(:disabled) {
                transform: translateY(0);
           }
 
-          .btn-login:disabled {
+          .btn-submit:disabled {
                opacity: 0.6;
                cursor: not-allowed;
           }
 
-          /* Loading spinner inside button */
-          .spinner {
+          .spin {
                width: 16px;
                height: 16px;
                border: 2px solid rgba(255, 255, 255, 0.3);
@@ -451,56 +481,180 @@
                }
           }
 
-          /* ══════════════════════════════════════
-           Global Alert (success/error toast)
-        ══════════════════════════════════════ */
-          .global-alert {
-               padding: 12px 16px;
+          /* Global alert */
+          .g-alert {
+               padding: 12px 14px;
                border-radius: 10px;
                font-size: 13px;
-               margin-top: 16px;
+               margin-top: 14px;
                display: none;
                align-items: center;
                gap: 8px;
                border: 1px solid;
-               animation: fadeInUp 0.3s ease;
+               line-height: 1.4;
           }
 
-          .global-alert.show {
+          .g-alert.show {
                display: flex;
           }
 
-          .global-alert.success {
-               background: var(--color-success-bg);
+          .g-alert.success {
+               background: var(--success-bg);
                border-color: rgba(52, 211, 153, 0.3);
-               color: var(--color-success);
+               color: var(--success);
           }
 
-          .global-alert.error {
-               background: var(--color-error-bg);
+          .g-alert.error {
+               background: var(--error-bg);
                border-color: rgba(248, 113, 113, 0.3);
-               color: var(--color-error);
+               color: var(--error);
           }
 
-          /* ══════════════════════════════════════
-           Footer
-        ══════════════════════════════════════ */
-          .card-footer {
-               margin-top: 24px;
+          .g-alert.info {
+               background: rgba(20, 184, 166, 0.08);
+               border-color: rgba(20, 184, 166, 0.25);
+               color: var(--teal);
+          }
+
+          /* ── FORGOT PASSWORD MODAL ── */
+          .modal-overlay {
+               position: fixed;
+               inset: 0;
+               z-index: 999;
+               background: rgba(0, 0, 0, 0.7);
+               backdrop-filter: blur(6px);
+               display: none;
+               align-items: center;
+               justify-content: center;
+               padding: 20px;
+          }
+
+          .modal-overlay.open {
+               display: flex;
+               animation: fadeUp 0.3s ease;
+          }
+
+          .modal {
+               background: var(--bg-card);
+               border: 1px solid var(--bg-card-border);
+               border-radius: 18px;
+               padding: 32px;
+               width: 100%;
+               max-width: 400px;
+               box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+          }
+
+          .modal-header {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               margin-bottom: 8px;
+          }
+
+          .modal-title {
+               font-family: 'Syne', sans-serif;
+               font-size: 20px;
+               font-weight: 700;
+          }
+
+          .modal-close {
+               background: none;
+               border: none;
+               color: var(--text3);
+               font-size: 18px;
+               cursor: pointer;
+               padding: 4px;
+               transition: color 0.2s;
+          }
+
+          .modal-close:hover {
+               color: var(--error);
+          }
+
+          .modal-desc {
+               font-size: 13px;
+               color: var(--text2);
+               margin-bottom: 22px;
+               line-height: 1.6;
+          }
+
+          .modal-steps {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+               margin-bottom: 20px;
+          }
+
+          .modal-step {
+               display: flex;
+               align-items: flex-start;
+               gap: 12px;
+               padding: 12px 14px;
+               border-radius: 10px;
+               background: rgba(20, 184, 166, 0.06);
+               border: 1px solid rgba(20, 184, 166, 0.12);
+          }
+
+          .step-num {
+               width: 24px;
+               height: 24px;
+               border-radius: 50%;
+               background: var(--teal);
+               color: #fff;
+               font-size: 11px;
+               font-weight: 700;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               flex-shrink: 0;
+               margin-top: 1px;
+          }
+
+          .step-text p {
+               font-size: 13px;
+               font-weight: 500;
+          }
+
+          .step-text span {
+               font-size: 12px;
+               color: var(--text2);
+               margin-top: 2px;
+               display: block;
+          }
+
+          .modal-btn {
+               width: 100%;
+               padding: 12px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border: none;
+               border-radius: 10px;
+               color: #fff;
+               font-family: 'Syne', sans-serif;
+               font-size: 14px;
+               font-weight: 700;
+               cursor: pointer;
+               transition: opacity 0.2s;
+          }
+
+          .modal-btn:hover {
+               opacity: 0.88;
+          }
+
+          /* Footer */
+          .card-foot {
+               margin-top: 22px;
                text-align: center;
                font-size: 12px;
-               color: var(--color-text-dim);
+               color: var(--text3);
           }
 
-          .card-footer i {
-               color: var(--color-teal);
+          .card-foot i {
+               color: var(--teal);
                margin-right: 4px;
           }
 
-          /* ══════════════════════════════════════
-           Theme Toggle
-        ══════════════════════════════════════ */
-          .theme-toggle {
+          /* Theme toggle */
+          .theme-btn {
                position: fixed;
                top: 20px;
                right: 20px;
@@ -514,27 +668,24 @@
                align-items: center;
                justify-content: center;
                cursor: pointer;
-               color: var(--color-teal);
+               color: var(--teal);
                font-size: 16px;
                transition: all 0.2s;
                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
           }
 
-          .theme-toggle:hover {
+          .theme-btn:hover {
                transform: scale(1.1);
-               box-shadow: 0 4px 20px var(--color-teal-glow);
+               box-shadow: 0 4px 20px var(--teal-glow);
           }
 
-          /* ══════════════════════════════════════
-           Responsive
-        ══════════════════════════════════════ */
-          @media (max-width: 480px) {
+          @media (max-width:480px) {
                .card {
-                    padding: 28px 24px;
+                    padding: 26px 20px;
                }
 
                .card-title {
-                    font-size: 22px;
+                    font-size: 21px;
                }
           }
      </style>
@@ -542,293 +693,419 @@
 
 <body>
 
-     <!-- Background effects -->
      <div class="bg-grid"></div>
      <div class="bg-orb orb-1"></div>
      <div class="bg-orb orb-2"></div>
      <div class="bg-orb orb-3"></div>
 
      <!-- Theme Toggle -->
-     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+     <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
           <i class="fas fa-moon" id="themeIcon"></i>
      </button>
 
-     <!-- Login Card -->
-     <div class="login-wrapper">
+     <!-- ══════════════════════════════════════
+     LOGIN CARD
+══════════════════════════════════════ -->
+     <div class="wrapper">
 
           <!-- Brand -->
           <div class="brand">
                <div class="admin-badge">Admin Portal</div>
                <div class="brand-logo">
-                    <div class="brand-icon">🎓</div>
+                    <!-- Hexagon logo — same as student pages -->
+                    <svg width="40" height="40" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6"
+                              stroke-width="2" />
+                         <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)"
+                              stroke="#14b8a6" stroke-width="1" />
+                         <text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold" fill="#14b8a6"
+                              font-family="sans-serif">AI</text>
+                    </svg>
                     <span class="brand-name">EduMind AI</span>
                </div>
-               <p class="brand-subtitle">Smart Study Planner — Administration</p>
+               <p class="brand-sub">Smart Study Planner — Administration</p>
           </div>
 
           <!-- Card -->
           <div class="card">
-               <div class="card-header">
-                    <h1 class="card-title">Welcome back, Admin</h1>
-                    <p class="card-desc">Sign in to access the admin control panel.</p>
-               </div>
+               <h1 class="card-title">Welcome back, Admin 👋</h1>
+               <p class="card-desc">Sign in to access the admin control panel.</p>
 
-               <!-- Warning -->
-               <div class="alert alert-warning">
+               <!-- Admin-only warning -->
+               <div class="warning-box">
                     <i class="fas fa-shield-halved"></i>
-                    <span>This area is restricted to authorized administrators only. Unauthorized access attempts are
-                         logged.</span>
+                    <span>Restricted area — authorized administrators only. All access attempts are logged and
+                         monitored.</span>
                </div>
 
-               <!-- Login Form -->
-               <form id="adminLoginForm" novalidate>
+               <!-- Form -->
+               <form id="loginForm" novalidate autocomplete="off">
 
                     <!-- Email -->
                     <div class="form-group">
-                         <label class="form-label" for="adminEmail">Admin Email</label>
-                         <div class="input-wrapper">
-                              <input type="email" id="adminEmail" class="form-input" placeholder="admin@edumind.com"
+                         <label class="form-label" for="email">
+                              <span>Admin Email <span style="color:var(--error)">*</span></span>
+                         </label>
+                         <div class="input-wrap">
+                              <input type="email" id="email" class="form-input" placeholder="e.g. admin@edumind.com"
                                    autocomplete="email" />
                               <i class="fas fa-envelope input-icon"></i>
+                              <span class="input-status" id="emailStatus"></span>
                          </div>
-                         <div class="error-msg" id="emailError">
-                              <i class="fas fa-circle-exclamation"></i>
-                              <span></span>
+                         <div class="field-msg err" id="emailErr">
+                              <i class="fas fa-circle-exclamation"></i><span id="emailErrText"></span>
                          </div>
                     </div>
 
                     <!-- Password -->
                     <div class="form-group">
-                         <label class="form-label" for="adminPassword">Password</label>
-                         <div class="input-wrapper">
-                              <input type="password" id="adminPassword" class="form-input"
-                                   placeholder="Enter your password" autocomplete="current-password" />
+                         <label class="form-label" for="password">
+                              <span>Password <span style="color:var(--error)">*</span></span>
+                              <a class="forgot-link" onclick="openForgotModal()" tabindex="0">Forgot password?</a>
+                         </label>
+                         <div class="input-wrap">
+                              <input type="password" id="password" class="form-input" placeholder="Enter your password"
+                                   autocomplete="current-password" />
                               <i class="fas fa-lock input-icon"></i>
-                              <button type="button" class="password-toggle" id="togglePassword"
-                                   title="Show/hide password">
+                              <span class="input-status" id="passStatus"></span>
+                              <button type="button" class="eye-btn" id="eyeBtn" title="Show/hide password">
                                    <i class="fas fa-eye" id="eyeIcon"></i>
                               </button>
                          </div>
-                         <div class="error-msg" id="passwordError">
-                              <i class="fas fa-circle-exclamation"></i>
-                              <span></span>
+                         <div class="field-msg err" id="passErr">
+                              <i class="fas fa-circle-exclamation"></i><span id="passErrText"></span>
+                         </div>
+                         <!-- Password strength -->
+                         <div class="strength-wrap" id="strengthWrap">
+                              <div class="strength-bar">
+                                   <div class="strength-fill" id="strengthFill"></div>
+                              </div>
+                              <span class="strength-label" id="strengthLabel">Password strength</span>
                          </div>
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" class="btn-login" id="loginBtn">
-                         <div class="spinner" id="loginSpinner"></div>
-                         <i class="fas fa-right-to-bracket" id="loginIcon"></i>
-                         <span id="loginBtnText">Sign In to Admin Panel</span>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                         <div class="spin" id="spin"></div>
+                         <i class="fas fa-right-to-bracket" id="submitIcon"></i>
+                         <span id="submitText">Sign In to Admin Panel</span>
                     </button>
 
-                    <!-- Global Alert -->
-                    <div class="global-alert" id="globalAlert">
-                         <i class="fas fa-circle-info" id="alertIcon"></i>
-                         <span id="alertText"></span>
+                    <!-- Global message -->
+                    <div class="g-alert" id="gAlert">
+                         <i id="gIcon"></i>
+                         <span id="gText"></span>
                     </div>
 
                </form>
 
-               <!-- Footer note -->
-               <div class="card-footer">
+               <div class="card-foot">
                     <i class="fas fa-lock"></i>
-                    Secured with JWT Authentication &nbsp;·&nbsp; EduMind AI &copy; 2025
+                    Secured with JWT &nbsp;·&nbsp; EduMind AI &copy; 2025
                </div>
           </div>
+     </div>
 
+     <!-- ══════════════════════════════════════
+     FORGOT PASSWORD MODAL
+══════════════════════════════════════ -->
+     <div class="modal-overlay" id="forgotModal">
+          <div class="modal">
+               <div class="modal-header">
+                    <h2 class="modal-title">🔑 Reset Password</h2>
+                    <button class="modal-close" onclick="closeForgotModal()">
+                         <i class="fas fa-xmark"></i>
+                    </button>
+               </div>
+               <p class="modal-desc">
+                    Admin password reset requires direct database or system access for security reasons.
+                    Follow these steps to reset your admin password:
+               </p>
+               <div class="modal-steps">
+                    <div class="modal-step">
+                         <div class="step-num">1</div>
+                         <div class="step-text">
+                              <p>Open MySQL Workbench</p>
+                              <span>Connect to your StudyPlanner database</span>
+                         </div>
+                    </div>
+                    <div class="modal-step">
+                         <div class="step-num">2</div>
+                         <div class="step-text">
+                              <p>Generate BCrypt Hash</p>
+                              <span>Visit bcrypt-generator.com → enter new password → copy hash</span>
+                         </div>
+                    </div>
+                    <div class="modal-step">
+                         <div class="step-num">3</div>
+                         <div class="step-text">
+                              <p>Run SQL Update</p>
+                              <span style="font-family:monospace; font-size:11px; color:var(--teal)">
+                                   UPDATE users SET password='&lt;hash&gt;' WHERE role='ADMIN';
+                              </span>
+                         </div>
+                    </div>
+                    <div class="modal-step">
+                         <div class="step-num">4</div>
+                         <div class="step-text">
+                              <p>Login with new password</p>
+                              <span>Restart backend if needed, then sign in</span>
+                         </div>
+                    </div>
+               </div>
+               <button class="modal-btn" onclick="closeForgotModal()">
+                    <i class="fas fa-check"></i> Got it, Thanks!
+               </button>
+          </div>
      </div>
 
      <script>
-          // ══════════════════════════════════════
-          // Config — Backend URL
-          // Apna backend port yahan set karo
-          // ══════════════════════════════════════
           const API_BASE = 'http://localhost:8080';
 
-          // ══════════════════════════════════════
-          // Theme Toggle
-          // ══════════════════════════════════════
+          /* ── Theme ── */
           function toggleTheme() {
-               const body = document.body;
-               const icon = document.getElementById('themeIcon');
-               if (body.getAttribute('data-theme') === 'light') {
-                    body.removeAttribute('data-theme');
-                    icon.className = 'fas fa-moon';
+               const isLight = document.body.getAttribute('data-theme') === 'light';
+               if (isLight) {
+                    document.body.removeAttribute('data-theme');
+                    document.getElementById('themeIcon').className = 'fas fa-moon';
                     localStorage.setItem('adminTheme', 'dark');
                } else {
-                    body.setAttribute('data-theme', 'light');
-                    icon.className = 'fas fa-sun';
+                    document.body.setAttribute('data-theme', 'light');
+                    document.getElementById('themeIcon').className = 'fas fa-sun';
                     localStorage.setItem('adminTheme', 'light');
                }
           }
-
-          // Load saved theme
           (function () {
-               const saved = localStorage.getItem('adminTheme');
-               if (saved === 'light') {
+               if (localStorage.getItem('adminTheme') === 'light') {
                     document.body.setAttribute('data-theme', 'light');
                     document.getElementById('themeIcon').className = 'fas fa-sun';
                }
           })();
 
-          // ══════════════════════════════════════
-          // Password Eye Toggle
-          // ══════════════════════════════════════
-          document.getElementById('togglePassword').addEventListener('click', function () {
-               const input = document.getElementById('adminPassword');
+          /* ── Eye toggle ── */
+          document.getElementById('eyeBtn').addEventListener('click', function () {
+               const inp = document.getElementById('password');
                const icon = document.getElementById('eyeIcon');
-               if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.className = 'fas fa-eye-slash';
+               if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+               else { inp.type = 'password'; icon.className = 'fas fa-eye'; }
+          });
+
+          /* ── Forgot Modal ── */
+          function openForgotModal() { document.getElementById('forgotModal').classList.add('open'); }
+          function closeForgotModal() { document.getElementById('forgotModal').classList.remove('open'); }
+          // Close on overlay click
+          document.getElementById('forgotModal').addEventListener('click', function (e) {
+               if (e.target === this) closeForgotModal();
+          });
+
+          /* ── Validation helpers ── */
+          function setValid(inputId, statusId) {
+               document.getElementById(inputId).classList.remove('invalid');
+               document.getElementById(inputId).classList.add('valid');
+               const s = document.getElementById(statusId);
+               s.innerHTML = '<i class="fas fa-circle-check"></i>';
+               s.className = 'input-status show-valid';
+          }
+          function setInvalid(inputId, statusId, errId, msg) {
+               document.getElementById(inputId).classList.remove('valid');
+               document.getElementById(inputId).classList.add('invalid');
+               const s = document.getElementById(statusId);
+               s.innerHTML = '<i class="fas fa-circle-xmark"></i>';
+               s.className = 'input-status show-invalid';
+               const e = document.getElementById(errId);
+               e.querySelector('span').textContent = msg;
+               e.className = 'field-msg err show';
+          }
+          function clearState(inputId, statusId, errId) {
+               document.getElementById(inputId).classList.remove('valid', 'invalid');
+               document.getElementById(statusId).className = 'input-status';
+               document.getElementById(errId).className = 'field-msg err';
+          }
+          function showGAlert(type, msg) {
+               const a = document.getElementById('gAlert');
+               a.className = 'g-alert show ' + type;
+               document.getElementById('gText').textContent = msg;
+               const icons = { success: 'fas fa-circle-check', error: 'fas fa-circle-xmark', info: 'fas fa-circle-info' };
+               document.getElementById('gIcon').className = icons[type] || icons.info;
+          }
+          function hideGAlert() { document.getElementById('gAlert').className = 'g-alert'; }
+
+          /* ── Email real-time validation ── */
+          const emailInp = document.getElementById('email');
+          emailInp.addEventListener('input', function () {
+               hideGAlert();
+               const val = this.value.trim();
+               if (!val) { clearState('email', 'emailStatus', 'emailErr'); return; }
+               if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                    setInvalid('email', 'emailStatus', 'emailErr', 'Please enter a valid email address.');
                } else {
-                    input.type = 'password';
-                    icon.className = 'fas fa-eye';
+                    setValid('email', 'emailStatus');
+                    document.getElementById('emailErr').className = 'field-msg err';
                }
           });
-
-          // ══════════════════════════════════════
-          // Validation Helpers
-          // ══════════════════════════════════════
-          function showFieldError(inputId, errorId, message) {
-               const input = document.getElementById(inputId);
-               const errorDiv = document.getElementById(errorId);
-               input.classList.add('error');
-               errorDiv.querySelector('span').textContent = message;
-               errorDiv.classList.add('show');
-          }
-
-          function clearFieldError(inputId, errorId) {
-               const input = document.getElementById(inputId);
-               const errorDiv = document.getElementById(errorId);
-               input.classList.remove('error');
-               errorDiv.classList.remove('show');
-          }
-
-          function showGlobalAlert(type, message) {
-               const alert = document.getElementById('globalAlert');
-               const alertText = document.getElementById('alertText');
-               const alertIcon = document.getElementById('alertIcon');
-
-               alert.className = 'global-alert show ' + type;
-               alertText.textContent = message;
-               alertIcon.className = type === 'success'
-                    ? 'fas fa-circle-check'
-                    : 'fas fa-circle-xmark';
-          }
-
-          function hideGlobalAlert() {
-               document.getElementById('globalAlert').className = 'global-alert';
-          }
-
-          // Clear errors on input
-          document.getElementById('adminEmail').addEventListener('input', function () {
-               clearFieldError('adminEmail', 'emailError');
-               hideGlobalAlert();
+          emailInp.addEventListener('blur', function () {
+               const val = this.value.trim();
+               if (!val) setInvalid('email', 'emailStatus', 'emailErr', 'Email is required.');
           });
 
-          document.getElementById('adminPassword').addEventListener('input', function () {
-               clearFieldError('adminPassword', 'passwordError');
-               hideGlobalAlert();
+          /* ── Password real-time validation + strength ── */
+          const passInp = document.getElementById('password');
+          passInp.addEventListener('input', function () {
+               hideGAlert();
+               const val = this.value;
+               const wrap = document.getElementById('strengthWrap');
+               const fill = document.getElementById('strengthFill');
+               const label = document.getElementById('strengthLabel');
+
+               if (!val) {
+                    clearState('password', 'passStatus', 'passErr');
+                    wrap.className = 'strength-wrap';
+                    return;
+               }
+
+               // Show strength bar
+               wrap.className = 'strength-wrap show';
+
+               // Calculate strength
+               let score = 0;
+               if (val.length >= 6) score++;
+               if (val.length >= 10) score++;
+               if (/[A-Z]/.test(val)) score++;
+               if (/[0-9]/.test(val)) score++;
+               if (/[^A-Za-z0-9]/.test(val)) score++;
+
+               const levels = [
+                    { pct: '20%', color: '#f87171', text: 'Very Weak' },
+                    { pct: '40%', color: '#fb923c', text: 'Weak' },
+                    { pct: '60%', color: '#fbbf24', text: 'Fair' },
+                    { pct: '80%', color: '#34d399', text: 'Strong' },
+                    { pct: '100%', color: '#14b8a6', text: 'Very Strong' },
+               ];
+               const lv = levels[Math.min(score, 4)];
+               fill.style.width = lv.pct;
+               fill.style.background = lv.color;
+               label.textContent = 'Strength: ' + lv.text;
+               label.style.color = lv.color;
+
+               // Validation message
+               if (val.length < 6) {
+                    setInvalid('password', 'passStatus', 'passErr', 'Password must be at least 6 characters.');
+               } else {
+                    setValid('password', 'passStatus');
+                    document.getElementById('passErr').className = 'field-msg err';
+               }
+          });
+          passInp.addEventListener('blur', function () {
+               if (!this.value) setInvalid('password', 'passStatus', 'passErr', 'Password is required.');
           });
 
-          // ══════════════════════════════════════
-          // Login Form Submit
-          // ══════════════════════════════════════
-          document.getElementById('adminLoginForm').addEventListener('submit', async function (e) {
+          /* ── Form Submit ── */
+          document.getElementById('loginForm').addEventListener('submit', async function (e) {
                e.preventDefault();
+               hideGAlert();
 
-               const email = document.getElementById('adminEmail').value.trim();
-               const password = document.getElementById('adminPassword').value;
+               const email = emailInp.value.trim();
+               const password = passInp.value;
+               let ok = true;
 
-               // Clear previous errors
-               clearFieldError('adminEmail', 'emailError');
-               clearFieldError('adminPassword', 'passwordError');
-               hideGlobalAlert();
-
-               // --- Frontend Validation ---
-               let hasError = false;
-
+               // Final validation on submit
                if (!email) {
-                    showFieldError('adminEmail', 'emailError', 'Email is required.');
-                    hasError = true;
+                    setInvalid('email', 'emailStatus', 'emailErr', 'Email is required.');
+                    ok = false;
                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    showFieldError('adminEmail', 'emailError', 'Please enter a valid email address.');
-                    hasError = true;
+                    setInvalid('email', 'emailStatus', 'emailErr', 'Please enter a valid email address.');
+                    ok = false;
                }
-
                if (!password) {
-                    showFieldError('adminPassword', 'passwordError', 'Password is required.');
-                    hasError = true;
+                    setInvalid('password', 'passStatus', 'passErr', 'Password is required.');
+                    ok = false;
                } else if (password.length < 6) {
-                    showFieldError('adminPassword', 'passwordError', 'Password must be at least 6 characters.');
-                    hasError = true;
+                    setInvalid('password', 'passStatus', 'passErr', 'Password must be at least 6 characters.');
+                    ok = false;
                }
+               if (!ok) return;
 
-               if (hasError) return;
-
-               // --- Loading State ---
-               const btn = document.getElementById('loginBtn');
-               const spinner = document.getElementById('loginSpinner');
-               const btnText = document.getElementById('loginBtnText');
-               const loginIcon = document.getElementById('loginIcon');
-
-               btn.disabled = true;
-               spinner.style.display = 'block';
-               loginIcon.style.display = 'none';
-               btnText.textContent = 'Signing in...';
+               // Loading
+               const btn = document.getElementById('submitBtn');
+               const spin = document.getElementById('spin');
+               const icon = document.getElementById('submitIcon');
+               const txt = document.getElementById('submitText');
+               btn.disabled = true; spin.style.display = 'block'; icon.style.display = 'none'; txt.textContent = 'Signing in...';
 
                try {
-                    // --- API Call ---
-                    const response = await fetch(`${API_BASE}/api/admin/auth/login`, {
+                    const res = await fetch(`${API_BASE}/api/admin/auth/login`, {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' },
                          body: JSON.stringify({ email, password })
                     });
-
-                    const data = await response.json();
+                    const data = await res.json();
 
                     if (data.success) {
-                         // Save token and admin info
                          localStorage.setItem('adminToken', data.token);
                          localStorage.setItem('adminName', data.adminName);
                          localStorage.setItem('adminEmail', data.adminEmail);
                          localStorage.setItem('adminRole', data.role);
-
-                         showGlobalAlert('success', '✓ Login successful! Redirecting to dashboard...');
-
-                         // Redirect after short delay
-                         setTimeout(() => {
-                              window.location.href = '/pages/admin/admin-dashboard.html';
-                         }, 1200);
-
+                         showGAlert('success', '✓ Login successful! Redirecting to dashboard...');
+                         setTimeout(() => { window.location.href = '/pages/admin/admin-dashboard.html'; }, 1200);
                     } else {
-                         showGlobalAlert('error', data.message || 'Login failed. Please try again.');
-                         btn.disabled = false;
-                         spinner.style.display = 'none';
-                         loginIcon.style.display = 'inline';
-                         btnText.textContent = 'Sign In to Admin Panel';
+                         showGAlert('error', data.message || 'Login failed. Please try again.');
+                         btn.disabled = false; spin.style.display = 'none'; icon.style.display = 'inline'; txt.textContent = 'Sign In to Admin Panel';
                     }
-
                } catch (err) {
-                    console.error('Login error:', err);
-                    showGlobalAlert('error', 'Server not reachable. Please check backend.');
-                    btn.disabled = false;
-                    spinner.style.display = 'none';
-                    loginIcon.style.display = 'inline';
-                    btnText.textContent = 'Sign In to Admin Panel';
+                    showGAlert('error', 'Cannot reach server. Please check if backend is running.');
+                    btn.disabled = false; spin.style.display = 'none'; icon.style.display = 'inline'; txt.textContent = 'Sign In to Admin Panel';
                }
           });
 
-          // ══════════════════════════════════════
-          // Auto-redirect if already logged in
-          // ══════════════════════════════════════
-          (function checkAlreadyLoggedIn() {
-               const token = localStorage.getItem('adminToken');
-               const role = localStorage.getItem('adminRole');
-               if (token && role === 'ADMIN') {
+          /* ── Auto redirect if already logged in ── */
+          (function () {
+               if (localStorage.getItem('adminToken') && localStorage.getItem('adminRole') === 'ADMIN')
                     window.location.href = '/pages/admin/admin-dashboard.html';
+          })();
+
+          (function () {
+               "use strict";
+               const LOGIN_PAGE = "login.html";
+               const STUDENT_HOME = "dashboard.html";
+               const ADMIN_HOME = "admin-dashboard.html";
+               const token = localStorage.getItem("token");
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+               const userRole = localStorage.getItem("userRole") || "STUDENT";
+               function goTo(page) {
+                    // Already on that page? Skip redirect to avoid loop
+                    if (window.location.href.includes(page)) return;
+                    window.location.href = page;
                }
+               if (!token || !isLoggedIn) {
+                    goTo(LOGIN_PAGE);
+                    return; // script execution rok do
+               }
+               document.addEventListener("DOMContentLoaded", function () {
+
+                    const body = document.body;
+                    const pageRole = body ? body.getAttribute("data-page-role") : null;
+
+                    // data-page-role set nahi hai toh guard kuch nahi karega
+                    if (!pageRole) return;
+
+                    if (pageRole === "admin" && userRole !== "ADMIN") {
+                         // Student admin page pe aaya → student home pe bhejo
+                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
+                         goTo(STUDENT_HOME);
+                         return;
+                    }
+
+                    if (pageRole === "student" && userRole === "ADMIN") {
+                         // Admin student page pe aaya → admin home pe bhejo
+                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
+                         goTo(ADMIN_HOME);
+                         return;
+                    }
+
+                    // Role sahi hai → page load hone do
+                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
+               });
+
           })();
      </script>
 </body>

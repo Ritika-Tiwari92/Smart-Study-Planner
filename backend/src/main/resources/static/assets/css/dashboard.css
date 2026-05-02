@@ -3210,3 +3210,15 @@ body.preview-dark .stat-completed .stat-helper-text {
 body.preview-dark .stat-progress .stat-helper-text {
   color: #93c5fd;
 }
+.qa-pomodoro {
+  border-left: 3px solid #6c63ff;
+}
+.qa-pomodoro i {
+  color: #6c63ff;
+}
+.qa-pomodoro:hover {
+  background: #f5f3ff;
+}
+body.preview-dark .qa-pomodoro:hover {
+  background: rgba(108, 99, 255, 0.12);
+}

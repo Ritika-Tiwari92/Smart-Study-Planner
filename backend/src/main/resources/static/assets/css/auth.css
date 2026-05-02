@@ -1,25 +1,26 @@
 /* ============================================================
-   EduMind AI — Auth Pages (Login & Register)
-   auth.css
-   Covers: .auth-page, .auth-left, .auth-right, .auth-card,
-           .auth-form, .auth-form-group, validation states,
-           password strength, eye toggle, animations.
-
-   This file depends on:
-     variables.css  → design tokens
-     base.css       → reset
-     components.css → shared components
+   EduMind AI — Auth Pages  |  auth.css
+   Login + Register + Forgot + Reset Password
+   Full dark/light theme + premium animations
    ============================================================ */
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 1 — KEYFRAME ANIMATIONS
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════ */
 
-/* Card fade + slide up on page load */
-@keyframes authCardEntrance {
+@keyframes pageIn {
   from {
     opacity: 0;
-    transform: translateY(32px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -27,11 +28,10 @@
   }
 }
 
-/* Left panel slide in from left */
-@keyframes authLeftEntrance {
+@keyframes leftIn {
   from {
     opacity: 0;
-    transform: translateX(-28px);
+    transform: translateX(-36px);
   }
   to {
     opacity: 1;
@@ -39,105 +39,91 @@
   }
 }
 
-/* Floating orb slow drift */
-@keyframes orbFloat {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -40px) scale(1.05);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.97);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-/* Secondary orb - opposite drift */
-@keyframes orbFloat2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(-35px, 30px) scale(1.04);
-  }
-  66% {
-    transform: translate(25px, -20px) scale(0.96);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-/* Error message slide down */
-@keyframes errorSlideDown {
+@keyframes featureIn {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes logoBeat {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(0, 229, 255, 0.8))
+      drop-shadow(0 0 40px rgba(124, 58, 237, 0.35));
+  }
+}
+
+@keyframes orbA {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.06);
+  }
+  66% {
+    transform: translate(-20px, 22px) scale(0.96);
+  }
+}
+
+@keyframes orbB {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-32px, 28px) scale(1.04);
+  }
+  66% {
+    transform: translate(24px, -18px) scale(0.97);
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes errorIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
     max-height: 0;
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    max-height: 60px;
+    max-height: 80px;
   }
 }
 
-/* Password strength bar fill */
-@keyframes strengthFill {
-  from {
-    width: 0;
-  }
-}
-
-/* Feature item stagger fade-in */
-@keyframes featureItemIn {
-  from {
-    opacity: 0;
-    transform: translateX(-16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Gradient mesh slow movement */
-@keyframes meshShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Subtle pulse glow on logo */
-@keyframes logoPulse {
-  0%,
-  100% {
-    text-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
-  }
-  50% {
-    text-shadow:
-      0 0 24px rgba(0, 229, 255, 0.75),
-      0 0 48px rgba(124, 58, 237, 0.3);
-  }
-}
-
-/* Rule checkmark pop */
 @keyframes checkPop {
   0% {
-    transform: scale(0.6);
+    transform: scale(0.4);
     opacity: 0;
   }
   60% {
-    transform: scale(1.2);
+    transform: scale(1.25);
   }
   100% {
     transform: scale(1);
@@ -145,46 +131,103 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 2 — AUTH PAGE WRAPPER & BACKGROUND
-══════════════════════════════════════════════════════════════ */
+@keyframes barFill {
+  from {
+    width: 0;
+  }
+}
 
-/* The root wrapper that fills the whole viewport */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes iconIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-15deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes togglePop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.88);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SMOOTH THEME TRANSITION
+   Only runs when theme changes (class added by JS)
+══════════════════════════════════════════ */
+
+body.theme-transitioning,
+body.theme-transitioning * {
+  transition:
+    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ══════════════════════════════════════════
+   PAGE WRAPPER
+══════════════════════════════════════════ */
+
 .auth-page {
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-deep);
   position: relative;
   overflow: hidden;
+  animation: pageIn 0.35s ease both;
 }
 
-/* Animated gradient mesh background */
+/* Radial glow mesh */
 .auth-page::before {
   content: "";
   position: fixed;
   inset: 0;
   background:
     radial-gradient(
-      ellipse 80% 60% at 15% 20%,
+      ellipse 80% 60% at 12% 18%,
       rgba(0, 229, 255, 0.07) 0%,
       transparent 60%
     ),
     radial-gradient(
-      ellipse 70% 70% at 85% 80%,
+      ellipse 70% 70% at 88% 82%,
       rgba(124, 58, 237, 0.09) 0%,
       transparent 60%
-    ),
-    radial-gradient(
-      ellipse 50% 50% at 50% 50%,
-      rgba(7, 26, 31, 0.98) 0%,
-      transparent 100%
     );
-  background-color: var(--bg-deep);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Floating decorative orb — top left (cyan) */
+[data-theme="light"] .auth-page::before {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 12% 18%,
+      rgba(2, 132, 199, 0.07) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 70% 70% at 88% 82%,
+      rgba(109, 40, 217, 0.06) 0%,
+      transparent 60%
+    );
+}
+
+/* Orb top-left */
 .auth-page::after {
   content: "";
   position: fixed;
@@ -198,39 +241,137 @@
     rgba(0, 229, 255, 0.1) 0%,
     transparent 70%
   );
-  animation: orbFloat 18s ease-in-out infinite;
+  animation: orbA 18s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Second orb — bottom right (purple) via a pseudo on auth-left */
+[data-theme="light"] .auth-page::after {
+  background: radial-gradient(
+    circle,
+    rgba(2, 132, 199, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+/* Orb bottom-right */
 .auth-left::before {
   content: "";
   position: fixed;
   bottom: -200px;
   right: -150px;
-  width: 600px;
-  height: 600px;
+  width: 580px;
+  height: 580px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(124, 58, 237, 0.12) 0%,
+    rgba(124, 58, 237, 0.11) 0%,
     transparent 70%
   );
-  animation: orbFloat2 22s ease-in-out infinite;
+  animation: orbB 22s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Small grid texture overlay for depth */
+[data-theme="light"] .auth-left::before {
+  background: radial-gradient(
+    circle,
+    rgba(109, 40, 217, 0.07) 0%,
+    transparent 70%
+  );
+}
+
 .auth-page > * {
   position: relative;
   z-index: 1;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 3 — LEFT PANEL (Branding)
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   THEME TOGGLE BUTTON
+══════════════════════════════════════════ */
+
+.auth-theme-btn {
+  position: fixed;
+  top: 18px;
+  right: 20px;
+  z-index: 200;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--toggle-bg);
+  border: 1.5px solid var(--toggle-border);
+  color: var(--toggle-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  /* No global transition — handled individually */
+}
+
+.auth-theme-btn:hover {
+  background: var(--toggle-hover-bg);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 18px var(--cyan-glow);
+  transform: scale(1.08);
+  transition: all var(--t-fast);
+}
+
+.auth-theme-btn:active {
+  animation: togglePop 0.25s ease;
+}
+
+.auth-theme-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+/* Icon wrappers */
+.auth-theme-sun,
+.auth-theme-moon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-theme-sun svg,
+.auth-theme-moon svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Dark mode defaults */
+[data-theme="dark"] .auth-theme-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.55);
+}
+[data-theme="dark"] .auth-theme-moon {
+  opacity: 1;
+  transform: none;
+}
+
+/* Light mode */
+[data-theme="light"] .auth-theme-moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.55);
+}
+[data-theme="light"] .auth-theme-sun {
+  opacity: 1;
+  transform: none;
+}
+
+/* ══════════════════════════════════════════
+   LEFT PANEL
+══════════════════════════════════════════ */
 
 .auth-left {
   flex: 1;
@@ -239,38 +380,51 @@
   justify-content: center;
   padding: 60px 48px;
   position: relative;
-  /* Subtle left-side gradient tint */
-  background: linear-gradient(
-    135deg,
-    rgba(0, 229, 255, 0.04) 0%,
-    rgba(124, 58, 237, 0.04) 100%
-  );
-  border-right: 1px solid var(--border-default);
+  background: var(--auth-left-bg);
+  border-right: 1px solid var(--auth-left-border);
 }
 
-/* Brand content block */
 .auth-brand {
   max-width: 480px;
-  animation: authLeftEntrance 0.65s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: leftIn 0.65s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-/* ── Logo Row ── */
+/* ── Logo ── */
 .auth-logo {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 40px;
+  text-decoration: none;
 }
 
+.auth-logo-svg {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  animation: logoBeat 3.5s ease-in-out infinite;
+}
+
+.auth-logo-text {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* FA icon fallback */
 .auth-logo i {
   font-size: 2rem;
   color: var(--cyan);
-  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.55));
-  animation: logoPulse 3s ease-in-out infinite;
+  animation: logoBeat 3.5s ease-in-out infinite;
 }
 
 .auth-logo span {
-  font-size: var(--font-size-xl);
+  font-size: var(--fs-xl);
   font-weight: 700;
   background: var(--gradient-brand);
   -webkit-background-clip: text;
@@ -281,99 +435,89 @@
 
 /* ── Heading ── */
 .auth-brand h1 {
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  font-size: clamp(1.55rem, 2.8vw, 2.4rem);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
 
-/* Gradient highlight on last word of h1 */
-.auth-brand h1 em {
-  font-style: normal;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Description ── */
+/* ── Subtitle ── */
 .auth-brand > p {
-  font-size: var(--font-size-base);
+  font-size: var(--fs-base);
   color: var(--text-muted);
   line-height: 1.75;
-  margin-bottom: 40px;
+  margin-bottom: 36px;
   max-width: 400px;
 }
 
-/* ── Feature List ── */
+/* ── Feature list ── */
 .auth-feature-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Each feature item */
 .auth-feature-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 13px 18px;
+  background: var(--feature-item-bg);
+  border: 1px solid var(--feature-item-bdr);
   border-radius: var(--radius-md);
-  transition: all var(--transition-normal);
-  /* Staggered entrance for each item */
-  animation: featureItemIn 0.5s ease both;
+  transition:
+    background var(--t-normal),
+    border-color var(--t-normal),
+    transform var(--t-normal);
+  animation: featureIn 0.5s ease both;
 }
 
 .auth-feature-item:nth-child(1) {
   animation-delay: 0.2s;
 }
 .auth-feature-item:nth-child(2) {
-  animation-delay: 0.35s;
+  animation-delay: 0.34s;
 }
 .auth-feature-item:nth-child(3) {
-  animation-delay: 0.5s;
+  animation-delay: 0.48s;
 }
 
 .auth-feature-item:hover {
-  background: rgba(0, 229, 255, 0.06);
-  border-color: rgba(0, 229, 255, 0.2);
-  transform: translateX(6px);
+  background: var(--cyan-dim);
+  border-color: rgba(0, 229, 255, 0.24);
+  transform: translateX(7px);
 }
 
-/* Icon inside feature item */
 .auth-feature-item i {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--cyan);
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 229, 255, 0.12);
+  background: var(--feature-icon-bg);
   border-radius: var(--radius-sm);
   flex-shrink: 0;
-  transition: all var(--transition-fast);
+  transition: all var(--t-fast);
 }
 
 .auth-feature-item:hover i {
-  background: rgba(0, 229, 255, 0.2);
-  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+  background: var(--cyan-dim);
+  box-shadow: 0 0 12px var(--cyan-glow);
 }
 
 .auth-feature-item span {
-  font-size: var(--font-size-sm);
+  font-size: var(--fs-sm);
   color: var(--text-label);
-  font-weight: 400;
   line-height: 1.4;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 4 — RIGHT PANEL (Form area)
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   RIGHT PANEL
+══════════════════════════════════════════ */
 
 .auth-right {
   flex: 1;
@@ -384,30 +528,26 @@
   overflow-y: auto;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 5 — AUTH CARD (Glassmorphism)
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   AUTH CARD (Glassmorphism)
+══════════════════════════════════════════ */
 
 .auth-card {
   width: 100%;
-  /* max-width comes from inline style in HTML (520px) */
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--card-bg);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-xl);
   padding: 44px 40px;
-  box-shadow:
-    0 32px 80px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  animation: authCardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  box-shadow: var(--card-shadow);
+  animation: cardIn 0.65s cubic-bezier(0.4, 0, 0.2, 1) both;
   animation-delay: 0.1s;
   position: relative;
   overflow: hidden;
 }
 
-/* Top gradient accent line on card */
+/* Top gradient accent */
 .auth-card::before {
   content: "";
   position: absolute;
@@ -419,42 +559,34 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
-/* Subtle inner glow */
+/* Scan line */
 .auth-card::after {
   content: "";
   position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(124, 58, 237, 0.08) 0%,
-    transparent 70%
-  );
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  animation: scanLine 6s ease-in-out infinite;
+  opacity: 0.28;
   pointer-events: none;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 6 — CARD TOP (Heading area)
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   CARD TOP
+══════════════════════════════════════════ */
 
 .auth-card-top {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   text-align: center;
 }
 
 .auth-card-top h2 {
-  font-size: var(--font-size-2xl);
+  font-size: var(--fs-2xl);
   font-weight: 700;
-  color: var(--text-primary);
   letter-spacing: -0.025em;
   margin-bottom: 8px;
-}
-
-/* Gradient accent on the heading */
-.auth-card-top h2 span {
   background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -462,14 +594,14 @@
 }
 
 .auth-card-top p {
-  font-size: var(--font-size-sm);
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   line-height: 1.6;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 7 — AUTH FORM
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   FORM
+══════════════════════════════════════════ */
 
 .auth-form {
   display: flex;
@@ -477,11 +609,6 @@
   gap: 20px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 8 — FORM GROUP (Label + Input + Error)
-══════════════════════════════════════════════════════════════ */
-
-/* Each field wrapper */
 .auth-form-group {
   display: flex;
   flex-direction: column;
@@ -489,9 +616,9 @@
   position: relative;
 }
 
-/* ── Label ── */
+/* Label */
 .auth-form-group label {
-  font-size: var(--font-size-sm);
+  font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--text-label);
   display: flex;
@@ -499,33 +626,30 @@
   gap: 4px;
 }
 
-/* Red asterisk for required fields — add class="required" to label */
-.auth-form-group label .required-star,
-.auth-form-group label .req {
+.req-star {
   color: var(--error);
-  font-size: 0.85em;
-  line-height: 1;
+  font-size: 0.8em;
+  margin-left: 2px;
 }
 
-/* Asterisk using data-required or aria approach */
-.auth-form-group label[data-required="true"]::after {
-  content: " *";
-  color: var(--error);
-  font-size: 0.85em;
+/* Label row with link */
+.auth-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* ── Input Wrapper (for eye button positioning) ── */
+/* Input wrapper for eye button */
 .auth-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
-
 .auth-input-wrapper input {
   width: 100%;
 }
 
-/* ── Base Input Style ── */
+/* ── Input base ── */
 .auth-form-group input,
 .auth-form input {
   width: 100%;
@@ -535,74 +659,79 @@
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: var(--font-main);
-  font-size: var(--font-size-base);
-  font-weight: 400;
-  transition:
-    border-color var(--transition-fast),
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
+  font-size: var(--fs-base);
   caret-color: var(--cyan);
+  outline: none;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    box-shadow var(--t-fast);
 }
 
-/* Input when eye button is present — right padding to avoid text under icon */
 .auth-input-wrapper input {
   padding-right: 48px;
 }
 
-/* Placeholder */
 .auth-form-group input::placeholder {
   color: rgba(148, 163, 184, 0.45);
+  font-size: var(--fs-sm);
   font-weight: 300;
-  font-size: var(--font-size-sm);
 }
 
-/* ── Focus State ── */
+[data-theme="light"] .auth-form-group input::placeholder {
+  color: rgba(74, 122, 126, 0.5);
+}
+
+/* Focus */
 .auth-form-group input:focus,
 .auth-form input:focus {
   border-color: var(--border-focus);
   background: var(--bg-input-focus);
   box-shadow:
-    0 0 0 3px rgba(0, 229, 255, 0.12),
-    0 0 16px rgba(0, 229, 255, 0.08);
-  outline: none;
+    0 0 0 3px var(--cyan-dim),
+    0 0 18px var(--cyan-glow);
 }
 
-/* ── Valid State (JS adds .input-valid to the input) ── */
-.auth-form-group input.input-valid,
-.auth-form-group input[data-valid="true"] {
+/* Valid */
+.auth-form-group input.input-valid {
   border-color: var(--border-success);
   background: var(--success-bg);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
-/* ── Invalid / Error State (JS adds .input-error to the input) ── */
-.auth-form-group input.input-error,
-.auth-form-group input[data-valid="false"] {
+/* Invalid */
+.auth-form-group input.input-error {
   border-color: var(--border-error);
   background: var(--error-bg);
   box-shadow: 0 0 0 3px rgba(255, 92, 122, 0.1);
 }
 
-/* ── Auto-fill override (browser autofill colors are ugly) ── */
+[data-theme="light"] .auth-form-group input.input-error {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Autofill */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px rgba(7, 26, 31, 0.95) inset;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-deep) inset;
   -webkit-text-fill-color: var(--text-primary);
   border-color: var(--border-default);
   caret-color: var(--cyan);
-  transition: background-color 9999s ease;
+  transition: background-color 9999s;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 9 — PASSWORD EYE TOGGLE BUTTON
-══════════════════════════════════════════════════════════════ */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #f5fafb inset;
+  -webkit-text-fill-color: var(--text-primary);
+}
 
-/*
-   The eye button is injected by JS inside .auth-input-wrapper,
-   or can be placed directly in HTML inside the wrapper div.
-   Class: .auth-eye-btn
-*/
+/* ══════════════════════════════════════════
+   EYE TOGGLE
+══════════════════════════════════════════ */
+
 .auth-eye-btn {
   position: absolute;
   right: 14px;
@@ -613,21 +742,20 @@ input:-webkit-autofill:focus {
   padding: 4px;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  line-height: 1;
+  font-size: 0.88rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
   transition:
-    color var(--transition-fast),
-    background var(--transition-fast);
+    color var(--t-fast),
+    background var(--t-fast);
   z-index: 2;
 }
 
 .auth-eye-btn:hover {
   color: var(--cyan);
-  background: rgba(0, 229, 255, 0.1);
+  background: var(--cyan-dim);
 }
 
 .auth-eye-btn:focus-visible {
@@ -635,66 +763,43 @@ input:-webkit-autofill:focus {
   outline-offset: 2px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 10 — INLINE ERROR MESSAGES
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   ERROR / SUCCESS MESSAGES
+══════════════════════════════════════════ */
 
-/*
-   JS should inject: <span class="auth-field-error">message</span>
-   immediately after the input or input-wrapper inside .auth-form-group
-*/
 .auth-field-error {
   display: block;
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--error);
-  margin-top: 4px;
+  margin-top: 2px;
   padding-left: 2px;
   line-height: 1.4;
-  animation: errorSlideDown 0.22s ease both;
+  animation: errorIn 0.22s ease both;
   overflow: hidden;
 }
 
-.auth-field-error i,
-.auth-field-error .err-icon {
-  margin-right: 4px;
-  font-size: 0.7rem;
-}
-
-/* Hidden state — JS toggles this */
-.auth-field-error:empty,
-.auth-field-error.hidden {
+.auth-field-error:empty {
   display: none;
 }
 
-/* Success hint */
 .auth-field-success {
   display: block;
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--success);
-  margin-top: 4px;
-  padding-left: 2px;
-  animation: errorSlideDown 0.22s ease both;
+  margin-top: 2px;
+  animation: errorIn 0.22s ease both;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 11 — PASSWORD STRENGTH INDICATOR
-══════════════════════════════════════════════════════════════ */
-
-/*
-   Inject after password input in register form:
-   <div class="auth-strength-bar">
-     <div class="auth-strength-fill"></div>
-   </div>
-   <span class="auth-strength-label">Weak</span>
-*/
+/* ══════════════════════════════════════════
+   PASSWORD STRENGTH
+══════════════════════════════════════════ */
 
 .auth-password-strength {
   margin-top: 8px;
 }
 
-/* Track bar */
 .auth-strength-bar {
   height: 5px;
   background: rgba(255, 255, 255, 0.08);
@@ -703,18 +808,19 @@ input:-webkit-autofill:focus {
   margin-bottom: 6px;
 }
 
-/* Fill bar — width and color set by JS */
+[data-theme="light"] .auth-strength-bar {
+  background: rgba(0, 0, 0, 0.08);
+}
+
 .auth-strength-fill {
   height: 100%;
   border-radius: var(--radius-full);
   width: 0%;
   transition:
     width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s ease;
-  animation: strengthFill 0.4s ease both;
+    background 0.3s;
 }
 
-/* Strength levels — JS adds class to .auth-strength-fill */
 .auth-strength-fill.strength-weak {
   width: 33%;
   background: var(--error);
@@ -733,9 +839,8 @@ input:-webkit-autofill:focus {
   box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
 }
 
-/* Strength label text */
 .auth-strength-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -751,19 +856,9 @@ input:-webkit-autofill:focus {
   color: var(--success);
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 12 — PASSWORD RULE CHECKLIST
-══════════════════════════════════════════════════════════════ */
-
-/*
-   Inject after strength bar:
-   <ul class="auth-password-rules">
-     <li class="auth-rule" data-rule="length">
-       <i class="fa-solid fa-circle-check"></i> Min 8 characters
-     </li>
-     ... more rules
-   </ul>
-*/
+/* ══════════════════════════════════════════
+   PASSWORD RULE CHECKLIST
+══════════════════════════════════════════ */
 
 .auth-password-rules {
   display: flex;
@@ -771,68 +866,67 @@ input:-webkit-autofill:focus {
   gap: 5px;
   margin-top: 10px;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--rule-bg);
+  border: 1px solid var(--rule-border);
   border-radius: var(--radius-md);
+  list-style: none;
 }
 
-/* Individual rule item */
 .auth-rule {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-xs);
   color: var(--text-muted);
-  font-weight: 400;
-  transition: color var(--transition-fast);
   line-height: 1.3;
+  transition: color var(--t-fast);
 }
 
 .auth-rule i {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   width: 14px;
   flex-shrink: 0;
-  color: rgba(148, 163, 184, 0.4);
-  transition: all var(--transition-fast);
+  color: rgba(148, 163, 184, 0.35);
+  transition:
+    color var(--t-fast),
+    transform var(--t-fast);
 }
 
-/* Rule passed — JS adds .rule-pass to the li */
 .auth-rule.rule-pass {
   color: var(--success);
 }
-
 .auth-rule.rule-pass i {
   color: var(--success);
-  animation: checkPop 0.25s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: checkPop 0.25s ease both;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 13 — SUBMIT BUTTON
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   SUBMIT BUTTON
+══════════════════════════════════════════ */
 
 .auth-submit-btn {
   width: 100%;
   padding: 14px 24px;
-  margin-top: 6px;
+  margin-top: 4px;
   background: var(--gradient-btn);
   color: #fff;
   font-family: var(--font-main);
-  font-size: var(--font-size-base);
+  font-size: var(--fs-base);
   font-weight: 600;
   border: none;
   border-radius: var(--radius-full);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition:
-    transform var(--transition-normal),
-    box-shadow var(--transition-normal),
-    opacity var(--transition-fast);
   box-shadow: var(--shadow-btn);
   letter-spacing: 0.02em;
+  transition:
+    transform var(--t-normal),
+    box-shadow var(--t-normal),
+    opacity var(--t-fast);
 }
 
-/* Shine sweep on hover */
+/* Shine */
 .auth-submit-btn::after {
   content: "";
   position: absolute;
@@ -842,9 +936,9 @@ input:-webkit-autofill:focus {
   height: 100%;
   background: linear-gradient(
     120deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.22) 50%,
-    transparent 100%
+    transparent,
+    rgba(255, 255, 255, 0.24),
+    transparent
   );
   transition: left 0.55s ease;
 }
@@ -852,28 +946,23 @@ input:-webkit-autofill:focus {
 .auth-submit-btn:hover:not(:disabled)::after {
   left: 160%;
 }
-
 .auth-submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-btn-hover);
 }
-
 .auth-submit-btn:active:not(:disabled) {
-  transform: translateY(0px);
-  box-shadow: var(--shadow-btn);
+  transform: translateY(0);
 }
 
-/* Disabled state — while API is loading */
-.auth-submit-btn:disabled,
-.auth-submit-btn.loading {
-  opacity: 0.65;
+.auth-submit-btn:disabled {
+  opacity: 0.62;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-/* Loading spinner inside button */
-.auth-submit-btn .btn-spinner {
+/* Loading spinner */
+.btn-spinner {
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -885,32 +974,25 @@ input:-webkit-autofill:focus {
   vertical-align: middle;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 14 — BOTTOM TEXT & LINKS
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   BOTTOM TEXT & LINKS
+══════════════════════════════════════════ */
 
 .auth-bottom-text {
   text-align: center;
-  font-size: var(--font-size-sm);
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   margin-top: 4px;
 }
 
 .auth-bottom-text a {
-  color: var(--cyan);
+  color: var(--text-link);
   font-weight: 600;
   text-decoration: none;
-  transition: all var(--transition-fast);
   position: relative;
+  transition: color var(--t-fast);
 }
 
-/* Underline slide animation on hover */
 .auth-bottom-text a::after {
   content: "";
   position: absolute;
@@ -918,343 +1000,39 @@ input:-webkit-autofill:focus {
   left: 0;
   width: 0%;
   height: 1.5px;
-  background: var(--cyan);
-  transition: width var(--transition-normal);
+  background: var(--text-link);
   border-radius: var(--radius-full);
-}
-
-.auth-bottom-text a:hover {
-  color: #40eeff;
+  transition: width var(--t-normal);
 }
 
 .auth-bottom-text a:hover::after {
   width: 100%;
 }
 
-/* Forgot password link variant */
 .auth-forgot-link {
-  display: block;
-  text-align: right;
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-xs);
   color: var(--text-muted);
-  margin-top: -10px;
-  transition: color var(--transition-fast);
+  text-decoration: none;
+  transition: color var(--t-fast);
 }
-
 .auth-forgot-link:hover {
   color: var(--cyan);
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION 15 — REQUIRED ASTERISK SUPPORT
-══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TWO-COLUMN ROW (Course + College)
+══════════════════════════════════════════ */
 
-/*
-   Add class="field-required" to label element
-   OR wrap with <span class="req-star">*</span> inside label
-*/
-.req-star {
-  color: var(--error);
-  font-size: 0.8em;
-  margin-left: 2px;
-  vertical-align: middle;
-  line-height: 1;
-}
-
-/* If JS adds asterisk as text node inside label */
-.auth-form-group label .asterisk {
-  color: var(--error);
-  margin-left: 3px;
-  font-size: 0.8em;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 16 — DIVIDER (between form sections)
-══════════════════════════════════════════════════════════════ */
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
-  margin: 4px 0;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border-default);
-  border-radius: var(--radius-full);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 17 — REGISTER SPECIFIC EXTRAS
-        (course, college fields + two-column layout if needed)
-══════════════════════════════════════════════════════════════ */
-
-/*
-   Register has 6 fields: fullName, email, password,
-   confirmPassword, course, college.
-   Add .auth-form-row to wrap two side-by-side fields.
-*/
 .auth-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-/* Register card can be slightly taller — allow it to grow */
-.auth-card.register-card {
-  max-width: 560px;
-}
+/* ══════════════════════════════════════════
+   OTP BOXES
+══════════════════════════════════════════ */
 
-/* Section label for grouped fields */
-.auth-section-label {
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: -8px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 18 — ALERT / TOAST BANNER (top of form)
-══════════════════════════════════════════════════════════════ */
-
-/*
-   JS can inject: <div class="auth-alert auth-alert--error">msg</div>
-   inside .auth-form at the top.
-*/
-.auth-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 15px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  animation: errorSlideDown 0.25s ease both;
-  margin-bottom: 4px;
-}
-
-.auth-alert i {
-  font-size: 0.85rem;
-  margin-top: 1px;
-  flex-shrink: 0;
-}
-
-.auth-alert--error {
-  background: var(--error-bg);
-  color: var(--error);
-  border: 1px solid rgba(255, 92, 122, 0.22);
-}
-
-.auth-alert--success {
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1px solid rgba(34, 197, 94, 0.22);
-}
-
-.auth-alert--info {
-  background: rgba(0, 229, 255, 0.07);
-  color: var(--cyan);
-  border: 1px solid rgba(0, 229, 255, 0.2);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 19 — RESPONSIVE: TABLET (≤ 1024px)
-══════════════════════════════════════════════════════════════ */
-
-@media (max-width: 1024px) {
-  .auth-left {
-    padding: 48px 36px;
-  }
-
-  .auth-brand h1 {
-    font-size: 1.8rem;
-  }
-
-  .auth-card {
-    padding: 36px 32px;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 20 — RESPONSIVE: MOBILE (≤ 768px)
-══════════════════════════════════════════════════════════════ */
-
-@media (max-width: 768px) {
-  /* Stack left and right panels vertically on mobile */
-  .auth-page {
-    flex-direction: column;
-  }
-
-  /* Left panel becomes a compact header on mobile */
-  .auth-left {
-    padding: 32px 24px 24px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-default);
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 229, 255, 0.05) 0%,
-      transparent 100%
-    );
-  }
-
-  .auth-brand {
-    max-width: 100%;
-    text-align: center;
-  }
-
-  .auth-logo {
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-
-  .auth-brand h1 {
-    font-size: 1.5rem;
-  }
-
-  .auth-brand > p {
-    font-size: var(--font-size-sm);
-    margin-bottom: 24px;
-    max-width: 100%;
-  }
-
-  /* Hide feature list on small mobile to save space */
-  .auth-feature-list {
-    display: none;
-  }
-
-  /* Right panel gets the full remaining space */
-  .auth-right {
-    padding: 32px 20px;
-    align-items: flex-start;
-    padding-top: 28px;
-  }
-
-  .auth-card {
-    padding: 28px 22px;
-    border-radius: var(--radius-lg);
-    /* Remove the max-width inline style effect on mobile */
-    max-width: 100% !important;
-  }
-
-  .auth-card-top {
-    margin-bottom: 24px;
-  }
-
-  .auth-card-top h2 {
-    font-size: var(--font-size-xl);
-  }
-
-  .auth-form {
-    gap: 16px;
-  }
-
-  /* Side-by-side fields collapse to single column */
-  .auth-form-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .auth-submit-btn {
-    padding: 13px 20px;
-  }
-
-  /* Password rules stay readable */
-  .auth-password-rules {
-    padding: 10px 12px;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 21 — RESPONSIVE: SMALL MOBILE (≤ 400px)
-══════════════════════════════════════════════════════════════ */
-
-@media (max-width: 400px) {
-  .auth-right {
-    padding: 20px 14px;
-  }
-
-  .auth-card {
-    padding: 22px 16px;
-  }
-
-  .auth-form-group input {
-    padding: 11px 14px;
-    font-size: var(--font-size-sm);
-  }
-
-  .auth-input-wrapper input {
-    padding-right: 44px;
-  }
-
-  .auth-card-top h2 {
-    font-size: var(--font-size-lg);
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 22 — ACCESSIBILITY HELPERS
-══════════════════════════════════════════════════════════════ */
-
-/* Focus-visible ring for keyboard navigation */
-.auth-submit-btn:focus-visible {
-  outline: 3px solid var(--cyan);
-  outline-offset: 3px;
-}
-
-.auth-form-group input:focus-visible {
-  outline: none; /* handled by border + box-shadow */
-}
-
-/* Reduced motion: turn off all animations */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   SECTION 23 — UTILITY HELPERS
-══════════════════════════════════════════════════════════════ */
-
-/* Visually hidden but accessible */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Flex helpers */
-.auth-flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-/* ============================================================
-   ADD THIS TO THE END OF YOUR auth.css FILE
-   OTP Input Boxes + Timer Styling
-   ============================================================ */
-
-/* ── OTP Input Group ── */
 .otp-input-group {
   display: flex;
   gap: 10px;
@@ -1262,7 +1040,6 @@ input:-webkit-autofill:focus {
   margin-top: 8px;
 }
 
-/* Individual OTP box */
 .otp-box {
   width: 52px;
   height: 58px;
@@ -1275,23 +1052,22 @@ input:-webkit-autofill:focus {
   border: 2px solid var(--border-default);
   border-radius: var(--radius-md);
   caret-color: var(--cyan);
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    background var(--transition-fast);
   outline: none;
+  transition:
+    border-color var(--t-fast),
+    box-shadow var(--t-fast),
+    background var(--t-fast);
 }
 
 .otp-box:focus {
   border-color: var(--border-focus);
   background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.12);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
 }
 
 .otp-box.input-error {
   border-color: var(--border-error);
   background: var(--error-bg);
-  box-shadow: 0 0 0 3px rgba(255, 92, 122, 0.1);
 }
 
 .otp-box.input-valid {
@@ -1299,19 +1075,18 @@ input:-webkit-autofill:focus {
   background: var(--success-bg);
 }
 
-/* ── OTP Timer ── */
 .otp-timer {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: var(--font-size-sm);
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   margin-top: -8px;
 }
 
 .otp-timer i {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--cyan);
 }
 
@@ -1322,16 +1097,138 @@ input:-webkit-autofill:focus {
   font-size: 1rem;
 }
 
-/* ── Responsive OTP boxes ── */
-@media (max-width: 400px) {
-  .otp-box {
-    width: 42px;
-    height: 50px;
-    font-size: 1.25rem;
-    border-radius: var(--radius-sm);
+/* ══════════════════════════════════════════
+   RESPONSIVE — TABLET ≤1024px
+══════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .auth-left {
+    padding: 48px 36px;
+  }
+  .auth-brand h1 {
+    font-size: 1.75rem;
+  }
+  .auth-card {
+    padding: 36px 32px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MOBILE ≤768px
+══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .auth-page {
+    flex-direction: column;
   }
 
+  .auth-left {
+    padding: 32px 24px 22px;
+    border-right: none;
+    border-bottom: 1px solid var(--auth-left-border);
+  }
+
+  .auth-brand {
+    max-width: 100%;
+    text-align: center;
+  }
+  .auth-logo {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .auth-brand h1 {
+    font-size: 1.45rem;
+  }
+  .auth-brand > p {
+    font-size: var(--fs-sm);
+    margin-bottom: 20px;
+    max-width: 100%;
+  }
+  .auth-feature-list {
+    display: none;
+  }
+
+  .auth-right {
+    padding: 28px 20px;
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    padding: 26px 20px;
+    border-radius: var(--radius-lg);
+    max-width: 100% !important;
+  }
+
+  .auth-form {
+    gap: 16px;
+  }
+  .auth-form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .auth-theme-btn {
+    width: 38px;
+    height: 38px;
+    top: 14px;
+    right: 14px;
+  }
+
+  .otp-box {
+    width: 44px;
+    height: 52px;
+    font-size: 1.3rem;
+  }
   .otp-input-group {
-    gap: 7px;
+    gap: 8px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — SMALL ≤400px
+══════════════════════════════════════════ */
+
+@media (max-width: 400px) {
+  .auth-right {
+    padding: 18px 14px;
+  }
+  .auth-card {
+    padding: 20px 16px;
+  }
+  .auth-form-group input {
+    padding: 11px 14px;
+    font-size: var(--fs-sm);
+  }
+  .auth-input-wrapper input {
+    padding-right: 44px;
+  }
+  .auth-card-top h2 {
+    font-size: var(--fs-lg);
+  }
+  .otp-box {
+    width: 40px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+  .otp-input-group {
+    gap: 6px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   ACCESSIBILITY
+══════════════════════════════════════════ */
+
+.auth-submit-btn:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

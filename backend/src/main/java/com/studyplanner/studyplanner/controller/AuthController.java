@@ -18,17 +18,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Auth Controller — final version with:
+ * Auth Controller
  *
- * PUBLIC endpoints:
- * POST /api/auth/register → register new user
- * POST /api/auth/login → login, returns access + refresh token
- * POST /api/auth/refresh-token → get new access token using refresh token
- * POST /api/auth/logout → invalidate refresh token (JWT required)
+ * PUBLIC endpoints (no JWT):
+ * POST /api/auth/register
+ * POST /api/auth/login
+ * POST /api/auth/refresh-token
+ *
+ * NOTE: forgot-password, verify-otp, reset-password are handled
+ * by ForgotPasswordController.java — do NOT add them here.
  *
  * PROTECTED endpoints (JWT required):
- * GET /api/auth/profile → get user profile
- * PUT /api/auth/profile → update profile
+ * POST /api/auth/logout
+ * GET /api/auth/profile
+ * PUT /api/auth/profile
  * PUT /api/auth/change-password
  * DELETE /api/auth/delete-account
  * PUT /api/auth/two-factor
@@ -46,13 +49,11 @@ public class AuthController {
      }
 
      // ═══════════════════════════════════════════
-     // PUBLIC ENDPOINTS
+     // PUBLIC — REGISTER / LOGIN / REFRESH
      // ═══════════════════════════════════════════
 
      /**
       * POST /api/auth/register
-      * 
-      * @Valid runs DTO annotations → GlobalExceptionHandler handles failures
       */
      @PostMapping("/register")
      public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequestDto request) {
@@ -63,7 +64,6 @@ public class AuthController {
           } catch (IllegalArgumentException ex) {
                String message = ex.getMessage();
 
-               // Duplicate email → 409 Conflict
                if (message != null && message.toLowerCase().contains("email already")) {
                     return ResponseEntity
                               .status(HttpStatus.CONFLICT)
@@ -78,8 +78,7 @@ public class AuthController {
 
      /**
       * POST /api/auth/login
-      * Returns both accessToken (15 min) and refreshToken (7 days).
-      * Frontend stores both in localStorage.
+      * Returns both accessToken and refreshToken.
       */
      @PostMapping("/login")
      public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequestDto request) {
@@ -88,7 +87,6 @@ public class AuthController {
                return ResponseEntity.ok(response);
 
           } catch (AccountLockedException ex) {
-               // 423 Locked — account locked after too many failures
                return ResponseEntity
                          .status(HttpStatus.LOCKED) // 423
                          .body(ApiErrorResponse.of("email", ex.getMessage()));
@@ -96,7 +94,6 @@ public class AuthController {
           } catch (IllegalArgumentException ex) {
                String message = ex.getMessage();
 
-               // Wrong credentials → 401
                if (message != null && (message.toLowerCase().contains("invalid")
                          || message.toLowerCase().contains("no account"))) {
                     return ResponseEntity
@@ -112,9 +109,6 @@ public class AuthController {
 
      /**
       * POST /api/auth/refresh-token
-      * Frontend calls this when access token expires (401 from any API).
-      * Sends refresh token → gets new access token.
-      * No JWT needed for this endpoint — it IS the token renewal mechanism.
       */
      @PostMapping("/refresh-token")
      public ResponseEntity<?> refreshToken(
@@ -124,17 +118,18 @@ public class AuthController {
                return ResponseEntity.ok(response);
 
           } catch (IllegalArgumentException ex) {
-               // Expired or invalid refresh token → must login again
                return ResponseEntity
                          .status(HttpStatus.UNAUTHORIZED)
                          .body(ApiErrorResponse.general(ex.getMessage()));
           }
      }
 
+     // ═══════════════════════════════════════════
+     // PROTECTED ENDPOINTS (JWT required)
+     // ═══════════════════════════════════════════
+
      /**
       * POST /api/auth/logout
-      * JWT required — uses @AuthenticationPrincipal to get logged-in user.
-      * Deletes refresh token from DB → session fully invalidated.
       */
      @PostMapping("/logout")
      public ResponseEntity<?> logout(
@@ -149,11 +144,9 @@ public class AuthController {
           }
      }
 
-     // ═══════════════════════════════════════════
-     // PROTECTED ENDPOINTS (JWT required)
-     // All unchanged from previous version
-     // ═══════════════════════════════════════════
-
+     /**
+      * GET /api/auth/profile
+      */
      @GetMapping("/profile")
      public ResponseEntity<?> getUserProfile(
                @AuthenticationPrincipal UserDetails userDetails) {
@@ -166,6 +159,9 @@ public class AuthController {
           }
      }
 
+     /**
+      * PUT /api/auth/profile
+      */
      @PutMapping("/profile")
      public ResponseEntity<?> updateUserProfile(
                @AuthenticationPrincipal UserDetails userDetails,
@@ -180,6 +176,9 @@ public class AuthController {
           }
      }
 
+     /**
+      * PUT /api/auth/change-password
+      */
      @PutMapping("/change-password")
      public ResponseEntity<?> changeUserPassword(
                @AuthenticationPrincipal UserDetails userDetails,
@@ -194,6 +193,9 @@ public class AuthController {
           }
      }
 
+     /**
+      * DELETE /api/auth/delete-account
+      */
      @DeleteMapping("/delete-account")
      public ResponseEntity<?> deleteUserAccount(
                @AuthenticationPrincipal UserDetails userDetails) {
@@ -206,6 +208,9 @@ public class AuthController {
           }
      }
 
+     /**
+      * PUT /api/auth/two-factor
+      */
      @PutMapping("/two-factor")
      public ResponseEntity<?> updateTwoFactorStatus(
                @AuthenticationPrincipal UserDetails userDetails,
@@ -220,6 +225,9 @@ public class AuthController {
           }
      }
 
+     /**
+      * GET /api/auth/validate
+      */
      @GetMapping("/validate")
      public ResponseEntity<?> validateToken(
                @AuthenticationPrincipal UserDetails userDetails) {

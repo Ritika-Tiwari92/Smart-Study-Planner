@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Notifications | EduMind AI Admin</title>
+     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+          rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --border: rgba(20, 184, 166, 0.12);
+               --border2: rgba(255, 255, 255, 0.06);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #475569;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --radius: 14px;
+               --radius-sm: 10px;
+               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          [data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               font-family: 'DM Sans', sans-serif;
+               background: var(--bg);
+               color: var(--text);
+               display: flex;
+               min-height: 100vh;
+          }
+
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               background: var(--bg2);
+               border-right: 1px solid var(--border);
+               display: flex;
+               flex-direction: column;
+               position: fixed;
+               left: 0;
+               top: 0;
+               z-index: 200;
+               transition: width var(--tr);
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               padding: 20px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+               min-height: var(--header-h);
+               flex-shrink: 0;
+          }
+
+          .brand-text h2 {
+               font-family: 'Syne', sans-serif;
+               font-size: 16px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               right: -14px;
+               top: 24px;
+               width: 28px;
+               height: 28px;
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--teal);
+               font-size: 11px;
+               transition: all var(--tr);
+               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               z-index: 10;
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: #fff;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               overflow-y: auto;
+               overflow-x: hidden;
+               padding: 12px 10px;
+          }
+
+          .nav-section-label {
+               font-size: 10px;
+               font-weight: 600;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+               color: var(--text3);
+               padding: 10px 8px 6px;
+               white-space: nowrap;
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed .nav-section-label {
+               opacity: 0;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               white-space: nowrap;
+               margin-bottom: 2px;
+          }
+
+          .nav-item:hover {
+               background: rgba(20, 184, 166, 0.08);
+               color: var(--teal);
+          }
+
+          .nav-item.active {
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
+               color: var(--teal);
+               border-left: 2px solid var(--teal);
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+               font-size: 15px;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .nav-item span,
+          .sidebar.collapsed .nav-section-label {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+               flex-shrink: 0;
+          }
+
+          .admin-profile {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               background: rgba(255, 255, 255, 0.04);
+               margin-bottom: 8px;
+               overflow: hidden;
+          }
+
+          .admin-avatar {
+               width: 34px;
+               height: 34px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+               font-weight: 700;
+               color: #fff;
+               flex-shrink: 0;
+          }
+
+          .admin-info p {
+               font-size: 13px;
+               font-weight: 600;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .admin-info span {
+               font-size: 11px;
+               color: var(--teal);
+          }
+
+          .sidebar.collapsed .admin-info {
+               display: none;
+          }
+
+          .logout-btn {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--rose);
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               border: none;
+               background: none;
+               width: 100%;
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, 0.1);
+          }
+
+          .logout-btn i {
+               width: 20px;
+               text-align: center;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .main {
+               margin-left: var(--sidebar-w);
+               flex: 1;
+               transition: margin-left var(--tr);
+               min-height: 100vh;
+               display: flex;
+               flex-direction: column;
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+          }
+
+          .topbar {
+               height: var(--header-h);
+               background: var(--bg2);
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               padding: 0 28px;
+               gap: 16px;
+               position: sticky;
+               top: 0;
+               z-index: 100;
+          }
+
+          .topbar-left {
+               flex: 1;
+          }
+
+          .topbar-left h1 {
+               font-family: 'Syne', sans-serif;
+               font-size: 20px;
+               font-weight: 700;
+          }
+
+          .topbar-left p {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .topbar-btn {
+               width: 38px;
+               height: 38px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--text2);
+               font-size: 15px;
+               transition: all var(--tr);
+          }
+
+          .topbar-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .mobile-toggle {
+               display: none;
+               background: none;
+               border: none;
+               color: var(--text);
+               font-size: 20px;
+               cursor: pointer;
+               padding: 4px;
+          }
+
+          .content {
+               padding: 28px;
+               flex: 1;
+          }
+
+          .two-col {
+               display: grid;
+               grid-template-columns: 1fr 1fr;
+               gap: 24px;
+          }
+
+          .section-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               padding: 24px;
+          }
+
+          .section-title {
+               font-family: 'Syne', sans-serif;
+               font-size: 16px;
+               font-weight: 700;
+               margin-bottom: 20px;
+               display: flex;
+               align-items: center;
+               gap: 8px;
+          }
+
+          .form-group {
+               margin-bottom: 16px;
+          }
+
+          .form-label {
+               display: block;
+               font-size: 13px;
+               font-weight: 500;
+               color: var(--text2);
+               margin-bottom: 8px;
+          }
+
+          .form-input,
+          .form-select,
+          .form-textarea {
+               width: 100%;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px;
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13.5px;
+               color: var(--text);
+               outline: none;
+               transition: border-color 0.2s;
+          }
+
+          .form-textarea {
+               resize: vertical;
+               min-height: 90px;
+          }
+
+          .form-input:focus,
+          .form-select:focus,
+          .form-textarea:focus {
+               border-color: var(--teal);
+          }
+
+          .form-input::placeholder,
+          .form-textarea::placeholder {
+               color: var(--text3);
+          }
+
+          .btn-send {
+               width: 100%;
+               padding: 12px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border: none;
+               border-radius: 10px;
+               color: #fff;
+               font-family: 'Syne', sans-serif;
+               font-size: 14px;
+               font-weight: 700;
+               cursor: pointer;
+               transition: opacity 0.2s, transform 0.15s;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               gap: 8px;
+          }
+
+          .btn-send:hover {
+               opacity: 0.9;
+               transform: translateY(-1px);
+          }
+
+          .notif-list {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+               max-height: 480px;
+               overflow-y: auto;
+          }
+
+          .notif-list::-webkit-scrollbar {
+               width: 4px;
+          }
+
+          .notif-list::-webkit-scrollbar-thumb {
+               background: var(--border);
+               border-radius: 4px;
+          }
+
+          .notif-item {
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 14px 16px;
+               display: flex;
+               gap: 12px;
+               align-items: flex-start;
+               transition: border-color var(--tr);
+          }
+
+          .notif-item:hover {
+               border-color: var(--border);
+          }
+
+          .notif-icon {
+               width: 36px;
+               height: 36px;
+               border-radius: 9px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 16px;
+               flex-shrink: 0;
+          }
+
+          .notif-body p {
+               font-size: 13.5px;
+               font-weight: 600;
+               margin-bottom: 3px;
+          }
+
+          .notif-body span {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .notif-meta {
+               margin-left: auto;
+               text-align: right;
+               flex-shrink: 0;
+          }
+
+          .badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 4px;
+               padding: 2px 9px;
+               border-radius: 100px;
+               font-size: 11px;
+               font-weight: 600;
+          }
+
+          .badge-study {
+               background: rgba(20, 184, 166, 0.15);
+               color: var(--teal);
+          }
+
+          .badge-test {
+               background: rgba(139, 92, 246, 0.15);
+               color: var(--purple);
+          }
+
+          .badge-revision {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .badge-general {
+               background: rgba(148, 163, 184, 0.1);
+               color: var(--text2);
+          }
+
+          .notif-time {
+               font-size: 11px;
+               color: var(--text3);
+               margin-top: 4px;
+               display: block;
+          }
+
+          .empty-notif {
+               text-align: center;
+               padding: 32px;
+               color: var(--text2);
+          }
+
+          .empty-notif i {
+               font-size: 30px;
+               color: var(--text3);
+               display: block;
+               margin-bottom: 10px;
+          }
+
+          .alert {
+               padding: 12px 14px;
+               border-radius: 10px;
+               font-size: 13px;
+               display: none;
+               align-items: center;
+               gap: 8px;
+               margin-top: 12px;
+               border: 1px solid;
+          }
+
+          .alert.show {
+               display: flex;
+          }
+
+          .alert.success {
+               background: rgba(16, 185, 129, 0.1);
+               border-color: rgba(16, 185, 129, 0.3);
+               color: var(--green);
+          }
+
+          .alert.error {
+               background: rgba(244, 63, 94, 0.08);
+               border-color: rgba(244, 63, 94, 0.25);
+               color: var(--rose);
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, 0.6);
+               z-index: 150;
+          }
+
+          @media(max-width:900px) {
+               .two-col {
+                    grid-template-columns: 1fr;
+               }
+          }
+
+          @media(max-width:768px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .mobile-overlay.show {
+                    display: block;
+               }
+
+               .main {
+                    margin-left: 0 !important;
+               }
+
+               .mobile-toggle {
+                    display: block;
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+               }
+
+               .topbar {
+                    padding: 0 16px;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <svg width="34" height="34" viewBox="0 0 42 42" fill="none" style="flex-shrink:0">
+                    <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6" stroke-width="2" />
+                    <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)" stroke="#14b8a6"
+                         stroke-width="1" /><text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold"
+                         fill="#14b8a6" font-family="sans-serif">AI</text>
+               </svg>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2><span>Admin Panel</span>
+               </div>
+          </div>
+          <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+               <a href="admin-dashboard.html" class="nav-item"><i
+                         class="fas fa-chart-tree-map"></i><span>Dashboard</span></a>
+               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
+               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span>Subjects</span></a>
+               <div class="nav-section-label">Content</div>
+               <a href="admin-planner.html" class="nav-item"><i
+                         class="fas fa-calendar-days"></i><span>Planner</span></a>
+               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span>Tasks</span></a>
+               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span>Revisions</span></a>
+               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span>Tests</span></a>
+               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span>Question
+                         Bank</span></a>
+               <div class="nav-section-label">Insights</div>
+               <a href="admin-analytics.html" class="nav-item"><i
+                         class="fas fa-chart-line"></i><span>Analytics</span></a>
+               <a href="admin-notifications.html" class="nav-item active"><i
+                         class="fas fa-bell"></i><span>Notifications</span></a>
+               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span>Settings</span></a>
+               <a href="admin-security.html" class="nav-item"><i class="fas fa-shield-halved"></i><span>Security
+                         Logs</span></a>
+          </div>
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="adminName">Admin</p><span>Administrator</span>
+                    </div>
+               </div>
+               <button class="logout-btn" onclick="handleLogout()"><i
+                         class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+          </div>
+     </nav>
+     <div class="main" id="main">
+          <div class="topbar">
+               <button class="mobile-toggle" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+               <div class="topbar-left">
+                    <h1>Notifications</h1>
+                    <p>Send announcements and view notification history.</p>
+               </div>
+               <div class="topbar-right">
+                    <div class="topbar-btn" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></div>
+               </div>
+          </div>
+          <div class="content">
+               <div class="two-col">
+                    <!-- Send Notification Form -->
+                    <div class="section-card">
+                         <div class="section-title"><i class="fas fa-paper-plane" style="color:var(--teal)"></i> Send
+                              Notification</div>
+                         <div class="form-group">
+                              <label class="form-label">Title <span style="color:var(--rose)">*</span></label>
+                              <input type="text" class="form-input" id="notifTitle"
+                                   placeholder="e.g. Upcoming Test Reminder" />
+                         </div>
+                         <div class="form-group">
+                              <label class="form-label">Message <span style="color:var(--rose)">*</span></label>
+                              <textarea class="form-textarea" id="notifMsg"
+                                   placeholder="Write your notification message here..."></textarea>
+                         </div>
+                         <div class="form-group">
+                              <label class="form-label">Type</label>
+                              <select class="form-select" id="notifType">
+                                   <option value="General">General</option>
+                                   <option value="Study">Study</option>
+                                   <option value="Test">Test</option>
+                                   <option value="Revision">Revision</option>
+                                   <option value="Pomodoro">Pomodoro</option>
+                              </select>
+                         </div>
+                         <div class="form-group">
+                              <label class="form-label">Send To</label>
+                              <select class="form-select" id="notifTarget">
+                                   <option value="all">All Students</option>
+                              </select>
+                         </div>
+                         <button class="btn-send" onclick="sendNotification()">
+                              <i class="fas fa-paper-plane"></i> Send Notification
+                         </button>
+                         <div class="alert" id="notifAlert">
+                              <i id="alertIcon"></i><span id="alertMsg"></span>
+                         </div>
+                    </div>
+                    <!-- Notification History -->
+                    <div class="section-card">
+                         <div class="section-title"><i class="fas fa-clock-rotate-left" style="color:var(--teal)"></i>
+                              Notification History</div>
+                         <div class="notif-list" id="notifList">
+                              <div class="empty-notif"><i class="fas fa-bell-slash"></i>
+                                   <p>No notifications sent yet.</p>
+                                   <p style="font-size:12px;margin-top:4px">Send your first notification!</p>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+     <script>
+          const API = `http://localhost:8080`; const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin';
+          if (!token || role !== 'ADMIN') window.location.href = '/pages/admin/admin-login.html';
+          document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+
+          // Local notification history (stored in localStorage until backend ready)
+          let history = JSON.parse(localStorage.getItem('adminNotifHistory') || '[]');
+          renderHistory();
+
+          function typeIcon(t) { const m = { Study: '📚', Test: '📝', Revision: '🔁', Pomodoro: '⏱️', General: '📢' }; return m[t] || '📢'; }
+          function typeBadge(t) { const cls = { Study: 'badge-study', Test: 'badge-test', Revision: 'badge-revision', General: 'badge-general', Pomodoro: 'badge-study' }; return `<span class="badge ${cls[t] || 'badge-general'}">${t || 'General'}</span>`; }
+
+          function sendNotification() {
+               const title = document.getElementById('notifTitle').value.trim();
+               const msg = document.getElementById('notifMsg').value.trim();
+               const type = document.getElementById('notifType').value;
+               const target = document.getElementById('notifTarget').value;
+               if (!title || !msg) { showAlert('error', 'Title and message are required!'); return; }
+               const notif = { id: Date.now(), title, message: msg, type, target, sentAt: new Date().toISOString() };
+               history.unshift(notif);
+               localStorage.setItem('adminNotifHistory', JSON.stringify(history));
+               renderHistory();
+               document.getElementById('notifTitle').value = '';
+               document.getElementById('notifMsg').value = '';
+               showAlert('success', `Notification "${title}" sent successfully!`);
+          }
+
+          function renderHistory() {
+               const list = document.getElementById('notifList');
+               if (!history.length) { list.innerHTML = `<div class="empty-notif"><i class="fas fa-bell-slash"></i><p>No notifications sent yet.</p></div>`; return; }
+               list.innerHTML = history.map(n => `
+    <div class="notif-item">
+        <div class="notif-icon" style="background:rgba(20,184,166,0.12)">${typeIcon(n.type)}</div>
+        <div class="notif-body">
+            <p>${n.title}</p>
+            <span>${n.message}</span>
+        </div>
+        <div class="notif-meta">
+            ${typeBadge(n.type)}
+            <span class="notif-time">${new Date(n.sentAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+    </div>`).join('');
+          }
+
+          function showAlert(type, msg) {
+               const a = document.getElementById('notifAlert');
+               a.className = `alert show ${type}`;
+               document.getElementById('alertIcon').className = type === 'success' ? 'fas fa-circle-check' : 'fas fa-circle-xmark';
+               document.getElementById('alertMsg').textContent = msg;
+               setTimeout(() => a.className = 'alert', 4000);
+          }
+
+          let collapsed = false;
+          function toggleSidebar() { collapsed = !collapsed; document.getElementById('sidebar').classList.toggle('collapsed', collapsed); document.getElementById('main').classList.toggle('expanded', collapsed); document.getElementById('toggleIcon').className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'; }
+          function openMobile() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+          function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+          function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } }
+          (function () { if (localStorage.getItem('adminTheme') === 'light') { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; } })();
+          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/admin-login.html'; } }
+     </script>
+</body>
+
+</html>

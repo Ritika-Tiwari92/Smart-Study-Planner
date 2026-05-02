@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Security Logs | EduMind AI Admin</title>
+     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+          rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --border: rgba(20, 184, 166, 0.12);
+               --border2: rgba(255, 255, 255, 0.06);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f1f5f9;
+               --text2: #94a3b8;
+               --text3: #475569;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --radius: 14px;
+               --radius-sm: 10px;
+               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          [data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               font-family: 'DM Sans', sans-serif;
+               background: var(--bg);
+               color: var(--text);
+               display: flex;
+               min-height: 100vh;
+          }
+
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               background: var(--bg2);
+               border-right: 1px solid var(--border);
+               display: flex;
+               flex-direction: column;
+               position: fixed;
+               left: 0;
+               top: 0;
+               z-index: 200;
+               transition: width var(--tr);
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               padding: 20px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+               min-height: var(--header-h);
+               flex-shrink: 0;
+          }
+
+          .brand-text h2 {
+               font-family: 'Syne', sans-serif;
+               font-size: 16px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: 0.1em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               right: -14px;
+               top: 24px;
+               width: 28px;
+               height: 28px;
+               background: var(--card);
+               border: 1px solid var(--border);
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--teal);
+               font-size: 11px;
+               transition: all var(--tr);
+               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               z-index: 10;
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: #fff;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               overflow-y: auto;
+               overflow-x: hidden;
+               padding: 12px 10px;
+          }
+
+          .nav-section-label {
+               font-size: 10px;
+               font-weight: 600;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+               color: var(--text3);
+               padding: 10px 8px 6px;
+               white-space: nowrap;
+               overflow: hidden;
+          }
+
+          .sidebar.collapsed .nav-section-label {
+               opacity: 0;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               white-space: nowrap;
+               margin-bottom: 2px;
+          }
+
+          .nav-item:hover {
+               background: rgba(20, 184, 166, 0.08);
+               color: var(--teal);
+          }
+
+          .nav-item.active {
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
+               color: var(--teal);
+               border-left: 2px solid var(--teal);
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+               font-size: 15px;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .nav-item span,
+          .sidebar.collapsed .nav-section-label {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+               flex-shrink: 0;
+          }
+
+          .admin-profile {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               background: rgba(255, 255, 255, 0.04);
+               margin-bottom: 8px;
+               overflow: hidden;
+          }
+
+          .admin-avatar {
+               width: 34px;
+               height: 34px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+               font-weight: 700;
+               color: #fff;
+               flex-shrink: 0;
+          }
+
+          .admin-info p {
+               font-size: 13px;
+               font-weight: 600;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .admin-info span {
+               font-size: 11px;
+               color: var(--teal);
+          }
+
+          .sidebar.collapsed .admin-info {
+               display: none;
+          }
+
+          .logout-btn {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: var(--radius-sm);
+               cursor: pointer;
+               color: var(--rose);
+               font-size: 13.5px;
+               font-weight: 500;
+               transition: all var(--tr);
+               border: none;
+               background: none;
+               width: 100%;
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, 0.1);
+          }
+
+          .logout-btn i {
+               width: 20px;
+               text-align: center;
+               flex-shrink: 0;
+          }
+
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .main {
+               margin-left: var(--sidebar-w);
+               flex: 1;
+               transition: margin-left var(--tr);
+               min-height: 100vh;
+               display: flex;
+               flex-direction: column;
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+          }
+
+          .topbar {
+               height: var(--header-h);
+               background: var(--bg2);
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               padding: 0 28px;
+               gap: 16px;
+               position: sticky;
+               top: 0;
+               z-index: 100;
+          }
+
+          .topbar-left {
+               flex: 1;
+          }
+
+          .topbar-left h1 {
+               font-family: 'Syne', sans-serif;
+               font-size: 20px;
+               font-weight: 700;
+          }
+
+          .topbar-left p {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+          }
+
+          .topbar-btn {
+               width: 38px;
+               height: 38px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               color: var(--text2);
+               font-size: 15px;
+               transition: all var(--tr);
+          }
+
+          .topbar-btn:hover {
+               border-color: var(--teal);
+               color: var(--teal);
+          }
+
+          .mobile-toggle {
+               display: none;
+               background: none;
+               border: none;
+               color: var(--text);
+               font-size: 20px;
+               cursor: pointer;
+               padding: 4px;
+          }
+
+          .content {
+               padding: 28px;
+               flex: 1;
+          }
+
+          .stats-row {
+               display: grid;
+               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+               gap: 16px;
+               margin-bottom: 28px;
+          }
+
+          .stat-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               padding: 18px 20px;
+               display: flex;
+               align-items: center;
+               gap: 14px;
+          }
+
+          .stat-icon {
+               width: 44px;
+               height: 44px;
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 18px;
+               flex-shrink: 0;
+          }
+
+          .stat-info p {
+               font-size: 11px;
+               color: var(--text2);
+               margin-bottom: 3px;
+               font-weight: 500;
+          }
+
+          .stat-info h3 {
+               font-family: 'Syne', sans-serif;
+               font-size: 24px;
+               font-weight: 800;
+          }
+
+          .icon-teal {
+               background: rgba(20, 184, 166, 0.15);
+               color: var(--teal);
+          }
+
+          .icon-green {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .icon-amber {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .icon-rose {
+               background: rgba(244, 63, 94, 0.15);
+               color: var(--rose);
+          }
+
+          .toolbar {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               margin-bottom: 20px;
+               flex-wrap: wrap;
+          }
+
+          .search-wrap {
+               position: relative;
+               flex: 1;
+               min-width: 220px;
+          }
+
+          .search-wrap i {
+               position: absolute;
+               left: 12px;
+               top: 50%;
+               transform: translateY(-50%);
+               color: var(--text3);
+               font-size: 14px;
+          }
+
+          .search-input {
+               width: 100%;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px 10px 38px;
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13.5px;
+               color: var(--text);
+               outline: none;
+               transition: border-color 0.2s;
+          }
+
+          .search-input:focus {
+               border-color: var(--teal);
+          }
+
+          .search-input::placeholder {
+               color: var(--text3);
+          }
+
+          .filter-select {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 10px;
+               padding: 10px 14px;
+               font-family: 'DM Sans', sans-serif;
+               font-size: 13px;
+               color: var(--text);
+               outline: none;
+               cursor: pointer;
+          }
+
+          .logs-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: var(--radius);
+               overflow: hidden;
+          }
+
+          .logs-header {
+               padding: 18px 22px;
+               border-bottom: 1px solid var(--border2);
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+          }
+
+          .logs-header h3 {
+               font-family: 'Syne', sans-serif;
+               font-size: 15px;
+               font-weight: 700;
+          }
+
+          .logs-header span {
+               font-size: 12px;
+               color: var(--text2);
+               background: var(--bg3);
+               padding: 4px 10px;
+               border-radius: 100px;
+          }
+
+          .log-list {
+               display: flex;
+               flex-direction: column;
+          }
+
+          .log-item {
+               display: flex;
+               align-items: flex-start;
+               gap: 14px;
+               padding: 14px 22px;
+               border-bottom: 1px solid var(--border2);
+               transition: background var(--tr);
+          }
+
+          .log-item:last-child {
+               border-bottom: none;
+          }
+
+          .log-item:hover {
+               background: rgba(20, 184, 166, 0.03);
+          }
+
+          .log-dot {
+               width: 10px;
+               height: 10px;
+               border-radius: 50%;
+               flex-shrink: 0;
+               margin-top: 5px;
+          }
+
+          .dot-info {
+               background: var(--teal);
+          }
+
+          .dot-warning {
+               background: var(--amber);
+          }
+
+          .dot-critical {
+               background: var(--rose);
+          }
+
+          .dot-success {
+               background: var(--green);
+          }
+
+          .log-content {
+               flex: 1;
+          }
+
+          .log-content p {
+               font-size: 13.5px;
+               font-weight: 500;
+               margin-bottom: 3px;
+          }
+
+          .log-content span {
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .log-meta {
+               text-align: right;
+               flex-shrink: 0;
+          }
+
+          .badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 4px;
+               padding: 2px 9px;
+               border-radius: 100px;
+               font-size: 11px;
+               font-weight: 600;
+          }
+
+          .badge-info {
+               background: rgba(20, 184, 166, 0.15);
+               color: var(--teal);
+          }
+
+          .badge-warning {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .badge-critical {
+               background: rgba(244, 63, 94, 0.1);
+               color: var(--rose);
+          }
+
+          .badge-success {
+               background: rgba(16, 185, 129, 0.15);
+               color: var(--green);
+          }
+
+          .log-time {
+               font-size: 11px;
+               color: var(--text3);
+               margin-top: 4px;
+               display: block;
+          }
+
+          .empty-state {
+               text-align: center;
+               padding: 48px 24px;
+               color: var(--text2);
+          }
+
+          .empty-state i {
+               font-size: 36px;
+               color: var(--text3);
+               display: block;
+               margin-bottom: 12px;
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, 0.6);
+               z-index: 150;
+          }
+
+          @media(max-width:768px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .mobile-overlay.show {
+                    display: block;
+               }
+
+               .main {
+                    margin-left: 0 !important;
+               }
+
+               .mobile-toggle {
+                    display: block;
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+               }
+
+               .topbar {
+                    padding: 0 16px;
+               }
+
+               .stats-row {
+                    grid-template-columns: 1fr 1fr;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <svg width="34" height="34" viewBox="0 0 42 42" fill="none" style="flex-shrink:0">
+                    <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6" stroke-width="2" />
+                    <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)" stroke="#14b8a6"
+                         stroke-width="1" /><text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold"
+                         fill="#14b8a6" font-family="sans-serif">AI</text>
+               </svg>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2><span>Admin Panel</span>
+               </div>
+          </div>
+          <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+               <a href="admin-dashboard.html" class="nav-item"><i
+                         class="fas fa-chart-tree-map"></i><span>Dashboard</span></a>
+               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
+               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span>Subjects</span></a>
+               <div class="nav-section-label">Content</div>
+               <a href="admin-planner.html" class="nav-item"><i
+                         class="fas fa-calendar-days"></i><span>Planner</span></a>
+               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span>Tasks</span></a>
+               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span>Revisions</span></a>
+               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span>Tests</span></a>
+               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span>Question
+                         Bank</span></a>
+               <div class="nav-section-label">Insights</div>
+               <a href="admin-analytics.html" class="nav-item"><i
+                         class="fas fa-chart-line"></i><span>Analytics</span></a>
+               <a href="admin-notifications.html" class="nav-item"><i
+                         class="fas fa-bell"></i><span>Notifications</span></a>
+               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span>Settings</span></a>
+               <a href="admin-security.html" class="nav-item active"><i class="fas fa-shield-halved"></i><span>Security
+                         Logs</span></a>
+          </div>
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="adminName">Admin</p><span>Administrator</span>
+                    </div>
+               </div>
+               <button class="logout-btn" onclick="handleLogout()"><i
+                         class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+          </div>
+     </nav>
+     <div class="main" id="main">
+          <div class="topbar">
+               <button class="mobile-toggle" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+               <div class="topbar-left">
+                    <h1>Security Logs</h1>
+                    <p>Monitor login activity and system events.</p>
+               </div>
+               <div class="topbar-right">
+                    <div class="topbar-btn" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></div>
+                    <div class="topbar-btn" onclick="renderLogs()" title="Refresh"><i class="fas fa-rotate-right"></i>
+                    </div>
+               </div>
+          </div>
+          <div class="content">
+               <div class="stats-row">
+                    <div class="stat-card">
+                         <div class="stat-icon icon-teal"><i class="fas fa-right-to-bracket"></i></div>
+                         <div class="stat-info">
+                              <p>Total Events</p>
+                              <h3 id="statTotal">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-green"><i class="fas fa-circle-check"></i></div>
+                         <div class="stat-info">
+                              <p>Successful Logins</p>
+                              <h3 id="statSuccess">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-amber"><i class="fas fa-triangle-exclamation"></i></div>
+                         <div class="stat-info">
+                              <p>Warnings</p>
+                              <h3 id="statWarn">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-rose"><i class="fas fa-ban"></i></div>
+                         <div class="stat-info">
+                              <p>Failed Attempts</p>
+                              <h3 id="statFailed">–</h3>
+                         </div>
+                    </div>
+               </div>
+               <div class="toolbar">
+                    <div class="search-wrap"><i class="fas fa-magnifying-glass"></i><input type="text"
+                              class="search-input" id="searchInput" placeholder="Search logs..."
+                              oninput="filterLogs()" /></div>
+                    <select class="filter-select" id="severityFilter" onchange="filterLogs()">
+                         <option value="all">All Severity</option>
+                         <option value="info">Info</option>
+                         <option value="success">Success</option>
+                         <option value="warning">Warning</option>
+                         <option value="critical">Critical</option>
+                    </select>
+               </div>
+               <div class="logs-card">
+                    <div class="logs-header">
+                         <h3>Activity Timeline</h3><span id="logCount">Loading...</span>
+                    </div>
+                    <div class="log-list" id="logList"></div>
+               </div>
+          </div>
+     </div>
+     <script>
+          const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin'; const adminEmail = localStorage.getItem('adminEmail') || 'admin';
+          if (!token || role !== 'ADMIN') window.location.href = '/pages/admin/admin-login.html';
+          document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+
+          // Generate security logs from localStorage data
+          function generateLogs() {
+               const logs = [];
+               const now = new Date();
+               // Admin login log
+               logs.push({ type: 'success', severity: 'success', msg: `Admin ${name} logged in successfully`, detail: `Email: ${adminEmail}`, time: new Date(now - 60000).toISOString() });
+               logs.push({ type: 'info', severity: 'info', msg: 'Admin panel accessed', detail: 'Dashboard loaded', time: new Date(now - 55000).toISOString() });
+               // Notification history
+               const notifs = JSON.parse(localStorage.getItem('adminNotifHistory') || '[]');
+               notifs.slice(0, 5).forEach(n => {
+                    logs.push({ type: 'info', severity: 'info', msg: `Notification sent: "${n.title}"`, detail: `Type: ${n.type} | Target: ${n.target}`, time: n.sentAt });
+               });
+               // Session info
+               logs.push({ type: 'info', severity: 'info', msg: 'JWT token issued', detail: 'Access token valid for 15 minutes', time: new Date(now - 120000).toISOString() });
+               logs.push({ type: 'warning', severity: 'warning', msg: 'Note: Some student accounts have failed login attempts', detail: 'Check user accounts for locked status', time: new Date(now - 300000).toISOString() });
+               logs.push({ type: 'info', severity: 'info', msg: 'Admin module initialized', detail: 'EduMind AI Admin Panel v1.0', time: new Date(now - 600000).toISOString() });
+               return logs.sort((a, b) => new Date(b.time) - new Date(a.time));
+          }
+
+          let allLogs = [];
+          function renderLogs() {
+               allLogs = generateLogs();
+               updateStats(allLogs);
+               displayLogs(allLogs);
+          }
+          function updateStats(logs) {
+               document.getElementById('statTotal').textContent = logs.length;
+               document.getElementById('statSuccess').textContent = logs.filter(l => l.severity === 'success').length;
+               document.getElementById('statWarn').textContent = logs.filter(l => l.severity === 'warning').length;
+               document.getElementById('statFailed').textContent = logs.filter(l => l.severity === 'critical').length;
+          }
+          function displayLogs(logs) {
+               const list = document.getElementById('logList');
+               document.getElementById('logCount').textContent = logs.length + ' events';
+               if (!logs.length) { list.innerHTML = `<div class="empty-state"><i class="fas fa-shield-halved"></i><p>No security events found.</p></div>`; return; }
+               list.innerHTML = logs.map(l => `
+    <div class="log-item">
+        <div class="log-dot dot-${l.severity}"></div>
+        <div class="log-content">
+            <p>${l.msg}</p>
+            <span>${l.detail}</span>
+        </div>
+        <div class="log-meta">
+            ${severityBadge(l.severity)}
+            <span class="log-time">${formatTime(l.time)}</span>
+        </div>
+    </div>`).join('');
+          }
+          function severityBadge(s) { const map = { info: 'badge-info', success: 'badge-success', warning: 'badge-warning', critical: 'badge-critical' }; const labels = { info: 'Info', success: 'Success', warning: 'Warning', critical: 'Critical' }; return `<span class="badge ${map[s] || 'badge-info'}">${labels[s] || s}</span>`; }
+          function filterLogs() {
+               const q = document.getElementById('searchInput').value.toLowerCase();
+               const sev = document.getElementById('severityFilter').value;
+               let f = allLogs;
+               if (q) f = f.filter(l => l.msg.toLowerCase().includes(q) || l.detail.toLowerCase().includes(q));
+               if (sev !== 'all') f = f.filter(l => l.severity === sev);
+               displayLogs(f);
+          }
+          function formatTime(str) { try { const d = new Date(str); const now = new Date(); const diff = Math.floor((now - d) / 60000); if (diff < 1) return 'Just now'; if (diff < 60) return diff + 'm ago'; if (diff < 1440) return Math.floor(diff / 60) + 'h ago'; return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return 'Recently'; } }
+          let collapsed = false;
+          function toggleSidebar() { collapsed = !collapsed; document.getElementById('sidebar').classList.toggle('collapsed', collapsed); document.getElementById('main').classList.toggle('expanded', collapsed); document.getElementById('toggleIcon').className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'; }
+          function openMobile() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
+          function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
+          function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } }
+          (function () { if (localStorage.getItem('adminTheme') === 'light') { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; } })();
+          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/admin-login.html'; } }
+          renderLogs();
+     </script>
+</body>
+
+</html>

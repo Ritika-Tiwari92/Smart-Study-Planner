@@ -1,9 +1,7 @@
 /**
  * subjects.js — EduMind AI
- * Fixed: duplicate function definitions removed
- * Fixed: API base URL updated to /api/subjects
- * Fixed: userId removed from URL — JWT handles identity
- * Added: syllabus upload, file preview, drag-drop, chapter preview
+ * Updated: fetch() → fetchWithAuth() for auto token refresh
+ * Everything else unchanged.
  */
 
 // ─────────────────────────────────────────────
@@ -50,21 +48,13 @@ const chaptersList            = document.getElementById("chaptersList");
 const chaptersCountBadge      = document.getElementById("chaptersCountBadge");
 
 // ─────────────────────────────────────────────
-// API CONFIG — updated to /api/subjects (JWT-secured)
+// API CONFIG
 // ─────────────────────────────────────────────
-const SUBJECTS_API   = "http://localhost:8080/api/subjects";
-const SYLLABUS_API   = "http://localhost:8080/api/syllabus";
+const SUBJECTS_API = "/api/subjects";
+const SYLLABUS_API = "/api/syllabus";
 
-let editingSubjectId = null;
-let selectedSyllabusFile = null;   // holds File object selected by user
-
-// ─────────────────────────────────────────────
-// AUTH HEADER — reads token from localStorage
-// ─────────────────────────────────────────────
-function getAuthHeaders(extra = {}) {
-    const token = (localStorage.getItem("token") || "").trim();
-    return { "Authorization": `Bearer ${token}`, ...extra };
-}
+let editingSubjectId   = null;
+let selectedSyllabusFile = null;
 
 // ─────────────────────────────────────────────
 // MODAL OPEN / CLOSE
@@ -109,8 +99,6 @@ function clearSubjectModalState() {
 // ─────────────────────────────────────────────
 // SYLLABUS UPLOAD UI
 // ─────────────────────────────────────────────
-
-// Toggle shows/hides the upload area
 if (syllabusUploadToggle) {
     syllabusUploadToggle.addEventListener("change", function () {
         if (this.checked) {
@@ -133,7 +121,6 @@ function resetSyllabusUploadUI() {
     if (syllabusUploadArea)      syllabusUploadArea.classList.add("hidden");
 }
 
-// File input change
 if (syllabusFileInput) {
     syllabusFileInput.addEventListener("change", function () {
         const file = this.files[0];
@@ -141,7 +128,6 @@ if (syllabusFileInput) {
     });
 }
 
-// Remove file button
 if (syllabusRemoveBtn) {
     syllabusRemoveBtn.addEventListener("click", function () {
         resetSyllabusUploadUI();
@@ -150,17 +136,14 @@ if (syllabusRemoveBtn) {
     });
 }
 
-// Drag and drop
 if (syllabusDropzone) {
     syllabusDropzone.addEventListener("dragover", function (e) {
         e.preventDefault();
         syllabusDropzone.classList.add("dragover");
     });
-
     syllabusDropzone.addEventListener("dragleave", function () {
         syllabusDropzone.classList.remove("dragover");
     });
-
     syllabusDropzone.addEventListener("drop", function (e) {
         e.preventDefault();
         syllabusDropzone.classList.remove("dragover");
@@ -170,22 +153,16 @@ if (syllabusDropzone) {
 }
 
 function handleSyllabusFileSelected(file) {
-    // Validate type
     const allowed = ["pdf", "docx", "txt"];
     const ext = file.name.split(".").pop().toLowerCase();
-
     if (!allowed.includes(ext)) {
         showSyllabusError("Invalid file type. Use PDF, DOCX, or TXT.");
         return;
     }
-
-    // Validate size — 10MB
     if (file.size > 10 * 1024 * 1024) {
         showSyllabusError("File too large. Maximum size is 10MB.");
         return;
     }
-
-    // Valid — show preview
     selectedSyllabusFile = file;
     syllabusFileName.textContent = file.name;
     syllabusFileSize.textContent = formatFileSize(file.size);
@@ -210,20 +187,15 @@ function formatFileSize(bytes) {
 // ─────────────────────────────────────────────
 function showFieldError(errorElementId, message) {
     const el = document.getElementById(errorElementId);
-    if (el) {
-        el.textContent = message;
-        el.classList.remove("hidden");
-    }
+    if (el) { el.textContent = message; el.classList.remove("hidden"); }
 }
 
 function hideFieldErrors() {
-    document.querySelectorAll(".field-error").forEach(el => {
-        el.classList.add("hidden");
-    });
+    document.querySelectorAll(".field-error").forEach(el => el.classList.add("hidden"));
 }
 
 // ─────────────────────────────────────────────
-// API HELPERS
+// API RESPONSE HANDLER
 // ─────────────────────────────────────────────
 async function handleApiResponse(response) {
     if (!response.ok) {
@@ -235,7 +207,6 @@ async function handleApiResponse(response) {
         throw new Error(message);
     }
     if (response.status === 204) return null;
-
     const contentType = response.headers.get("content-type") || "";
     return contentType.includes("application/json")
         ? response.json()
@@ -243,62 +214,65 @@ async function handleApiResponse(response) {
 }
 
 // ─────────────────────────────────────────────
-// SUBJECT API CALLS
+// SUBJECT API CALLS — using fetchWithAuth()
+// fetchWithAuth() is defined in auth-guard.js
+// It auto-refreshes token on 401
 // ─────────────────────────────────────────────
+
 async function fetchSubjectsFromApi() {
-    const response = await fetch(SUBJECTS_API, {
-        headers: getAuthHeaders()
-    });
+    // fetchWithAuth auto-adds Authorization header
+    const response = await fetchWithAuth(SUBJECTS_API);
     const data = await handleApiResponse(response);
     return Array.isArray(data) ? data.map(mapBackendSubject) : [];
 }
 
 async function createSubjectInApi(subjectData) {
-    const response = await fetch(SUBJECTS_API, {
+    const response = await fetchWithAuth(SUBJECTS_API, {
         method: "POST",
-        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(buildPayload(subjectData))
     });
     return handleApiResponse(response);
 }
 
 async function updateSubjectInApi(subjectId, subjectData) {
-    const response = await fetch(`${SUBJECTS_API}/${subjectId}`, {
+    const response = await fetchWithAuth(`${SUBJECTS_API}/${subjectId}`, {
         method: "PUT",
-        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(buildPayload(subjectData))
     });
     return handleApiResponse(response);
 }
 
 async function deleteSubjectFromApi(subjectId) {
-    const response = await fetch(`${SUBJECTS_API}/${subjectId}`, {
-        method: "DELETE",
-        headers: getAuthHeaders()
+    const response = await fetchWithAuth(`${SUBJECTS_API}/${subjectId}`, {
+        method: "DELETE"
     });
     return handleApiResponse(response);
 }
 
 // ─────────────────────────────────────────────
 // SYLLABUS API CALLS
+// Note: FormData upload needs special handling —
+// fetchWithAuth used but Content-Type NOT set manually
+// (browser sets multipart/form-data with boundary automatically)
 // ─────────────────────────────────────────────
 async function uploadSyllabusForSubject(subjectId, file) {
     const formData = new FormData();
     formData.append("file", file);
 
+    const token = (localStorage.getItem("token") || "").trim();
+
+    // Can't use fetchWithAuth here directly because
+    // Content-Type must NOT be set for FormData
     const response = await fetch(`${SYLLABUS_API}/upload/${subjectId}`, {
         method: "POST",
-        headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-        // Do NOT set Content-Type here — browser sets it with boundary automatically
+        headers: { "Authorization": `Bearer ${token}` },
         body: formData
     });
     return handleApiResponse(response);
 }
 
 async function fetchChaptersForSubject(subjectId) {
-    const response = await fetch(`${SYLLABUS_API}/${subjectId}/chapters`, {
-        headers: getAuthHeaders()
-    });
+    const response = await fetchWithAuth(`${SYLLABUS_API}/${subjectId}/chapters`);
     return handleApiResponse(response);
 }
 
@@ -349,7 +323,6 @@ function createSubjectCard({ id, name, chapters, progress, iconClass,
                               description, code, hasSyllabus }) {
     const card = document.createElement("div");
     card.className = "subject-card";
-
     const safe = getSafeProgress(progress);
 
     card.innerHTML = `
@@ -380,12 +353,12 @@ function createSubjectCard({ id, name, chapters, progress, iconClass,
         </div>
     `;
 
-    card.dataset.subjectId  = id;
-    card.dataset.progress   = String(safe);
-    card.dataset.status     = getSubjectStatus(safe);
-    card.dataset.icon       = iconClass;
-    card.dataset.code       = code;
-    card.dataset.chapters   = String(chapters);
+    card.dataset.subjectId   = id;
+    card.dataset.progress    = String(safe);
+    card.dataset.status      = getSubjectStatus(safe);
+    card.dataset.icon        = iconClass;
+    card.dataset.code        = code;
+    card.dataset.chapters    = String(chapters);
     card.dataset.description = description;
     card.dataset.hasSyllabus = hasSyllabus ? "true" : "false";
 
@@ -414,9 +387,8 @@ async function loadSubjects() {
     }
 }
 
-
 // ─────────────────────────────────────────────
-// CHAPTER PREVIEW (shown in modal after upload)
+// CHAPTER PREVIEW
 // ─────────────────────────────────────────────
 async function showChaptersPreview(subjectId) {
     try {
@@ -474,8 +446,8 @@ function applySubjectFilters() {
     let visible = 0;
 
     cards.forEach(card => {
-        const title = card.querySelector("h3")?.textContent.toLowerCase() || "";
-        const desc  = card.querySelector("p")?.textContent.toLowerCase() || "";
+        const title  = card.querySelector("h3")?.textContent.toLowerCase() || "";
+        const desc   = card.querySelector("p")?.textContent.toLowerCase()  || "";
         const status = card.dataset.status || "";
 
         const matchesSearch = title.includes(search) || desc.includes(search);
@@ -505,7 +477,7 @@ function updateSubjectsEmptyState(count) {
 // FORM FILL FOR EDIT
 // ─────────────────────────────────────────────
 function fillSubjectFormForEdit(card) {
-    editingSubjectId = card.dataset.subjectId || null;
+    editingSubjectId              = card.dataset.subjectId || null;
     subjectNameInput.value        = card.querySelector("h3")?.textContent.trim() || "";
     subjectCodeInput.value        = card.dataset.code        || "";
     subjectChaptersInput.value    = card.dataset.chapters    || "";
@@ -515,7 +487,7 @@ function fillSubjectFormForEdit(card) {
 }
 
 // ─────────────────────────────────────────────
-// TOAST NOTIFICATION
+// TOAST
 // ─────────────────────────────────────────────
 function showToast(message, type = "success") {
     let toast = document.getElementById("edumindToast");
@@ -585,14 +557,13 @@ if (subjectModalForm) {
         e.preventDefault();
         hideFieldErrors();
 
-        const name      = subjectNameInput.value.trim();
-        const code      = subjectCodeInput.value.trim();
-        const chapters  = subjectChaptersInput.value.trim();
-        const progress  = getSafeProgress(subjectProgressInput.value);
-        const iconClass = subjectIconInput.value.trim();
+        const name        = subjectNameInput.value.trim();
+        const code        = subjectCodeInput.value.trim();
+        const chapters    = subjectChaptersInput.value.trim();
+        const progress    = getSafeProgress(subjectProgressInput.value);
+        const iconClass   = subjectIconInput.value.trim();
         const description = subjectDescriptionInput.value.trim();
 
-        // Validate required fields
         let hasError = false;
         if (!name) {
             showFieldError("subjectNameError", "Subject name is required.");
@@ -607,7 +578,6 @@ if (subjectModalForm) {
         const subjectData = { name, code, chapters, progress,
                               iconClass, description, difficultyLevel: "" };
 
-        // Disable button during save
         subjectSaveBtn.disabled = true;
         subjectSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
@@ -620,13 +590,10 @@ if (subjectModalForm) {
                 savedSubject = await createSubjectInApi(subjectData);
             }
 
-            // If syllabus file was selected, upload it now
             if (syllabusUploadToggle?.checked && selectedSyllabusFile) {
                 const subjectId = savedSubject.id || editingSubjectId;
-
                 subjectSaveBtn.innerHTML =
                     '<i class="fa-solid fa-spinner fa-spin"></i> Uploading syllabus...';
-
                 try {
                     await uploadSyllabusForSubject(subjectId, selectedSyllabusFile);
                     await showChaptersPreview(subjectId);
@@ -657,7 +624,7 @@ if (subjectModalForm) {
     });
 }
 
-// ─── CARD ACTIONS (edit / delete) ───────────
+// ─── CARD ACTIONS ───────────────────────────
 if (subjectsGrid) {
     subjectsGrid.addEventListener("click", async function (e) {
         const deleteBtn = e.target.closest(".subject-action-btn.delete");
@@ -667,9 +634,7 @@ if (subjectsGrid) {
             const card = deleteBtn.closest(".subject-card");
             const id   = card?.dataset.subjectId;
             if (!id) return;
-
             if (!confirm("Delete this subject? This cannot be undone.")) return;
-
             try {
                 await deleteSubjectFromApi(id);
                 showToast("Subject deleted.");

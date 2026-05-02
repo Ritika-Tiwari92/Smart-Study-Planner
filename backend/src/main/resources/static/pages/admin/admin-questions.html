@@ -4,133 +4,196 @@
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Admin Questions | EduMind AI</title>
+     <title>Question Bank | EduMind AI</title>
 
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
+          rel="stylesheet" />
 
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/admin-questions.css">
+     <link rel="stylesheet" href="../../assets/css/admin-questions.css" />
 </head>
 
-<body>
-     <div class="dashboard-layout">
-          <aside class="sidebar">
-               <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </h2>
+<body data-page-role="admin">
+
+     <div id="pageLoader">
+          <div class="loader-logo">🎓 EduMind AI</div>
+          <div class="loader-bar">
+               <div class="loader-bar-fill"></div>
+          </div>
+     </div>
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+     <nav class="sidebar" id="sidebar">
+
+          <div class="sidebar-brand">
+               <div class="brand-icon-box">🎓</div>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2>
+                    <span>Admin Panel</span>
+               </div>
+          </div>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Collapse sidebar">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+
+          <div class="sidebar-nav">
+
+               <div class="nav-section-label">Main</div>
+
+               <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-chart-tree-map"></i>
+                    <span class="nav-label">Dashboard</span>
+               </a>
+
+               <a href="admin-users.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-label">Students</span>
+               </a>
+
+               <a href="admin-subjects.html" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-label">Subjects</span>
+               </a>
+
+               <div class="nav-section-label">Content</div>
+
+               <a href="admin-planner.html" class="nav-item">
+                    <i class="fas fa-calendar-days"></i>
+                    <span class="nav-label">Planner</span>
+               </a>
+
+               <a href="admin-tasks.html" class="nav-item">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="nav-label">Tasks</span>
+               </a>
+
+               <a href="admin-revisions.html" class="nav-item">
+                    <i class="fas fa-rotate"></i>
+                    <span class="nav-label">Revisions</span>
+               </a>
+
+               <a href="admin-tests.html" class="nav-item">
+                    <i class="fas fa-file-pen"></i>
+                    <span class="nav-label">Tests</span>
+               </a>
+
+               <a href="admin-questions.html" class="nav-item active">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-label">Question Bank</span>
+               </a>
+
+               <div class="nav-section-label">Insights</div>
+
+               <a href="admin-analytics.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-label">Analytics</span>
+               </a>
+
+               <a href="admin-assistant.html" class="nav-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="nav-label">Assistant Logs</span>
+               </a>
+
+               <a href="admin-pomodoro.html" class="nav-item">
+                    <i class="fas fa-stopwatch"></i>
+                    <span class="nav-label">Pomodoro</span>
+               </a>
+
+               <div class="nav-section-label">Manage</div>
+
+               <a href="admin-notifications.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-label">Notifications</span>
+               </a>
+
+               <a href="admin-reports.html" class="nav-item">
+                    <i class="fas fa-file-chart-column"></i>
+                    <span class="nav-label">Reports</span>
+               </a>
+
+               <a href="admin-settings.html" class="nav-item">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Settings</span>
+               </a>
+
+               <a href="admin-security.html" class="nav-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="nav-label">Security Logs</span>
+               </a>
+
+          </div>
+
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="sidebarAdminName">Admin</p>
+                         <span>Administrator</span>
+                    </div>
                </div>
 
-               <nav class="sidebar-nav">
-                    <a href="admin-dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-table-columns"></i>
-                         <span>Admin Dashboard</span>
-                    </a>
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+               </button>
+          </div>
 
-                    <a href="admin-tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-circle-plus"></i>
-                         <span>Admin Tests</span>
-                    </a>
+     </nav>
 
-                    <a href="admin-questions.html" class="nav-item active">
-                         <i class="fa-solid fa-list-ul"></i>
-                         <span>Question Bank</span>
-                    </a>
+     <div class="main" id="main">
 
-                    <a href="admin-results.html" class="nav-item">
-                         <i class="fa-solid fa-square-poll-vertical"></i>
-                         <span>Admin Results</span>
-                    </a>
+          <div class="topbar">
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
 
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Student Dashboard</span>
-                    </a>
-
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Student Tests</span>
-                    </a>
-
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
-               </nav>
-
-               <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
-                    </a>
+               <div class="topbar-left">
+                    <h1>Admin Question Builder</h1>
+                    <p>Create, organize, and manage questions for selected tests.</p>
                </div>
-          </aside>
 
-          <main class="dashboard-main">
-               <header class="dashboard-header">
-                    <div class="header-left">
-                         <div>
-                              <h1>Admin Question Builder</h1>
-                              <p>Create, organize, and manage questions for selected tests.</p>
-                         </div>
+               <div class="topbar-right">
+                    <div class="topbar-time" id="liveTime">--:--</div>
+
+                    <a href="admin-tests.html" class="topbar-secondary-btn">
+                         <i class="fas fa-arrow-left"></i>
+                         <span>Back to Tests</span>
+                    </a>
+
+                    <button class="topbar-primary-btn" type="button" id="openQuestionModalBtn">
+                         <i class="fas fa-plus"></i>
+                         <span>Add Question</span>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="toggleAdminTheme()" title="Toggle theme"
+                         id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="refreshAdminQuestionsPage()"
+                         title="Refresh questions">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
+               </div>
+          </div>
+
+          <main class="content">
+
+               <section class="welcome-banner">
+                    <div class="welcome-emoji">📚</div>
+                    <div class="welcome-text">
+                         <h2>Question Bank Control</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. Add MCQ/theory questions, marks, correct
+                              answers,
+                              focus topics, and options for the selected test.</p>
                     </div>
-
-                    <div class="header-actions">
-                         <a href="admin-tests.html" class="back-admin-btn">
-                              <i class="fa-solid fa-arrow-left"></i>
-                              <span>Back to Tests</span>
-                         </a>
-
-                         <button class="add-question-btn" id="openQuestionModalBtn">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>Add Question</span>
-                         </button>
-
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
-                              <i class="fa-solid fa-moon"></i>
-                         </button>
-
-                         <div class="profile-mini" id="profileMenuToggle">
-                              <img src="../assets/avatar/default-user.png" alt="Admin">
-                              <div>
-                                   <h4>Admin</h4>
-                                   <p>EduMind Manager</p>
-                              </div>
-                         </div>
-
-                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="admin-tests.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-file-circle-plus"></i>
-                                   <span>Manage Tests</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
-                         </div>
-                    </div>
-               </header>
+               </section>
 
                <section class="admin-questions-content">
+
                     <div class="admin-question-test-card">
                          <div class="admin-question-test-left">
                               <div class="question-page-badge">
@@ -161,8 +224,10 @@
                          </div>
                     </div>
 
+                    <div class="section-label">Question Overview</div>
+
                     <div class="admin-questions-summary-grid">
-                         <div class="admin-question-summary-card">
+                         <div class="admin-question-summary-card card-purple">
                               <div class="summary-icon total">
                                    <i class="fa-solid fa-list-check"></i>
                               </div>
@@ -172,7 +237,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-question-summary-card">
+                         <div class="admin-question-summary-card card-cyan">
                               <div class="summary-icon mcq">
                                    <i class="fa-solid fa-circle-dot"></i>
                               </div>
@@ -182,7 +247,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-question-summary-card">
+                         <div class="admin-question-summary-card card-amber">
                               <div class="summary-icon theory">
                                    <i class="fa-solid fa-pen"></i>
                               </div>
@@ -192,7 +257,7 @@
                               </div>
                          </div>
 
-                         <div class="admin-question-summary-card">
+                         <div class="admin-question-summary-card card-green">
                               <div class="summary-icon marks">
                                    <i class="fa-solid fa-award"></i>
                               </div>
@@ -207,7 +272,7 @@
                          <div class="questions-search">
                               <i class="fa-solid fa-magnifying-glass"></i>
                               <input type="text" id="questionSearchInput"
-                                   placeholder="Search by question text or focus topic...">
+                                   placeholder="Search by question text or focus topic..." />
                          </div>
 
                          <div class="questions-filter">
@@ -222,8 +287,10 @@
 
                     <div class="admin-question-list-card">
                          <div class="section-title">
-                              <h3>Saved Questions</h3>
-                              <p>Review and manage all questions added to this test.</p>
+                              <div>
+                                   <h3>Saved Questions</h3>
+                                   <p>Review and manage all questions added to this test.</p>
+                              </div>
                          </div>
 
                          <div class="admin-question-list" id="adminQuestionList"></div>
@@ -234,6 +301,7 @@
                               <p>Add your first question or change the current filter.</p>
                          </div>
                     </div>
+
                </section>
 
                <div class="question-modal-overlay hidden" id="questionModalOverlay">
@@ -267,51 +335,53 @@
 
                                    <div class="question-form-group">
                                         <label for="questionMarks">Marks</label>
-                                        <input type="number" id="questionMarks" min="1" value="1" placeholder="1">
+                                        <input type="number" id="questionMarks" min="1" value="1" placeholder="1" />
                                    </div>
 
                                    <div class="question-form-group">
                                         <label for="questionOrder">Question Order</label>
-                                        <input type="number" id="questionOrder" min="1" placeholder="Auto">
+                                        <input type="number" id="questionOrder" min="1" placeholder="Auto" />
                                    </div>
 
                                    <div class="question-form-group full-width">
                                         <label for="questionFocusTopic">Focus Topic</label>
                                         <input type="text" id="questionFocusTopic"
-                                             placeholder="e.g. Java OOP, DBMS joins, CN protocols">
+                                             placeholder="e.g. Java OOP, DBMS joins, CN protocols" />
                                    </div>
 
                                    <div class="question-form-group full-width">
                                         <label for="questionCorrectAnswer">Correct Answer</label>
                                         <input type="text" id="questionCorrectAnswer"
-                                             placeholder="For MCQ use A / B / C / D, for theory write model answer">
+                                             placeholder="For MCQ use A / B / C / D, for theory write model answer" />
                                    </div>
 
                                    <div class="question-options-wrap full-width" id="questionOptionsWrap">
                                         <div class="section-title compact">
-                                             <h3>MCQ Options</h3>
-                                             <p>Add answer options for the MCQ question.</p>
+                                             <div>
+                                                  <h3>MCQ Options</h3>
+                                                  <p>Add answer options for the MCQ question.</p>
+                                             </div>
                                         </div>
 
                                         <div class="question-options-grid">
                                              <div class="question-form-group">
                                                   <label for="optionA">Option A</label>
-                                                  <input type="text" id="optionA" placeholder="Enter option A">
+                                                  <input type="text" id="optionA" placeholder="Enter option A" />
                                              </div>
 
                                              <div class="question-form-group">
                                                   <label for="optionB">Option B</label>
-                                                  <input type="text" id="optionB" placeholder="Enter option B">
+                                                  <input type="text" id="optionB" placeholder="Enter option B" />
                                              </div>
 
                                              <div class="question-form-group">
                                                   <label for="optionC">Option C</label>
-                                                  <input type="text" id="optionC" placeholder="Enter option C">
+                                                  <input type="text" id="optionC" placeholder="Enter option C" />
                                              </div>
 
                                              <div class="question-form-group">
                                                   <label for="optionD">Option D</label>
-                                                  <input type="text" id="optionD" placeholder="Enter option D">
+                                                  <input type="text" id="optionD" placeholder="Enter option D" />
                                              </div>
                                         </div>
                                    </div>
@@ -326,12 +396,212 @@
                          </form>
                     </div>
                </div>
+
           </main>
      </div>
 
-     <script src="../assets/js/auth-guard.js"></script>
-     <script src="../assets/js/theme.js"></script>
-     <script src="../assets/js/admin-questions.js"></script>
+     <script>
+          function parseSafeJson(value) {
+               try {
+                    return JSON.parse(value);
+               } catch (error) {
+                    return null;
+               }
+          }
+
+          function getAdminDisplayName() {
+               const adminName = localStorage.getItem("adminName");
+               if (adminName) return adminName;
+
+               const storedUser =
+                    parseSafeJson(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseSafeJson(localStorage.getItem("loggedInUser")) ||
+                    parseSafeJson(localStorage.getItem("currentUser"));
+
+               return storedUser?.fullName || storedUser?.name || storedUser?.email || "Admin";
+          }
+
+          function setupAdminIdentity() {
+               const adminName = getAdminDisplayName();
+
+               const sidebarName = document.getElementById("sidebarAdminName");
+               const avatar = document.getElementById("adminAvatar");
+               const welcomeName = document.getElementById("welcomeName");
+
+               if (sidebarName) sidebarName.textContent = adminName;
+               if (avatar) avatar.textContent = adminName.charAt(0).toUpperCase();
+               if (welcomeName) welcomeName.textContent = adminName.split(" ")[0] || "Admin";
+          }
+
+          function updateClock() {
+               const liveTime = document.getElementById("liveTime");
+               if (!liveTime) return;
+
+               const now = new Date();
+               const h = String(now.getHours()).padStart(2, "0");
+               const m = String(now.getMinutes()).padStart(2, "0");
+               const s = String(now.getSeconds()).padStart(2, "0");
+
+               liveTime.textContent = `${h}:${m}:${s}`;
+          }
+
+          let sidebarCollapsed = false;
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+
+               sidebar.classList.toggle("collapsed", sidebarCollapsed);
+               main.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) {
+                    icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+               }
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebarState() {
+               const saved = localStorage.getItem("adminSidebarCollapsed") === "true";
+               if (!saved) return;
+
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = true;
+               sidebar.classList.add("collapsed");
+               main.classList.add("expanded");
+
+               if (icon) icon.className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar")?.classList.add("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar")?.classList.remove("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("adminTheme");
+               const themeBtn = document.getElementById("themeBtn");
+
+               if (theme === "light") {
+                    document.body.setAttribute("data-theme", "light");
+                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+               } else {
+                    document.body.removeAttribute("data-theme");
+                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+               }
+          }
+
+          function toggleAdminTheme() {
+               const themeBtn = document.getElementById("themeBtn");
+               const isLight = document.body.getAttribute("data-theme") === "light";
+
+               if (isLight) {
+                    document.body.removeAttribute("data-theme");
+                    localStorage.setItem("adminTheme", "dark");
+                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+               } else {
+                    document.body.setAttribute("data-theme", "light");
+                    localStorage.setItem("adminTheme", "light");
+                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+               }
+          }
+
+          function refreshAdminQuestionsPage() {
+               const refreshIcon = document.getElementById("refreshIcon");
+
+               if (refreshIcon) {
+                    refreshIcon.classList.add("spin-now");
+               }
+
+               const jobs = [];
+
+               if (typeof loadSelectedTestDetails === "function") {
+                    jobs.push(Promise.resolve(loadSelectedTestDetails()));
+               }
+
+               if (typeof loadQuestions === "function") {
+                    jobs.push(Promise.resolve(loadQuestions()));
+               }
+
+               Promise.allSettled(jobs).finally(function () {
+                    if (refreshIcon) refreshIcon.classList.remove("spin-now");
+               });
+          }
+
+          function handleLogout() {
+               const confirmLogout = confirm("Logout from admin panel?");
+               if (!confirmLogout) return;
+
+               localStorage.removeItem("adminToken");
+               localStorage.removeItem("adminRole");
+               localStorage.removeItem("adminName");
+               localStorage.removeItem("adminEmail");
+
+               localStorage.removeItem("token");
+               localStorage.removeItem("userRole");
+               localStorage.removeItem("edumind_is_logged_in");
+               localStorage.removeItem("edumind_logged_in_user");
+
+               window.location.href = "/pages/admin/admin-login.html";
+          }
+
+          function hidePageLoader() {
+               const loader = document.getElementById("pageLoader");
+               if (!loader) return;
+
+               setTimeout(function () {
+                    loader.classList.add("hidden");
+
+                    setTimeout(function () {
+                         loader.remove();
+                    }, 400);
+               }, 500);
+          }
+
+          function softAdminGuard() {
+               const adminToken = localStorage.getItem("adminToken");
+               const adminRole = localStorage.getItem("adminRole");
+
+               const token = localStorage.getItem("token");
+               const legacyRole = localStorage.getItem("userRole");
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+
+               const hasNewAdminSession = adminToken && adminRole === "ADMIN";
+               const hasLegacySession = token && isLoggedIn;
+
+               if (!hasNewAdminSession && !hasLegacySession) {
+                    window.location.href = "/pages/admin/admin-login.html";
+                    return;
+               }
+
+               if (legacyRole && legacyRole !== "ADMIN" && !hasNewAdminSession) {
+                    window.location.href = "/pages/dashboard.html";
+               }
+          }
+
+          document.addEventListener("DOMContentLoaded", function () {
+               softAdminGuard();
+               setupAdminIdentity();
+               applySavedTheme();
+               restoreSidebarState();
+               updateClock();
+               setInterval(updateClock, 1000);
+               hidePageLoader();
+          });
+     </script>
+
+     <script src="../../assets/js/admin-questions.js"></script>
 </body>
 
 </html>
