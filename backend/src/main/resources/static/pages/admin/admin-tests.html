@@ -329,9 +329,10 @@
                     <span class="nav-label">Revisions</span>
                </a>
 
-               <a href="admin-tests.html" class="nav-item active">
+               <a href="admin-tests.html" class="nav-item active" id="sidebarTestsNavItem">
                     <i class="fas fa-file-pen"></i>
                     <span class="nav-label">Tests</span>
+                    <span class="sidebar-count-badge" id="sidebarTestsCount">0</span>
                </a>
 
                <a href="admin-question-bank.html" class="nav-item">
@@ -408,11 +409,16 @@
 
                <div class="topbar-left">
                     <h1>Admin Test Management</h1>
-                    <p>Create, manage, publish, and organize tests from one place.</p>
+                    <p>Create, manage, publish, filter, and export tests from one place.</p>
                </div>
 
                <div class="topbar-right">
                     <div class="topbar-time" id="liveTime">--:--</div>
+
+                    <button class="topbar-secondary-btn" type="button" id="exportAdminTestsCsvBtn">
+                         <i class="fas fa-file-csv"></i>
+                         <span>Export CSV</span>
+                    </button>
 
                     <button class="topbar-primary-btn" type="button" id="openAdminTestModalBtn">
                          <i class="fas fa-plus"></i>
@@ -440,7 +446,7 @@
                     <div class="welcome-text">
                          <h2>Test Control Center</h2>
                          <p>Hello, <span id="welcomeName">Admin</span>. Manage test drafts, publishing status,
-                              questions, and student-ready exams from here.</p>
+                              questions, student-ready exams, and CSV export from here.</p>
                     </div>
                </section>
 
@@ -490,32 +496,92 @@
                          </div>
                     </div>
 
-                    <div class="admin-tests-toolbar">
-                         <div class="tests-search">
-                              <i class="fa-solid fa-magnifying-glass"></i>
-                              <input type="text" id="adminTestSearchInput"
-                                   placeholder="Search tests by title or subject..." />
+                    <!-- Enhanced Filter Bar -->
+                    <div class="admin-tests-filter-card">
+                         <div class="admin-tests-filter-header">
+                              <div>
+                                   <h3>Filter Tests</h3>
+                                   <p>Search, filter by subject/type/status, and narrow tests by date range.</p>
+                              </div>
+
+                              <button class="clear-filters-btn" type="button" id="clearAdminTestFiltersBtn">
+                                   <i class="fa-solid fa-filter-circle-xmark"></i>
+                                   Clear Filters
+                              </button>
                          </div>
 
-                         <div class="tests-filter">
-                              <i class="fa-solid fa-filter"></i>
-                              <select id="adminTestFilterSelect">
-                                   <option value="ALL">All Tests</option>
-                                   <option value="DRAFT">Draft</option>
-                                   <option value="PUBLISHED">Published</option>
-                                   <option value="UPCOMING">Upcoming</option>
-                                   <option value="THIS_WEEK">This Week</option>
-                                   <option value="MOCK_TEST">Mock Test</option>
-                              </select>
+                         <div class="admin-tests-toolbar enhanced-filter-toolbar">
+                              <div class="tests-search enhanced-search">
+                                   <i class="fa-solid fa-magnifying-glass"></i>
+                                   <input type="text" id="adminTestSearchInput"
+                                        placeholder="Search tests by title, subject, or description..." />
+                              </div>
+
+                              <div class="tests-filter">
+                                   <i class="fa-solid fa-layer-group"></i>
+                                   <select id="adminTestFilterSelect" title="Quick filter">
+                                        <option value="ALL">All Tests</option>
+                                        <option value="DRAFT">Draft</option>
+                                        <option value="PUBLISHED">Published</option>
+                                        <option value="UPCOMING">Upcoming</option>
+                                        <option value="THIS_WEEK">This Week</option>
+                                        <option value="MOCK_TEST">Mock Test</option>
+                                   </select>
+                              </div>
+
+                              <div class="tests-filter">
+                                   <i class="fa-solid fa-book-open"></i>
+                                   <select id="adminSubjectFilterSelect" title="Filter by subject">
+                                        <option value="ALL">All Subjects</option>
+                                   </select>
+                              </div>
+
+                              <div class="tests-filter">
+                                   <i class="fa-solid fa-vial-circle-check"></i>
+                                   <select id="adminTypeFilterSelect" title="Filter by type">
+                                        <option value="ALL">All Types</option>
+                                        <option value="Upcoming">Upcoming</option>
+                                        <option value="This Week">This Week</option>
+                                        <option value="Mock Test">Mock Test</option>
+                                        <option value="Completed">Completed</option>
+                                   </select>
+                              </div>
+
+                              <div class="tests-filter">
+                                   <i class="fa-solid fa-paper-plane"></i>
+                                   <select id="adminStatusFilterSelect" title="Filter by publish status">
+                                        <option value="ALL">All Status</option>
+                                        <option value="DRAFT">Draft</option>
+                                        <option value="PUBLISHED">Published</option>
+                                   </select>
+                              </div>
+
+                              <div class="tests-filter date-filter">
+                                   <i class="fa-solid fa-calendar-days"></i>
+                                   <input type="date" id="adminDateFromFilter" title="From date" />
+                              </div>
+
+                              <div class="tests-filter date-filter">
+                                   <i class="fa-solid fa-calendar-check"></i>
+                                   <input type="date" id="adminDateToFilter" title="To date" />
+                              </div>
                          </div>
+
+                         <div class="active-filter-chips" id="adminActiveFilterChips"></div>
                     </div>
 
                     <div class="admin-tests-main-card">
                          <div class="section-title">
                               <div>
                                    <h3>Manage Tests</h3>
-                                   <p>Create tests, update details, manage questions, and publish when ready.</p>
+                                   <p>Create tests, update details, manage questions, publish, bulk update, or export
+                                        filtered tests.</p>
                               </div>
+
+                              <label class="select-all-tests-wrap">
+                                   <input type="checkbox" id="selectAllAdminTestsCheckbox" />
+                                   <span>Select All</span>
+                              </label>
                          </div>
 
                          <div class="admin-test-list" id="adminTestList"></div>
@@ -523,13 +589,13 @@
                          <div class="tests-empty-state hidden" id="adminTestsEmptyState">
                               <i class="fa-regular fa-folder-open"></i>
                               <h3>No admin tests found</h3>
-                              <p>Create your first test or change the current filter.</p>
+                              <p>Create your first test or change the current filters.</p>
                          </div>
                     </div>
 
                </section>
 
-               <!-- MODAL -->
+               <!-- CREATE / EDIT TEST MODAL -->
                <div class="admin-test-modal-overlay hidden" id="adminTestModalOverlay">
                     <div class="admin-test-modal">
                          <div class="admin-test-modal-header">
@@ -572,6 +638,7 @@
                                              <option>Upcoming</option>
                                              <option>This Week</option>
                                              <option>Mock Test</option>
+                                             <option>Completed</option>
                                         </select>
                                    </div>
 
@@ -619,6 +686,36 @@
                </div>
 
           </main>
+     </div>
+
+     <!-- Bulk Action Bar -->
+     <div class="bulk-action-bar hidden" id="adminBulkActionBar">
+          <div class="bulk-action-info">
+               <i class="fa-solid fa-square-check"></i>
+               <span id="bulkSelectedCountText">0 tests selected</span>
+          </div>
+
+          <div class="bulk-action-buttons">
+               <button type="button" class="bulk-btn bulk-publish" id="bulkPublishTestsBtn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Bulk Publish
+               </button>
+
+               <button type="button" class="bulk-btn bulk-unpublish" id="bulkUnpublishTestsBtn">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    Bulk Unpublish
+               </button>
+
+               <button type="button" class="bulk-btn bulk-delete" id="bulkDeleteTestsBtn">
+                    <i class="fa-solid fa-trash"></i>
+                    Bulk Delete
+               </button>
+
+               <button type="button" class="bulk-btn bulk-cancel" id="bulkCancelSelectionBtn">
+                    <i class="fa-solid fa-xmark"></i>
+                    Cancel
+               </button>
+          </div>
      </div>
 
      <script>
@@ -765,7 +862,7 @@
                }
 
                if (typeof loadAdminTests === "function") {
-                    Promise.resolve(loadAdminTests()).finally(function () {
+                    Promise.resolve(loadAdminTests(true)).finally(function () {
                          if (refreshIcon) refreshIcon.classList.remove("spin-now");
                     });
                } else if (refreshIcon) {

@@ -1,46 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Analytics | EduMind AI Admin</title>
-     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+     <link rel="icon" href="data:," />
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet" />
+
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
      <style>
           :root {
                --bg: #080d1a;
                --bg2: #0c1220;
                --bg3: #101828;
                --card: #111827;
-               --border: rgba(20, 184, 166, 0.12);
-               --border2: rgba(255, 255, 255, 0.06);
+               --card2: #162032;
+               --border: rgba(20, 184, 166, 0.14);
+               --border2: rgba(255, 255, 255, 0.08);
+
                --teal: #14b8a6;
                --cyan: #06b6d4;
                --purple: #8b5cf6;
+               --blue: #3b82f6;
                --amber: #f59e0b;
                --rose: #f43f5e;
                --green: #10b981;
-               --text: #f1f5f9;
-               --text2: #94a3b8;
-               --text3: #475569;
+
+               --text: #f8fafc;
+               --text2: #a8b3c7;
+               --text3: #64748b;
+
                --sidebar-w: 260px;
                --sidebar-collapsed: 72px;
                --header-h: 68px;
-               --radius: 14px;
-               --radius-sm: 10px;
-               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+               --radius: 16px;
+               --radius-sm: 12px;
+               --tr: 0.25s ease;
           }
 
-          [data-theme="light"] {
+          html[data-theme="light"],
+          body[data-theme="light"] {
                --bg: #f0f4f8;
-               --bg2: #e8edf5;
-               --bg3: #dde4ef;
+               --bg2: #ffffff;
+               --bg3: #eef3f9;
                --card: #ffffff;
-               --border: rgba(20, 184, 166, 0.15);
-               --border2: rgba(0, 0, 0, 0.07);
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.18);
+               --border2: rgba(15, 23, 42, 0.08);
+
                --text: #0f172a;
                --text2: #475569;
                --text3: #94a3b8;
@@ -52,27 +66,238 @@
                box-sizing: border-box;
           }
 
+          html {
+               scroll-behavior: smooth;
+          }
+
           body {
-               font-family: 'DM Sans', sans-serif;
-               background: var(--bg);
+               min-height: 100vh;
+               font-family: "Poppins", sans-serif;
+               background:
+                    radial-gradient(circle at 15% 15%, rgba(20, 184, 166, 0.09), transparent 28%),
+                    radial-gradient(circle at 85% 10%, rgba(59, 130, 246, 0.10), transparent 32%),
+                    var(--bg);
                color: var(--text);
                display: flex;
-               min-height: 100vh;
+               overflow-x: hidden;
           }
+
+          button,
+          input,
+          select,
+          textarea {
+               font-family: inherit;
+          }
+
+          button {
+               cursor: pointer;
+          }
+
+          a {
+               color: inherit;
+          }
+
+          .hidden {
+               display: none !important;
+          }
+
+          .spin-now {
+               animation: spinNow 0.75s linear infinite;
+          }
+
+          @keyframes spinNow {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          /* Loader */
+
+          #pageLoader {
+               position: fixed;
+               inset: 0;
+               z-index: 99999;
+               background: var(--bg);
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               justify-content: center;
+               gap: 20px;
+               transition: opacity 0.35s ease, visibility 0.35s ease;
+          }
+
+          #pageLoader.hidden {
+               opacity: 0;
+               visibility: hidden;
+          }
+
+          .loader-logo {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+          }
+
+          .loader-logo-wrap {
+               width: 46px;
+               height: 46px;
+               display: grid;
+               place-items: center;
+          }
+
+          .loader-logo-text {
+               font-size: 22px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .loader-bar {
+               width: 210px;
+               height: 6px;
+               border-radius: 999px;
+               background: rgba(255, 255, 255, 0.08);
+               overflow: hidden;
+          }
+
+          .loader-bar-fill {
+               width: 55%;
+               height: 100%;
+               border-radius: inherit;
+               background: linear-gradient(90deg, var(--teal), var(--cyan), var(--purple));
+               animation: loaderMove 1.1s ease-in-out infinite alternate;
+          }
+
+          @keyframes loaderMove {
+               from {
+                    transform: translateX(-70%);
+               }
+
+               to {
+                    transform: translateX(130%);
+               }
+          }
+
+          /* Animated logo */
+
+          .brand-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .sidebar-logo-svg,
+          .loader-logo-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, 0.45));
+          }
+
+          @keyframes analyticsNodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.82;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.7;
+               }
+          }
+
+          @keyframes analyticsCenterPulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.7;
+               }
+          }
+
+          @keyframes analyticsHexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes analyticsLineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .sidebar-logo-svg .hex-outer,
+          .loader-logo-svg .hex-outer {
+               animation: analyticsHexRotate 18s linear infinite;
+          }
+
+          .sidebar-logo-svg .node-top,
+          .sidebar-logo-svg .node-left,
+          .sidebar-logo-svg .node-right,
+          .sidebar-logo-svg .node-bottom,
+          .loader-logo-svg .node-top,
+          .loader-logo-svg .node-left,
+          .loader-logo-svg .node-right,
+          .loader-logo-svg .node-bottom {
+               animation: analyticsNodePulse 2.4s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .center-dot,
+          .loader-logo-svg .center-dot {
+               animation: analyticsCenterPulse 2s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .conn-line,
+          .loader-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: analyticsLineFlow 3s linear infinite;
+          }
+
+          /* Sidebar */
 
           .sidebar {
                width: var(--sidebar-w);
                height: 100vh;
-               background: var(--bg2);
-               border-right: 1px solid var(--border);
+               position: fixed;
+               top: 0;
+               left: 0;
+               z-index: 1000;
+               background: rgba(12, 18, 32, 0.96);
+               backdrop-filter: blur(16px);
+               border-right: 1px solid var(--border2);
                display: flex;
                flex-direction: column;
-               position: fixed;
-               left: 0;
-               top: 0;
-               z-index: 200;
-               transition: width var(--tr);
-               overflow: hidden;
+               transition: width var(--tr), transform var(--tr);
+          }
+
+          html[data-theme="light"] .sidebar,
+          body[data-theme="light"] .sidebar {
+               background: rgba(255, 255, 255, 0.96);
           }
 
           .sidebar.collapsed {
@@ -80,19 +305,23 @@
           }
 
           .sidebar-brand {
-               padding: 20px 18px;
+               height: var(--header-h);
+               padding: 14px 18px;
                display: flex;
                align-items: center;
                gap: 12px;
                border-bottom: 1px solid var(--border2);
-               min-height: var(--header-h);
-               flex-shrink: 0;
+          }
+
+          .brand-text {
+               white-space: nowrap;
+               overflow: hidden;
           }
 
           .brand-text h2 {
-               font-family: 'Syne', sans-serif;
-               font-size: 16px;
+               font-size: 17px;
                font-weight: 800;
+               line-height: 1.1;
                background: linear-gradient(135deg, var(--teal), var(--cyan));
                -webkit-background-clip: text;
                -webkit-text-fill-color: transparent;
@@ -102,100 +331,104 @@
           .brand-text span {
                font-size: 10px;
                color: var(--text3);
-               letter-spacing: 0.1em;
+               letter-spacing: 0.12em;
                text-transform: uppercase;
           }
 
           .sidebar-toggle {
                position: absolute;
+               top: 22px;
                right: -14px;
-               top: 24px;
                width: 28px;
                height: 28px;
-               background: var(--card);
-               border: 1px solid var(--border);
                border-radius: 50%;
+               border: 1px solid var(--border);
+               background: var(--card);
+               color: var(--teal);
                display: flex;
                align-items: center;
                justify-content: center;
-               cursor: pointer;
-               color: var(--teal);
-               font-size: 11px;
-               transition: all var(--tr);
-               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               font-size: 12px;
                z-index: 10;
+               transition: all var(--tr);
           }
 
           .sidebar-toggle:hover {
                background: var(--teal);
-               color: #fff;
+               color: #ffffff;
+               box-shadow: 0 0 18px rgba(20, 184, 166, 0.35);
           }
 
           .sidebar-nav {
                flex: 1;
-               overflow-y: auto;
-               overflow-x: hidden;
                padding: 12px 10px;
+               overflow-y: auto;
+          }
+
+          .sidebar-nav::-webkit-scrollbar {
+               width: 5px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar-thumb {
+               background: rgba(20, 184, 166, 0.25);
+               border-radius: 999px;
           }
 
           .nav-section-label {
+               padding: 10px 10px 6px;
                font-size: 10px;
-               font-weight: 600;
-               letter-spacing: 0.12em;
-               text-transform: uppercase;
+               font-weight: 700;
                color: var(--text3);
-               padding: 10px 8px 6px;
+               text-transform: uppercase;
+               letter-spacing: 0.12em;
                white-space: nowrap;
-               overflow: hidden;
-          }
-
-          .sidebar.collapsed .nav-section-label {
-               opacity: 0;
           }
 
           .nav-item {
+               position: relative;
                display: flex;
                align-items: center;
                gap: 12px;
+               min-height: 42px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
-               cursor: pointer;
+               border-radius: 12px;
                color: var(--text2);
                text-decoration: none;
                font-size: 13.5px;
                font-weight: 500;
+               margin-bottom: 3px;
                transition: all var(--tr);
                white-space: nowrap;
-               margin-bottom: 2px;
-          }
-
-          .nav-item:hover {
-               background: rgba(20, 184, 166, 0.08);
-               color: var(--teal);
-          }
-
-          .nav-item.active {
-               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
-               color: var(--teal);
-               border-left: 2px solid var(--teal);
           }
 
           .nav-item i {
                width: 20px;
                text-align: center;
                font-size: 15px;
-               flex-shrink: 0;
           }
 
-          .sidebar.collapsed .nav-item span,
-          .sidebar.collapsed .nav-section-label {
+          .nav-item:hover {
+               color: var(--teal);
+               background: rgba(20, 184, 166, 0.08);
+          }
+
+          .nav-item.active {
+               color: var(--teal);
+               background: linear-gradient(90deg, rgba(20, 184, 166, 0.17), rgba(20, 184, 166, 0.05));
+               box-shadow: inset 2px 0 0 var(--teal);
+          }
+
+          .sidebar.collapsed .brand-text,
+          .sidebar.collapsed .nav-label,
+          .sidebar.collapsed .nav-section-label,
+          .sidebar.collapsed .admin-info,
+          .sidebar.collapsed .logout-btn span {
                display: none;
           }
 
           .sidebar-bottom {
                padding: 12px 10px;
                border-top: 1px solid var(--border2);
-               flex-shrink: 0;
           }
 
           .admin-profile {
@@ -203,171 +436,307 @@
                align-items: center;
                gap: 10px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
+               border-radius: 14px;
                background: rgba(255, 255, 255, 0.04);
                margin-bottom: 8px;
-               overflow: hidden;
+          }
+
+          html[data-theme="light"] .admin-profile,
+          body[data-theme="light"] .admin-profile {
+               background: rgba(15, 23, 42, 0.04);
           }
 
           .admin-avatar {
-               width: 34px;
-               height: 34px;
-               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               width: 36px;
+               height: 36px;
                border-radius: 50%;
                display: flex;
                align-items: center;
                justify-content: center;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #ffffff;
+               font-weight: 800;
                font-size: 14px;
-               font-weight: 700;
-               color: #fff;
-               flex-shrink: 0;
           }
 
           .admin-info p {
                font-size: 13px;
-               font-weight: 600;
-               white-space: nowrap;
-               overflow: hidden;
-               text-overflow: ellipsis;
+               font-weight: 700;
+               color: var(--text);
           }
 
           .admin-info span {
                font-size: 11px;
                color: var(--teal);
-          }
-
-          .sidebar.collapsed .admin-info {
-               display: none;
+               font-weight: 500;
           }
 
           .logout-btn {
+               width: 100%;
+               border: none;
+               background: transparent;
+               color: var(--rose);
                display: flex;
                align-items: center;
                gap: 10px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
-               cursor: pointer;
-               color: var(--rose);
-               font-size: 13.5px;
-               font-weight: 500;
+               border-radius: 12px;
+               font-size: 13px;
+               font-weight: 600;
                transition: all var(--tr);
-               border: none;
-               background: none;
-               width: 100%;
           }
 
           .logout-btn:hover {
-               background: rgba(244, 63, 94, 0.1);
+               background: rgba(244, 63, 94, 0.10);
           }
 
-          .logout-btn i {
-               width: 20px;
-               text-align: center;
-               flex-shrink: 0;
-          }
-
-          .sidebar.collapsed .logout-btn span {
-               display: none;
-          }
+          /* Main */
 
           .main {
-               margin-left: var(--sidebar-w);
                flex: 1;
-               transition: margin-left var(--tr);
+               margin-left: var(--sidebar-w);
                min-height: 100vh;
-               display: flex;
-               flex-direction: column;
+               width: calc(100vw - var(--sidebar-w));
+               max-width: calc(100vw - var(--sidebar-w));
+               overflow-x: hidden;
+               transition: margin-left var(--tr), width var(--tr), max-width var(--tr);
           }
 
           .main.expanded {
                margin-left: var(--sidebar-collapsed);
+               width: calc(100vw - var(--sidebar-collapsed));
+               max-width: calc(100vw - var(--sidebar-collapsed));
           }
 
           .topbar {
-               height: var(--header-h);
-               background: var(--bg2);
-               border-bottom: 1px solid var(--border2);
-               display: flex;
-               align-items: center;
-               padding: 0 28px;
-               gap: 16px;
                position: sticky;
                top: 0;
                z-index: 100;
+               min-height: var(--header-h);
+               display: flex;
+               align-items: center;
+               gap: 16px;
+               padding: 10px 28px;
+               background: rgba(12, 18, 32, 0.92);
+               backdrop-filter: blur(18px);
+               border-bottom: 1px solid var(--border2);
+          }
+
+          html[data-theme="light"] .topbar,
+          body[data-theme="light"] .topbar {
+               background: rgba(255, 255, 255, 0.92);
+          }
+
+          .mobile-topbar-toggle {
+               display: none;
+               border: none;
+               background: transparent;
+               color: var(--text);
+               font-size: 20px;
           }
 
           .topbar-left {
                flex: 1;
+               min-width: 0;
           }
 
           .topbar-left h1 {
-               font-family: 'Syne', sans-serif;
                font-size: 20px;
-               font-weight: 700;
+               font-weight: 800;
+               color: var(--text);
           }
 
           .topbar-left p {
+               margin-top: 2px;
                font-size: 12px;
                color: var(--text2);
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
           }
 
           .topbar-right {
                display: flex;
                align-items: center;
                gap: 10px;
+               flex-wrap: wrap;
+               justify-content: flex-end;
+               flex-shrink: 0;
+          }
+
+          .topbar-time {
+               padding: 9px 13px;
+               border-radius: 12px;
+               background: var(--card);
+               border: 1px solid var(--border2);
+               color: var(--text2);
+               font-size: 12px;
+               font-weight: 700;
           }
 
           .topbar-btn {
                width: 38px;
                height: 38px;
-               background: var(--card);
+               border-radius: 12px;
                border: 1px solid var(--border2);
-               border-radius: 10px;
+               background: var(--card);
+               color: var(--text2);
                display: flex;
                align-items: center;
                justify-content: center;
-               cursor: pointer;
-               color: var(--text2);
-               font-size: 15px;
                transition: all var(--tr);
           }
 
           .topbar-btn:hover {
-               border-color: var(--teal);
                color: var(--teal);
-          }
-
-          .mobile-toggle {
-               display: none;
-               background: none;
-               border: none;
-               color: var(--text);
-               font-size: 20px;
-               cursor: pointer;
-               padding: 4px;
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, 0.10);
           }
 
           .content {
+               width: 100%;
+               max-width: 100%;
+               overflow-x: hidden;
                padding: 28px;
-               flex: 1;
+               padding-bottom: 90px;
+          }
+
+          .welcome-banner {
+               position: relative;
+               overflow: hidden;
+               background: linear-gradient(135deg, var(--card2), var(--card));
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               padding: 24px 28px;
+               display: flex;
+               align-items: center;
+               gap: 18px;
+               margin-bottom: 24px;
+          }
+
+          .welcome-banner::before {
+               content: "";
+               position: absolute;
+               right: -50px;
+               top: -60px;
+               width: 190px;
+               height: 190px;
+               background: radial-gradient(circle, rgba(20, 184, 166, 0.18), transparent 70%);
+          }
+
+          .welcome-icon {
+               width: 56px;
+               height: 56px;
+               border-radius: 18px;
+               background: rgba(20, 184, 166, 0.12);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 25px;
+               flex-shrink: 0;
+          }
+
+          .welcome-text {
+               position: relative;
+               z-index: 1;
+          }
+
+          .welcome-text h2 {
+               font-size: 23px;
+               font-weight: 800;
+               color: var(--text);
+          }
+
+          .welcome-text p {
+               margin-top: 5px;
+               color: var(--text2);
+               font-size: 13px;
+               line-height: 1.6;
+          }
+
+          .welcome-text span {
+               color: var(--teal);
+               font-weight: 800;
+          }
+
+          .analytics-toolbar {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 18px;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 16px;
+               flex-wrap: wrap;
+               margin-bottom: 22px;
+          }
+
+          .analytics-toolbar-left h3 {
+               font-size: 16px;
+               font-weight: 800;
+               color: var(--text);
+          }
+
+          .analytics-toolbar-left p {
+               margin-top: 4px;
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .analytics-toolbar-right {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               flex-wrap: wrap;
+          }
+
+          .analytics-filter {
+               min-height: 42px;
+               border-radius: 13px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               color: var(--text);
+               padding: 0 14px;
+               outline: none;
+               font-size: 13px;
+               font-weight: 700;
+          }
+
+          .analytics-refresh-btn {
+               min-height: 42px;
+               border: none;
+               border-radius: 13px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #ffffff;
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               gap: 8px;
+               padding: 0 16px;
+               font-size: 13px;
+               font-weight: 800;
+               box-shadow: 0 14px 30px rgba(20, 184, 166, 0.22);
           }
 
           .stats-row {
                display: grid;
-               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+               grid-template-columns: repeat(6, minmax(0, 1fr));
                gap: 16px;
-               margin-bottom: 28px;
+               margin-bottom: 24px;
           }
 
           .stat-card {
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: var(--radius);
-               padding: 18px 20px;
+               border-radius: 18px;
+               padding: 20px;
                display: flex;
                align-items: center;
                gap: 14px;
                transition: all var(--tr);
+               min-width: 0;
           }
 
           .stat-card:hover {
@@ -376,27 +745,28 @@
           }
 
           .stat-icon {
-               width: 44px;
-               height: 44px;
-               border-radius: 10px;
+               width: 48px;
+               height: 48px;
+               border-radius: 15px;
                display: flex;
                align-items: center;
                justify-content: center;
-               font-size: 18px;
+               font-size: 19px;
                flex-shrink: 0;
           }
 
           .stat-info p {
-               font-size: 11px;
+               font-size: 12px;
                color: var(--text2);
-               margin-bottom: 3px;
-               font-weight: 500;
+               margin-bottom: 4px;
+               font-weight: 600;
           }
 
           .stat-info h3 {
-               font-family: 'Syne', sans-serif;
-               font-size: 24px;
+               font-size: 28px;
                font-weight: 800;
+               color: var(--text);
+               line-height: 1.1;
           }
 
           .icon-teal {
@@ -419,65 +789,288 @@
                color: var(--amber);
           }
 
+          .icon-cyan {
+               background: rgba(6, 182, 212, 0.15);
+               color: var(--cyan);
+          }
+
+          .icon-rose {
+               background: rgba(244, 63, 94, 0.15);
+               color: var(--rose);
+          }
+
+          .performance-summary {
+               display: grid;
+               grid-template-columns: repeat(4, minmax(0, 1fr));
+               gap: 16px;
+               margin-bottom: 24px;
+          }
+
+          .perf-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 18px;
+               min-width: 0;
+          }
+
+          .perf-head {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 12px;
+               margin-bottom: 10px;
+          }
+
+          .perf-head span {
+               font-size: 13px;
+               font-weight: 700;
+               color: var(--text2);
+          }
+
+          .perf-head strong {
+               font-size: 24px;
+               font-weight: 800;
+               color: var(--text);
+               white-space: nowrap;
+          }
+
+          .perf-card p {
+               font-size: 12px;
+               color: var(--text2);
+               margin-bottom: 12px;
+               line-height: 1.5;
+          }
+
+          .trend-chip {
+               display: inline-flex;
+               align-items: center;
+               gap: 6px;
+               padding: 7px 12px;
+               border-radius: 999px;
+               font-size: 11px;
+               font-weight: 800;
+          }
+
+          .trend-chip.positive {
+               background: rgba(16, 185, 129, 0.12);
+               color: #34d399;
+               border: 1px solid rgba(16, 185, 129, 0.22);
+          }
+
+          .trend-chip.negative {
+               background: rgba(244, 63, 94, 0.12);
+               color: #fb7185;
+               border: 1px solid rgba(244, 63, 94, 0.22);
+          }
+
+          .trend-chip.neutral {
+               background: rgba(148, 163, 184, 0.12);
+               color: #cbd5e1;
+               border: 1px solid rgba(148, 163, 184, 0.22);
+          }
+
           .charts-grid {
                display: grid;
-               grid-template-columns: 1fr 1fr;
+               grid-template-columns: repeat(2, minmax(0, 1fr));
                gap: 20px;
-               margin-bottom: 28px;
+               margin-bottom: 24px;
           }
 
           .chart-card {
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: var(--radius);
+               border-radius: 18px;
                padding: 22px;
+               min-width: 0;
           }
 
           .chart-card.full {
-               grid-column: 1/-1;
+               grid-column: 1 / -1;
           }
 
           .chart-head {
                display: flex;
-               align-items: center;
+               align-items: flex-start;
                justify-content: space-between;
+               gap: 14px;
                margin-bottom: 18px;
           }
 
           .chart-head h3 {
-               font-family: 'Syne', sans-serif;
-               font-size: 15px;
-               font-weight: 700;
+               font-size: 16px;
+               font-weight: 800;
+               color: var(--text);
+          }
+
+          .chart-head p {
+               margin-top: 4px;
+               font-size: 12px;
+               color: var(--text2);
           }
 
           .chart-head span {
                font-size: 11px;
                color: var(--text2);
                background: var(--bg3);
-               padding: 4px 10px;
-               border-radius: 100px;
+               padding: 6px 11px;
+               border-radius: 999px;
+               white-space: nowrap;
+               font-weight: 700;
           }
 
           .chart-wrap {
                position: relative;
-               height: 220px;
+               height: 280px;
+          }
+
+          .chart-wrap.large {
+               height: 320px;
+          }
+
+          .insights-grid {
+               display: grid;
+               grid-template-columns: repeat(3, minmax(0, 1fr));
+               gap: 16px;
+          }
+
+          .insight-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 20px;
+               min-width: 0;
+          }
+
+          .insight-card h3 {
+               font-size: 15px;
+               font-weight: 800;
+               color: var(--text);
+               margin-bottom: 12px;
+          }
+
+          .insight-card p {
+               font-size: 12px;
+               line-height: 1.6;
+               color: var(--text2);
+               margin-bottom: 12px;
+          }
+
+          .insight-list {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+          }
+
+          .insight-item {
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: 13px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+          }
+
+          .insight-item span {
+               font-size: 12px;
+               color: var(--text2);
+               font-weight: 600;
+               line-height: 1.45;
+          }
+
+          .insight-item strong {
+               font-size: 13px;
+               color: var(--text);
+               font-weight: 800;
+               text-align: right;
+          }
+
+          .summary-lines {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+          }
+
+          .summary-line {
+               padding: 12px 14px;
+               border-radius: 14px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               font-size: 12px;
+               line-height: 1.6;
+               color: var(--text2);
+          }
+
+          .summary-line strong {
+               color: var(--text);
+          }
+
+          .analytics-toast {
+               position: fixed;
+               top: 82px;
+               right: 22px;
+               z-index: 99999;
+               min-width: 270px;
+               max-width: 390px;
+               padding: 14px 16px;
+               border-radius: 14px;
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-size: 13px;
+               font-weight: 700;
+               box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+          }
+
+          .analytics-toast.success {
+               background: #065f46;
+               color: #6ee7b7;
+               border: 1px solid rgba(52, 211, 153, 0.3);
+          }
+
+          .analytics-toast.error {
+               background: #7f1d1d;
+               color: #fca5a5;
+               border: 1px solid rgba(248, 113, 113, 0.3);
+          }
+
+          .analytics-toast.info {
+               background: #164e63;
+               color: #67e8f9;
+               border: 1px solid rgba(34, 211, 238, 0.3);
           }
 
           .mobile-overlay {
                display: none;
                position: fixed;
                inset: 0;
-               background: rgba(0, 0, 0, 0.6);
-               z-index: 150;
+               background: rgba(0, 0, 0, 0.58);
+               z-index: 900;
           }
 
-          @media(max-width:900px) {
-               .charts-grid {
+          .mobile-overlay.show {
+               display: block;
+          }
+
+          @media (max-width: 1450px) {
+               .stats-row {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+               }
+
+               .performance-summary {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+               }
+          }
+
+          @media (max-width: 1250px) {
+               .insights-grid {
                     grid-template-columns: 1fr;
                }
           }
 
-          @media(max-width:768px) {
+          @media (max-width: 900px) {
                .sidebar {
                     transform: translateX(-100%);
                     width: var(--sidebar-w) !important;
@@ -487,222 +1080,2005 @@
                     transform: translateX(0);
                }
 
-               .mobile-overlay.show {
-                    display: block;
-               }
-
-               .main {
-                    margin-left: 0 !important;
-               }
-
-               .mobile-toggle {
-                    display: block;
-               }
-
                .sidebar-toggle {
+                    display: none;
+               }
+
+               .main,
+               .main.expanded {
+                    margin-left: 0;
+                    width: 100vw;
+                    max-width: 100vw;
+               }
+
+               .mobile-topbar-toggle {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+               }
+
+               .topbar {
+                    padding: 10px 16px;
+                    flex-wrap: wrap;
+               }
+
+               .topbar-left {
+                    min-width: calc(100% - 42px);
+               }
+
+               .topbar-left p {
+                    white-space: normal;
+               }
+
+               .topbar-right {
+                    width: 100%;
+                    justify-content: flex-start;
+               }
+
+               .topbar-time {
                     display: none;
                }
 
                .content {
                     padding: 16px;
+                    padding-bottom: 90px;
                }
 
-               .topbar {
-                    padding: 0 16px;
+               .charts-grid {
+                    grid-template-columns: 1fr;
+               }
+
+               .analytics-toolbar {
+                    align-items: stretch;
+               }
+
+               .analytics-toolbar-right {
+                    width: 100%;
+               }
+
+               .analytics-filter,
+               .analytics-refresh-btn {
+                    flex: 1;
                }
 
                .stats-row {
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+               }
+
+               .performance-summary {
+                    grid-template-columns: 1fr;
+               }
+          }
+
+          @media (max-width: 620px) {
+               .stats-row {
+                    grid-template-columns: 1fr;
+               }
+
+               .welcome-banner {
+                    align-items: flex-start;
+                    padding: 20px;
+               }
+
+               .welcome-text h2 {
+                    font-size: 20px;
+               }
+
+               .chart-head {
+                    flex-direction: column;
+               }
+
+               .chart-wrap,
+               .chart-wrap.large {
+                    height: 250px;
+               }
+          }
+
+          /* =====================================================
+   Advanced Analytics Extra UI
+===================================================== */
+
+          .advanced-analytics-grid {
+               margin-top: 8px;
+          }
+
+          .chart-card.full .chart-wrap.large {
+               min-height: 340px;
+          }
+
+          .student-rank-note {
+               margin-top: 10px;
+               font-size: 12px;
+               color: var(--text2);
+               line-height: 1.6;
+          }
+
+          @media (max-width: 900px) {
+               .chart-card.full .chart-wrap.large {
+                    min-height: 280px;
                }
           }
      </style>
 </head>
 
-<body>
-     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+<body data-page-role="admin">
+
+     <div id="pageLoader">
+          <div class="loader-logo">
+               <div class="loader-logo-wrap">
+                    <svg class="loader-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#analyticsLoaderGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#analyticsLoaderBg)"
+                              opacity="0.15" />
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#analyticsLoaderGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#analyticsLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#analyticsLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#analyticsLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#analyticsLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="analyticsLoaderGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="analyticsLoaderBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="analyticsLoaderLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
+               <span class="loader-logo-text">EduMind AI</span>
+          </div>
+
+          <div class="loader-bar">
+               <div class="loader-bar-fill"></div>
+          </div>
+     </div>
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
      <nav class="sidebar" id="sidebar">
           <div class="sidebar-brand">
-               <svg width="34" height="34" viewBox="0 0 42 42" fill="none" style="flex-shrink:0">
-                    <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6" stroke-width="2" />
-                    <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)" stroke="#14b8a6"
-                         stroke-width="1" /><text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold"
-                         fill="#14b8a6" font-family="sans-serif">AI</text>
-               </svg>
+               <div class="brand-logo-wrap">
+                    <svg class="sidebar-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#analyticsLogoGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#analyticsLogoBg)"
+                              opacity="0.15" />
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#analyticsLogoGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#analyticsLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#analyticsLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#analyticsLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#analyticsLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="analyticsLogoGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="analyticsLogoBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="analyticsLogoLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
                <div class="brand-text">
-                    <h2>EduMind AI</h2><span>Admin Panel</span>
+                    <h2>EduMind AI</h2>
+                    <span>Admin Panel</span>
                </div>
           </div>
-          <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left" id="toggleIcon"></i>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle" title="Collapse sidebar">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
           </div>
+
           <div class="sidebar-nav">
                <div class="nav-section-label">Main</div>
-               <a href="admin-dashboard.html" class="nav-item"><i
-                         class="fas fa-chart-tree-map"></i><span>Dashboard</span></a>
-               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
-               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span>Subjects</span></a>
+
+               <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+               </a>
+
+               <a href="admin-students.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-label">Students</span>
+               </a>
+
+               <a href="admin-subjects.html" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="nav-label">Subjects</span>
+               </a>
+
                <div class="nav-section-label">Content</div>
-               <a href="admin-planner.html" class="nav-item"><i
-                         class="fas fa-calendar-days"></i><span>Planner</span></a>
-               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span>Tasks</span></a>
-               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span>Revisions</span></a>
-               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span>Tests</span></a>
-               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span>Question
-                         Bank</span></a>
+
+               <a href="admin-planner.html" class="nav-item">
+                    <i class="fas fa-calendar-days"></i>
+                    <span class="nav-label">Planner</span>
+               </a>
+
+               <a href="admin-tasks.html" class="nav-item">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="nav-label">Tasks</span>
+               </a>
+
+               <a href="admin-revisions.html" class="nav-item">
+                    <i class="fas fa-rotate"></i>
+                    <span class="nav-label">Revisions</span>
+               </a>
+
+               <a href="admin-tests.html" class="nav-item">
+                    <i class="fas fa-file-pen"></i>
+                    <span class="nav-label">Tests</span>
+               </a>
+
+               <a href="admin-question-bank.html" class="nav-item">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-label">Question Bank</span>
+               </a>
+
                <div class="nav-section-label">Insights</div>
-               <a href="admin-analytics.html" class="nav-item active"><i
-                         class="fas fa-chart-line"></i><span>Analytics</span></a>
-               <a href="admin-notifications.html" class="nav-item"><i
-                         class="fas fa-bell"></i><span>Notifications</span></a>
-               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span>Settings</span></a>
-               <a href="admin-security.html" class="nav-item"><i class="fas fa-shield-halved"></i><span>Security
-                         Logs</span></a>
+
+               <a href="admin-analytics.html" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-label">Analytics</span>
+               </a>
+
+               <a href="admin-assistant.html" class="nav-item">
+                    <i class="fas fa-robot"></i>
+                    <span class="nav-label">Assistant Logs</span>
+               </a>
+
+               <a href="admin-pomodoro.html" class="nav-item">
+                    <i class="fas fa-stopwatch"></i>
+                    <span class="nav-label">Pomodoro</span>
+               </a>
+
+               <div class="nav-section-label">Manage</div>
+
+               <a href="admin-notifications.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-label">Notifications</span>
+               </a>
+
+               <a href="admin-reports.html" class="nav-item">
+                    <i class="fas fa-file-lines"></i>
+                    <span class="nav-label">Reports</span>
+               </a>
+
+               <a href="admin-settings.html" class="nav-item">
+                    <i class="fas fa-gear"></i>
+                    <span class="nav-label">Settings</span>
+               </a>
+
+               <a href="admin-security.html" class="nav-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="nav-label">Security Logs</span>
+               </a>
           </div>
+
           <div class="sidebar-bottom">
                <div class="admin-profile">
                     <div class="admin-avatar" id="adminAvatar">A</div>
                     <div class="admin-info">
-                         <p id="adminName">Admin</p><span>Administrator</span>
+                         <p id="sidebarAdminName">Admin</p>
+                         <span>Administrator</span>
                     </div>
                </div>
-               <button class="logout-btn" onclick="handleLogout()"><i
-                         class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+               </button>
           </div>
      </nav>
+
      <div class="main" id="main">
           <div class="topbar">
-               <button class="mobile-toggle" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
+
                <div class="topbar-left">
                     <h1>Analytics</h1>
-                    <p>Platform-wide statistics and performance insights.</p>
+                    <p>Platform-wide statistics, monthly trends, completion rate, and growth insights.</p>
                </div>
+
                <div class="topbar-right">
-                    <div class="topbar-btn" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></div>
-                    <div class="topbar-btn" onclick="loadAll()" title="Refresh"><i class="fas fa-rotate-right"></i>
-                    </div>
+                    <div class="topbar-time" id="liveTime">--:--</div>
+
+                    <button class="topbar-btn" type="button" onclick="toggleAdminTheme()" title="Toggle theme"
+                         id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="topbar-btn" type="button" onclick="loadAll(true)" title="Refresh analytics">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
                </div>
           </div>
-          <div class="content">
-               <div class="stats-row">
+
+          <main class="content">
+               <section class="welcome-banner">
+                    <div class="welcome-icon">
+                         <i class="fas fa-chart-simple"></i>
+                    </div>
+
+                    <div class="welcome-text">
+                         <h2>Analytics Control Center</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. Ab yahan se aap monthly progress, module trends,
+                              publish rate, completion rate aur improvement summary ek jagah dekh sakte ho.</p>
+                    </div>
+               </section>
+
+               <section class="analytics-toolbar">
+                    <div class="analytics-toolbar-left">
+                         <h3>Enhanced Realtime Analytics</h3>
+                         <p>Charts now show monthly trends + current month vs previous month improvement.</p>
+                    </div>
+
+                    <div class="analytics-toolbar-right">
+                         <select class="analytics-filter" id="analyticsViewFilter">
+                              <option value="ALL">All Modules</option>
+                              <option value="TASKS">Tasks Focus</option>
+                              <option value="TESTS">Tests Focus</option>
+                              <option value="PLANNER">Planner Focus</option>
+                              <option value="REVISION">Revision Focus</option>
+                         </select>
+
+                         <select class="analytics-filter" id="analyticsRangeFilter">
+                              <option value="6">Last 6 Months</option>
+                              <option value="12">Last 12 Months</option>
+                         </select>
+
+                         <button class="analytics-refresh-btn" type="button" onclick="loadAll(true)">
+                              <i class="fas fa-rotate-right"></i>
+                              Refresh Data
+                         </button>
+                    </div>
+               </section>
+
+               <section class="stats-row">
                     <div class="stat-card">
-                         <div class="stat-icon icon-teal"><i class="fas fa-users"></i></div>
+                         <div class="stat-icon icon-teal">
+                              <i class="fas fa-users"></i>
+                         </div>
                          <div class="stat-info">
                               <p>Total Students</p>
                               <h3 id="sStudents">–</h3>
                          </div>
                     </div>
+
                     <div class="stat-card">
-                         <div class="stat-icon icon-green"><i class="fas fa-book-open"></i></div>
+                         <div class="stat-icon icon-green">
+                              <i class="fas fa-book-open"></i>
+                         </div>
                          <div class="stat-info">
                               <p>Total Subjects</p>
                               <h3 id="sSubjects">–</h3>
                          </div>
                     </div>
+
                     <div class="stat-card">
-                         <div class="stat-icon icon-purple"><i class="fas fa-list-check"></i></div>
+                         <div class="stat-icon icon-purple">
+                              <i class="fas fa-list-check"></i>
+                         </div>
                          <div class="stat-info">
                               <p>Total Tasks</p>
                               <h3 id="sTasks">–</h3>
                          </div>
                     </div>
+
                     <div class="stat-card">
-                         <div class="stat-icon icon-amber"><i class="fas fa-file-pen"></i></div>
+                         <div class="stat-icon icon-amber">
+                              <i class="fas fa-file-pen"></i>
+                         </div>
                          <div class="stat-info">
                               <p>Total Tests</p>
                               <h3 id="sTests">–</h3>
                          </div>
                     </div>
-               </div>
-               <div class="charts-grid">
-                    <div class="chart-card">
-                         <div class="chart-head">
-                              <h3>Task Completion Rate</h3><span>All Students</span>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-cyan">
+                              <i class="fas fa-calendar-days"></i>
                          </div>
-                         <div class="chart-wrap"><canvas id="taskChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                         <div class="chart-head">
-                              <h3>Revision Status</h3><span>All Students</span>
+                         <div class="stat-info">
+                              <p>Total Plans</p>
+                              <h3 id="sPlans">–</h3>
                          </div>
-                         <div class="chart-wrap"><canvas id="revisionChart"></canvas></div>
                     </div>
-                    <div class="chart-card">
-                         <div class="chart-head">
-                              <h3>Test Published vs Draft</h3><span>All Tests</span>
+
+                    <div class="stat-card">
+                         <div class="stat-icon icon-rose">
+                              <i class="fas fa-rotate"></i>
                          </div>
-                         <div class="chart-wrap"><canvas id="testChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                         <div class="chart-head">
-                              <h3>Planner Completion</h3><span>All Plans</span>
+                         <div class="stat-info">
+                              <p>Total Revisions</p>
+                              <h3 id="sRevisions">–</h3>
                          </div>
-                         <div class="chart-wrap"><canvas id="plannerChart"></canvas></div>
                     </div>
-                    <div class="chart-card full">
-                         <div class="chart-head">
-                              <h3>Student Registration Trend</h3><span>By Month</span>
+               </section>
+
+               <section class="performance-summary">
+                    <div class="perf-card">
+                         <div class="perf-head">
+                              <span>Task Completion Rate</span>
+                              <strong id="taskPerfValue">–</strong>
                          </div>
-                         <div class="chart-wrap" style="height:240px"><canvas id="regChart"></canvas></div>
+                         <p id="taskPerfSub">Monthly comparison loading...</p>
+                         <div class="trend-chip neutral" id="taskPerfTrend">Loading</div>
                     </div>
-               </div>
-          </div>
+
+                    <div class="perf-card">
+                         <div class="perf-head">
+                              <span>Test Publish Rate</span>
+                              <strong id="testPerfValue">–</strong>
+                         </div>
+                         <p id="testPerfSub">Monthly comparison loading...</p>
+                         <div class="trend-chip neutral" id="testPerfTrend">Loading</div>
+                    </div>
+
+                    <div class="perf-card">
+                         <div class="perf-head">
+                              <span>Planner Completion Rate</span>
+                              <strong id="planPerfValue">–</strong>
+                         </div>
+                         <p id="planPerfSub">Monthly comparison loading...</p>
+                         <div class="trend-chip neutral" id="planPerfTrend">Loading</div>
+                    </div>
+
+                    <div class="perf-card">
+                         <div class="perf-head">
+                              <span>Revision Completion Rate</span>
+                              <strong id="revisionPerfValue">–</strong>
+                         </div>
+                         <p id="revisionPerfSub">Monthly comparison loading...</p>
+                         <div class="trend-chip neutral" id="revisionPerfTrend">Loading</div>
+                    </div>
+               </section>
+
+               <section class="charts-grid">
+                    <div class="chart-card full" data-modules="TASKS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Monthly Productivity Trend</h3>
+                                   <p>Completed tasks, completed plans, and completed revisions month by month.</p>
+                              </div>
+                              <span id="monthlyTrendLabel">Last 6 Months</span>
+                         </div>
+                         <div class="chart-wrap large">
+                              <canvas id="monthlyProgressChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="TESTS">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Monthly Test Publish Trend</h3>
+                                   <p>Published vs draft tests across months.</p>
+                              </div>
+                              <span>Tests</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="testMonthlyChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Module Completion / Publish Rate</h3>
+                                   <p>Overall efficiency comparison across all modules.</p>
+                              </div>
+                              <span>Overall %</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="moduleRateChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>This Month vs Last Month</h3>
+                                   <p>How much each module improved compared to previous month.</p>
+                              </div>
+                              <span>MoM</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="currentVsPreviousChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Module Volume Overview</h3>
+                                   <p>Total records vs completed / published records for each module.</p>
+                              </div>
+                              <span>Volume</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="moduleVolumeChart"></canvas>
+                         </div>
+                    </div>
+               </section>
+
+               <section class="charts-grid advanced-analytics-grid">
+
+                    <div class="chart-card full" data-modules="STUDENTS,TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Weekly Active Students</h3>
+                                   <p>Last 7 days me kitne unique students active rahe, based on task, test, planner,
+                                        and revision activity.</p>
+                              </div>
+                              <span>Last 7 Days</span>
+                         </div>
+                         <div class="chart-wrap large">
+                              <canvas id="weeklyActiveStudentsChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="STUDENTS,TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Most Active Students</h3>
+                                   <p>Students ranked by total activities across modules.</p>
+                              </div>
+                              <span>Activity Rank</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="mostActiveStudentsChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="STUDENTS,TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Most Productive Students</h3>
+                                   <p>Students ranked by completed tasks, completed plans, completed revisions, and
+                                        published/attempted test activity.</p>
+                              </div>
+                              <span>Productivity Rank</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="productiveStudentsChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="SUBJECTS,TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Subject-wise Activity Distribution</h3>
+                                   <p>Which subjects are getting the most activity across tasks, tests, plans, and
+                                        revisions.</p>
+                              </div>
+                              <span>Subjects</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="subjectActivityChart"></canvas>
+                         </div>
+                    </div>
+
+                    <div class="chart-card" data-modules="TASKS,TESTS,PLANNER,REVISION">
+                         <div class="chart-head">
+                              <div>
+                                   <h3>Admin Growth Radar</h3>
+                                   <p>Overall health comparison of completion, publishing, planning, revision, and
+                                        activity consistency.</p>
+                              </div>
+                              <span>Growth Index</span>
+                         </div>
+                         <div class="chart-wrap">
+                              <canvas id="growthRadarChart"></canvas>
+                         </div>
+                    </div>
+
+               </section>
+
+               <section class="insights-grid">
+                    <div class="insight-card">
+                         <h3>Monthly Improvement Summary</h3>
+                         <p>Ye section batata hai ki current month me previous month ke comparison me kitna improvement
+                              hua.</p>
+                         <div class="summary-lines">
+                              <div class="summary-line" id="improvementTasks">Loading...</div>
+                              <div class="summary-line" id="improvementTests">Loading...</div>
+                              <div class="summary-line" id="improvementPlans">Loading...</div>
+                              <div class="summary-line" id="improvementRevisions">Loading...</div>
+                         </div>
+                    </div>
+
+                    <div class="insight-card">
+                         <h3>Current Month Snapshot</h3>
+                         <div class="insight-list">
+                              <div class="insight-item">
+                                   <span>Total Productive Actions This Month</span>
+                                   <strong id="snapshotOverall">–</strong>
+                              </div>
+                              <div class="insight-item">
+                                   <span>Best Performing Module</span>
+                                   <strong id="snapshotBestModule">–</strong>
+                              </div>
+                              <div class="insight-item">
+                                   <span>Highest Total Volume</span>
+                                   <strong id="snapshotHighestVolume">–</strong>
+                              </div>
+                              <div class="insight-item">
+                                   <span>Best Activity Month</span>
+                                   <strong id="snapshotBestMonth">–</strong>
+                              </div>
+                         </div>
+                    </div>
+
+                    <div class="insight-card">
+                         <h3>Smart Summary</h3>
+                         <p>Quick readable summary for admin decision making.</p>
+                         <div class="summary-lines">
+                              <div class="summary-line" id="smartSummary1">Loading...</div>
+                              <div class="summary-line" id="smartSummary2">Loading...</div>
+                              <div class="summary-line" id="smartSummary3">Loading...</div>
+                              <div class="summary-line" id="smartSummary4">Loading...</div>
+                         </div>
+                    </div>
+               </section>
+          </main>
      </div>
+
      <script>
-          const API = `http://localhost:8080`; const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin';
-          if (!token || role !== 'ADMIN') window.location.href = '/pages/admin/admin-login.html';
-          document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+          const API = window.location.port === "8080" ? "" : "http://localhost:8080";
           let charts = {};
-          function getColors() { const isLight = document.body.getAttribute('data-theme') === 'light'; return { grid: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)', text: isLight ? '#475569' : '#94a3b8' }; }
-          async function loadAll() {
+          let sidebarCollapsed = false;
+
+          const analyticsState = {
+               summary: null,
+               tasks: [],
+               revisions: [],
+               tests: [],
+               plans: []
+          };
+
+          function parseSafeJson(value) {
                try {
-                    const [sumRes, taskRes, revRes, testRes, planRes] = await Promise.all([
-                         fetch(`${API}/api/admin/dashboard-summary`, { headers: { Authorization: `Bearer ${token}` } }),
-                         fetch(`${API}/api/admin/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
-                         fetch(`${API}/api/admin/revisions`, { headers: { Authorization: `Bearer ${token}` } }),
-                         fetch(`${API}/api/admin/tests`, { headers: { Authorization: `Bearer ${token}` } }),
-                         fetch(`${API}/api/admin/plans`, { headers: { Authorization: `Bearer ${token}` } })
-                    ]);
-                    const [sum, tasks, revs, tests, plans] = await Promise.all([sumRes.json(), taskRes.json(), revRes.json(), testRes.json(), planRes.json()]);
-                    if (sum.success) {
-                         document.getElementById('sStudents').textContent = sum.totalStudents;
-                         document.getElementById('sSubjects').textContent = sum.totalSubjects;
-                         document.getElementById('sTasks').textContent = sum.totalTasks;
-                         document.getElementById('sTests').textContent = sum.totalTests;
-                    }
-                    Object.values(charts).forEach(c => c && c.destroy());
-                    const { grid, text } = getColors();
-                    const doughnutOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'right', labels: { color: text, font: { size: 11 }, boxWidth: 12 } } }, cutout: '65%' };
-                    if (tasks.success) {
-                         const comp = tasks.tasks.filter(t => t.status === 'Completed').length;
-                         const pend = tasks.tasks.length - comp;
-                         charts.task = new Chart(document.getElementById('taskChart'), { type: 'doughnut', data: { labels: ['Completed', 'Pending'], datasets: [{ data: [comp, pend], backgroundColor: ['#10b981', '#f59e0b'], borderWidth: 0 }] }, options: doughnutOpts });
-                    }
-                    if (revs.success) {
-                         const comp = revs.revisions.filter(r => r.status === 'Completed').length;
-                         const pend = revs.revisions.length - comp;
-                         charts.rev = new Chart(document.getElementById('revisionChart'), { type: 'doughnut', data: { labels: ['Completed', 'Pending'], datasets: [{ data: [comp, pend], backgroundColor: ['#14b8a6', '#8b5cf6'], borderWidth: 0 }] }, options: doughnutOpts });
-                    }
-                    if (tests.success) {
-                         const pub = tests.tests.filter(t => t.published).length;
-                         const draft = tests.tests.length - pub;
-                         charts.test = new Chart(document.getElementById('testChart'), { type: 'doughnut', data: { labels: ['Published', 'Draft'], datasets: [{ data: [pub, draft], backgroundColor: ['#06b6d4', '#f43f5e'], borderWidth: 0 }] }, options: doughnutOpts });
-                    }
-                    if (plans.success) {
-                         const comp = plans.plans.filter(p => p.status === 'Completed').length;
-                         const pend = plans.plans.length - comp;
-                         charts.plan = new Chart(document.getElementById('plannerChart'), { type: 'doughnut', data: { labels: ['Completed', 'Pending'], datasets: [{ data: [comp, pend], backgroundColor: ['#10b981', '#f59e0b'], borderWidth: 0 }] }, options: doughnutOpts });
-                    }
-                    // Registration trend — bar chart (placeholder months)
-                    charts.reg = new Chart(document.getElementById('regChart'), { type: 'bar', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], datasets: [{ label: 'Registrations', data: [1, 2, 0, 1, 3, 2, 1, 0, 2, 1, 0, sum.totalStudents ? 1 : 0], backgroundColor: 'rgba(20,184,166,0.7)', borderRadius: 6, borderSkipped: false }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } }, y: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } }, beginAtZero: true, ticks: { stepSize: 1 } } } } });
-               } catch (e) { console.error(e); }
+                    return JSON.parse(value);
+               } catch (error) {
+                    return null;
+               }
           }
-          let collapsed = false;
-          function toggleSidebar() { collapsed = !collapsed; document.getElementById('sidebar').classList.toggle('collapsed', collapsed); document.getElementById('main').classList.toggle('expanded', collapsed); document.getElementById('toggleIcon').className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'; }
-          function openMobile() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-          function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-          function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } loadAll(); }
-          (function () { if (localStorage.getItem('adminTheme') === 'light') { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; } })();
-          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/admin-login.html'; } }
-          loadAll();
+
+          function getToken() {
+               return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+          }
+
+          function getAdminRole() {
+               return localStorage.getItem("adminRole") || localStorage.getItem("userRole") || "";
+          }
+
+          function softAdminGuard() {
+               const token = getToken();
+               const role = getAdminRole();
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+
+               if (!token || (!isLoggedIn && role !== "ADMIN")) {
+                    window.location.href = "/pages/admin/admin-login.html";
+                    return;
+               }
+
+               if (role && role !== "ADMIN") {
+                    window.location.href = "/pages/dashboard.html";
+               }
+          }
+
+          function getAdminDisplayName() {
+               const adminName = localStorage.getItem("adminName");
+               if (adminName) return adminName;
+
+               const storedUser =
+                    parseSafeJson(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseSafeJson(localStorage.getItem("loggedInUser")) ||
+                    parseSafeJson(localStorage.getItem("currentUser"));
+
+               return storedUser?.fullName || storedUser?.name || storedUser?.email || "Admin";
+          }
+
+          function setupAdminIdentity() {
+               const adminName = getAdminDisplayName();
+
+               const sidebarName = document.getElementById("sidebarAdminName");
+               const avatar = document.getElementById("adminAvatar");
+               const welcomeName = document.getElementById("welcomeName");
+
+               if (sidebarName) sidebarName.textContent = adminName;
+               if (avatar) avatar.textContent = adminName.charAt(0).toUpperCase();
+               if (welcomeName) welcomeName.textContent = adminName.split(" ")[0] || "Admin";
+          }
+
+          function updateClock() {
+               const liveTime = document.getElementById("liveTime");
+               if (!liveTime) return;
+
+               const now = new Date();
+
+               liveTime.textContent = now.toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
+          }
+
+          function hidePageLoader() {
+               const loader = document.getElementById("pageLoader");
+               if (!loader) return;
+
+               setTimeout(function () {
+                    loader.classList.add("hidden");
+
+                    setTimeout(function () {
+                         loader.remove();
+                    }, 400);
+               }, 500);
+          }
+
+          function showAnalyticsToast(message, type = "success") {
+               const oldToast = document.querySelector(".analytics-toast");
+
+               if (oldToast) oldToast.remove();
+
+               const toast = document.createElement("div");
+               toast.className = `analytics-toast ${type}`;
+
+               const iconClass =
+                    type === "success"
+                         ? "circle-check"
+                         : type === "info"
+                              ? "circle-info"
+                              : "triangle-exclamation";
+
+               toast.innerHTML = `
+                    <i class="fa-solid fa-${iconClass}"></i>
+                    <span>${escapeHtml(message)}</span>
+               `;
+
+               document.body.appendChild(toast);
+
+               setTimeout(function () {
+                    toast.remove();
+               }, 3500);
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+          }
+
+          async function fetchJson(url) {
+               const token = getToken();
+
+               const response = await fetch(url, {
+                    headers: {
+                         Accept: "application/json",
+                         ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    }
+               });
+
+               const text = await response.text();
+
+               if (response.status === 401 || response.status === 403) {
+                    showAnalyticsToast("Admin session expired. Please login again.", "error");
+                    setTimeout(function () {
+                         localStorage.clear();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+                    throw new Error("Unauthorized admin session.");
+               }
+
+               if (!response.ok) {
+                    throw new Error(text || `HTTP ${response.status}`);
+               }
+
+               if (!text) return null;
+
+               try {
+                    return JSON.parse(text);
+               } catch (error) {
+                    return null;
+               }
+          }
+
+          function unwrapArray(data, key) {
+               if (Array.isArray(data)) return data;
+               if (data && Array.isArray(data[key])) return data[key];
+               if (data && Array.isArray(data.data)) return data.data;
+               if (data && Array.isArray(data.content)) return data.content;
+               if (data && Array.isArray(data.items)) return data.items;
+               return [];
+          }
+
+          function setText(id, value) {
+               const el = document.getElementById(id);
+               if (el) el.textContent = value;
+          }
+
+          function setHtml(id, value) {
+               const el = document.getElementById(id);
+               if (el) el.innerHTML = value;
+          }
+
+          function isCompleted(status) {
+               const normalized = String(status || "").trim().toLowerCase();
+               return normalized === "completed" || normalized === "done";
+          }
+
+          function isPublished(test) {
+               return Boolean(test?.published) ||
+                    String(test?.adminStatus || "").trim().toUpperCase() === "PUBLISHED";
+          }
+
+          function getPercentValue(part, total) {
+               if (!total) return 0;
+               return (part / total) * 100;
+          }
+
+          function formatPercent(value) {
+               return `${Math.round(value || 0)}%`;
+          }
+
+          function getColors() {
+               const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
+               return {
+                    grid: isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255,255,255,0.08)",
+                    text: isLight ? "#475569" : "#a8b3c7",
+                    border: isLight ? "rgba(15, 23, 42, 0.12)" : "rgba(255,255,255,0.12)"
+               };
+          }
+
+          function destroyCharts() {
+               Object.values(charts).forEach((chart) => {
+                    if (chart) chart.destroy();
+               });
+
+               charts = {};
+          }
+
+          function getRangeMonths() {
+               const value = Number(document.getElementById("analyticsRangeFilter")?.value || 6);
+               return Number.isNaN(value) ? 6 : value;
+          }
+
+          function getMonthKeys(monthCount) {
+               const keys = [];
+               const now = new Date();
+
+               for (let i = monthCount - 1; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                    keys.push(key);
+               }
+
+               return keys;
+          }
+
+          function getMonthKeyFromDate(date) {
+               return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+          }
+
+          function formatMonthKey(key) {
+               const [year, month] = key.split("-");
+               return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric"
+               });
+          }
+
+          function getValidDate(record, fields) {
+               for (const field of fields) {
+                    const value = record?.[field];
+                    if (!value) continue;
+
+                    const date = new Date(value);
+                    if (!Number.isNaN(date.getTime())) {
+                         return date;
+                    }
+               }
+
+               return null;
+          }
+
+          function createZeroArray(length) {
+               return Array.from({ length }, () => 0);
+          }
+
+          function countByMonth(records, fields, monthKeys, predicate = () => true) {
+               const map = new Map(monthKeys.map((key, index) => [key, index]));
+               const counts = createZeroArray(monthKeys.length);
+
+               records.forEach((record) => {
+                    if (!predicate(record)) return;
+
+                    const date = getValidDate(record, fields);
+                    if (!date) return;
+
+                    const key = getMonthKeyFromDate(date);
+                    const index = map.get(key);
+
+                    if (index !== undefined) {
+                         counts[index] += 1;
+                    }
+               });
+
+               return counts;
+          }
+
+          function subtractArrays(totalArray, partArray) {
+               return totalArray.map((value, index) => Math.max(0, (value || 0) - (partArray[index] || 0)));
+          }
+
+          function getCurrentPreviousPair(array) {
+               const current = array[array.length - 1] || 0;
+               const previous = array[array.length - 2] || 0;
+               return { current, previous };
+          }
+
+          function getCurrentPreviousRate(totalArray, completedArray) {
+               const currentTotal = totalArray[totalArray.length - 1] || 0;
+               const previousTotal = totalArray[totalArray.length - 2] || 0;
+               const currentCompleted = completedArray[completedArray.length - 1] || 0;
+               const previousCompleted = completedArray[completedArray.length - 2] || 0;
+
+               return {
+                    currentRate: getPercentValue(currentCompleted, currentTotal),
+                    previousRate: getPercentValue(previousCompleted, previousTotal),
+                    currentCount: currentCompleted,
+                    previousCount: previousCompleted
+               };
+          }
+
+          function updatePerformanceCard(prefix, currentRate, previousRate, currentCount, previousCount, label) {
+               setText(`${prefix}Value`, formatPercent(currentRate));
+               setText(`${prefix}Sub`, `${label}: ${currentCount} this month vs ${previousCount} last month`);
+
+               const trendEl = document.getElementById(`${prefix}Trend`);
+               if (!trendEl) return;
+
+               const diff = currentRate - previousRate;
+
+               trendEl.className = "trend-chip";
+
+               if (diff > 0.49) {
+                    trendEl.classList.add("positive");
+                    trendEl.textContent = `↑ ${Math.round(diff)} pts improvement`;
+               } else if (diff < -0.49) {
+                    trendEl.classList.add("negative");
+                    trendEl.textContent = `↓ ${Math.abs(Math.round(diff))} pts down`;
+               } else {
+                    trendEl.classList.add("neutral");
+                    trendEl.textContent = "• Stable month";
+               }
+          }
+
+          function buildImprovementMessage(moduleName, currentRate, previousRate, currentCount, previousCount, noun) {
+               const diff = currentRate - previousRate;
+
+               if (currentCount === 0 && previousCount === 0) {
+                    return `<strong>${moduleName}:</strong> current month aur previous month dono me koi significant ${noun} activity nahi mili.`;
+               }
+
+               if (diff > 0.49) {
+                    return `<strong>${moduleName}:</strong> ${formatPercent(previousRate)} se badhkar ${formatPercent(currentRate)} ho gaya. ${currentCount} ${noun} this month vs ${previousCount} last month.`;
+               }
+
+               if (diff < -0.49) {
+                    return `<strong>${moduleName}:</strong> ${formatPercent(previousRate)} se girkar ${formatPercent(currentRate)} par aaya. ${currentCount} ${noun} this month vs ${previousCount} last month.`;
+               }
+
+               return `<strong>${moduleName}:</strong> लगभग stable raha — ${formatPercent(currentRate)} rate with ${currentCount} ${noun} this month.`;
+          }
+
+          function createLineChart(canvasId, labels, datasets) {
+               const canvas = document.getElementById(canvasId);
+               if (!canvas) return null;
+
+               const { grid, text } = getColors();
+
+               return new Chart(canvas, {
+                    type: "line",
+                    data: {
+                         labels,
+                         datasets
+                    },
+                    options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         interaction: {
+                              mode: "index",
+                              intersect: false
+                         },
+                         plugins: {
+                              legend: {
+                                   labels: {
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   }
+                              }
+                         },
+                         scales: {
+                              x: {
+                                   grid: {
+                                        color: grid
+                                   },
+                                   ticks: {
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   }
+                              },
+                              y: {
+                                   beginAtZero: true,
+                                   grid: {
+                                        color: grid
+                                   },
+                                   ticks: {
+                                        precision: 0,
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               });
+          }
+
+          function createBarChart(canvasId, labels, datasets, options = {}) {
+               const canvas = document.getElementById(canvasId);
+               if (!canvas) return null;
+
+               const { grid, text } = getColors();
+
+               return new Chart(canvas, {
+                    type: "bar",
+                    data: {
+                         labels,
+                         datasets
+                    },
+                    options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         indexAxis: options.indexAxis || "x",
+                         plugins: {
+                              legend: {
+                                   display: options.legend !== false,
+                                   labels: {
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   }
+                              }
+                         },
+                         scales: {
+                              x: {
+                                   stacked: Boolean(options.stacked),
+                                   grid: {
+                                        color: grid
+                                   },
+                                   ticks: {
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   }
+                              },
+                              y: {
+                                   beginAtZero: true,
+                                   stacked: Boolean(options.stacked),
+                                   grid: {
+                                        color: grid
+                                   },
+                                   ticks: {
+                                        precision: 0,
+                                        color: text,
+                                        font: {
+                                             size: 11,
+                                             family: "Poppins"
+                                        }
+                                   },
+                                   max: options.max
+                              }
+                         }
+                    }
+               });
+          }
+
+          function getBestMonthLabel(labels, values) {
+               if (!labels.length || !values.length) return "No data";
+
+               let maxIndex = 0;
+               let maxValue = values[0] || 0;
+
+               values.forEach((value, index) => {
+                    if (value > maxValue) {
+                         maxValue = value;
+                         maxIndex = index;
+                    }
+               });
+
+               return maxValue > 0 ? `${labels[maxIndex]} (${maxValue})` : "No strong activity";
+          }
+
+          function getBestModule(items) {
+               if (!items.length) return "No data";
+
+               let best = items[0];
+               items.forEach((item) => {
+                    if (item.value > best.value) best = item;
+               });
+
+               return `${best.label} (${best.value})`;
+          }
+
+          function getHighestVolumeModule(items) {
+               if (!items.length) return "No data";
+
+               let best = items[0];
+               items.forEach((item) => {
+                    if (item.value > best.value) best = item;
+               });
+
+               return `${best.label} (${best.value})`;
+          }
+          function getStudentId(record) {
+               return record?.userId ??
+                    record?.studentId ??
+                    record?.ownerId ??
+                    record?.user?.id ??
+                    record?.student?.id ??
+                    record?.id ??
+                    "unknown";
+          }
+
+          function getStudentName(record) {
+               return record?.studentName ||
+                    record?.fullName ||
+                    record?.name ||
+                    record?.student?.fullName ||
+                    record?.student?.name ||
+                    record?.user?.fullName ||
+                    record?.user?.name ||
+                    record?.studentEmail ||
+                    record?.email ||
+                    `Student #${getStudentId(record)}`;
+          }
+
+          function getSubjectName(record) {
+               return record?.subject ||
+                    record?.subjectName ||
+                    record?.subject?.subjectName ||
+                    record?.subject?.name ||
+                    record?.title ||
+                    "General";
+          }
+
+          function getRecordActivityDate(record, fields) {
+               return getValidDate(record, fields);
+          }
+
+          function getLast7DayKeys() {
+               const keys = [];
+               const now = new Date();
+
+               for (let i = 6; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                    const key = d.toISOString().slice(0, 10);
+                    keys.push(key);
+               }
+
+               return keys;
+          }
+
+          function formatDayKey(key) {
+               const date = new Date(`${key}T00:00:00`);
+               return date.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    day: "2-digit"
+               });
+          }
+
+          function getDateKey(date) {
+               return date.toISOString().slice(0, 10);
+          }
+
+          function collectActivityRecords() {
+               const records = [];
+
+               analyticsState.tasks.forEach((item) => {
+                    records.push({
+                         module: "Task",
+                         studentId: getStudentId(item),
+                         studentName: getStudentName(item),
+                         subject: getSubjectName(item),
+                         date: getRecordActivityDate(item, ["completedAt", "dueDate", "createdAt", "updatedAt"]),
+                         completed: isCompleted(item.status),
+                         productiveWeight: isCompleted(item.status) ? 2 : 1
+                    });
+               });
+
+               analyticsState.revisions.forEach((item) => {
+                    records.push({
+                         module: "Revision",
+                         studentId: getStudentId(item),
+                         studentName: getStudentName(item),
+                         subject: getSubjectName(item),
+                         date: getRecordActivityDate(item, ["completedAt", "revisionDate", "createdAt", "updatedAt"]),
+                         completed: isCompleted(item.status),
+                         productiveWeight: isCompleted(item.status) ? 2 : 1
+                    });
+               });
+
+               analyticsState.plans.forEach((item) => {
+                    records.push({
+                         module: "Plan",
+                         studentId: getStudentId(item),
+                         studentName: getStudentName(item),
+                         subject: getSubjectName(item),
+                         date: getRecordActivityDate(item, ["completedAt", "date", "planDate", "createdAt", "updatedAt"]),
+                         completed: isCompleted(item.status),
+                         productiveWeight: isCompleted(item.status) ? 2 : 1
+                    });
+               });
+
+               analyticsState.tests.forEach((item) => {
+                    records.push({
+                         module: "Test",
+                         studentId: getStudentId(item),
+                         studentName: getStudentName(item),
+                         subject: getSubjectName(item),
+                         date: getRecordActivityDate(item, ["testDate", "createdAt", "updatedAt"]),
+                         completed: isPublished(item),
+                         productiveWeight: isPublished(item) ? 2 : 1
+                    });
+               });
+
+               return records.filter((record) => record.date && record.studentId !== "unknown");
+          }
+
+          function getWeeklyActiveStudentData(activityRecords) {
+               const dayKeys = getLast7DayKeys();
+               const activeMap = new Map(dayKeys.map((key) => [key, new Set()]));
+
+               activityRecords.forEach((record) => {
+                    const key = getDateKey(record.date);
+
+                    if (activeMap.has(key)) {
+                         activeMap.get(key).add(String(record.studentId));
+                    }
+               });
+
+               return {
+                    labels: dayKeys.map(formatDayKey),
+                    values: dayKeys.map((key) => activeMap.get(key).size)
+               };
+          }
+
+          function getTopActiveStudents(activityRecords, limit = 6) {
+               const map = new Map();
+
+               activityRecords.forEach((record) => {
+                    const id = String(record.studentId);
+
+                    if (!map.has(id)) {
+                         map.set(id, {
+                              studentId: id,
+                              studentName: record.studentName,
+                              activityCount: 0,
+                              productiveScore: 0
+                         });
+                    }
+
+                    const item = map.get(id);
+                    item.activityCount += 1;
+                    item.productiveScore += Number(record.productiveWeight || 1);
+               });
+
+               return [...map.values()]
+                    .sort((a, b) => b.activityCount - a.activityCount)
+                    .slice(0, limit);
+          }
+
+          function getTopProductiveStudents(activityRecords, limit = 6) {
+               const map = new Map();
+
+               activityRecords.forEach((record) => {
+                    const id = String(record.studentId);
+
+                    if (!map.has(id)) {
+                         map.set(id, {
+                              studentId: id,
+                              studentName: record.studentName,
+                              activityCount: 0,
+                              productiveScore: 0
+                         });
+                    }
+
+                    const item = map.get(id);
+                    item.activityCount += 1;
+                    item.productiveScore += Number(record.productiveWeight || 1);
+               });
+
+               return [...map.values()]
+                    .sort((a, b) => b.productiveScore - a.productiveScore)
+                    .slice(0, limit);
+          }
+
+          function getSubjectActivityData(activityRecords, limit = 8) {
+               const map = new Map();
+
+               activityRecords.forEach((record) => {
+                    const subject = record.subject || "General";
+                    map.set(subject, (map.get(subject) || 0) + 1);
+               });
+
+               const sorted = [...map.entries()]
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, limit);
+
+               return {
+                    labels: sorted.map((item) => item[0]),
+                    values: sorted.map((item) => item[1])
+               };
+          }
+
+          function createRadarChart(canvasId, labels, data) {
+               const canvas = document.getElementById(canvasId);
+               if (!canvas) return null;
+
+               const { grid, text } = getColors();
+
+               return new Chart(canvas, {
+                    type: "radar",
+                    data: {
+                         labels,
+                         datasets: [
+                              {
+                                   label: "Growth Score",
+                                   data,
+                                   backgroundColor: "rgba(20,184,166,0.18)",
+                                   borderColor: "#14b8a6",
+                                   pointBackgroundColor: "#06b6d4",
+                                   pointBorderColor: "#ffffff",
+                                   pointRadius: 4
+                              }
+                         ]
+                    },
+                    options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                              legend: {
+                                   labels: {
+                                        color: text,
+                                        font: {
+                                             family: "Poppins",
+                                             size: 11
+                                        }
+                                   }
+                              }
+                         },
+                         scales: {
+                              r: {
+                                   beginAtZero: true,
+                                   max: 100,
+                                   grid: {
+                                        color: grid
+                                   },
+                                   angleLines: {
+                                        color: grid
+                                   },
+                                   pointLabels: {
+                                        color: text,
+                                        font: {
+                                             family: "Poppins",
+                                             size: 11
+                                        }
+                                   },
+                                   ticks: {
+                                        color: text,
+                                        backdropColor: "transparent"
+                                   }
+                              }
+                         }
+                    }
+               });
+          }
+
+          function createPolarChart(canvasId, labels, data) {
+               const canvas = document.getElementById(canvasId);
+               if (!canvas) return null;
+
+               const { text } = getColors();
+
+               return new Chart(canvas, {
+                    type: "polarArea",
+                    data: {
+                         labels,
+                         datasets: [
+                              {
+                                   data,
+                                   backgroundColor: [
+                                        "rgba(20,184,166,0.75)",
+                                        "rgba(6,182,212,0.75)",
+                                        "rgba(139,92,246,0.75)",
+                                        "rgba(245,158,11,0.75)",
+                                        "rgba(244,63,94,0.75)",
+                                        "rgba(59,130,246,0.75)",
+                                        "rgba(16,185,129,0.75)",
+                                        "rgba(236,72,153,0.75)"
+                                   ],
+                                   borderWidth: 0
+                              }
+                         ]
+                    },
+                    options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                              legend: {
+                                   position: "right",
+                                   labels: {
+                                        color: text,
+                                        font: {
+                                             family: "Poppins",
+                                             size: 11
+                                        },
+                                        boxWidth: 12
+                                   }
+                              }
+                         },
+                         scales: {
+                              r: {
+                                   ticks: {
+                                        display: false
+                                   },
+                                   grid: {
+                                        color: "rgba(148,163,184,0.15)"
+                                   }
+                              }
+                         }
+                    }
+               });
+          }
+
+          function applyAnalyticsViewFilter() {
+               const filter = document.getElementById("analyticsViewFilter")?.value || "ALL";
+               const cards = document.querySelectorAll("[data-modules]");
+
+               cards.forEach((card) => {
+                    const modules = (card.getAttribute("data-modules") || "")
+                         .split(",")
+                         .map((item) => item.trim());
+
+                    if (
+                         filter === "ALL" ||
+                         modules.includes(filter) ||
+                         (filter === "TASKS" && modules.includes("STUDENTS")) ||
+                         (filter === "TESTS" && modules.includes("STUDENTS")) ||
+                         (filter === "PLANNER" && modules.includes("STUDENTS")) ||
+                         (filter === "REVISION" && modules.includes("STUDENTS"))
+                    ) {
+                         card.classList.remove("hidden");
+                    } else {
+                         card.classList.add("hidden");
+                    }
+               });
+          }
+
+          function renderAnalytics() {
+               const monthCount = getRangeMonths();
+               const monthKeys = getMonthKeys(monthCount);
+               const monthLabels = monthKeys.map(formatMonthKey);
+
+               setText("monthlyTrendLabel", `Last ${monthCount} Months`);
+
+               const tasks = analyticsState.tasks || [];
+               const revisions = analyticsState.revisions || [];
+               const tests = analyticsState.tests || [];
+               const plans = analyticsState.plans || [];
+
+               const taskMonthlyTotal = countByMonth(tasks, ["dueDate", "createdAt", "updatedAt"], monthKeys);
+               const taskMonthlyCompleted = countByMonth(tasks, ["dueDate", "createdAt", "updatedAt"], monthKeys, (item) => isCompleted(item.status));
+
+               const revisionMonthlyTotal = countByMonth(revisions, ["revisionDate", "createdAt", "updatedAt"], monthKeys);
+               const revisionMonthlyCompleted = countByMonth(revisions, ["revisionDate", "createdAt", "updatedAt"], monthKeys, (item) => isCompleted(item.status));
+
+               const planMonthlyTotal = countByMonth(plans, ["date", "planDate", "createdAt", "updatedAt"], monthKeys);
+               const planMonthlyCompleted = countByMonth(plans, ["date", "planDate", "createdAt", "updatedAt"], monthKeys, (item) => isCompleted(item.status));
+
+               const testMonthlyTotal = countByMonth(tests, ["testDate", "createdAt", "updatedAt"], monthKeys);
+               const testMonthlyPublished = countByMonth(tests, ["testDate", "createdAt", "updatedAt"], monthKeys, (item) => isPublished(item));
+               const testMonthlyDraft = subtractArrays(testMonthlyTotal, testMonthlyPublished);
+
+               const totalStudents = analyticsState.summary?.totalStudents ?? 0;
+               const totalSubjects = analyticsState.summary?.totalSubjects ?? 0;
+               const totalTasks = analyticsState.summary?.totalTasks ?? tasks.length;
+               const totalTests = analyticsState.summary?.totalTests ?? tests.length;
+               const totalPlans = analyticsState.summary?.totalPlans ?? plans.length;
+               const totalRevisions = analyticsState.summary?.totalRevisions ?? revisions.length;
+
+               setText("sStudents", totalStudents);
+               setText("sSubjects", totalSubjects);
+               setText("sTasks", totalTasks);
+               setText("sTests", totalTests);
+               setText("sPlans", totalPlans);
+               setText("sRevisions", totalRevisions);
+
+               const completedTasks = tasks.filter((item) => isCompleted(item.status)).length;
+               const completedRevisions = revisions.filter((item) => isCompleted(item.status)).length;
+               const completedPlans = plans.filter((item) => isCompleted(item.status)).length;
+               const publishedTests = tests.filter((item) => isPublished(item)).length;
+
+               const taskRate = getPercentValue(completedTasks, tasks.length);
+               const revisionRate = getPercentValue(completedRevisions, revisions.length);
+               const planRate = getPercentValue(completedPlans, plans.length);
+               const testRate = getPercentValue(publishedTests, tests.length);
+
+               const taskPerf = getCurrentPreviousRate(taskMonthlyTotal, taskMonthlyCompleted);
+               const revisionPerf = getCurrentPreviousRate(revisionMonthlyTotal, revisionMonthlyCompleted);
+               const planPerf = getCurrentPreviousRate(planMonthlyTotal, planMonthlyCompleted);
+               const testPerf = getCurrentPreviousRate(testMonthlyTotal, testMonthlyPublished);
+
+               updatePerformanceCard("taskPerf", taskPerf.currentRate, taskPerf.previousRate, taskPerf.currentCount, taskPerf.previousCount, "Completed tasks");
+               updatePerformanceCard("testPerf", testPerf.currentRate, testPerf.previousRate, testPerf.currentCount, testPerf.previousCount, "Published tests");
+               updatePerformanceCard("planPerf", planPerf.currentRate, planPerf.previousRate, planPerf.currentCount, planPerf.previousCount, "Completed plans");
+               updatePerformanceCard("revisionPerf", revisionPerf.currentRate, revisionPerf.previousRate, revisionPerf.currentCount, revisionPerf.previousCount, "Completed revisions");
+
+               destroyCharts();
+
+               charts.monthlyProgress = createLineChart("monthlyProgressChart", monthLabels, [
+                    {
+                         label: "Completed Tasks",
+                         data: taskMonthlyCompleted,
+                         borderColor: "#10b981",
+                         backgroundColor: "rgba(16,185,129,0.15)",
+                         fill: true,
+                         tension: 0.35,
+                         pointRadius: 4
+                    },
+                    {
+                         label: "Completed Plans",
+                         data: planMonthlyCompleted,
+                         borderColor: "#f59e0b",
+                         backgroundColor: "rgba(245,158,11,0.12)",
+                         fill: true,
+                         tension: 0.35,
+                         pointRadius: 4
+                    },
+                    {
+                         label: "Completed Revisions",
+                         data: revisionMonthlyCompleted,
+                         borderColor: "#8b5cf6",
+                         backgroundColor: "rgba(139,92,246,0.12)",
+                         fill: true,
+                         tension: 0.35,
+                         pointRadius: 4
+                    }
+               ]);
+
+               charts.testMonthly = createBarChart("testMonthlyChart", monthLabels, [
+                    {
+                         label: "Published Tests",
+                         data: testMonthlyPublished,
+                         backgroundColor: "rgba(6,182,212,0.8)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    },
+                    {
+                         label: "Draft Tests",
+                         data: testMonthlyDraft,
+                         backgroundColor: "rgba(244,63,94,0.8)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    }
+               ]);
+
+               charts.moduleRate = createBarChart("moduleRateChart", ["Tasks", "Revisions", "Plans", "Tests"], [
+                    {
+                         label: "Rate %",
+                         data: [
+                              Math.round(taskRate),
+                              Math.round(revisionRate),
+                              Math.round(planRate),
+                              Math.round(testRate)
+                         ],
+                         backgroundColor: [
+                              "rgba(16,185,129,0.8)",
+                              "rgba(139,92,246,0.8)",
+                              "rgba(245,158,11,0.8)",
+                              "rgba(6,182,212,0.8)"
+                         ],
+                         borderRadius: 8,
+                         borderSkipped: false
+                    }
+               ], { legend: false, max: 100 });
+
+               charts.currentVsPrevious = createBarChart("currentVsPreviousChart", ["Tasks", "Revisions", "Plans", "Tests"], [
+                    {
+                         label: "This Month",
+                         data: [
+                              taskPerf.currentCount,
+                              revisionPerf.currentCount,
+                              planPerf.currentCount,
+                              testPerf.currentCount
+                         ],
+                         backgroundColor: "rgba(20,184,166,0.8)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    },
+                    {
+                         label: "Last Month",
+                         data: [
+                              taskPerf.previousCount,
+                              revisionPerf.previousCount,
+                              planPerf.previousCount,
+                              testPerf.previousCount
+                         ],
+                         backgroundColor: "rgba(148,163,184,0.75)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    }
+               ]);
+
+               charts.moduleVolume = createBarChart("moduleVolumeChart", ["Tasks", "Revisions", "Plans", "Tests"], [
+                    {
+                         label: "Total",
+                         data: [tasks.length, revisions.length, plans.length, tests.length],
+                         backgroundColor: "rgba(59,130,246,0.72)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    },
+                    {
+                         label: "Completed / Published",
+                         data: [completedTasks, completedRevisions, completedPlans, publishedTests],
+                         backgroundColor: "rgba(20,184,166,0.85)",
+                         borderRadius: 8,
+                         borderSkipped: false
+                    }
+               ]);
+               const activityRecords = collectActivityRecords();
+
+               const weeklyActiveData = getWeeklyActiveStudentData(activityRecords);
+               const topActiveStudents = getTopActiveStudents(activityRecords, 6);
+               const topProductiveStudents = getTopProductiveStudents(activityRecords, 6);
+               const subjectActivityData = getSubjectActivityData(activityRecords, 8);
+
+               charts.weeklyActiveStudents = createLineChart("weeklyActiveStudentsChart", weeklyActiveData.labels, [
+                    {
+                         label: "Active Students",
+                         data: weeklyActiveData.values,
+                         borderColor: "#06b6d4",
+                         backgroundColor: "rgba(6,182,212,0.18)",
+                         fill: true,
+                         tension: 0.4,
+                         pointRadius: 5,
+                         pointHoverRadius: 7
+                    }
+               ]);
+
+               charts.mostActiveStudents = createBarChart(
+                    "mostActiveStudentsChart",
+                    topActiveStudents.map((item) => item.studentName),
+                    [
+                         {
+                              label: "Total Activities",
+                              data: topActiveStudents.map((item) => item.activityCount),
+                              backgroundColor: "rgba(139,92,246,0.8)",
+                              borderRadius: 8,
+                              borderSkipped: false
+                         }
+                    ],
+                    {
+                         indexAxis: "y",
+                         legend: false
+                    }
+               );
+
+               charts.productiveStudents = createBarChart(
+                    "productiveStudentsChart",
+                    topProductiveStudents.map((item) => item.studentName),
+                    [
+                         {
+                              label: "Productive Score",
+                              data: topProductiveStudents.map((item) => item.productiveScore),
+                              backgroundColor: "rgba(16,185,129,0.8)",
+                              borderRadius: 8,
+                              borderSkipped: false
+                         }
+                    ],
+                    {
+                         indexAxis: "y",
+                         legend: false
+                    }
+               );
+
+               charts.subjectActivity = createPolarChart(
+                    "subjectActivityChart",
+                    subjectActivityData.labels,
+                    subjectActivityData.values
+               );
+
+               const activityConsistency = weeklyActiveData.values.length
+                    ? getPercentValue(weeklyActiveData.values.filter((value) => value > 0).length, weeklyActiveData.values.length)
+                    : 0;
+
+               charts.growthRadar = createRadarChart(
+                    "growthRadarChart",
+                    [
+                         "Task Completion",
+                         "Revision Completion",
+                         "Planner Completion",
+                         "Test Publish",
+                         "Weekly Activity"
+                    ],
+                    [
+                         Math.round(taskRate),
+                         Math.round(revisionRate),
+                         Math.round(planRate),
+                         Math.round(testRate),
+                         Math.round(activityConsistency)
+                    ]
+               );
+
+               const overallCurrentActivity = taskPerf.currentCount + revisionPerf.currentCount + planPerf.currentCount + testPerf.currentCount;
+               const overallPreviousActivity = taskPerf.previousCount + revisionPerf.previousCount + planPerf.previousCount + testPerf.previousCount;
+
+               const bestRateModule = getBestModule([
+                    { label: "Tasks", value: Math.round(taskRate) },
+                    { label: "Revisions", value: Math.round(revisionRate) },
+                    { label: "Plans", value: Math.round(planRate) },
+                    { label: "Tests", value: Math.round(testRate) }
+               ]);
+
+               const highestVolumeModule = getHighestVolumeModule([
+                    { label: "Tasks", value: tasks.length },
+                    { label: "Revisions", value: revisions.length },
+                    { label: "Plans", value: plans.length },
+                    { label: "Tests", value: tests.length }
+               ]);
+
+               const mergedMonthlyActivity = monthKeys.map((_, index) =>
+                    (taskMonthlyCompleted[index] || 0) +
+                    (revisionMonthlyCompleted[index] || 0) +
+                    (planMonthlyCompleted[index] || 0) +
+                    (testMonthlyPublished[index] || 0)
+               );
+
+               const bestMonth = getBestMonthLabel(monthLabels, mergedMonthlyActivity);
+
+               setText("snapshotOverall", `${overallCurrentActivity} actions`);
+               setText("snapshotBestModule", bestRateModule);
+               setText("snapshotHighestVolume", highestVolumeModule);
+               setText("snapshotBestMonth", bestMonth);
+
+               setHtml("improvementTasks", buildImprovementMessage("Tasks", taskPerf.currentRate, taskPerf.previousRate, taskPerf.currentCount, taskPerf.previousCount, "completed tasks"));
+               setHtml("improvementTests", buildImprovementMessage("Tests", testPerf.currentRate, testPerf.previousRate, testPerf.currentCount, testPerf.previousCount, "published tests"));
+               setHtml("improvementPlans", buildImprovementMessage("Planner", planPerf.currentRate, planPerf.previousRate, planPerf.currentCount, planPerf.previousCount, "completed plans"));
+               setHtml("improvementRevisions", buildImprovementMessage("Revisions", revisionPerf.currentRate, revisionPerf.previousRate, revisionPerf.currentCount, revisionPerf.previousCount, "completed revisions"));
+
+               const overallDiff = overallCurrentActivity - overallPreviousActivity;
+               const overallTrendText =
+                    overallDiff > 0
+                         ? `${overallCurrentActivity} productive actions hue, jo last month se ${overallDiff} zyada hain.`
+                         : overallDiff < 0
+                              ? `${overallCurrentActivity} productive actions hue, jo last month se ${Math.abs(overallDiff)} kam hain.`
+                              : `${overallCurrentActivity} productive actions hue, jo last month ke equal hain.`;
+
+               setHtml("smartSummary1", `<strong>Overall Month Summary:</strong> ${overallTrendText}`);
+               setHtml("smartSummary2", `<strong>Best Efficiency:</strong> ${bestRateModule} currently sabse strong efficiency dikha raha hai.`);
+               setHtml("smartSummary3", `<strong>Highest Workload:</strong> ${highestVolumeModule} me sabse zyada total records hain, isliye admin attention yahin sabse useful rahegi.`);
+               setHtml("smartSummary4", `<strong>Best Activity Window:</strong> ${bestMonth} me sabse zyada productive completions / publishing record hua.`);
+
+               applyAnalyticsViewFilter();
+          }
+
+          async function loadAll(showToast = false) {
+               const refreshIcon = document.getElementById("refreshIcon");
+
+               if (refreshIcon) refreshIcon.classList.add("spin-now");
+
+               try {
+                    const [sum, tasksData, revData, testData, planData] = await Promise.all([
+                         fetchJson(`${API}/api/admin/dashboard-summary`),
+                         fetchJson(`${API}/api/admin/tasks`),
+                         fetchJson(`${API}/api/admin/revisions`),
+                         fetchJson(`${API}/api/admin/tests`),
+                         fetchJson(`${API}/api/admin/plans`)
+                    ]);
+
+                    analyticsState.summary = sum || {};
+                    analyticsState.tasks = unwrapArray(tasksData, "tasks");
+                    analyticsState.revisions = unwrapArray(revData, "revisions");
+                    analyticsState.tests = unwrapArray(testData, "tests");
+                    analyticsState.plans = unwrapArray(planData, "plans");
+
+                    renderAnalytics();
+
+                    if (showToast) {
+                         showAnalyticsToast("Enhanced analytics refreshed successfully.", "success");
+                    }
+
+               } catch (error) {
+                    console.error("Analytics load failed:", error);
+                    showAnalyticsToast(`Analytics load failed: ${error.message}`, "error");
+
+               } finally {
+                    if (refreshIcon) refreshIcon.classList.remove("spin-now");
+               }
+          }
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+
+               sidebar.classList.toggle("collapsed", sidebarCollapsed);
+               main.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) {
+                    icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+               }
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebarState() {
+               const saved = localStorage.getItem("adminSidebarCollapsed") === "true";
+
+               if (!saved) return;
+
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = true;
+               sidebar.classList.add("collapsed");
+               main.classList.add("expanded");
+
+               if (icon) icon.className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar")?.classList.add("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar")?.classList.remove("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("edumind-admin-theme")
+                    || localStorage.getItem("adminTheme")
+                    || "dark";
+
+               document.documentElement.setAttribute("data-theme", theme);
+
+               if (theme === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(theme);
+          }
+
+          function updateThemeIcon(theme) {
+               const themeBtn = document.getElementById("themeBtn");
+
+               if (!themeBtn) return;
+
+               themeBtn.innerHTML = theme === "light"
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
+          }
+
+          function toggleAdminTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               if (next === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(next);
+               renderAnalytics();
+          }
+
+          function handleLogout() {
+               const confirmLogout = confirm("Logout from admin panel?");
+               if (!confirmLogout) return;
+
+               localStorage.removeItem("adminToken");
+               localStorage.removeItem("adminRole");
+               localStorage.removeItem("adminName");
+               localStorage.removeItem("adminEmail");
+
+               localStorage.removeItem("token");
+               localStorage.removeItem("userRole");
+               localStorage.removeItem("edumind_is_logged_in");
+               localStorage.removeItem("edumind_logged_in_user");
+
+               window.location.href = "/pages/admin/admin-login.html";
+          }
+
+          document.addEventListener("DOMContentLoaded", function () {
+               softAdminGuard();
+               setupAdminIdentity();
+               applySavedTheme();
+               restoreSidebarState();
+               updateClock();
+               setInterval(updateClock, 1000);
+               hidePageLoader();
+
+               document.getElementById("analyticsViewFilter")?.addEventListener("change", applyAnalyticsViewFilter);
+               document.getElementById("analyticsRangeFilter")?.addEventListener("change", renderAnalytics);
+
+               loadAll(false);
+          });
      </script>
 </body>
 

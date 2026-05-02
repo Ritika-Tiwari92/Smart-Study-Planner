@@ -1,37 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Question Bank | EduMind AI</title>
+     <link rel="icon" href="data:," />
 
-     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet" />
 
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-     <link rel="stylesheet" href="/assets/css/admin-question-bank.css" />
+     <link rel="stylesheet" href="../../assets/css/admin-question-bank.css" />
+
+     <style>
+          body,
+          button,
+          input,
+          select,
+          textarea {
+               font-family: "Poppins", sans-serif !important;
+          }
+
+          .brand-text h2,
+          .loader-logo-text,
+          .topbar-left h1,
+          .welcome-text h2,
+          .question-test-left h2,
+          .question-summary-card h3,
+          .section-title h3,
+          .question-text,
+          .question-modal-header h2 {
+               font-family: "Poppins", sans-serif !important;
+          }
+
+          html[data-theme="light"] body {
+               --bg: #f0f4f8;
+               --bg2: #e8edf5;
+               --bg3: #dde4ef;
+               --card: #ffffff;
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.15);
+               --border2: rgba(0, 0, 0, 0.07);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          .brand-logo-wrap,
+          .loader-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .loader-logo-wrap {
+               width: 46px;
+               height: 46px;
+          }
+
+          .sidebar-logo-svg,
+          .loader-logo-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, 0.45));
+          }
+
+          .loader-logo {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+          }
+
+          .loader-logo-text {
+               font-size: 22px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          @keyframes qbNodePulse {
+
+               0%,
+               100% {
+                    opacity: 0.82;
+                    r: 2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 2.7;
+               }
+          }
+
+          @keyframes qbCenterPulse {
+
+               0%,
+               100% {
+                    opacity: 0.85;
+                    r: 1.2;
+               }
+
+               50% {
+                    opacity: 1;
+                    r: 1.7;
+               }
+          }
+
+          @keyframes qbHexRotate {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes qbLineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .sidebar-logo-svg .hex-outer,
+          .loader-logo-svg .hex-outer {
+               animation: qbHexRotate 18s linear infinite;
+          }
+
+          .sidebar-logo-svg .node-top,
+          .sidebar-logo-svg .node-left,
+          .sidebar-logo-svg .node-right,
+          .sidebar-logo-svg .node-bottom,
+          .loader-logo-svg .node-top,
+          .loader-logo-svg .node-left,
+          .loader-logo-svg .node-right,
+          .loader-logo-svg .node-bottom {
+               animation: qbNodePulse 2.4s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .center-dot,
+          .loader-logo-svg .center-dot {
+               animation: qbCenterPulse 2s ease-in-out infinite;
+          }
+
+          .sidebar-logo-svg .conn-line,
+          .loader-logo-svg .conn-line {
+               stroke-dasharray: 12;
+               animation: qbLineFlow 3s linear infinite;
+          }
+     </style>
 </head>
 
 <body data-page-role="admin">
 
      <!-- Page Loader -->
      <div id="pageLoader">
-          <div class="loader-logo">🎓 EduMind AI</div>
+          <div class="loader-logo">
+               <div class="loader-logo-wrap">
+                    <svg class="loader-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                              stroke="url(#qbLoaderGrad)" stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#qbLoaderBg)" opacity="0.15" />
+
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#qbLoaderGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#qbLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#qbLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#qbLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#qbLoaderLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+
+                         <defs>
+                              <linearGradient id="qbLoaderGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="qbLoaderBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="qbLoaderLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
+               <span class="loader-logo-text">EduMind AI</span>
+          </div>
+
           <div class="loader-bar">
                <div class="loader-bar-fill"></div>
           </div>
      </div>
 
-     <!-- Mobile Overlay -->
      <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
 
      <!-- Sidebar -->
      <nav class="sidebar" id="sidebar">
 
           <div class="sidebar-brand">
-               <div class="brand-icon-box">🎓</div>
+               <div class="brand-logo-wrap">
+                    <svg class="sidebar-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11" stroke="url(#qbLogoGrad)"
+                              stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#qbLogoBg)" opacity="0.15" />
+
+                         <circle class="node-top" cx="22" cy="15" r="2.5" fill="url(#qbLogoGrad)" />
+                         <circle class="node-left" cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-right" cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle class="node-bottom" cx="22" cy="30" r="1.8" fill="#38bdf8" />
+
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#qbLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#qbLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#qbLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#qbLogoLine)"
+                              stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="30" y2="24" stroke="#14b8a6" stroke-width="0.8"
+                              opacity="0.45" />
+
+                         <circle class="center-dot" cx="22" cy="22" r="1.2" fill="white" />
+
+                         <defs>
+                              <linearGradient id="qbLogoGrad" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="qbLogoBg" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="qbLogoLine" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+
                <div class="brand-text">
                     <h2>EduMind AI</h2>
                     <span>Admin Panel</span>
@@ -47,11 +282,11 @@
                <div class="nav-section-label">Main</div>
 
                <a href="admin-dashboard.html" class="nav-item">
-                    <i class="fas fa-chart-tree-map"></i>
+                    <i class="fas fa-gauge-high"></i>
                     <span class="nav-label">Dashboard</span>
                </a>
 
-               <a href="admin-users.html" class="nav-item">
+               <a href="admin-students.html" class="nav-item">
                     <i class="fas fa-users"></i>
                     <span class="nav-label">Students</span>
                </a>
@@ -83,7 +318,7 @@
                     <span class="nav-label">Tests</span>
                </a>
 
-               <a href="question-bank.html" class="nav-item active">
+               <a href="admin-question-bank.html" class="nav-item active">
                     <i class="fas fa-database"></i>
                     <span class="nav-label">Question Bank</span>
                </a>
@@ -113,7 +348,7 @@
                </a>
 
                <a href="admin-reports.html" class="nav-item">
-                    <i class="fas fa-file-chart-column"></i>
+                    <i class="fas fa-file-lines"></i>
                     <span class="nav-label">Reports</span>
                </a>
 
@@ -149,7 +384,6 @@
      <!-- Main -->
      <div class="main" id="main">
 
-          <!-- Topbar -->
           <div class="topbar">
                <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
                     <i class="fas fa-bars"></i>
@@ -185,7 +419,6 @@
                </div>
           </div>
 
-          <!-- Content -->
           <main class="content">
 
                <section class="welcome-banner">
@@ -193,14 +426,12 @@
                     <div class="welcome-text">
                          <h2>Question Bank Control</h2>
                          <p>Hello, <span id="welcomeName">Admin</span>. Add MCQ/theory questions, marks, correct
-                              answers,
-                              focus topics, and options for the selected test.</p>
+                              answers, focus topics, and options for the selected test.</p>
                     </div>
                </section>
 
                <section class="question-bank-content">
 
-                    <!-- Selected Test Info -->
                     <div class="question-test-card">
                          <div class="question-test-left">
                               <div class="question-page-badge">
@@ -233,7 +464,6 @@
 
                     <div class="section-label">Question Overview</div>
 
-                    <!-- Summary Cards -->
                     <div class="question-summary-grid">
                          <div class="question-summary-card card-purple">
                               <div class="summary-icon total">
@@ -276,7 +506,6 @@
                          </div>
                     </div>
 
-                    <!-- Toolbar -->
                     <div class="question-toolbar">
                          <div class="question-search">
                               <i class="fa-solid fa-magnifying-glass"></i>
@@ -294,7 +523,6 @@
                          </div>
                     </div>
 
-                    <!-- Question List -->
                     <div class="question-list-card">
                          <div class="section-title">
                               <div>
@@ -314,7 +542,6 @@
 
                </section>
 
-               <!-- Question Modal -->
                <div class="question-modal-overlay hidden" id="questionModalOverlay">
                     <div class="question-modal">
                          <div class="question-modal-header">
@@ -332,7 +559,8 @@
                               <div class="question-form-grid">
 
                                    <div class="question-form-group full-width">
-                                        <label for="questionText">Question Text</label>
+                                        <label for="questionText">Question Text <span
+                                                  style="color:var(--rose)">*</span></label>
                                         <textarea id="questionText" rows="4"
                                              placeholder="Write the full question here..."></textarea>
                                    </div>
@@ -362,7 +590,8 @@
                                    </div>
 
                                    <div class="question-form-group full-width">
-                                        <label for="questionCorrectAnswer">Correct Answer</label>
+                                        <label for="questionCorrectAnswer">Correct Answer <span
+                                                  style="color:var(--rose)">*</span></label>
                                         <input type="text" id="questionCorrectAnswer"
                                              placeholder="For MCQ use A / B / C / D, for theory write model answer" />
                                    </div>
@@ -452,11 +681,12 @@
                if (!liveTime) return;
 
                const now = new Date();
-               const h = String(now.getHours()).padStart(2, "0");
-               const m = String(now.getMinutes()).padStart(2, "0");
-               const s = String(now.getSeconds()).padStart(2, "0");
 
-               liveTime.textContent = `${h}:${m}:${s}`;
+               liveTime.textContent = now.toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
           }
 
           let sidebarCollapsed = false;
@@ -504,31 +734,45 @@
           }
 
           function applySavedTheme() {
-               const theme = localStorage.getItem("adminTheme");
-               const themeBtn = document.getElementById("themeBtn");
+               const theme = localStorage.getItem("edumind-admin-theme")
+                    || localStorage.getItem("adminTheme")
+                    || "dark";
+
+               document.documentElement.setAttribute("data-theme", theme);
 
                if (theme === "light") {
                     document.body.setAttribute("data-theme", "light");
-                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
                } else {
                     document.body.removeAttribute("data-theme");
-                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
                }
+
+               updateThemeIcon(theme);
+          }
+
+          function updateThemeIcon(theme) {
+               const themeBtn = document.getElementById("themeBtn");
+               if (!themeBtn) return;
+
+               themeBtn.innerHTML = theme === "light"
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
           }
 
           function toggleAdminTheme() {
-               const themeBtn = document.getElementById("themeBtn");
-               const isLight = document.body.getAttribute("data-theme") === "light";
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
 
-               if (isLight) {
-                    document.body.removeAttribute("data-theme");
-                    localStorage.setItem("adminTheme", "dark");
-                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
-               } else {
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               if (next === "light") {
                     document.body.setAttribute("data-theme", "light");
-                    localStorage.setItem("adminTheme", "light");
-                    if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+               } else {
+                    document.body.removeAttribute("data-theme");
                }
+
+               updateThemeIcon(next);
           }
 
           function refreshQuestionBankPage() {
@@ -538,19 +782,15 @@
                     refreshIcon.classList.add("spin-now");
                }
 
-               const jobs = [];
-
-               if (typeof loadSelectedTestDetails === "function") {
-                    jobs.push(Promise.resolve(loadSelectedTestDetails()));
-               }
-
                if (typeof loadQuestions === "function") {
-                    jobs.push(Promise.resolve(loadQuestions()));
+                    Promise.resolve(loadQuestions()).finally(function () {
+                         if (refreshIcon) refreshIcon.classList.remove("spin-now");
+                    });
+               } else if (refreshIcon) {
+                    setTimeout(function () {
+                         refreshIcon.classList.remove("spin-now");
+                    }, 700);
                }
-
-               Promise.allSettled(jobs).finally(function () {
-                    if (refreshIcon) refreshIcon.classList.remove("spin-now");
-               });
           }
 
           function handleLogout() {
@@ -615,7 +855,7 @@
           });
      </script>
 
-     <script src="/assets/js/admin-question-bank.js"></script>
+     <script src="../../assets/js/admin-question-bank.js"></script>
 </body>
 
 </html>

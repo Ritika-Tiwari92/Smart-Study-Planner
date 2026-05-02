@@ -1,3 +1,23 @@
+/* =====================================================
+   EduMind AI — Admin Question Bank JS
+   Full updated copy-paste file
+
+   Features:
+   - Selected test metadata from URL
+   - Load questions from backend in real-time
+   - Add / Edit / Delete MCQ and Theory questions
+   - Field-wise validation
+   - Toast messages
+   - Search + type filter
+   - Summary cards update in real-time
+   - Keeps existing backend endpoints:
+     /api/tests/{testId}/questions?userId=...
+===================================================== */
+
+/* =====================================================
+   DOM References
+===================================================== */
+
 const selectedTestTitle = document.getElementById("selectedTestTitle");
 const selectedTestSubtitle = document.getElementById("selectedTestSubtitle");
 const selectedTestSubject = document.getElementById("selectedTestSubject");
@@ -35,6 +55,10 @@ const optionB = document.getElementById("optionB");
 const optionC = document.getElementById("optionC");
 const optionD = document.getElementById("optionD");
 
+/* =====================================================
+   API + State
+===================================================== */
+
 const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
 const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
 
@@ -42,6 +66,10 @@ let selectedTestId = null;
 let selectedTestMeta = null;
 let allQuestions = [];
 let editingQuestionId = null;
+
+/* =====================================================
+   Storage + Auth Helpers
+===================================================== */
 
 function parseStoredJson(value) {
     try {
@@ -57,6 +85,7 @@ function decodeJwtPayload(token) {
 
         const payload = token.split(".")[1];
         const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+
         const decoded = atob(
             normalized.padEnd(
                 normalized.length + (4 - (normalized.length % 4)) % 4,
@@ -74,6 +103,29 @@ function getAuthToken() {
     return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
 }
 
+function clearAdminSessionAndRedirect() {
+    [
+        "adminToken",
+        "adminRole",
+        "adminName",
+        "adminEmail",
+        "token",
+        "refreshToken",
+        "userRole",
+        "userId",
+        "userEmail",
+        "userName",
+        "edumind_is_logged_in",
+        "edumind_logged_in_user"
+    ].forEach(function (key) {
+        localStorage.removeItem(key);
+    });
+
+    setTimeout(function () {
+        window.location.href = "/pages/admin/admin-login.html";
+    }, 900);
+}
+
 function getStoredUserObject() {
     const possibleKeys = [
         "edumind_logged_in_user",
@@ -89,9 +141,11 @@ function getStoredUserObject() {
 
     for (const key of possibleKeys) {
         const rawValue = localStorage.getItem(key);
+
         if (!rawValue) continue;
 
         const parsed = parseStoredJson(rawValue);
+
         if (parsed && typeof parsed === "object") {
             return parsed;
         }
@@ -107,6 +161,8 @@ function getQueryParams() {
         testId: params.get("testId"),
         title: params.get("title") || "",
         subject: params.get("subject") || "",
+        type: params.get("type") || "",
+        duration: params.get("duration") || "",
         userId: params.get("userId") || ""
     };
 }
@@ -140,7 +196,8 @@ function getCurrentUserId() {
         tokenPayload?.id ??
         tokenPayload?.userId ??
         tokenPayload?.adminId ??
-        tokenPayload?.uid;
+        tokenPayload?.uid ??
+        tokenPayload?.subId;
 
     if (jwtUserId != null && jwtUserId !== "") {
         const numericJwtId = Number(jwtUserId);
@@ -149,6 +206,10 @@ function getCurrentUserId() {
 
     return null;
 }
+
+/* =====================================================
+   API Helpers
+===================================================== */
 
 function addUserIdIfAvailable(url) {
     const userId = getCurrentUserId();
@@ -163,6 +224,7 @@ function addUserIdIfAvailable(url) {
 
 function buildQuestionsApiUrl(testId, questionId = "") {
     const questionPath = questionId ? `/${encodeURIComponent(questionId)}` : "";
+
     return addUserIdIfAvailable(
         `${TESTS_API_URL}/${encodeURIComponent(testId)}/questions${questionPath}`
     );
@@ -175,11 +237,12 @@ function extractApiErrorMessage(responseText, responseStatus) {
 
     try {
         const parsed = JSON.parse(responseText);
+
         if (parsed && typeof parsed === "object") {
             return parsed.message || parsed.error || `HTTP ${responseStatus}`;
         }
     } catch (error) {
-        // Raw text use hoga
+        // raw text use hoga
     }
 
     return responseText;
@@ -206,7 +269,9 @@ async function fetchJson(url, options = {}) {
     }
 
     if (response.status === 401 || response.status === 403) {
-        throw new Error("Unauthorized. Admin token/session invalid hai. Please login again.");
+        showQuestionToast("Admin session expired. Please login again.", "error");
+        clearAdminSessionAndRedirect();
+        throw new Error("Unauthorized admin session.");
     }
 
     if (!response.ok) {
@@ -242,8 +307,12 @@ function unwrapArrayResponse(data, possibleKeys = []) {
     return [];
 }
 
+/* =====================================================
+   UI Helpers
+===================================================== */
+
 function escapeHtml(value) {
-    return String(value || "")
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -252,69 +321,107 @@ function escapeHtml(value) {
 }
 
 function showQuestionToast(message, type = "success") {
-    let toastRoot = document.getElementById("questionToastRoot");
+    const oldToast = document.querySelector(".question-toast");
 
-    if (!toastRoot) {
-        toastRoot = document.createElement("div");
-        toastRoot.id = "questionToastRoot";
-        toastRoot.style.position = "fixed";
-        toastRoot.style.top = "82px";
-        toastRoot.style.right = "22px";
-        toastRoot.style.zIndex = "99999";
-        toastRoot.style.display = "flex";
-        toastRoot.style.flexDirection = "column";
-        toastRoot.style.gap = "10px";
-        document.body.appendChild(toastRoot);
+    if (oldToast) {
+        oldToast.remove();
     }
 
     const toast = document.createElement("div");
-    const isError = type === "error";
+    toast.className = `question-toast ${type}`;
 
-    toast.style.minWidth = "260px";
-    toast.style.maxWidth = "360px";
-    toast.style.padding = "14px 16px";
-    toast.style.borderRadius = "14px";
-    toast.style.fontSize = "13px";
-    toast.style.fontWeight = "700";
-    toast.style.boxShadow = "0 18px 40px rgba(0,0,0,0.28)";
-    toast.style.border = isError
-        ? "1px solid rgba(244,63,94,0.35)"
-        : "1px solid rgba(20,184,166,0.35)";
-    toast.style.background = isError
-        ? "linear-gradient(135deg, #3b0f1a, #111827)"
-        : "linear-gradient(135deg, #0f3b36, #111827)";
-    toast.style.color = "#ffffff";
-    toast.style.transform = "translateX(18px)";
-    toast.style.opacity = "0";
-    toast.style.transition = "all 0.28s ease";
+    const iconClass =
+        type === "success"
+            ? "circle-check"
+            : type === "info"
+                ? "circle-info"
+                : "triangle-exclamation";
 
     toast.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:16px;">${isError ? "⚠️" : "✅"}</span>
-            <span>${escapeHtml(message)}</span>
-        </div>
+        <i class="fa-solid fa-${iconClass}"></i>
+        <span>${escapeHtml(message)}</span>
     `;
 
-    toastRoot.appendChild(toast);
+    document.body.appendChild(toast);
 
-    requestAnimationFrame(() => {
-        toast.style.transform = "translateX(0)";
-        toast.style.opacity = "1";
-    });
-
-    setTimeout(() => {
-        toast.style.transform = "translateX(18px)";
-        toast.style.opacity = "0";
-
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 2600);
+    setTimeout(function () {
+        toast.remove();
+    }, 3500);
 }
+
+function getFieldWrapper(input) {
+    return input ? input.closest(".question-form-group") : null;
+}
+
+function setQuestionFieldError(input, message) {
+    if (!input) return;
+
+    const wrapper = getFieldWrapper(input);
+
+    input.classList.remove("question-input-valid");
+    input.classList.add("question-input-error");
+
+    if (!wrapper) return;
+
+    let error = wrapper.querySelector(".question-field-error");
+
+    if (!error) {
+        error = document.createElement("div");
+        error.className = "question-field-error";
+        wrapper.appendChild(error);
+    }
+
+    error.textContent = message;
+}
+
+function clearQuestionFieldError(input) {
+    if (!input) return;
+
+    const wrapper = getFieldWrapper(input);
+
+    input.classList.remove("question-input-error");
+
+    if (String(input.value || "").trim()) {
+        input.classList.add("question-input-valid");
+    } else {
+        input.classList.remove("question-input-valid");
+    }
+
+    if (!wrapper) return;
+
+    const error = wrapper.querySelector(".question-field-error");
+
+    if (error) {
+        error.remove();
+    }
+}
+
+function clearAllQuestionFieldErrors() {
+    [
+        questionText,
+        questionType,
+        questionMarks,
+        questionOrder,
+        questionFocusTopic,
+        questionCorrectAnswer,
+        optionA,
+        optionB,
+        optionC,
+        optionD
+    ].forEach(clearQuestionFieldError);
+}
+
+/* =====================================================
+   Normalization + Mapping
+===================================================== */
 
 function normalizeQuestionType(value) {
     const type = String(value || "").trim().toUpperCase();
     return type === "THEORY" ? "THEORY" : "MCQ";
+}
+
+function normalizeCorrectAnswerForMcq(value) {
+    return String(value || "").trim().toUpperCase();
 }
 
 function mapBackendQuestionToFrontend(question) {
@@ -328,10 +435,10 @@ function mapBackendQuestionToFrontend(question) {
         questionOrder: Number(question.questionOrder ?? question.orderNo ?? 1),
         options: Array.isArray(question.options)
             ? question.options.map((option) => ({
-                  id: option.id,
-                  optionLabel: option.optionLabel || option.label || "",
-                  optionText: option.optionText || option.text || ""
-              }))
+                id: option.id,
+                optionLabel: option.optionLabel || option.label || "",
+                optionText: option.optionText || option.text || ""
+            }))
             : []
     };
 }
@@ -345,6 +452,10 @@ function sortQuestions(items) {
         return Number(a.id || 0) - Number(b.id || 0);
     });
 }
+
+/* =====================================================
+   Modal Helpers
+===================================================== */
 
 function setQuestionModalAddMode() {
     editingQuestionId = null;
@@ -372,6 +483,7 @@ function resetQuestionForm() {
     if (!questionModalForm) return;
 
     questionModalForm.reset();
+    clearAllQuestionFieldErrors();
 
     if (questionType) {
         questionType.value = "MCQ";
@@ -398,6 +510,10 @@ function openQuestionModal() {
 
     questionModalOverlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+
+    setTimeout(function () {
+        questionText?.focus();
+    }, 120);
 }
 
 function closeQuestionModal() {
@@ -426,6 +542,10 @@ function updateQuestionTypeVisibility() {
         }
     }
 }
+
+/* =====================================================
+   Selected Test
+===================================================== */
 
 function renderSelectedTestMeta() {
     if (!selectedTestMeta) return;
@@ -456,6 +576,10 @@ function renderSelectedTestMeta() {
 async function loadSelectedTestDetails() {
     renderSelectedTestMeta();
 }
+
+/* =====================================================
+   Summary + Render
+===================================================== */
 
 function updateQuestionSummaryCards() {
     const total = allQuestions.length;
@@ -494,14 +618,19 @@ function createQuestionCard(question) {
 
     const optionsSummary =
         question.questionType === "MCQ" &&
-        Array.isArray(question.options) &&
-        question.options.length > 0
+            Array.isArray(question.options) &&
+            question.options.length > 0
             ? question.options
-                  .map((option) => `${option.optionLabel}. ${option.optionText}`)
-                  .join(" | ")
+                .map((option) => `${option.optionLabel}. ${option.optionText}`)
+                .join(" | ")
             : "";
 
     questionItem.dataset.optionsSummary = optionsSummary;
+
+    const answerBoxLabel = question.questionType === "MCQ" ? "Options" : "Model Answer";
+    const answerBoxText = question.questionType === "MCQ"
+        ? optionsSummary || "No options available"
+        : question.correctAnswer || "No model answer available";
 
     questionItem.innerHTML = `
         <div class="question-item-top">
@@ -518,17 +647,13 @@ function createQuestionCard(question) {
         <h4 class="question-text">${escapeHtml(question.questionText || "Question text not available.")}</h4>
 
         <div class="question-meta">
-            <span class="question-pill">${escapeHtml(`${question.marks} mark${question.marks > 1 ? "s" : ""}`)}</span>
+            <span class="question-pill">${escapeHtml(`${question.marks} mark${Number(question.marks) > 1 ? "s" : ""}`)}</span>
             <span class="question-pill">${escapeHtml(`Correct: ${question.correctAnswer || "-"}`)}</span>
         </div>
 
         <div class="question-answer-box">
-            <span>${question.questionType === "MCQ" ? "Options" : "Model Answer"}</span>
-            <p>${escapeHtml(
-                question.questionType === "MCQ"
-                    ? optionsSummary || "No options available"
-                    : question.correctAnswer || "No model answer available"
-            )}</p>
+            <span>${escapeHtml(answerBoxLabel)}</span>
+            <p>${escapeHtml(answerBoxText)}</p>
         </div>
 
         <div class="question-actions">
@@ -572,6 +697,7 @@ function applyQuestionFilters() {
         const typeValue = normalizeQuestionType(item.dataset.questionType || "");
 
         const matchesSearch =
+            !searchText ||
             questionTextValue.includes(searchText) ||
             focusTopicValue.includes(searchText);
 
@@ -601,12 +727,21 @@ function renderQuestions() {
     applyQuestionFilters();
 }
 
+/* =====================================================
+   Edit Fill
+===================================================== */
+
 function fillQuestionFormForEdit(questionId) {
     const question = allQuestions.find((item) => String(item.id) === String(questionId));
-    if (!question) return;
+
+    if (!question) {
+        showQuestionToast("Selected question not found.", "error");
+        return;
+    }
 
     editingQuestionId = question.id;
     setQuestionModalEditMode();
+    clearAllQuestionFieldErrors();
 
     if (questionText) {
         questionText.value = question.questionText || "";
@@ -652,21 +787,96 @@ function fillQuestionFormForEdit(questionId) {
     openQuestionModal();
 }
 
+/* =====================================================
+   Validation + Payload
+===================================================== */
+
+function validateQuestionForm() {
+    clearAllQuestionFieldErrors();
+
+    let isValid = true;
+
+    const questionTextValue = questionText ? questionText.value.trim() : "";
+    const questionTypeValue = normalizeQuestionType(questionType?.value);
+    const marksValue = questionMarks ? Number(questionMarks.value || 1) : 1;
+    const correctAnswerValue = questionCorrectAnswer ? questionCorrectAnswer.value.trim() : "";
+    const orderValue = questionOrder ? questionOrder.value.trim() : "";
+
+    if (!questionTextValue) {
+        setQuestionFieldError(questionText, "Question text is required.");
+        isValid = false;
+    } else if (questionTextValue.length < 5) {
+        setQuestionFieldError(questionText, "Question text must be at least 5 characters.");
+        isValid = false;
+    }
+
+    if (!Number.isFinite(marksValue) || marksValue < 1) {
+        setQuestionFieldError(questionMarks, "Marks must be at least 1.");
+        isValid = false;
+    }
+
+    if (orderValue && Number(orderValue) < 1) {
+        setQuestionFieldError(questionOrder, "Question order must be at least 1.");
+        isValid = false;
+    }
+
+    if (!correctAnswerValue) {
+        setQuestionFieldError(questionCorrectAnswer, "Correct answer is required.");
+        isValid = false;
+    }
+
+    if (questionTypeValue === "MCQ") {
+        const options = [
+            { input: optionA, label: "A", value: optionA ? optionA.value.trim() : "" },
+            { input: optionB, label: "B", value: optionB ? optionB.value.trim() : "" },
+            { input: optionC, label: "C", value: optionC ? optionC.value.trim() : "" },
+            { input: optionD, label: "D", value: optionD ? optionD.value.trim() : "" }
+        ];
+
+        const filledOptions = options.filter((option) => option.value);
+
+        if (filledOptions.length < 2) {
+            setQuestionFieldError(optionA, "MCQ must have at least 2 filled options.");
+            isValid = false;
+        }
+
+        const normalizedCorrect = normalizeCorrectAnswerForMcq(correctAnswerValue);
+        const filledLabels = filledOptions.map((option) => option.label);
+
+        if (correctAnswerValue && !filledLabels.includes(normalizedCorrect)) {
+            setQuestionFieldError(
+                questionCorrectAnswer,
+                "Correct answer must match one filled option label: A, B, C, or D."
+            );
+            isValid = false;
+        }
+
+        filledOptions.forEach((option) => {
+            if (option.value.length < 1) {
+                setQuestionFieldError(option.input, `Option ${option.label} cannot be empty.`);
+                isValid = false;
+            }
+        });
+    }
+
+    if (!isValid) {
+        showQuestionToast("Please fix the highlighted fields.", "error");
+    }
+
+    return isValid;
+}
+
 function buildQuestionPayload() {
+    if (!validateQuestionForm()) {
+        throw new Error("Validation failed.");
+    }
+
     const questionTextValue = questionText ? questionText.value.trim() : "";
     const questionTypeValue = normalizeQuestionType(questionType?.value);
     const marksValue = questionMarks ? Number(questionMarks.value || 1) : 1;
     const questionOrderValue = questionOrder ? questionOrder.value.trim() : "";
     const focusTopicValue = questionFocusTopic ? questionFocusTopic.value.trim() : "";
     const correctAnswerValue = questionCorrectAnswer ? questionCorrectAnswer.value.trim() : "";
-
-    if (!questionTextValue) {
-        throw new Error("Question text is required.");
-    }
-
-    if (!correctAnswerValue) {
-        throw new Error("Correct answer is required.");
-    }
 
     const payload = {
         questionText: questionTextValue,
@@ -686,26 +896,28 @@ function buildQuestionPayload() {
             { optionLabel: "D", optionText: optionD ? optionD.value.trim() : "" }
         ].filter((option) => option.optionText);
 
-        if (options.length < 2) {
-            throw new Error("MCQ question must have at least 2 options.");
-        }
-
-        const optionLabels = options.map((option) => option.optionLabel);
-        const normalizedCorrect = correctAnswerValue.toUpperCase();
-
-        if (!optionLabels.includes(normalizedCorrect)) {
-            throw new Error("Correct answer must match one of the filled option labels A/B/C/D.");
-        }
+        const normalizedCorrect = normalizeCorrectAnswerForMcq(correctAnswerValue);
 
         payload.correctAnswer = normalizedCorrect;
         payload.options = options;
+    } else {
+        payload.correctAnswer = correctAnswerValue;
+        payload.options = [];
     }
 
     return payload;
 }
 
+/* =====================================================
+   Backend CRUD
+===================================================== */
+
 async function loadQuestions() {
-    if (!selectedTestId) return;
+    if (!selectedTestId) {
+        allQuestions = [];
+        renderQuestions();
+        return;
+    }
 
     try {
         if (adminQuestionList) {
@@ -726,6 +938,7 @@ async function loadQuestions() {
             : [];
 
         renderQuestions();
+
     } catch (error) {
         console.error("Questions load failed:", error);
 
@@ -773,6 +986,10 @@ async function deleteQuestion(questionId) {
     });
 }
 
+/* =====================================================
+   Submit + Actions
+===================================================== */
+
 async function handleQuestionModalSubmit(event) {
     event.preventDefault();
 
@@ -783,6 +1000,7 @@ async function handleQuestionModalSubmit(event) {
 
     try {
         const wasEditing = Boolean(editingQuestionId);
+        const currentEditingQuestionId = editingQuestionId;
         const payload = buildQuestionPayload();
 
         if (saveQuestionModalBtn) {
@@ -790,8 +1008,8 @@ async function handleQuestionModalSubmit(event) {
             saveQuestionModalBtn.textContent = wasEditing ? "Updating..." : "Saving...";
         }
 
-        if (editingQuestionId) {
-            await updateQuestion(editingQuestionId, payload);
+        if (wasEditing) {
+            await updateQuestion(currentEditingQuestionId, payload);
         } else {
             await createQuestion(payload);
         }
@@ -801,9 +1019,14 @@ async function handleQuestionModalSubmit(event) {
         await loadQuestions();
 
         showQuestionToast(wasEditing ? "Question updated successfully." : "Question added successfully.");
+
     } catch (error) {
         console.error("Question save failed:", error);
-        showQuestionToast(`Question save failed: ${error.message}`, "error");
+
+        if (error.message !== "Validation failed.") {
+            showQuestionToast(`Question save failed: ${error.message}`, "error");
+        }
+
     } finally {
         if (saveQuestionModalBtn) {
             saveQuestionModalBtn.disabled = false;
@@ -847,11 +1070,16 @@ async function handleQuestionListClick(event) {
     }
 }
 
+/* =====================================================
+   Init
+===================================================== */
+
 function initializeSelectedTest() {
     const params = getQueryParams();
 
     if (!params.testId) {
         selectedTestId = null;
+
         selectedTestMeta = {
             title: "No test selected",
             subject: "-",
@@ -877,8 +1105,8 @@ function initializeSelectedTest() {
         id: params.testId,
         title: params.title || "Selected Test",
         subject: params.subject || "-",
-        type: "-",
-        duration: "-"
+        type: params.type || "-",
+        duration: params.duration || "-"
     };
 
     renderSelectedTestMeta();
@@ -941,6 +1169,29 @@ function initializeQuestionBankPage() {
     if (questionTypeFilter) {
         questionTypeFilter.addEventListener("change", applyQuestionFilters);
     }
+
+    [
+        questionText,
+        questionType,
+        questionMarks,
+        questionOrder,
+        questionFocusTopic,
+        questionCorrectAnswer,
+        optionA,
+        optionB,
+        optionC,
+        optionD
+    ].forEach(function (input) {
+        if (!input) return;
+
+        input.addEventListener("input", function () {
+            clearQuestionFieldError(input);
+        });
+
+        input.addEventListener("change", function () {
+            clearQuestionFieldError(input);
+        });
+    });
 
     document.addEventListener("keydown", function (event) {
         if (
