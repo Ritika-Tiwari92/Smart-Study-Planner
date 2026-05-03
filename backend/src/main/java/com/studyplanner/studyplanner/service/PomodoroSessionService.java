@@ -1,348 +1,471 @@
 package com.studyplanner.studyplanner.service;
 
-import com.studyplanner.studyplanner.dto.*;
 import com.studyplanner.studyplanner.model.PomodoroSession;
-import com.studyplanner.studyplanner.model.PomodoroSession.SessionStatus;
-import com.studyplanner.studyplanner.model.PomodoroSession.SessionType;
-import com.studyplanner.studyplanner.model.User;
 import com.studyplanner.studyplanner.repository.PomodoroSessionRepository;
-import com.studyplanner.studyplanner.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.OffsetDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class PomodoroSessionService {
 
-     @Autowired
-     private PomodoroSessionRepository pomodoroRepo;
+     private final PomodoroSessionRepository pomodoroSessionRepository;
 
-     @Autowired
-     private UserRepository userRepository;
+     public PomodoroSessionService(PomodoroSessionRepository pomodoroSessionRepository) {
+          this.pomodoroSessionRepository = pomodoroSessionRepository;
+     }
 
-     // ─── Start Session ────────────────────────────────────────────────────────
+     /*
+      * Student: start a new Pomodoro/focus session.
+      */
+     @Transactional
+     public PomodoroSession startSession(Long studentId, Map<String, Object> requestBody) {
+          if (studentId == null || studentId <= 0) {
+               throw new IllegalArgumentException("Valid student id is required.");
+          }
 
-     public PomodoroSessionResponse startSession(Long userId, PomodoroSessionRequest req) {
-
-          User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+          Map<String, Object> body = safeBody(requestBody);
 
           PomodoroSession session = new PomodoroSession();
-          session.setUser(user);
-          session.setSessionType(SessionType.valueOf(req.getSessionType()));
-          session.setStatus(SessionStatus.IN_PROGRESS);
-          session.setPlannedDurationMinutes(req.getPlannedDurationMinutes());
-          session.setLinkedSubjectName(req.getLinkedSubjectName());
-          session.setLinkedTaskId(req.getLinkedTaskId());
-          session.setLinkedRevisionId(req.getLinkedRevisionId());
-          session.setLinkedPlanId(req.getLinkedPlanId());
-          session.setCycleNumber(req.getCycleNumber() != null ? req.getCycleNumber() : 1);
-          session.setNotes(req.getNotes());
-          session.setStartedAt(LocalDateTime.now());
-          session.setSessionDate(LocalDate.now());
 
-          PomodoroSession saved = pomodoroRepo.save(session);
-          return PomodoroSessionResponse.fromEntity(saved);
+          session.setStudentId(studentId);
+          session.setStudentName(getString(body, "studentName", "name", "userName"));
+          session.setStudentEmail(getString(body, "studentEmail", "email"));
+          session.setSubjectId(getLong(body, "subjectId"));
+          session.setSubjectName(getString(body, "subjectName", "subject"));
+          session.setTopic(defaultText(getString(body, "topic", "title"), "Focus Session"));
+          session.setSessionType(normalizeSessionType(getString(body, "sessionType", "type")));
+          session.setStatus("ACTIVE");
+          session.setPlannedMinutes(
+                    defaultPositiveInt(getInteger(body, "plannedMinutes", "duration", "durationMinutes"), 25));
+          session.setBreakMinutes(defaultNonNegativeInt(getInteger(body, "breakMinutes"), 5));
+          session.setFocusMinutes(0);
+          session.setStartTime(parseDateTime(getString(body, "startTime")));
+
+          if (session.getStartTime() == null) {
+               session.setStartTime(LocalDateTime.now());
+          }
+
+          session.setNotes(getString(body, "notes"));
+
+          return pomodoroSessionRepository.save(session);
      }
 
-     // ─── Complete / Cancel Session ────────────────────────────────────────────
+     /*
+      * Student: complete session.
+      */
+     @Transactional
+     public PomodoroSession completeSession(Long sessionId, Long studentId, Map<String, Object> requestBody) {
+          PomodoroSession session = findSessionById(sessionId);
 
-     public PomodoroSessionResponse updateSession(Long sessionId, Long userId,
-               PomodoroSessionUpdateRequest req) {
+          validateSessionOwnerIfProvided(session, studentId);
 
-          PomodoroSession session = pomodoroRepo.findByIdAndUserId(sessionId, userId)
-                    .orElseThrow(() -> new RuntimeException("Session not found"));
+          Map<String, Object> body = safeBody(requestBody);
 
-          session.setStatus(SessionStatus.valueOf(req.getStatus()));
-          session.setActualDurationMinutes(req.getActualDurationMinutes());
-          session.setEndedAt(LocalDateTime.now());
+          LocalDateTime endTime = parseDateTime(getString(body, "endTime"));
+          if (endTime == null) {
+               endTime = LocalDateTime.now();
+          }
 
-          PomodoroSession updated = pomodoroRepo.save(session);
-          return PomodoroSessionResponse.fromEntity(updated);
+          Integer focusMinutes = getInteger(body, "focusMinutes", "actualMinutes", "durationMinutes");
+
+          if (focusMinutes == null || focusMinutes < 0) {
+               focusMinutes = calculateMinutes(session.getStartTime(), endTime);
+          }
+
+          if (focusMinutes == null || focusMinutes <= 0) {
+               focusMinutes = session.getPlannedMinutes() == null ? 25 : session.getPlannedMinutes();
+          }
+
+          session.setEndTime(endTime);
+          session.setCompletedAt(endTime);
+          session.setFocusMinutes(focusMinutes);
+          session.setStatus("COMPLETED");
+
+          String notes = getString(body, "notes");
+          if (notes != null) {
+               session.setNotes(notes);
+          }
+
+          return pomodoroSessionRepository.save(session);
      }
 
-     // ─── Get All Sessions ─────────────────────────────────────────────────────
+     /*
+      * Student: interrupt/cancel session.
+      */
+     @Transactional
+     public PomodoroSession interruptSession(Long sessionId, Long studentId, Map<String, Object> requestBody) {
+          PomodoroSession session = findSessionById(sessionId);
 
-     public List<PomodoroSessionResponse> getAllSessions(Long userId) {
-          return pomodoroRepo.findByUserIdOrderByCreatedAtDesc(userId)
+          validateSessionOwnerIfProvided(session, studentId);
+
+          Map<String, Object> body = safeBody(requestBody);
+
+          LocalDateTime endTime = parseDateTime(getString(body, "endTime"));
+          if (endTime == null) {
+               endTime = LocalDateTime.now();
+          }
+
+          Integer focusMinutes = getInteger(body, "focusMinutes", "actualMinutes", "durationMinutes");
+
+          if (focusMinutes == null || focusMinutes < 0) {
+               focusMinutes = calculateMinutes(session.getStartTime(), endTime);
+          }
+
+          if (focusMinutes == null || focusMinutes < 0) {
+               focusMinutes = 0;
+          }
+
+          session.setEndTime(endTime);
+          session.setFocusMinutes(focusMinutes);
+          session.setStatus("INTERRUPTED");
+
+          String notes = getString(body, "notes", "reason");
+          if (notes != null) {
+               session.setNotes(notes);
+          }
+
+          return pomodoroSessionRepository.save(session);
+     }
+
+     /*
+      * Student: own session history.
+      */
+     public List<PomodoroSession> getMySessions(Long studentId) {
+          if (studentId == null || studentId <= 0) {
+               throw new IllegalArgumentException("Valid student id is required.");
+          }
+
+          return pomodoroSessionRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
+     }
+
+     /*
+      * Admin: all sessions.
+      */
+     public List<PomodoroSession> getAllSessions() {
+          return pomodoroSessionRepository.findAllByOrderByCreatedAtDesc();
+     }
+
+     /*
+      * Admin: filter by status.
+      */
+     public List<PomodoroSession> getSessionsByStatus(String status) {
+          if (isBlank(status) || status.equalsIgnoreCase("all")) {
+               return getAllSessions();
+          }
+
+          return pomodoroSessionRepository.findByStatusIgnoreCaseOrderByCreatedAtDesc(status);
+     }
+
+     /*
+      * Admin: filter by session type.
+      */
+     public List<PomodoroSession> getSessionsByType(String sessionType) {
+          if (isBlank(sessionType) || sessionType.equalsIgnoreCase("all")) {
+               return getAllSessions();
+          }
+
+          return pomodoroSessionRepository.findBySessionTypeIgnoreCaseOrderByCreatedAtDesc(sessionType);
+     }
+
+     /*
+      * Admin: summary for cards.
+      */
+     public Map<String, Object> getAdminSummary() {
+          List<PomodoroSession> sessions = getAllSessions();
+
+          long totalSessions = sessions.size();
+
+          int totalFocusMinutes = sessions.stream()
+                    .map(PomodoroSession::getFocusMinutes)
+                    .filter(minutes -> minutes != null && minutes > 0)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+
+          long completedSessions = sessions.stream()
+                    .filter(session -> equalsText(session.getStatus(), "COMPLETED"))
+                    .count();
+
+          long activeSessions = sessions.stream()
+                    .filter(session -> equalsText(session.getStatus(), "ACTIVE"))
+                    .count();
+
+          long interruptedSessions = sessions.stream()
+                    .filter(session -> equalsText(session.getStatus(), "INTERRUPTED"))
+                    .count();
+
+          LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
+
+          long activeToday = sessions.stream()
+                    .filter(session -> {
+                         LocalDateTime time = session.getCreatedAt();
+                         return time != null && !time.isBefore(startOfToday);
+                    })
+                    .count();
+
+          double averageSessionMinutes = completedSessions == 0
+                    ? 0
+                    : Math.round((totalFocusMinutes * 10.0 / completedSessions)) / 10.0;
+
+          Map<String, Integer> focusByStudent = new LinkedHashMap<>();
+
+          for (PomodoroSession session : sessions) {
+               String studentName = defaultText(session.getStudentName(), "Student #" + session.getStudentId());
+               int minutes = session.getFocusMinutes() == null ? 0 : session.getFocusMinutes();
+
+               focusByStudent.put(studentName, focusByStudent.getOrDefault(studentName, 0) + minutes);
+          }
+
+          Map.Entry<String, Integer> topStudentEntry = focusByStudent.entrySet()
                     .stream()
-                    .map(PomodoroSessionResponse::fromEntity)
+                    .max(Map.Entry.comparingByValue())
+                    .orElse(null);
+
+          String topFocusStudent = topStudentEntry == null ? "-" : topStudentEntry.getKey();
+          Integer topFocusMinutes = topStudentEntry == null ? 0 : topStudentEntry.getValue();
+
+          Map<String, Object> summary = new LinkedHashMap<>();
+          summary.put("totalSessions", totalSessions);
+          summary.put("totalFocusMinutes", totalFocusMinutes);
+          summary.put("completedSessions", completedSessions);
+          summary.put("activeSessions", activeSessions);
+          summary.put("interruptedSessions", interruptedSessions);
+          summary.put("activeToday", activeToday);
+          summary.put("averageSessionMinutes", averageSessionMinutes);
+          summary.put("topFocusStudent", topFocusStudent);
+          summary.put("topFocusMinutes", topFocusMinutes);
+
+          return summary;
+     }
+
+     /*
+      * Admin: student-wise focus ranking.
+      */
+     public List<Map<String, Object>> getStudentFocusRanking() {
+          List<PomodoroSession> sessions = getAllSessions();
+
+          Map<Long, List<PomodoroSession>> grouped = sessions.stream()
+                    .filter(session -> session.getStudentId() != null)
+                    .collect(Collectors.groupingBy(PomodoroSession::getStudentId));
+
+          return grouped.entrySet()
+                    .stream()
+                    .map(entry -> {
+                         Long studentId = entry.getKey();
+                         List<PomodoroSession> studentSessions = entry.getValue();
+
+                         int totalMinutes = studentSessions.stream()
+                                   .map(PomodoroSession::getFocusMinutes)
+                                   .filter(minutes -> minutes != null && minutes > 0)
+                                   .mapToInt(Integer::intValue)
+                                   .sum();
+
+                         long completed = studentSessions.stream()
+                                   .filter(session -> equalsText(session.getStatus(), "COMPLETED"))
+                                   .count();
+
+                         PomodoroSession latest = studentSessions.stream()
+                                   .max(Comparator.comparing(
+                                             session -> session.getCreatedAt() == null ? LocalDateTime.MIN
+                                                       : session.getCreatedAt()))
+                                   .orElse(null);
+
+                         Map<String, Object> item = new LinkedHashMap<>();
+                         item.put("studentId", studentId);
+                         item.put("studentName", latest == null ? "Student #" + studentId
+                                   : defaultText(latest.getStudentName(), "Student #" + studentId));
+                         item.put("studentEmail", latest == null ? "" : defaultText(latest.getStudentEmail(), ""));
+                         item.put("totalSessions", studentSessions.size());
+                         item.put("completedSessions", completed);
+                         item.put("totalFocusMinutes", totalMinutes);
+
+                         return item;
+                    })
+                    .sorted((a, b) -> Integer.compare(
+                              Integer.parseInt(String.valueOf(b.get("totalFocusMinutes"))),
+                              Integer.parseInt(String.valueOf(a.get("totalFocusMinutes")))))
                     .collect(Collectors.toList());
      }
 
-     // ─── Analytics ────────────────────────────────────────────────────────────
+     private PomodoroSession findSessionById(Long sessionId) {
+          if (sessionId == null || sessionId <= 0) {
+               throw new IllegalArgumentException("Valid session id is required.");
+          }
 
-     public PomodoroAnalyticsResponse getAnalytics(Long userId) {
-
-          PomodoroAnalyticsResponse analytics = new PomodoroAnalyticsResponse();
-          LocalDate today = LocalDate.now();
-          LocalDate sevenDaysAgo = today.minusDays(6);
-          LocalDate thirtyDaysAgo = today.minusDays(29);
-
-          // ── Total focus minutes ──
-          long totalFocusMinutes = pomodoroRepo.sumTotalFocusMinutes(userId);
-          analytics.setTotalFocusMinutes(totalFocusMinutes);
-
-          // ── Total completed sessions ──
-          long completedSessions = pomodoroRepo.countByUserIdAndSessionTypeAndStatus(
-                    userId, SessionType.FOCUS, SessionStatus.COMPLETED);
-          analytics.setTotalCompletedSessions(completedSessions);
-
-          // ── Total interrupted sessions ──
-          long interruptedSessions = pomodoroRepo.countByUserIdAndSessionTypeAndStatusIn(
-                    userId, SessionType.FOCUS,
-                    Arrays.asList(SessionStatus.INTERRUPTED, SessionStatus.CANCELLED));
-          analytics.setTotalInterruptedSessions(interruptedSessions);
-
-          // ── Average daily focus (last 7 days) ──
-          List<Object[]> dailyRaw = pomodoroRepo.findDailyFocusMinutes(userId, sevenDaysAgo);
-          long totalLast7Days = dailyRaw.stream()
-                    .mapToLong(row -> row[1] != null ? ((Number) row[1]).longValue() : 0)
-                    .sum();
-          analytics.setAverageDailyFocusMinutes(
-                    dailyRaw.isEmpty() ? 0 : Math.round((double) totalLast7Days / 7.0 * 10.0) / 10.0);
-
-          // ── Active days this week ──
-          LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
-          long activeDays = pomodoroRepo.countDistinctActiveDays(userId, startOfWeek, today);
-          analytics.setActiveDaysThisWeek(activeDays);
-
-          // ── Most focused subject ──
-          List<Object[]> subjectRaw = pomodoroRepo.findSubjectWiseFocusMinutes(userId);
-          String topSubject = subjectRaw.isEmpty() ? "None" : (String) subjectRaw.get(0)[0];
-          analytics.setMostFocusedSubject(topSubject);
-
-          // ── Break balance ratio ──
-          long breakSessions = pomodoroRepo.countCompletedBreakSessions(userId);
-          double breakRatio = completedSessions > 0
-                    ? Math.round((double) breakSessions / completedSessions * 100.0) / 100.0
-                    : 0;
-          analytics.setBreakBalanceRatio(breakRatio);
-
-          // ── Daily focus chart data ──
-          List<Map<String, Object>> dailyFocusData = buildDailyFocusData(dailyRaw, sevenDaysAgo, today);
-          analytics.setDailyFocusData(dailyFocusData);
-
-          // ── Subject focus chart data ──
-          List<Map<String, Object>> subjectData = subjectRaw.stream().map(row -> {
-               Map<String, Object> map = new LinkedHashMap<>();
-               map.put("subject", row[0]);
-               map.put("minutes", ((Number) row[1]).longValue());
-               return map;
-          }).collect(Collectors.toList());
-          analytics.setSubjectFocusData(subjectData);
-
-          // ── Weekly sessions chart data ──
-          List<Object[]> weeklyRaw = pomodoroRepo.findWeeklySessionCounts(userId, thirtyDaysAgo);
-          List<Map<String, Object>> weeklyData = buildWeeklyData(weeklyRaw);
-          analytics.setWeeklySessionData(weeklyData);
-
-          // ── Productivity score ──
-          long totalAttempted = completedSessions + interruptedSessions;
-          long subjectLinked = pomodoroRepo.countSubjectLinkedCompletedSessions(userId);
-          int score = calculateProductivityScore(
-                    completedSessions, totalAttempted, activeDays, totalLast7Days, subjectLinked, breakRatio);
-          analytics.setProductivityScore(score);
-          analytics.setProductivityLabel(getProductivityLabel(score));
-
-          // ── Insights ──
-          analytics.setInsights(generateInsights(
-                    analytics, topSubject, completedSessions,
-                    interruptedSessions, activeDays, breakRatio, dailyFocusData));
-
-          return analytics;
+          return pomodoroSessionRepository.findById(sessionId)
+                    .orElseThrow(
+                              () -> new IllegalArgumentException("Pomodoro session not found with id: " + sessionId));
      }
 
-     // ─── Productivity Score Formula ───────────────────────────────────────────
-     // Score = A(35) + B(25) + C(20) + D(10) + E(10)
-     // A = completion rate
-     // B = daily consistency this week
-     // C = weekly focus volume vs target (100 min/week)
-     // D = subject-linked session bonus
-     // E = break balance bonus
-
-     private int calculateProductivityScore(long completed, long totalAttempted,
-               long activeDays, long focusMinutesLast7,
-               long subjectLinked, double breakRatio) {
-          double scoreA = totalAttempted > 0 ? ((double) completed / totalAttempted) * 35 : 0;
-          double scoreB = (activeDays / 7.0) * 25;
-          double scoreC = Math.min((double) focusMinutesLast7 / 100.0, 1.0) * 20;
-          double scoreD = completed > 0 ? ((double) subjectLinked / completed) * 10 : 0;
-
-          // Break ratio is healthy between 0.2 and 0.4
-          double scoreE;
-          if (breakRatio >= 0.2 && breakRatio <= 0.4) {
-               scoreE = 10;
-          } else if (breakRatio > 0 && breakRatio < 0.2) {
-               scoreE = (breakRatio / 0.2) * 10;
-          } else if (breakRatio > 0.4) {
-               scoreE = Math.max(0, 10 - (breakRatio - 0.4) * 20);
-          } else {
-               scoreE = 0;
+     private void validateSessionOwnerIfProvided(PomodoroSession session, Long studentId) {
+          if (studentId == null || studentId <= 0) {
+               return;
           }
 
-          return (int) Math.round(scoreA + scoreB + scoreC + scoreD + scoreE);
+          if (session.getStudentId() != null && !session.getStudentId().equals(studentId)) {
+               throw new IllegalArgumentException("You are not allowed to update this Pomodoro session.");
+          }
      }
 
-     private String getProductivityLabel(int score) {
-          if (score >= 85)
-               return "Excellent 🌟";
-          if (score >= 65)
-               return "Strong 💪";
-          if (score >= 45)
-               return "Improving 📈";
-          return "Low Consistency 🔄";
+     private Integer calculateMinutes(LocalDateTime start, LocalDateTime end) {
+          if (start == null || end == null) {
+               return null;
+          }
+
+          long seconds = java.time.Duration.between(start, end).getSeconds();
+
+          if (seconds <= 0) {
+               return 0;
+          }
+
+          return Math.max(1, (int) Math.round(seconds / 60.0));
      }
 
-     // ─── Insight Generator ────────────────────────────────────────────────────
-
-     private List<String> generateInsights(PomodoroAnalyticsResponse analytics,
-               String topSubject, long completed,
-               long interrupted, long activeDays,
-               double breakRatio,
-               List<Map<String, Object>> dailyData) {
-          List<String> insights = new ArrayList<>();
-
-          // Most productive day
-          String mostProductiveDay = findMostProductiveDay(dailyData);
-          if (mostProductiveDay != null) {
-               insights.add("📅 You were most productive on " + mostProductiveDay + ".");
+     private String normalizeSessionType(String type) {
+          if (isBlank(type)) {
+               return "POMODORO";
           }
 
-          // Top subject
-          if (!"None".equals(topSubject)) {
-               insights.add("📚 Your focus time is highest in " + topSubject + ".");
+          String cleaned = type.trim().toUpperCase().replace(" ", "_").replace("-", "_");
+
+          if (cleaned.equals("POMODORO")
+                    || cleaned.equals("DEEP_WORK")
+                    || cleaned.equals("REVISION")
+                    || cleaned.equals("TEST_PREP")) {
+               return cleaned;
           }
 
-          // Completed sessions
-          if (completed > 0) {
-               insights.add("🍅 You completed " + completed + " focus sessions this week.");
-          }
-
-          // Break ratio
-          if (breakRatio >= 0.2 && breakRatio <= 0.4) {
-               insights.add("⚖️ Break ratio is balanced — great study rhythm!");
-          } else if (breakRatio < 0.2 && completed > 0) {
-               insights.add("☕ You're skipping breaks — take short breaks to stay sharp.");
-          } else if (breakRatio > 0.4) {
-               insights.add("⏸️ Break time is high compared to focus time — try to balance it.");
-          }
-
-          // Interruptions
-          if (interrupted > 2) {
-               insights.add("⚠️ Interrupted sessions are high — reduce distractions for better focus.");
-          }
-
-          // Consistency
-          if (activeDays >= 5) {
-               insights.add("🔥 Excellent consistency — you studied " + activeDays + " days this week!");
-          } else if (activeDays >= 3) {
-               insights.add("📈 Good effort — try to be consistent every day for better results.");
-          } else if (activeDays > 0) {
-               insights.add("💡 Only " + activeDays + " active day(s) this week — set a daily study goal.");
-          }
-
-          if (insights.isEmpty()) {
-               insights.add("🚀 Start your first Pomodoro session to see insights here!");
-          }
-
-          return insights;
+          return "POMODORO";
      }
 
-     // ─── Helper: Build daily focus data with 0s for missing days ─────────────
-
-     private List<Map<String, Object>> buildDailyFocusData(
-               List<Object[]> rawData, LocalDate from, LocalDate to) {
-
-          Map<LocalDate, Long> dbMap = new LinkedHashMap<>();
-          for (Object[] row : rawData) {
-               dbMap.put((LocalDate) row[0], ((Number) row[1]).longValue());
+     private LocalDateTime parseDateTime(String value) {
+          if (isBlank(value)) {
+               return null;
           }
 
-          List<Map<String, Object>> result = new ArrayList<>();
-          LocalDate current = from;
-          while (!current.isAfter(to)) {
-               Map<String, Object> entry = new LinkedHashMap<>();
-               entry.put("date", current.toString());
-               entry.put("day", current.getDayOfWeek().name().substring(0, 3)); // "MON"
-               entry.put("minutes", dbMap.getOrDefault(current, 0L));
-               result.add(entry);
-               current = current.plusDays(1);
+          String text = value.trim();
+
+          try {
+               return LocalDateTime.parse(text);
+          } catch (Exception ignored) {
           }
-          return result;
+
+          try {
+               return OffsetDateTime.parse(text).toLocalDateTime();
+          } catch (Exception ignored) {
+          }
+
+          return null;
      }
 
-     // ─── Helper: Build weekly data ────────────────────────────────────────────
-
-     private List<Map<String, Object>> buildWeeklyData(List<Object[]> rawData) {
-          List<Map<String, Object>> result = new ArrayList<>();
-          int weekLabel = 1;
-          for (Object[] row : rawData) {
-               Map<String, Object> entry = new LinkedHashMap<>();
-               entry.put("week", "Week " + weekLabel++);
-               entry.put("sessions", ((Number) row[1]).longValue());
-               result.add(entry);
-          }
-          return result;
-     }
-
-     // ─── Helper: Most productive day ─────────────────────────────────────────
-
-     private String findMostProductiveDay(List<Map<String, Object>> dailyData) {
-          return dailyData.stream()
-                    .max(Comparator.comparingLong(m -> ((Number) m.get("minutes")).longValue()))
-                    .filter(m -> ((Number) m.get("minutes")).longValue() > 0)
-                    .map(m -> {
-                         String day = (String) m.get("day");
-                         // Convert "MON" → "Monday"
-                         Map<String, String> dayNames = new LinkedHashMap<>();
-                         dayNames.put("MON", "Monday");
-                         dayNames.put("TUE", "Tuesday");
-                         dayNames.put("WED", "Wednesday");
-                         dayNames.put("THU", "Thursday");
-                         dayNames.put("FRI", "Friday");
-                         dayNames.put("SAT", "Saturday");
-                         dayNames.put("SUN", "Sunday");
-                         return dayNames.getOrDefault(day, day);
-                    })
-                    .orElse(null);
-     }
-
-     // ─── Subject-wise stats (dedicated endpoint ke liye) ──────────────────────
-
-     public List<PomodoroSubjectStatResponse> getSubjectStats(Long userId) {
-
-          List<Object[]> rawData = pomodoroRepo.findSubjectWiseFocusMinutes(userId);
-
-          // Pehle total minutes calculate karo percentage ke liye
-          long totalMinutes = rawData.stream()
-                    .mapToLong(row -> ((Number) row[1]).longValue())
-                    .sum();
-
-          // Phir har subject ka data build karo
-          List<PomodoroSubjectStatResponse> result = new ArrayList<>();
-
-          for (Object[] row : rawData) {
-               String subjectName = (String) row[0];
-               long minutes = ((Number) row[1]).longValue();
-
-               // Session count ke liye alag query
-               // Simple approach: minutes / avg session length (25 min)
-               // Ya alag query bhi likh sakte hain — abhi simple rakhte hain
-               long approxSessions = Math.max(1, minutes / 25);
-
-               double percentage = totalMinutes > 0
-                         ? Math.round((double) minutes / totalMinutes * 1000.0) / 10.0
-                         : 0;
-
-               result.add(new PomodoroSubjectStatResponse(
-                         subjectName, minutes, approxSessions, percentage));
+     private Map<String, Object> safeBody(Map<String, Object> body) {
+          if (body == null) {
+               return new LinkedHashMap<>();
           }
 
-          return result;
+          return body;
+     }
+
+     private String getString(Map<String, Object> body, String... keys) {
+          if (body == null) {
+               return null;
+          }
+
+          for (String key : keys) {
+               if (body.containsKey(key) && body.get(key) != null) {
+                    return String.valueOf(body.get(key));
+               }
+          }
+
+          return null;
+     }
+
+     private Integer getInteger(Map<String, Object> body, String... keys) {
+          if (body == null) {
+               return null;
+          }
+
+          for (String key : keys) {
+               if (!body.containsKey(key) || body.get(key) == null) {
+                    continue;
+               }
+
+               Object value = body.get(key);
+
+               if (value instanceof Number) {
+                    return ((Number) value).intValue();
+               }
+
+               try {
+                    return Integer.parseInt(String.valueOf(value).trim());
+               } catch (Exception ignored) {
+               }
+          }
+
+          return null;
+     }
+
+     private Long getLong(Map<String, Object> body, String... keys) {
+          if (body == null) {
+               return null;
+          }
+
+          for (String key : keys) {
+               if (!body.containsKey(key) || body.get(key) == null) {
+                    continue;
+               }
+
+               Object value = body.get(key);
+
+               if (value instanceof Number) {
+                    return ((Number) value).longValue();
+               }
+
+               try {
+                    return Long.parseLong(String.valueOf(value).trim());
+               } catch (Exception ignored) {
+               }
+          }
+
+          return null;
+     }
+
+     private int defaultPositiveInt(Integer value, int fallback) {
+          if (value == null || value <= 0) {
+               return fallback;
+          }
+
+          return value;
+     }
+
+     private int defaultNonNegativeInt(Integer value, int fallback) {
+          if (value == null || value < 0) {
+               return fallback;
+          }
+
+          return value;
+     }
+
+     private String defaultText(String value, String fallback) {
+          if (value == null || value.trim().isEmpty()) {
+               return fallback;
+          }
+
+          return value.trim();
+     }
+
+     private boolean equalsText(String value, String expected) {
+          return value != null && value.equalsIgnoreCase(expected);
+     }
+
+     private boolean isBlank(String value) {
+          return value == null || value.trim().isEmpty();
      }
 }

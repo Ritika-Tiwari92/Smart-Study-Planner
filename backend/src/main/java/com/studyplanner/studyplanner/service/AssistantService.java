@@ -17,7 +17,12 @@ import java.util.stream.Collectors;
 @Service
 public class AssistantService {
 
-     @Value("${groq.api.key}")
+     /*
+      * Important:
+      * Default empty value keeps backend safe if groq.api.key is missing.
+      * API key must stay in backend environment/application.properties only.
+      */
+     @Value("${groq.api.key:}")
      private String groqApiKey;
 
      private final WebClient webClient;
@@ -26,7 +31,8 @@ public class AssistantService {
      private final SubjectService subjectService;
      private final RevisionService revisionService;
 
-     public AssistantService(WebClient.Builder webClientBuilder,
+     public AssistantService(
+               WebClient.Builder webClientBuilder,
                ChatHistoryService chatHistoryService,
                TaskService taskService,
                SubjectService subjectService,
@@ -42,35 +48,56 @@ public class AssistantService {
 
      public AssistantResponse chat(AssistantRequest request, Long userId, String email) {
 
-          // ─── Collect real-time user data ──────────────────
+          String userMessage = request != null ? safeText(request.getMessage()) : "";
+
+          if (userMessage.isBlank()) {
+               return new AssistantResponse(
+                         "Please type your question first.",
+                         request != null ? request.getSessionId() : null);
+          }
+
+          String reply;
+
+          try {
+               if (groqApiKey == null || groqApiKey.trim().isBlank()) {
+                    reply = buildLocalFallbackReply(userMessage, userId, email);
+               } else {
+                    reply = callGroqAi(userMessage, userId, email);
+               }
+
+          } catch (Exception e) {
+               System.out.println("ASSISTANT AI ERROR: " + e.getMessage());
+               reply = buildLocalFallbackReply(userMessage, userId, email);
+          }
+
+          saveHistorySafely(request.getSessionId(), userMessage, reply);
+
+          return new AssistantResponse(reply, request.getSessionId());
+     }
+
+     private String callGroqAi(String userMessage, Long userId, String email) {
           String dataContext = buildDataContext(userId, email);
 
-          // ─── Build system prompt with real data ───────────
           String systemPrompt = """
                     You are Astra, an AI study assistant for the EduMind AI student planner app.
                     You help students with study plans, revision strategies, topic explanations,
                     coding doubts, and personalized smart suggestions.
 
-                    CRITICAL LANGUAGE RULE — FOLLOW STRICTLY:
-                    Step 1: Read the user's message carefully.
-                    Step 2: Identify what language they used.
-                    - If user message contains Hindi/Urdu words like "batao", "karo", "mera", "mere", "kya", "aaj", "chahiye" → reply ONLY in Hinglish.
-                    - If user message is fully in English with no Hindi words → reply ONLY in pure English.
-                    Step 3: NEVER switch language mid-reply.
+                    CRITICAL LANGUAGE RULE:
+                    1. Detect the user's language.
+                    2. If user uses Hinglish/Hindi words, reply in natural Hinglish.
+                    3. If user writes fully in English, reply in pure English.
+                    4. Do not switch language unnecessarily.
 
-                    EXAMPLES:
-                    User: "What are my pending tasks?" → Reply in English only.
-                    User: "Mere pending tasks batao" → Reply in Hinglish only.
-                    User: "Aaj mujhe kya padhna chahiye?" → Reply in Hinglish only.
-                    User: "Explain recursion to me" → Reply in English only.
-
-                    OTHER RULES:
+                    RULES:
                     - Keep answers practical and concise.
                     - Use the REAL DATA provided below to give personalized answers.
                     - Never make up task names, subject names, or test details.
                     - For study plans, suggest Pomodoro-style sessions: 25 min study, 5 min break.
-                    - When motivating, reference actual progress from data.
-                                """
+                    - Use beginner-friendly language.
+                    - If data is missing, tell the student what to add first.
+                    """
+                    + "\n\n"
                     + dataContext;
 
           Map<String, Object> requestBody = Map.of(
@@ -78,49 +105,176 @@ public class AssistantService {
                     "messages", List.of(
                               Map.of("role", "system", "content", systemPrompt),
                               Map.of("role", "user", "content",
-                                        "LANGUAGE DETECTION: The following message is written in: " +
-                                                  detectLanguage(request.getMessage()) +
-                                                  ". Reply ONLY in that language.\n\nUSER MESSAGE: " +
-                                                  request.getMessage())),
+                                        "Detected language: " + detectLanguage(userMessage)
+                                                  + "\nReply only in that language.\n\nUser message: "
+                                                  + userMessage)),
                     "max_tokens", 1024,
                     "temperature", 0.7);
 
-          try {
-               Map response = webClient.post()
-                         .uri("/openai/v1/chat/completions")
-                         .header("Content-Type", "application/json")
-                         .header("Authorization", "Bearer " + groqApiKey)
-                         .bodyValue(requestBody)
-                         .retrieve()
-                         .bodyToMono(Map.class)
-                         .block();
+          Map response = webClient.post()
+                    .uri("/openai/v1/chat/completions")
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + groqApiKey.trim())
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
 
-               List choices = (List) response.get("choices");
-               Map firstChoice = (Map) choices.get(0);
-               Map message = (Map) firstChoice.get("message");
-               String reply = (String) message.get("content");
+          if (response == null || response.get("choices") == null) {
+               throw new RuntimeException("Empty response from AI provider.");
+          }
 
-               // ─── Save to history if sessionId provided ────
-               if (request.getSessionId() != null) {
-                    chatHistoryService.saveMessage(request.getSessionId(), "USER", request.getMessage());
-                    chatHistoryService.saveMessage(request.getSessionId(), "ASSISTANT", reply);
+          List choices = (List) response.get("choices");
+
+          if (choices.isEmpty()) {
+               throw new RuntimeException("No choices received from AI provider.");
+          }
+
+          Map firstChoice = (Map) choices.get(0);
+          Map message = (Map) firstChoice.get("message");
+
+          if (message == null || message.get("content") == null) {
+               throw new RuntimeException("No message content received from AI provider.");
+          }
+
+          return String.valueOf(message.get("content")).trim();
+     }
+
+     private String buildLocalFallbackReply(String userMessage, Long userId, String email) {
+          String language = detectLanguage(userMessage);
+          String lower = userMessage.toLowerCase();
+
+          String dataSummary = buildShortDataSummary(userId, email);
+
+          boolean hinglish = language.toLowerCase().contains("hinglish");
+
+          if (lower.contains("task") || lower.contains("pending") || lower.contains("kaam")) {
+               if (hinglish) {
+                    return "Aapke current study data ke basis par yeh quick help hai:\n\n"
+                              + dataSummary
+                              + "\nSuggestion: Pehle pending/high-priority tasks complete karo. Har task ke liye 25-minute Pomodoro session rakho, phir 5-minute break lo.";
                }
 
-               return new AssistantResponse(reply, request.getSessionId());
+               return "Based on your current study data:\n\n"
+                         + dataSummary
+                         + "\nSuggestion: Start with pending or high-priority tasks. Use one 25-minute Pomodoro session per task, followed by a 5-minute break.";
+          }
 
+          if (lower.contains("plan") || lower.contains("schedule") || lower.contains("padhna")
+                    || lower.contains("study")) {
+               if (hinglish) {
+                    return "Yeh simple study plan follow karo:\n\n"
+                              + "1. Sabse pehle pending tasks/revisions dekho.\n"
+                              + "2. Ek subject choose karo jisme progress low hai.\n"
+                              + "3. 25 minute focus + 5 minute break ka Pomodoro use karo.\n"
+                              + "4. Session ke baad short notes banao.\n\n"
+                              + dataSummary;
+               }
+
+               return "Here is a simple study plan:\n\n"
+                         + "1. Check your pending tasks and revisions.\n"
+                         + "2. Pick the subject with lower progress first.\n"
+                         + "3. Study in 25-minute Pomodoro blocks with 5-minute breaks.\n"
+                         + "4. After each session, write short notes.\n\n"
+                         + dataSummary;
+          }
+
+          if (lower.contains("revision") || lower.contains("revise")) {
+               if (hinglish) {
+                    return "Revision ke liye best approach:\n\n"
+                              + "1. Pehle weak/high-priority topics revise karo.\n"
+                              + "2. Har topic ke baad 5 questions solve karo.\n"
+                              + "3. Galtiyon ko separate note me likho.\n"
+                              + "4. Raat me 10-minute quick recap karo.\n\n"
+                              + dataSummary;
+               }
+
+               return "For revision, use this approach:\n\n"
+                         + "1. Revise weak or high-priority topics first.\n"
+                         + "2. Solve 5 questions after each topic.\n"
+                         + "3. Keep a separate note of mistakes.\n"
+                         + "4. Do a 10-minute recap at night.\n\n"
+                         + dataSummary;
+          }
+
+          if (hinglish) {
+               return "Astra local assistant active hai. Main aapko study plan, pending tasks, revision help, coding doubts aur Pomodoro suggestions me help kar sakti hoon.\n\n"
+                         + dataSummary
+                         + "\nAap specific question puch sakti ho, jaise: “Aaj mujhe kya padhna chahiye?”";
+          }
+
+          return "Astra local assistant is active. I can help you with study plans, pending tasks, revision help, coding doubts, and Pomodoro suggestions.\n\n"
+                    + dataSummary
+                    + "\nYou can ask a specific question such as: “What should I study today?”";
+     }
+
+     private String buildShortDataSummary(Long userId, String email) {
+          StringBuilder summary = new StringBuilder();
+
+          try {
+               List<Subject> subjects = subjectService.getSubjectsByEmail(email);
+               summary.append("Subjects: ").append(subjects.size()).append("\n");
+
+               if (!subjects.isEmpty()) {
+                    summary.append("Top subjects:\n");
+                    subjects.stream().limit(5).forEach(subject -> {
+                         summary.append("- ").append(subject.getSubjectName());
+
+                         if (subject.getProgress() != null) {
+                              summary.append(" (").append(subject.getProgress()).append("% progress)");
+                         }
+
+                         summary.append("\n");
+                    });
+               }
           } catch (Exception e) {
-               System.out.println("GROQ ERROR: " + e.getMessage());
-               return new AssistantResponse(
-                         "Sorry yaar, abhi AI service se connect nahi ho pa raha. " +
-                                   "Thodi der baad try karo. Agar problem continue ho toh backend check karo.",
-                         request.getSessionId());
+               summary.append("Subjects: Could not fetch.\n");
+          }
+
+          try {
+               List<Task> allTasks = taskService.getAllTasks(userId);
+               long pending = allTasks.stream()
+                         .filter(task -> task.getStatus() != null && task.getStatus().equalsIgnoreCase("PENDING"))
+                         .count();
+
+               summary.append("Tasks: ").append(allTasks.size()).append(" total, ")
+                         .append(pending).append(" pending\n");
+          } catch (Exception e) {
+               summary.append("Tasks: Could not fetch.\n");
+          }
+
+          try {
+               List<Revision> revisions = revisionService.getAllRevisions(userId);
+               long pending = revisions.stream()
+                         .filter(revision -> revision.getStatus() != null
+                                   && revision.getStatus().equalsIgnoreCase("PENDING"))
+                         .count();
+
+               summary.append("Revisions: ").append(revisions.size()).append(" total, ")
+                         .append(pending).append(" pending\n");
+          } catch (Exception e) {
+               summary.append("Revisions: Could not fetch.\n");
+          }
+
+          return summary.toString().trim();
+     }
+
+     private void saveHistorySafely(Long sessionId, String userMessage, String reply) {
+          if (sessionId == null) {
+               return;
+          }
+
+          try {
+               chatHistoryService.saveMessage(sessionId, "USER", userMessage);
+               chatHistoryService.saveMessage(sessionId, "ASSISTANT", reply);
+          } catch (Exception e) {
+               System.out.println("Assistant chat history save failed: " + e.getMessage());
           }
      }
 
      private String detectLanguage(String message) {
-          String lower = message.toLowerCase();
+          String lower = safeText(message).toLowerCase();
 
-          // Only pure Hindi/Urdu words — no English words that accidentally match
           String[] hindiWords = {
                     "mera", "mere", "meri", "mujhe", "tumhe", "tumhara",
                     "kya", "kyun", "kaise", "kaun", "kitna", "kab", "kahan",
@@ -131,55 +285,66 @@ public class AssistantService {
                     "apna", "apni", "apne", "unka", "unki", "uska", "uski"
           };
 
-          // Count how many Hindi words appear — require at least 2 matches
           int hindiCount = 0;
+
           for (String word : hindiWords) {
                if (lower.contains(word)) {
                     hindiCount++;
                }
+
                if (hindiCount >= 2) {
-                    return "Hinglish (Hindi + English mix) — use Hindi words naturally mixed with English";
+                    return "Hinglish";
                }
           }
 
-          return "English — reply in pure English only, no Hindi words at all";
+          return "English";
      }
 
-     // ─── Build real-time data context string ──────────────
      private String buildDataContext(Long userId, String email) {
           StringBuilder ctx = new StringBuilder("=== STUDENT'S REAL-TIME DATA ===\n");
           ctx.append("Today's date: ").append(LocalDate.now()).append("\n\n");
 
-          // Subjects
           try {
                List<Subject> subjects = subjectService.getSubjectsByEmail(email);
+
                if (subjects.isEmpty()) {
                     ctx.append("SUBJECTS: None added yet.\n\n");
                } else {
                     ctx.append("SUBJECTS (").append(subjects.size()).append(" total):\n");
-                    for (Subject s : subjects) {
-                         ctx.append("- ").append(s.getSubjectName());
-                         if (s.getProgress() != null)
-                              ctx.append(" | Progress: ").append(s.getProgress()).append("%");
-                         if (s.getDifficultyLevel() != null)
-                              ctx.append(" | Difficulty: ").append(s.getDifficultyLevel());
+
+                    for (Subject subject : subjects) {
+                         ctx.append("- ").append(subject.getSubjectName());
+
+                         if (subject.getProgress() != null) {
+                              ctx.append(" | Progress: ").append(subject.getProgress()).append("%");
+                         }
+
+                         if (subject.getDifficultyLevel() != null) {
+                              ctx.append(" | Difficulty: ").append(subject.getDifficultyLevel());
+                         }
+
                          ctx.append("\n");
                     }
+
                     ctx.append("\n");
                }
           } catch (Exception e) {
                ctx.append("SUBJECTS: Could not fetch.\n\n");
           }
 
-          // Tasks
           try {
                List<Task> allTasks = taskService.getAllTasks(userId);
+
                List<Task> pendingTasks = allTasks.stream()
-                         .filter(t -> t.getStatus() != null && t.getStatus().equalsIgnoreCase("PENDING"))
+                         .filter(task -> task.getStatus() != null
+                                   && task.getStatus().equalsIgnoreCase("PENDING"))
                          .collect(Collectors.toList());
+
                List<Task> completedTasks = allTasks.stream()
-                         .filter(t -> t.getStatus() != null && t.getStatus().equalsIgnoreCase("COMPLETED"))
+                         .filter(task -> task.getStatus() != null
+                                   && task.getStatus().equalsIgnoreCase("COMPLETED"))
                          .collect(Collectors.toList());
+
                List<Task> todayTasks = taskService.getTodayTasks(userId);
 
                ctx.append("TASKS SUMMARY:\n");
@@ -189,31 +354,43 @@ public class AssistantService {
 
                if (!pendingTasks.isEmpty()) {
                     ctx.append("PENDING TASKS LIST:\n");
-                    pendingTasks.stream().limit(8).forEach(t -> {
-                         ctx.append("  * ").append(t.getTitle());
-                         if (t.getDueDate() != null)
-                              ctx.append(" (Due: ").append(t.getDueDate()).append(")");
-                         if (t.getPriority() != null)
-                              ctx.append(" [").append(t.getPriority()).append("]");
+
+                    pendingTasks.stream().limit(8).forEach(task -> {
+                         ctx.append("  * ").append(task.getTitle());
+
+                         if (task.getDueDate() != null) {
+                              ctx.append(" (Due: ").append(task.getDueDate()).append(")");
+                         }
+
+                         if (task.getPriority() != null) {
+                              ctx.append(" [").append(task.getPriority()).append("]");
+                         }
+
                          ctx.append("\n");
                     });
                }
 
                if (!todayTasks.isEmpty()) {
                     ctx.append("TODAY'S TASKS:\n");
-                    todayTasks.forEach(t -> ctx.append("  * ").append(t.getTitle())
-                              .append(" [").append(t.getStatus()).append("]\n"));
+
+                    todayTasks.forEach(task -> ctx.append("  * ")
+                              .append(task.getTitle())
+                              .append(" [")
+                              .append(task.getStatus())
+                              .append("]\n"));
                }
+
                ctx.append("\n");
           } catch (Exception e) {
                ctx.append("TASKS: Could not fetch.\n\n");
           }
 
-          // Revisions
           try {
                List<Revision> revisions = revisionService.getAllRevisions(userId);
+
                List<Revision> pendingRevisions = revisions.stream()
-                         .filter(r -> r.getStatus() != null && r.getStatus().equalsIgnoreCase("PENDING"))
+                         .filter(revision -> revision.getStatus() != null
+                                   && revision.getStatus().equalsIgnoreCase("PENDING"))
                          .collect(Collectors.toList());
 
                ctx.append("REVISIONS:\n");
@@ -222,15 +399,22 @@ public class AssistantService {
 
                if (!pendingRevisions.isEmpty()) {
                     ctx.append("PENDING REVISIONS:\n");
-                    pendingRevisions.stream().limit(5).forEach(r -> {
-                         ctx.append("  * ").append(r.getTitle());
-                         if (r.getSubject() != null)
-                              ctx.append(" (Subject: ").append(r.getSubject()).append(")");
-                         if (r.getPriority() != null)
-                              ctx.append(" [Priority: ").append(r.getPriority()).append("]");
+
+                    pendingRevisions.stream().limit(5).forEach(revision -> {
+                         ctx.append("  * ").append(revision.getTitle());
+
+                         if (revision.getSubject() != null) {
+                              ctx.append(" (Subject: ").append(revision.getSubject()).append(")");
+                         }
+
+                         if (revision.getPriority() != null) {
+                              ctx.append(" [Priority: ").append(revision.getPriority()).append("]");
+                         }
+
                          ctx.append("\n");
                     });
                }
+
                ctx.append("\n");
           } catch (Exception e) {
                ctx.append("REVISIONS: Could not fetch.\n\n");
@@ -238,5 +422,9 @@ public class AssistantService {
 
           ctx.append("=== END OF DATA ===\n");
           return ctx.toString();
+     }
+
+     private String safeText(String value) {
+          return value == null ? "" : value.trim();
      }
 }

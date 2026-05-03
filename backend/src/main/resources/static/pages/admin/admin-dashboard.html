@@ -1,65 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Admin Dashboard | EduMind AI</title>
 
-     <!-- Poppins Font -->
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
 
-     <!-- Common Sidebar CSS -->
      <link rel="stylesheet" href="admin-sidebar.css">
-
-     <!-- Font Awesome -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-     <!-- Chart.js -->
      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-     <!-- API Base -->
      <script>window.EM_API_BASE = 'http://localhost:8080';</script>
 
      <style>
-          /* ══════════════════════════════════════
-             CSS Variables
-          ══════════════════════════════════════ */
           :root {
                --bg: #080d1a;
                --bg2: #0c1220;
                --bg3: #101828;
                --card: #111827;
                --card2: #162032;
-               --border: rgba(20, 184, 166, 0.12);
-               --border2: rgba(255, 255, 255, 0.06);
+               --border: rgba(20, 184, 166, 0.14);
+               --border2: rgba(255, 255, 255, 0.07);
                --teal: #14b8a6;
                --cyan: #06b6d4;
                --purple: #8b5cf6;
                --amber: #f59e0b;
                --rose: #f43f5e;
                --green: #10b981;
+               --blue: #3b82f6;
                --teal-glow: rgba(20, 184, 166, 0.18);
                --text: #f1f5f9;
                --text2: #94a3b8;
-               --text3: #475569;
+               --text3: #64748b;
                --header-h: 64px;
-               --radius: 14px;
-               --radius-sm: 10px;
+               --radius: 18px;
+               --radius-sm: 12px;
                --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
-          [data-theme="light"] {
+          [data-theme="light"],
+          body[data-theme="light"] {
                --bg: #f0f4f8;
                --bg2: #e8edf5;
-               --bg3: #dde4ef;
+               --bg3: #eef3f8;
                --card: #ffffff;
                --card2: #f8fafc;
-               --border: rgba(20, 184, 166, 0.15);
-               --border2: rgba(0, 0, 0, 0.07);
+               --border: rgba(20, 184, 166, 0.16);
+               --border2: rgba(15, 23, 42, 0.08);
                --text: #0f172a;
                --text2: #475569;
                --text3: #94a3b8;
@@ -73,15 +65,20 @@
 
           body {
                font-family: 'Poppins', sans-serif;
-               background: var(--bg);
+               background:
+                    radial-gradient(circle at 14% 12%, rgba(20, 184, 166, 0.08), transparent 30%),
+                    radial-gradient(circle at 85% 8%, rgba(139, 92, 246, 0.09), transparent 35%),
+                    var(--bg);
                color: var(--text);
                min-height: 100vh;
                overflow-x: hidden;
           }
 
-          /* ══════════════════════════════════════
-             LOADER
-          ══════════════════════════════════════ */
+          button {
+               font-family: inherit;
+               cursor: pointer;
+          }
+
           #pageLoader {
                position: fixed;
                inset: 0;
@@ -110,12 +107,12 @@
                width: 48px;
                height: 48px;
                overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, .42));
           }
 
           .loader-text h2 {
-               font-family: 'Poppins', sans-serif;
                font-size: 22px;
-               font-weight: 700;
+               font-weight: 800;
                background: linear-gradient(135deg, #0fe0c0, #38bdf8);
                -webkit-background-clip: text;
                -webkit-text-fill-color: transparent;
@@ -131,8 +128,8 @@
           }
 
           .loader-bar {
-               width: 160px;
-               height: 3px;
+               width: 180px;
+               height: 4px;
                background: var(--bg3);
                border-radius: 10px;
                overflow: hidden;
@@ -140,7 +137,7 @@
 
           .loader-bar-fill {
                height: 100%;
-               background: linear-gradient(90deg, #0fe0c0, #38bdf8);
+               background: linear-gradient(90deg, #0fe0c0, #38bdf8, #8b5cf6);
                border-radius: 10px;
                animation: loadBar 1.2s ease forwards;
           }
@@ -155,69 +152,53 @@
                }
           }
 
-          /* SVG logo node animations */
           @keyframes nodePulse {
 
                0%,
                100% {
-                    opacity: .85
+                    opacity: .85;
+                    transform: scale(1);
                }
 
                50% {
-                    opacity: 1
-               }
-          }
-
-          @keyframes centerPulse {
-
-               0%,
-               100% {
-                    opacity: .9
-               }
-
-               50% {
-                    opacity: 1
-               }
-          }
-
-          @keyframes hexRotate {
-               from {
-                    transform: rotate(0deg) translate(-22px, -22px) rotate(0deg)
-               }
-
-               to {
-                    transform: rotate(360deg) translate(-22px, -22px) rotate(-360deg)
+                    opacity: 1;
+                    transform: scale(1.12);
                }
           }
 
           @keyframes lineFlow {
                0% {
-                    stroke-dashoffset: 20
+                    stroke-dashoffset: 20;
                }
 
                100% {
-                    stroke-dashoffset: 0
+                    stroke-dashoffset: 0;
                }
           }
 
           .loader-logo-svg .node-top {
                animation: nodePulse 2.4s ease-in-out infinite;
+               transform-origin: 22px 15px;
           }
 
           .loader-logo-svg .node-left {
                animation: nodePulse 2.4s ease-in-out infinite 0.4s;
+               transform-origin: 14px 24px;
           }
 
           .loader-logo-svg .node-right {
                animation: nodePulse 2.4s ease-in-out infinite 0.8s;
+               transform-origin: 30px 24px;
           }
 
           .loader-logo-svg .node-bottom {
                animation: nodePulse 2.4s ease-in-out infinite 1.2s;
+               transform-origin: 22px 30px;
           }
 
           .loader-logo-svg .center-dot {
-               animation: centerPulse 2s ease-in-out infinite;
+               animation: nodePulse 2s ease-in-out infinite;
+               transform-origin: 22px 22px;
           }
 
           .loader-logo-svg .conn-line {
@@ -225,27 +206,29 @@
                animation: lineFlow 3s linear infinite;
           }
 
-          /* ══════════════════════════════════════
-             MAIN CONTENT AREA
-          ══════════════════════════════════════ */
           .em-main-content {
                min-height: 100vh;
                display: flex;
                flex-direction: column;
           }
 
-          /* ── Topbar ── */
           .topbar {
-               height: var(--header-h);
-               background: var(--bg2);
+               min-height: var(--header-h);
+               background: rgba(12, 18, 32, .92);
+               backdrop-filter: blur(18px);
                border-bottom: 1px solid var(--border2);
                display: flex;
                align-items: center;
-               padding: 0 24px;
+               padding: 10px 24px;
                gap: 12px;
                position: sticky;
                top: 0;
                z-index: 100;
+          }
+
+          [data-theme="light"] .topbar,
+          body[data-theme="light"] .topbar {
+               background: rgba(255, 255, 255, .92);
           }
 
           .topbar-left {
@@ -254,7 +237,7 @@
 
           .topbar-left h1 {
                font-size: 18px;
-               font-weight: 600;
+               font-weight: 700;
                color: var(--text);
                line-height: 1.2;
           }
@@ -262,53 +245,62 @@
           .topbar-left p {
                font-size: 12px;
                color: var(--text2);
-               margin-top: 1px;
+               margin-top: 2px;
           }
 
           .topbar-right {
                display: flex;
                align-items: center;
                gap: 8px;
+               flex-wrap: wrap;
+               justify-content: flex-end;
           }
 
-          .topbar-btn {
-               width: 36px;
+          .topbar-btn,
+          .topbar-action {
+               min-width: 36px;
                height: 36px;
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: 9px;
+               border-radius: 10px;
                display: flex;
                align-items: center;
                justify-content: center;
-               cursor: pointer;
                color: var(--text2);
                font-size: 14px;
                transition: all var(--transition);
           }
 
-          .topbar-btn:hover {
+          .topbar-action {
+               gap: 8px;
+               padding: 0 12px;
+               font-size: 12px;
+               font-weight: 700;
+          }
+
+          .topbar-btn:hover,
+          .topbar-action:hover {
                border-color: var(--teal);
                color: var(--teal);
+               background: rgba(20, 184, 166, .08);
           }
 
           .topbar-time {
                font-size: 12px;
-               font-weight: 500;
+               font-weight: 600;
                color: var(--text2);
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: 9px;
-               padding: 7px 13px;
+               border-radius: 10px;
+               padding: 8px 13px;
                font-variant-numeric: tabular-nums;
           }
 
-          /* ── Content ── */
           .content {
                padding: 24px;
                flex: 1;
           }
 
-          /* Welcome Banner */
           .welcome-banner {
                background: linear-gradient(135deg, var(--card2), var(--card));
                border: 1px solid var(--border);
@@ -327,49 +319,71 @@
                position: absolute;
                right: -30px;
                top: -30px;
-               width: 160px;
-               height: 160px;
+               width: 180px;
+               height: 180px;
                background: radial-gradient(circle, var(--teal-glow), transparent 70%);
                pointer-events: none;
           }
 
+          .welcome-banner::after {
+               content: '';
+               position: absolute;
+               left: 12%;
+               bottom: -80px;
+               width: 240px;
+               height: 240px;
+               background: radial-gradient(circle, rgba(139, 92, 246, 0.10), transparent 70%);
+               pointer-events: none;
+          }
+
           .welcome-emoji {
-               font-size: 36px;
+               width: 52px;
+               height: 52px;
+               border-radius: 16px;
+               background: rgba(20, 184, 166, .13);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 26px;
+               flex: 0 0 52px;
+               z-index: 1;
+          }
+
+          .welcome-text {
+               z-index: 1;
           }
 
           .welcome-text h2 {
-               font-size: 20px;
-               font-weight: 700;
+               font-size: 21px;
+               font-weight: 800;
                line-height: 1.2;
           }
 
           .welcome-text p {
                font-size: 13px;
                color: var(--text2);
-               margin-top: 4px;
+               margin-top: 5px;
+               line-height: 1.6;
           }
 
           .welcome-text span {
                color: var(--teal);
-               font-weight: 600;
+               font-weight: 700;
           }
 
-          /* ── Section label ── */
           .section-label {
                font-size: 10.5px;
-               font-weight: 600;
-               letter-spacing: 0.1em;
+               font-weight: 700;
+               letter-spacing: 0.11em;
                text-transform: uppercase;
                color: var(--text3);
                margin-bottom: 14px;
           }
 
-          /* ══════════════════════════════════════
-             STAT CARDS
-          ══════════════════════════════════════ */
           .stats-grid {
                display: grid;
-               grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+               grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
                gap: 14px;
                margin-bottom: 24px;
           }
@@ -415,12 +429,13 @@
                display: flex;
                align-items: center;
                justify-content: space-between;
+               gap: 10px;
           }
 
           .stat-icon {
                width: 40px;
                height: 40px;
-               border-radius: 10px;
+               border-radius: 11px;
                display: flex;
                align-items: center;
                justify-content: center;
@@ -430,9 +445,10 @@
 
           .stat-trend {
                font-size: 10.5px;
-               font-weight: 600;
+               font-weight: 700;
                padding: 3px 8px;
                border-radius: 100px;
+               white-space: nowrap;
           }
 
           .trend-up {
@@ -445,21 +461,33 @@
                color: var(--text2);
           }
 
+          .trend-warn {
+               background: rgba(245, 158, 11, 0.15);
+               color: var(--amber);
+          }
+
+          .trend-bad {
+               background: rgba(244, 63, 94, 0.13);
+               color: var(--rose);
+          }
+
           .stat-val {
                font-size: 28px;
-               font-weight: 700;
+               font-weight: 800;
                line-height: 1;
                color: var(--text);
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
           }
 
           .stat-label {
                font-size: 12px;
                color: var(--text2);
-               font-weight: 400;
-               margin-top: 2px;
+               font-weight: 500;
+               margin-top: 3px;
           }
 
-          /* Card accent colors */
           .card-teal {
                --card-accent: var(--teal);
           }
@@ -514,7 +542,6 @@
                color: var(--green);
           }
 
-          /* Skeleton */
           .skeleton {
                background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
                background-size: 200% 100%;
@@ -534,62 +561,148 @@
                }
           }
 
-          /* ══════════════════════════════════════
-             CHARTS ROW
-          ══════════════════════════════════════ */
-          .row2 {
+          .insight-grid {
                display: grid;
-               grid-template-columns: 1fr 1fr 320px;
-               gap: 16px;
+               grid-template-columns: repeat(4, minmax(0, 1fr));
+               gap: 12px;
                margin-bottom: 24px;
           }
 
-          .chart-card {
-               background: var(--card);
+          .insight-item {
+               background: var(--bg3);
                border: 1px solid var(--border2);
-               border-radius: var(--radius);
-               padding: 20px;
+               border-radius: 13px;
+               padding: 14px;
           }
 
-          .chart-card-header {
-               display: flex;
-               align-items: center;
-               justify-content: space-between;
+          .insight-item p {
+               color: var(--text2);
+               font-size: 11px;
+               font-weight: 700;
+               text-transform: uppercase;
+               letter-spacing: .04em;
+          }
+
+          .insight-item h4 {
+               margin-top: 6px;
+               font-size: 16px;
+               color: var(--text);
+          }
+
+          .premium-chart-grid {
+               display: grid;
+               grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+               gap: 16px;
                margin-bottom: 16px;
           }
 
-          .chart-card-header h3 {
-               font-size: 14px;
-               font-weight: 600;
+          .premium-chart-grid.two {
+               grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .chart-card-header span {
-               font-size: 11px;
-               color: var(--text2);
-               background: var(--bg3);
-               padding: 3px 10px;
-               border-radius: 100px;
-          }
-
-          .chart-wrap {
-               position: relative;
-               height: 200px;
-          }
-
-          /* Activity */
+          .chart-card,
           .activity-card {
                background: var(--card);
                border: 1px solid var(--border2);
                border-radius: var(--radius);
                padding: 20px;
+               position: relative;
+               overflow: hidden;
+          }
+
+          .chart-card::before {
+               content: '';
+               position: absolute;
+               inset: 0;
+               background:
+                    radial-gradient(circle at 85% 0%, rgba(20, 184, 166, .08), transparent 30%),
+                    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, .07), transparent 32%);
+               pointer-events: none;
+          }
+
+          .chart-card-header {
+               display: flex;
+               align-items: flex-start;
+               justify-content: space-between;
+               gap: 12px;
+               margin-bottom: 16px;
+               position: relative;
+               z-index: 1;
+          }
+
+          .chart-title h3,
+          .activity-card h3 {
+               font-size: 14px;
+               font-weight: 800;
+               display: flex;
+               align-items: center;
+               gap: 8px;
+          }
+
+          .chart-title p {
+               margin-top: 4px;
+               font-size: 12px;
+               line-height: 1.5;
+               color: var(--text2);
+          }
+
+          .chart-pill {
+               font-size: 11px;
+               color: var(--text2);
+               background: var(--bg3);
+               padding: 5px 10px;
+               border-radius: 100px;
+               white-space: nowrap;
+               font-weight: 700;
+          }
+
+          .chart-wrap {
+               position: relative;
+               height: 250px;
+               z-index: 1;
+          }
+
+          .chart-wrap.small {
+               height: 225px;
+          }
+
+          .chart-metric-row {
+               display: grid;
+               grid-template-columns: repeat(3, 1fr);
+               gap: 10px;
+               margin-top: 14px;
+               position: relative;
+               z-index: 1;
+          }
+
+          .chart-mini-metric {
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 12px;
+               padding: 10px;
+          }
+
+          .chart-mini-metric p {
+               color: var(--text2);
+               font-size: 10.5px;
+               text-transform: uppercase;
+               font-weight: 800;
+               letter-spacing: .04em;
+          }
+
+          .chart-mini-metric h4 {
+               margin-top: 4px;
+               font-size: 16px;
+               color: var(--text);
+          }
+
+          .activity-card {
                display: flex;
                flex-direction: column;
-               max-height: 320px;
+               max-height: 424px;
           }
 
           .activity-card h3 {
-               font-size: 14px;
-               font-weight: 600;
                margin-bottom: 14px;
                flex-shrink: 0;
           }
@@ -600,6 +713,7 @@
                display: flex;
                flex-direction: column;
                gap: 10px;
+               padding-right: 4px;
           }
 
           .activity-list::-webkit-scrollbar {
@@ -615,7 +729,7 @@
                display: flex;
                align-items: flex-start;
                gap: 10px;
-               padding: 9px 11px;
+               padding: 10px 11px;
                background: var(--bg3);
                border-radius: var(--radius-sm);
                border: 1px solid var(--border2);
@@ -627,50 +741,27 @@
           }
 
           .activity-icon {
-               font-size: 16px;
+               font-size: 17px;
                flex-shrink: 0;
                margin-top: 1px;
           }
 
           .activity-text p {
                font-size: 12.5px;
-               font-weight: 500;
-               line-height: 1.4;
+               font-weight: 600;
+               line-height: 1.45;
           }
 
           .activity-text span {
                font-size: 11px;
                color: var(--text3);
-               margin-top: 2px;
+               margin-top: 3px;
                display: block;
           }
 
-          .empty-state {
-               text-align: center;
-               padding: 20px;
-               color: var(--text2);
-               font-size: 13px;
-          }
-
-          .empty-state i {
-               font-size: 26px;
-               color: var(--text3);
-               display: block;
-               margin-bottom: 8px;
-          }
-
-          /* Row 3 */
-          .row3 {
-               display: grid;
-               grid-template-columns: 1fr 1fr;
-               gap: 16px;
-               margin-bottom: 24px;
-          }
-
-          /* ── Quick Actions ── */
           .quick-actions {
                display: grid;
-               grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+               grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
                gap: 10px;
                margin-bottom: 24px;
           }
@@ -683,12 +774,11 @@
                display: flex;
                flex-direction: column;
                align-items: center;
-               gap: 7px;
-               cursor: pointer;
+               gap: 8px;
                text-decoration: none;
                color: var(--text2);
                font-size: 12px;
-               font-weight: 500;
+               font-weight: 600;
                transition: all var(--transition);
                text-align: center;
           }
@@ -704,24 +794,74 @@
                font-size: 20px;
           }
 
-          /* ══════════════════════════════════════
-             RESPONSIVE
-          ══════════════════════════════════════ */
-          @media (max-width: 1100px) {
-               .row2 {
-                    grid-template-columns: 1fr 1fr;
+          .empty-state {
+               text-align: center;
+               padding: 22px;
+               color: var(--text2);
+               font-size: 13px;
+          }
+
+          .empty-state i {
+               font-size: 26px;
+               color: var(--text3);
+               display: block;
+               margin-bottom: 8px;
+          }
+
+          .toast {
+               position: fixed;
+               top: 80px;
+               right: 24px;
+               z-index: 99999;
+               min-width: 280px;
+               max-width: 380px;
+               padding: 13px 15px;
+               border-radius: 14px;
+               background: #164e63;
+               color: #67e8f9;
+               border: 1px solid rgba(34, 211, 238, .3);
+               box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-size: 13px;
+               font-weight: 700;
+               animation: toastIn .25s ease;
+          }
+
+          .toast.success {
+               background: #065f46;
+               color: #6ee7b7;
+               border-color: rgba(52, 211, 153, .3);
+          }
+
+          .toast.error {
+               background: #7f1d1d;
+               color: #fca5a5;
+               border-color: rgba(248, 113, 113, .3);
+          }
+
+          @keyframes toastIn {
+               from {
+                    opacity: 0;
+                    transform: translateX(20px);
                }
 
-               .activity-card {
-                    grid-column: 1 / -1;
+               to {
+                    opacity: 1;
+                    transform: translateX(0);
                }
           }
 
-          @media (max-width: 820px) {
+          @media (max-width: 1120px) {
 
-               .row2,
-               .row3 {
+               .premium-chart-grid,
+               .premium-chart-grid.two {
                     grid-template-columns: 1fr;
+               }
+
+               .insight-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
                }
           }
 
@@ -735,16 +875,36 @@
                }
 
                .topbar {
-                    padding: 0 14px;
+                    padding: 10px 14px;
+                    flex-wrap: wrap;
+               }
+
+               .topbar-left {
+                    min-width: calc(100% - 44px);
+               }
+
+               .topbar-right {
+                    width: 100%;
+                    justify-content: flex-start;
+               }
+
+               .topbar-time {
+                    display: none;
                }
 
                .welcome-emoji {
                     display: none;
                }
+
+               .chart-metric-row {
+                    grid-template-columns: 1fr;
+               }
           }
 
-          @media (max-width: 420px) {
-               .stats-grid {
+          @media (max-width: 520px) {
+
+               .stats-grid,
+               .insight-grid {
                     grid-template-columns: 1fr;
                }
           }
@@ -759,10 +919,8 @@
 
 <body data-page-role="admin">
 
-     <!-- ══ Sidebar placeholder — JS injects sidebar here ══ -->
      <div id="sidebar-placeholder"></div>
 
-     <!-- ══ Page Loader ══ -->
      <div id="pageLoader">
           <div class="loader-brand">
                <svg class="loader-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -808,65 +966,94 @@
           </div>
      </div>
 
-     <!-- ══ MAIN CONTENT ══ -->
      <div class="em-main-content" id="mainContent">
-
-          <!-- Topbar -->
           <div class="topbar">
-               <!-- Hamburger — mobile sidebar toggle -->
                <button class="em-hamburger" id="emHamburger" aria-label="Open menu">
                     <span></span><span></span><span></span>
                </button>
 
                <div class="topbar-left">
                     <h1>Admin Dashboard</h1>
-                    <p>Welcome back — here's what's happening today.</p>
+                    <p>Realtime control center for EduMind AI platform modules.</p>
                </div>
 
                <div class="topbar-right">
                     <div class="topbar-time" id="liveTime">--:--:--</div>
-                    <div class="topbar-btn" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">
+                    <button class="topbar-action" type="button" onclick="openPage('admin-reports.html')"
+                         title="Open reports">
+                         <i class="fas fa-file-lines"></i> Reports
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">
                          <i class="fas fa-moon"></i>
-                    </div>
-                    <div class="topbar-btn" onclick="refreshDashboard()" title="Refresh data">
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="refreshDashboard(true)" title="Refresh data">
                          <i class="fas fa-rotate-right" id="refreshIcon"></i>
-                    </div>
+                    </button>
                </div>
           </div>
 
-          <!-- Page Content -->
           <div class="content">
-
-               <!-- Welcome Banner -->
                <div class="welcome-banner">
-                    <div class="welcome-emoji">👋</div>
+                    <div class="welcome-emoji"><i class="fas fa-brain"></i></div>
                     <div class="welcome-text">
                          <h2>Hello, <span id="welcomeName">Admin</span>!</h2>
-                         <p>EduMind AI admin panel — monitor, manage and control the whole platform from here.</p>
+                         <p>Monitor students, tests, notifications, security, Pomodoro focus sessions and assistant logs
+                              from one dynamic dashboard.</p>
                     </div>
                </div>
 
-               <!-- Stat Cards -->
                <div class="section-label">Platform Overview</div>
                <div class="stats-grid" id="statsGrid"></div>
 
-               <!-- Charts -->
-               <div class="section-label">Analytics Overview</div>
-               <div class="row2">
+               <div class="section-label">Smart Module Insights</div>
+               <div class="insight-grid">
+                    <div class="insight-item">
+                         <p>Study Activity</p>
+                         <h4 id="insightStudyActivity">Loading...</h4>
+                    </div>
+                    <div class="insight-item">
+                         <p>Focus Summary</p>
+                         <h4 id="insightFocus">Loading...</h4>
+                    </div>
+                    <div class="insight-item">
+                         <p>AI Usage</p>
+                         <h4 id="insightAi">Loading...</h4>
+                    </div>
+                    <div class="insight-item">
+                         <p>Security Health</p>
+                         <h4 id="insightSecurity">Loading...</h4>
+                    </div>
+               </div>
+
+               <div class="section-label">Premium Analytics Overview</div>
+
+               <div class="premium-chart-grid">
                     <div class="chart-card">
                          <div class="chart-card-header">
-                              <h3>Weekly Active Students</h3>
-                              <span>Last 7 days</span>
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-layer-group"></i> Weekly Platform Activity</h3>
+                                   <p>Tasks, planner, revisions, tests, Pomodoro sessions and assistant usage for the
+                                        last 7 days.</p>
+                              </div>
+                              <span class="chart-pill">Realtime</span>
                          </div>
-                         <div class="chart-wrap"><canvas id="weeklyChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                         <div class="chart-card-header">
-                              <h3>Task Completion</h3>
-                              <span>This month</span>
+                         <div class="chart-wrap"><canvas id="platformActivityChart"></canvas></div>
+                         <div class="chart-metric-row">
+                              <div class="chart-mini-metric">
+                                   <p>Total Activity</p>
+                                   <h4 id="platformTotalMetric">0</h4>
+                              </div>
+                              <div class="chart-mini-metric">
+                                   <p>Best Day</p>
+                                   <h4 id="platformBestDayMetric">—</h4>
+                              </div>
+                              <div class="chart-mini-metric">
+                                   <p>Main Module</p>
+                                   <h4 id="platformMainModuleMetric">—</h4>
+                              </div>
                          </div>
-                         <div class="chart-wrap"><canvas id="taskChart"></canvas></div>
                     </div>
+
                     <div class="activity-card">
                          <h3>🕐 Recent Activity</h3>
                          <div class="activity-list" id="activityList">
@@ -877,54 +1064,151 @@
                     </div>
                </div>
 
-               <div class="row3">
+               <div class="premium-chart-grid two">
                     <div class="chart-card">
                          <div class="chart-card-header">
-                              <h3>Subject Engagement</h3>
-                              <span>Distribution</span>
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-stopwatch"></i> Pomodoro Focus Trend</h3>
+                                   <p>Daily focus minutes and completed focus sessions.</p>
+                              </div>
+                              <span class="chart-pill">Last 7 Days</span>
                          </div>
-                         <div class="chart-wrap"><canvas id="subjectChart"></canvas></div>
+                         <div class="chart-wrap small"><canvas id="pomodoroTrendChart"></canvas></div>
                     </div>
+
                     <div class="chart-card">
                          <div class="chart-card-header">
-                              <h3>Test Score Trend</h3>
-                              <span>Avg score over time</span>
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-robot"></i> Assistant Usage</h3>
+                                   <p>Successful and failed AI assistant queries.</p>
+                              </div>
+                              <span class="chart-pill">AI Logs</span>
                          </div>
-                         <div class="chart-wrap"><canvas id="scoreChart"></canvas></div>
+                         <div class="chart-wrap small"><canvas id="assistantTrendChart"></canvas></div>
                     </div>
                </div>
 
-               <!-- Quick Actions -->
+               <div class="premium-chart-grid two">
+                    <div class="chart-card">
+                         <div class="chart-card-header">
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-list-check"></i> Task Status Overview</h3>
+                                   <p>Completed, pending, in-progress, overdue and other tasks.</p>
+                              </div>
+                              <span class="chart-pill">Tasks</span>
+                         </div>
+                         <div class="chart-wrap small"><canvas id="taskStatusChart"></canvas></div>
+                    </div>
+
+                    <div class="chart-card">
+                         <div class="chart-card-header">
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-book-open"></i> Subject Engagement</h3>
+                                   <p>Top subjects by platform activity.</p>
+                              </div>
+                              <span class="chart-pill">Top Subjects</span>
+                         </div>
+                         <div class="chart-wrap small"><canvas id="subjectEngagementChart"></canvas></div>
+                    </div>
+               </div>
+
+               <div class="premium-chart-grid two">
+                    <div class="chart-card">
+                         <div class="chart-card-header">
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-shield-halved"></i> Security Health Summary</h3>
+                                   <p>Safe, warning and critical security events.</p>
+                              </div>
+                              <span class="chart-pill">Security</span>
+                         </div>
+                         <div class="chart-wrap small"><canvas id="securityHealthChart"></canvas></div>
+                    </div>
+
+                    <div class="chart-card">
+                         <div class="chart-card-header">
+                              <div class="chart-title">
+                                   <h3><i class="fas fa-star-half-stroke"></i> Test Score Trend</h3>
+                                   <p>Monthly average score from tests and attempts.</p>
+                              </div>
+                              <span class="chart-pill">6 Months</span>
+                         </div>
+                         <div class="chart-wrap small"><canvas id="scoreChart"></canvas></div>
+                    </div>
+               </div>
+
                <div class="section-label">Quick Actions</div>
                <div class="quick-actions">
                     <a href="admin-students.html" class="qa-btn"><i class="fas fa-users"></i>Manage Students</a>
+                    <a href="admin-subjects.html" class="qa-btn"><i class="fas fa-book-open"></i>Subjects</a>
+                    <a href="admin-planner.html" class="qa-btn"><i class="fas fa-calendar-days"></i>Planner</a>
+                    <a href="admin-tasks.html" class="qa-btn"><i class="fas fa-circle-check"></i>Tasks</a>
+                    <a href="admin-revisions.html" class="qa-btn"><i class="fas fa-rotate"></i>Revisions</a>
+                    <a href="admin-tests.html" class="qa-btn"><i class="fas fa-file-pen"></i>Tests</a>
                     <a href="admin-question-bank.html" class="qa-btn"><i class="fas fa-database"></i>Question Bank</a>
-                    <a href="admin-notifications.html" class="qa-btn"><i class="fas fa-bell"></i>Send Notification</a>
-                    <a href="admin-tests.html" class="qa-btn"><i class="fas fa-file-pen"></i>Manage Tests</a>
-                    <a href="admin-analytics.html" class="qa-btn"><i class="fas fa-chart-line"></i>View Analytics</a>
-                    <a href="admin-reports.html" class="qa-btn"><i class="fas fa-file-export"></i>Export Reports</a>
+                    <a href="admin-analytics.html" class="qa-btn"><i class="fas fa-chart-line"></i>Analytics</a>
+                    <a href="admin-assistant.html" class="qa-btn"><i class="fas fa-robot"></i>Assistant Logs</a>
+                    <a href="admin-pomodoro.html" class="qa-btn"><i class="fas fa-stopwatch"></i>Pomodoro</a>
+                    <a href="admin-notifications.html" class="qa-btn"><i class="fas fa-bell"></i>Notifications</a>
+                    <a href="admin-reports.html" class="qa-btn"><i class="fas fa-file-export"></i>Reports</a>
                     <a href="admin-security.html" class="qa-btn"><i class="fas fa-shield-halved"></i>Security Logs</a>
                     <a href="admin-settings.html" class="qa-btn"><i class="fas fa-gear"></i>Settings</a>
                </div>
-
           </div>
-     </div><!-- /.em-main-content -->
+     </div>
 
      <script>
           const API_BASE = window.EM_API_BASE || 'http://localhost:8080';
 
-          /* ── Auth Guard ── */
           const adminToken = localStorage.getItem('adminToken');
           const adminRole = localStorage.getItem('adminRole');
-          const adminName = localStorage.getItem('adminName') || 'Admin';
+          const savedUser = parseJsonSafe(localStorage.getItem('edumind_logged_in_user')) || {};
+          const adminName =
+               localStorage.getItem('adminName') ||
+               savedUser.fullName ||
+               savedUser.name ||
+               savedUser.email ||
+               'Admin';
+
+          let dashboardData = {};
+          let premiumChartsData = {};
+          let charts = {};
 
           if (!adminToken || adminRole !== 'ADMIN') {
                window.location.href = 'login.html';
           }
 
-          document.getElementById('welcomeName').textContent = adminName.split(' ')[0];
+          document.getElementById('welcomeName').textContent = adminName.split(' ')[0] || 'Admin';
 
-          /* ── Live Clock ── */
+          function parseJsonSafe(value) {
+               try { return JSON.parse(value); } catch { return null; }
+          }
+
+          function openPage(url) {
+               window.location.href = url;
+          }
+
+          function showToast(message, type = 'success') {
+               const old = document.querySelector('.toast');
+               if (old) old.remove();
+
+               const icon = type === 'success' ? 'circle-check' : type === 'error' ? 'triangle-exclamation' : 'circle-info';
+               const toast = document.createElement('div');
+               toast.className = `toast ${type}`;
+               toast.innerHTML = `<i class="fas fa-${icon}"></i><span>${escapeHtml(message)}</span>`;
+               document.body.appendChild(toast);
+
+               setTimeout(() => toast.remove(), 3200);
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+          }
+
           function updateClock() {
                const now = new Date();
                const h = String(now.getHours()).padStart(2, '0');
@@ -932,49 +1216,70 @@
                const s = String(now.getSeconds()).padStart(2, '0');
                document.getElementById('liveTime').textContent = `${h}:${m}:${s}`;
           }
+
           setInterval(updateClock, 1000);
           updateClock();
 
-          /* ── Theme Toggle ── */
           function toggleTheme() {
                const isLight = document.body.getAttribute('data-theme') === 'light';
+
                if (isLight) {
                     document.body.removeAttribute('data-theme');
+                    document.documentElement.setAttribute('data-theme', 'dark');
                     document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>';
                     localStorage.setItem('adminTheme', 'dark');
                } else {
                     document.body.setAttribute('data-theme', 'light');
+                    document.documentElement.setAttribute('data-theme', 'light');
                     document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>';
                     localStorage.setItem('adminTheme', 'light');
                }
-               drawCharts();
+
+               drawCharts(dashboardData, premiumChartsData);
           }
-          (function () {
+
+          (function restoreTheme() {
                if (localStorage.getItem('adminTheme') === 'light') {
                     document.body.setAttribute('data-theme', 'light');
+                    document.documentElement.setAttribute('data-theme', 'light');
                     document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>';
+               } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
                }
           })();
 
-          /* ── Stat Cards Config ── */
           const CARD_CONFIG = [
                { key: 'totalStudents', label: 'Total Students', icon: 'fas fa-users', iconClass: 'icon-teal', cardClass: 'card-teal', trend: 'up', trendText: 'Registered' },
-               { key: 'totalSubjects', label: 'Subjects Created', icon: 'fas fa-book-open', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'up', trendText: 'All time' },
+               { key: 'totalSubjects', label: 'Subjects', icon: 'fas fa-book-open', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'up', trendText: 'All time' },
                { key: 'totalTasks', label: 'Total Tasks', icon: 'fas fa-circle-check', iconClass: 'icon-green', cardClass: 'card-green', trend: 'neu', trendText: 'All users' },
-               { key: 'pendingTasks', label: 'Pending Tasks', icon: 'fas fa-hourglass-half', iconClass: 'icon-amber', cardClass: 'card-amber', trend: 'neu', trendText: 'Awaiting' },
-               { key: 'totalTests', label: 'Tests Attempted', icon: 'fas fa-file-pen', iconClass: 'icon-purple', cardClass: 'card-purple', trend: 'up', trendText: 'Total' },
-               { key: 'avgScore', label: 'Avg Test Score', icon: 'fas fa-star-half-stroke', iconClass: 'icon-amber', cardClass: 'card-amber', trend: 'up', trendText: 'Out of 100' },
-               { key: 'totalRevisions', label: 'Total Revisions', icon: 'fas fa-rotate', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'neu', trendText: 'Scheduled' },
-               { key: 'pomodoroSessions', label: 'Pomodoro Sessions', icon: 'fas fa-stopwatch', iconClass: 'icon-rose', cardClass: 'card-rose', trend: 'neu', trendText: 'Focus sessions' },
+               { key: 'pendingTasks', label: 'Pending Tasks', icon: 'fas fa-hourglass-half', iconClass: 'icon-amber', cardClass: 'card-amber', trend: 'warn', trendText: 'Awaiting' },
+               { key: 'completedTasks', label: 'Completed Tasks', icon: 'fas fa-check-double', iconClass: 'icon-green', cardClass: 'card-green', trend: 'up', trendText: 'Done' },
+               { key: 'totalPlans', label: 'Planner Entries', icon: 'fas fa-calendar-days', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'neu', trendText: 'Schedules' },
+               { key: 'totalRevisions', label: 'Revisions', icon: 'fas fa-rotate', iconClass: 'icon-purple', cardClass: 'card-purple', trend: 'neu', trendText: 'Review' },
+               { key: 'totalTests', label: 'Tests', icon: 'fas fa-file-pen', iconClass: 'icon-purple', cardClass: 'card-purple', trend: 'up', trendText: 'Total' },
+               { key: 'publishedTests', label: 'Published Tests', icon: 'fas fa-upload', iconClass: 'icon-green', cardClass: 'card-green', trend: 'up', trendText: 'Live' },
+               { key: 'totalQuestions', label: 'Questions', icon: 'fas fa-database', iconClass: 'icon-teal', cardClass: 'card-teal', trend: 'neu', trendText: 'Bank' },
+               { key: 'totalNotifications', label: 'Notifications', icon: 'fas fa-bell', iconClass: 'icon-amber', cardClass: 'card-amber', trend: 'neu', trendText: 'Sent' },
+               { key: 'totalReports', label: 'Reports', icon: 'fas fa-file-lines', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'neu', trendText: 'Generated' },
+               { key: 'pomodoroSessions', label: 'Pomodoro Sessions', icon: 'fas fa-stopwatch', iconClass: 'icon-rose', cardClass: 'card-rose', trend: 'neu', trendText: 'Focus' },
+               { key: 'totalFocusMinutes', label: 'Focus Minutes', icon: 'fas fa-clock', iconClass: 'icon-teal', cardClass: 'card-teal', trend: 'up', trendText: 'Minutes' },
+               { key: 'assistantQueries', label: 'Assistant Queries', icon: 'fas fa-robot', iconClass: 'icon-purple', cardClass: 'card-purple', trend: 'neu', trendText: 'AI usage' },
+               { key: 'failedAssistantQueries', label: 'AI Failed Queries', icon: 'fas fa-triangle-exclamation', iconClass: 'icon-rose', cardClass: 'card-rose', trend: 'bad', trendText: 'Failed' },
+               { key: 'totalSecurityLogs', label: 'Security Logs', icon: 'fas fa-shield-halved', iconClass: 'icon-cyan', cardClass: 'card-cyan', trend: 'neu', trendText: 'Events' },
+               { key: 'securityWarnings', label: 'Security Warnings', icon: 'fas fa-user-shield', iconClass: 'icon-rose', cardClass: 'card-rose', trend: 'bad', trendText: 'Watch' },
+               { key: 'avgScore', label: 'Avg Test Score', icon: 'fas fa-star-half-stroke', iconClass: 'icon-amber', cardClass: 'card-amber', trend: 'up', trendText: 'Out of 100' }
           ];
 
           function renderStatCards(data) {
                const grid = document.getElementById('statsGrid');
                grid.innerHTML = '';
+
                CARD_CONFIG.forEach(cfg => {
-                    const val = data[cfg.key] !== undefined ? data[cfg.key] : 0;
-                    const trendClass = cfg.trend === 'up' ? 'trend-up' : 'trend-neu';
-                    const trendIcon = cfg.trend === 'up' ? '↑' : '–';
+                    const rawVal = data[cfg.key];
+                    const val = rawVal !== undefined && rawVal !== null ? rawVal : 0;
+                    const trendClass = cfg.trend === 'up' ? 'trend-up' : cfg.trend === 'bad' ? 'trend-bad' : cfg.trend === 'warn' ? 'trend-warn' : 'trend-neu';
+                    const trendIcon = cfg.trend === 'up' ? '↑' : cfg.trend === 'bad' ? '!' : cfg.trend === 'warn' ? '•' : '–';
+
                     grid.innerHTML += `
                     <div class="stat-card ${cfg.cardClass}">
                          <div class="stat-card-top">
@@ -982,7 +1287,7 @@
                               <span class="stat-trend ${trendClass}">${trendIcon} ${cfg.trendText}</span>
                          </div>
                          <div>
-                              <div class="stat-val">${val}</div>
+                              <div class="stat-val">${formatNumber(val)}</div>
                               <div class="stat-label">${cfg.label}</div>
                          </div>
                     </div>`;
@@ -992,7 +1297,8 @@
           function renderSkeletonCards() {
                const grid = document.getElementById('statsGrid');
                grid.innerHTML = '';
-               for (let i = 0; i < 8; i++) {
+
+               for (let i = 0; i < 12; i++) {
                     grid.innerHTML += `
                     <div class="stat-card">
                          <div class="stat-card-top">
@@ -1004,186 +1310,432 @@
                }
           }
 
-          /* ── Fetch Dashboard Summary ── */
+          function formatNumber(value) {
+               const num = Number(value);
+               if (Number.isNaN(num)) return value;
+               if (num >= 100000) return `${Math.round(num / 1000)}k`;
+               return num.toLocaleString('en-IN');
+          }
+
+          async function apiGet(path) {
+               const res = await fetch(`${API_BASE}${path}`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+               });
+
+               if (res.status === 401 || res.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                    return null;
+               }
+
+               const data = await res.json().catch(() => ({}));
+
+               if (!res.ok) {
+                    throw new Error(data.message || `Request failed: ${path}`);
+               }
+
+               return data;
+          }
+
           async function fetchDashboardSummary() {
                try {
-                    const res = await fetch(`${API_BASE}/api/admin/dashboard-summary`, {
-                         headers: { 'Authorization': `Bearer ${adminToken}` }
-                    });
-                    if (res.status === 401 || res.status === 403) {
-                         localStorage.clear();
-                         window.location.href = 'login.html';
-                         return;
+                    const data = await apiGet('/api/admin/dashboard-summary');
+
+                    if (data && data.success) {
+                         dashboardData = data;
+                         renderStatCards(data);
+                         renderInsights(data);
+                    } else {
+                         dashboardData = {};
+                         renderStatCards({});
+                         renderInsights({});
                     }
-                    const data = await res.json();
-                    if (data.success) renderStatCards(data);
-                    else renderStatCards({});
                } catch (err) {
                     console.error('Dashboard summary error:', err);
                     renderStatCards({});
+                    renderInsights({});
+                    showToast('Dashboard summary load failed.', 'error');
                }
           }
 
-          /* ── Fetch Activities ── */
+          async function fetchPremiumCharts() {
+               try {
+                    const data = await apiGet('/api/admin/dashboard-charts');
+
+                    if (data && data.success) {
+                         premiumChartsData = data;
+                    } else {
+                         premiumChartsData = {};
+                    }
+               } catch (err) {
+                    console.error('Premium charts error:', err);
+                    premiumChartsData = {};
+                    showToast('Premium charts load failed. Check /api/admin/dashboard-charts.', 'error');
+               }
+          }
+
           async function fetchActivities() {
                const list = document.getElementById('activityList');
+
                try {
-                    const res = await fetch(`${API_BASE}/api/admin/recent-activities`, {
-                         headers: { 'Authorization': `Bearer ${adminToken}` }
-                    });
-                    const data = await res.json();
+                    const data = await apiGet('/api/admin/recent-activities');
                     list.innerHTML = '';
-                    if (data.success && data.activities && data.activities.length > 0) {
+
+                    if (data && data.success && data.activities && data.activities.length > 0) {
                          data.activities.forEach(a => {
                               list.innerHTML += `
                               <div class="activity-item">
-                                   <div class="activity-icon">${a.icon || '📌'}</div>
+                                   <div class="activity-icon">${escapeHtml(a.icon || '📌')}</div>
                                    <div class="activity-text">
-                                        <p>${a.message}</p>
-                                        <span>${formatTime(a.time)}</span>
+                                        <p>${escapeHtml(a.message || 'Activity updated')}</p>
+                                        <span>${formatTime(a.time)} • ${escapeHtml(a.type || 'activity')}</span>
                                    </div>
                               </div>`;
                          });
                     } else {
                          list.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i>No recent activities.</div>`;
                     }
-               } catch {
+               } catch (err) {
+                    console.error('Activities error:', err);
                     list.innerHTML = `<div class="empty-state"><i class="fas fa-wifi-slash"></i>Could not load activities.</div>`;
+                    showToast('Recent activities load failed.', 'error');
                }
+          }
+
+          function renderInsights(data) {
+               const totalStudyItems =
+                    Number(data.totalTasks || 0) +
+                    Number(data.totalPlans || data.totalPlannerEntries || 0) +
+                    Number(data.totalRevisions || 0) +
+                    Number(data.totalTests || 0);
+
+               const focusMinutes = Number(data.totalFocusMinutes || 0);
+               const aiQueries = Number(data.assistantQueries || data.aiQueries || 0);
+               const failedAi = Number(data.failedAssistantQueries || 0);
+               const warnings = Number(data.securityWarnings || 0);
+
+               document.getElementById('insightStudyActivity').textContent = `${formatNumber(totalStudyItems)} study records tracked`;
+               document.getElementById('insightFocus').textContent = `${formatNumber(focusMinutes)} minutes across ${formatNumber(data.pomodoroSessions || 0)} sessions`;
+               document.getElementById('insightAi').textContent = `${formatNumber(aiQueries)} queries, ${formatNumber(failedAi)} failed`;
+               document.getElementById('insightSecurity').textContent = warnings > 0 ? `${formatNumber(warnings)} warnings need review` : 'No critical warnings';
           }
 
           function formatTime(t) {
                try {
                     const d = new Date(t);
-                    const diff = Math.floor((Date.now() - d) / 60000);
+                    if (Number.isNaN(d.getTime())) return 'Recently';
+
+                    const diff = Math.floor((Date.now() - d.getTime()) / 60000);
                     if (diff < 1) return 'Just now';
                     if (diff < 60) return `${diff}m ago`;
                     if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
-                    return d.toLocaleDateString();
-               } catch { return 'Recently'; }
+                    return d.toLocaleDateString('en-IN');
+               } catch {
+                    return 'Recently';
+               }
           }
-
-          /* ── Charts ── */
-          let charts = {};
 
           function getChartColors() {
                const light = document.body.getAttribute('data-theme') === 'light';
                return {
-                    grid: light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+                    grid: light ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.06)',
                     text: light ? '#475569' : '#94a3b8',
+                    title: light ? '#0f172a' : '#f8fafc',
+                    tooltipBg: light ? '#ffffff' : '#0f172a',
+                    tooltipText: light ? '#0f172a' : '#f8fafc'
                };
           }
 
-          function drawCharts() {
+          function safeLabels(chart, fallback) {
+               return chart && Array.isArray(chart.labels) && chart.labels.length ? chart.labels : fallback;
+          }
+
+          function safeData(chart, key, fallback) {
+               if (!chart) return fallback;
+               const value = key ? chart[key] : chart.data;
+               return Array.isArray(value) && value.length ? value : fallback;
+          }
+
+          function destroyCharts() {
+               Object.values(charts).forEach(c => c && c.destroy && c.destroy());
+               charts = {};
+          }
+
+          function chartTooltipOptions() {
+               const { tooltipBg, tooltipText } = getChartColors();
+
+               return {
+                    backgroundColor: tooltipBg,
+                    titleColor: tooltipText,
+                    bodyColor: tooltipText,
+                    borderColor: 'rgba(20,184,166,0.24)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 12,
+                    displayColors: true
+               };
+          }
+
+          function baseChartOptions(showLegend = false) {
                const { grid, text } = getChartColors();
-               Object.values(charts).forEach(c => c && c.destroy());
 
-               charts.weekly = new Chart(document.getElementById('weeklyChart'), {
-                    type: 'bar',
-                    data: {
-                         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                         datasets: [{
-                              label: 'Active Students', data: [4, 7, 5, 8, 6, 3, 2],
-                              backgroundColor: 'rgba(20,184,166,0.7)', borderRadius: 6, borderSkipped: false
-                         }]
+               return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                         legend: {
+                              display: showLegend,
+                              labels: { color: text, font: { size: 11, family: 'Poppins' }, boxWidth: 12 }
+                         },
+                         tooltip: chartTooltipOptions()
                     },
-                    options: {
-                         responsive: true, maintainAspectRatio: false,
-                         plugins: { legend: { display: false } },
-                         scales: {
-                              x: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } },
-                              y: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } }
-                         }
+                    scales: {
+                         x: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } } },
+                         y: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } }, beginAtZero: true }
                     }
-               });
+               };
+          }
 
-               charts.tasks = new Chart(document.getElementById('taskChart'), {
+          function drawCharts(summary = {}, premium = {}) {
+               if (!window.Chart) return;
+
+               destroyCharts();
+
+               const { grid, text } = getChartColors();
+               const platform = premium.platformActivityChart || {};
+               const pomodoro = premium.pomodoroTrendChart || {};
+               const assistant = premium.assistantTrendChart || {};
+               const taskStatus = premium.taskStatusChart || {};
+               const subjectEngagement = premium.subjectEngagementChart || summary.subjectChart || {};
+               const security = premium.securityHealthChart || {};
+               const score = summary.scoreChart || {};
+
+               charts.platform = new Chart(document.getElementById('platformActivityChart'), {
                     type: 'bar',
                     data: {
-                         labels: ['W1', 'W2', 'W3', 'W4'],
+                         labels: safeLabels(platform, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
                          datasets: [
-                              { label: 'Completed', data: [12, 18, 15, 22], backgroundColor: 'rgba(16,185,129,0.8)', borderRadius: 5 },
-                              { label: 'Pending', data: [8, 6, 9, 4], backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 5 }
+                              { label: 'Tasks', data: safeData(platform, 'tasks', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(139,92,246,0.82)', borderRadius: 7, stack: 'activity' },
+                              { label: 'Planner', data: safeData(platform, 'plans', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(6,182,212,0.78)', borderRadius: 7, stack: 'activity' },
+                              { label: 'Revisions', data: safeData(platform, 'revisions', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(16,185,129,0.78)', borderRadius: 7, stack: 'activity' },
+                              { label: 'Tests', data: safeData(platform, 'tests', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(245,158,11,0.78)', borderRadius: 7, stack: 'activity' },
+                              { label: 'Pomodoro', data: safeData(platform, 'pomodoro', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(244,63,94,0.72)', borderRadius: 7, stack: 'activity' },
+                              { label: 'Assistant', data: safeData(platform, 'assistant', [0, 0, 0, 0, 0, 0, 0]), backgroundColor: 'rgba(20,184,166,0.82)', borderRadius: 7, stack: 'activity' }
                          ]
                     },
                     options: {
-                         responsive: true, maintainAspectRatio: false,
-                         plugins: { legend: { display: true, labels: { color: text, font: { size: 11 } } } },
+                         ...baseChartOptions(true),
                          scales: {
-                              x: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } },
-                              y: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } }
+                              x: { stacked: true, grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } } },
+                              y: { stacked: true, grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } }, beginAtZero: true }
                          }
                     }
                });
 
-               charts.subject = new Chart(document.getElementById('subjectChart'), {
+               renderPlatformMetrics(platform);
+
+               charts.pomodoro = new Chart(document.getElementById('pomodoroTrendChart'), {
+                    type: 'line',
+                    data: {
+                         labels: safeLabels(pomodoro, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
+                         datasets: [
+                              {
+                                   type: 'bar',
+                                   label: 'Focus Minutes',
+                                   data: safeData(pomodoro, 'focusMinutes', [0, 0, 0, 0, 0, 0, 0]),
+                                   backgroundColor: 'rgba(20,184,166,0.70)',
+                                   borderRadius: 7,
+                                   yAxisID: 'y'
+                              },
+                              {
+                                   type: 'line',
+                                   label: 'Sessions',
+                                   data: safeData(pomodoro, 'sessions', [0, 0, 0, 0, 0, 0, 0]),
+                                   borderColor: '#f43f5e',
+                                   backgroundColor: 'rgba(244,63,94,0.12)',
+                                   tension: 0.38,
+                                   pointRadius: 4,
+                                   pointBackgroundColor: '#f43f5e',
+                                   yAxisID: 'y1'
+                              }
+                         ]
+                    },
+                    options: {
+                         ...baseChartOptions(true),
+                         scales: {
+                              x: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } } },
+                              y: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } }, beginAtZero: true, position: 'left' },
+                              y1: { grid: { drawOnChartArea: false }, ticks: { color: text, font: { size: 11, family: 'Poppins' } }, beginAtZero: true, position: 'right' }
+                         }
+                    }
+               });
+
+               charts.assistant = new Chart(document.getElementById('assistantTrendChart'), {
+                    type: 'bar',
+                    data: {
+                         labels: safeLabels(assistant, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
+                         datasets: [
+                              {
+                                   label: 'Success',
+                                   data: safeData(assistant, 'success', [0, 0, 0, 0, 0, 0, 0]),
+                                   backgroundColor: 'rgba(16,185,129,0.78)',
+                                   borderRadius: 7
+                              },
+                              {
+                                   label: 'Failed',
+                                   data: safeData(assistant, 'failed', [0, 0, 0, 0, 0, 0, 0]),
+                                   backgroundColor: 'rgba(244,63,94,0.72)',
+                                   borderRadius: 7
+                              }
+                         ]
+                    },
+                    options: baseChartOptions(true)
+               });
+
+               charts.taskStatus = new Chart(document.getElementById('taskStatusChart'), {
                     type: 'doughnut',
                     data: {
-                         labels: ['Math', 'Science', 'English', 'History', 'CS'],
+                         labels: safeLabels(taskStatus, ['Completed', 'Pending', 'In Progress', 'Overdue', 'Other']),
                          datasets: [{
-                              data: [30, 25, 20, 15, 10],
-                              backgroundColor: ['#14b8a6', '#06b6d4', '#8b5cf6', '#f59e0b', '#f43f5e'], borderWidth: 0
+                              data: safeData(taskStatus, 'data', [0, 0, 0, 0, 0]),
+                              backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#f43f5e', '#94a3b8'],
+                              borderWidth: 0
+                         }]
+                    },
+                    options: doughnutOptions(text)
+               });
+
+               charts.subjectEngagement = new Chart(document.getElementById('subjectEngagementChart'), {
+                    type: 'bar',
+                    data: {
+                         labels: safeLabels(subjectEngagement, ['No Data']),
+                         datasets: [{
+                              label: 'Activity',
+                              data: safeData(subjectEngagement, 'data', [0]),
+                              backgroundColor: ['rgba(20,184,166,0.78)', 'rgba(6,182,212,0.78)', 'rgba(139,92,246,0.78)', 'rgba(245,158,11,0.78)', 'rgba(244,63,94,0.70)', 'rgba(16,185,129,0.78)'],
+                              borderRadius: 8,
+                              borderSkipped: false
                          }]
                     },
                     options: {
-                         responsive: true, maintainAspectRatio: false, cutout: '68%',
-                         plugins: {
-                              legend: {
-                                   display: true, position: 'right',
-                                   labels: { color: text, font: { size: 11 }, boxWidth: 12 }
-                              }
-                         }
+                         ...baseChartOptions(false),
+                         indexAxis: 'y'
                     }
+               });
+
+               charts.securityHealth = new Chart(document.getElementById('securityHealthChart'), {
+                    type: 'doughnut',
+                    data: {
+                         labels: safeLabels(security, ['Safe', 'Warning', 'Critical']),
+                         datasets: [{
+                              data: safeData(security, 'data', [0, 0, 0]),
+                              backgroundColor: ['#10b981', '#f59e0b', '#f43f5e'],
+                              borderWidth: 0
+                         }]
+                    },
+                    options: doughnutOptions(text)
                });
 
                charts.score = new Chart(document.getElementById('scoreChart'), {
                     type: 'line',
                     data: {
-                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                         labels: safeLabels(score, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']),
                          datasets: [{
-                              label: 'Avg Score', data: [62, 68, 65, 74, 72, 78],
-                              borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)',
-                              fill: true, tension: 0.4, pointBackgroundColor: '#8b5cf6', pointRadius: 4
+                              label: 'Avg Score',
+                              data: safeData(score, 'data', [0, 0, 0, 0, 0, 0]),
+                              borderColor: '#8b5cf6',
+                              backgroundColor: 'rgba(139,92,246,0.12)',
+                              fill: true,
+                              tension: 0.38,
+                              pointBackgroundColor: '#8b5cf6',
+                              pointRadius: 4
                          }]
                     },
                     options: {
-                         responsive: true, maintainAspectRatio: false,
-                         plugins: { legend: { display: false } },
+                         ...baseChartOptions(false),
                          scales: {
-                              x: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } } },
-                              y: { grid: { color: grid }, ticks: { color: text, font: { size: 11 } }, min: 0, max: 100 }
+                              x: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } } },
+                              y: { grid: { color: grid }, ticks: { color: text, font: { size: 11, family: 'Poppins' } }, min: 0, max: 100 }
                          }
                     }
                });
           }
 
-          /* ── Refresh ── */
-          async function refreshDashboard() {
-               const icon = document.getElementById('refreshIcon');
-               icon.style.animation = 'spin 0.7s linear infinite';
-               renderSkeletonCards();
-               await Promise.all([fetchDashboardSummary(), fetchActivities()]);
-               icon.style.animation = '';
+          function doughnutOptions(text) {
+               return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                         legend: {
+                              display: true,
+                              position: 'right',
+                              labels: { color: text, font: { size: 11, family: 'Poppins' }, boxWidth: 12 }
+                         },
+                         tooltip: chartTooltipOptions()
+                    }
+               };
           }
 
-          /* ── Init ── */
+          function renderPlatformMetrics(platform) {
+               const labels = safeLabels(platform, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+               const totals = safeData(platform, 'total', [0, 0, 0, 0, 0, 0, 0]);
+               const totalActivity = totals.reduce((sum, val) => sum + Number(val || 0), 0);
+               const bestIndex = totals.reduce((best, value, index) => Number(value || 0) > Number(totals[best] || 0) ? index : best, 0);
+
+               const moduleTotals = {
+                    Tasks: sumArray(platform.tasks),
+                    Planner: sumArray(platform.plans),
+                    Revisions: sumArray(platform.revisions),
+                    Tests: sumArray(platform.tests),
+                    Pomodoro: sumArray(platform.pomodoro),
+                    Assistant: sumArray(platform.assistant)
+               };
+
+               const mainModule = Object.entries(moduleTotals).sort((a, b) => b[1] - a[1])[0];
+
+               document.getElementById('platformTotalMetric').textContent = formatNumber(totalActivity);
+               document.getElementById('platformBestDayMetric').textContent = totalActivity > 0 ? labels[bestIndex] : '—';
+               document.getElementById('platformMainModuleMetric').textContent = mainModule && mainModule[1] > 0 ? mainModule[0] : '—';
+          }
+
+          function sumArray(arr) {
+               return Array.isArray(arr) ? arr.reduce((sum, val) => sum + Number(val || 0), 0) : 0;
+          }
+
+          async function refreshDashboard(showToastAfter = false) {
+               const icon = document.getElementById('refreshIcon');
+               if (icon) icon.style.animation = 'spin 0.7s linear infinite';
+
+               renderSkeletonCards();
+
+               await Promise.all([fetchDashboardSummary(), fetchPremiumCharts(), fetchActivities()]);
+               drawCharts(dashboardData, premiumChartsData);
+
+               if (icon) icon.style.animation = '';
+
+               if (showToastAfter) {
+                    showToast('Dashboard refreshed successfully.', 'success');
+               }
+          }
+
           async function init() {
                renderSkeletonCards();
-               await Promise.all([fetchDashboardSummary(), fetchActivities()]);
-               drawCharts();
+               await refreshDashboard(false);
+
                setTimeout(() => {
                     const loader = document.getElementById('pageLoader');
                     if (loader) {
                          loader.classList.add('hidden');
                          setTimeout(() => loader.remove(), 400);
                     }
-               }, 800);
+               }, 650);
           }
 
           init();
      </script>
 
-     <!-- Common Sidebar JS — LAST -->
      <script src="admin-sidebar.js"></script>
 
 </body>

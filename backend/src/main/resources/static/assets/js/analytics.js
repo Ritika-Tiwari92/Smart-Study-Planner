@@ -1,1746 +1,1900 @@
-const analyticsFilterSelect = document.querySelector(".analytics-filter select");
+/**
+ * analytics.js — EduMind AI
+ * Student Analytics Premium UI
+ *
+ * Works without a separate Analytics backend.
+ * Uses existing APIs:
+ * GET /api/subjects
+ * GET /api/tasks
+ * GET /api/revisions
+ * GET /api/tests
+ * GET /api/plans
+ * GET /api/dashboard/study-summary
+ * GET /api/pomodoro/my
+ */
 
-const overallStudyProgressValue = document.getElementById("overallStudyProgressValue");
-const averageTestScoreValue = document.getElementById("averageTestScoreValue");
-const completedSessionsValue = document.getElementById("completedSessionsValue");
-const weeklyConsistencyValue = document.getElementById("weeklyConsistencyValue");
+document.addEventListener("DOMContentLoaded", function () {
+    const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
 
-const mockTestsValue = document.getElementById("mockTestsValue");
-const revisionAccuracyValue = document.getElementById("revisionAccuracyValue");
-const taskCompletionValue = document.getElementById("taskCompletionValue");
-const focusEfficiencyValue = document.getElementById("focusEfficiencyValue");
+    const ENDPOINTS = {
+        subjects: `${API_BASE_URL}/api/subjects`,
+        tasks: `${API_BASE_URL}/api/tasks`,
+        revisions: `${API_BASE_URL}/api/revisions`,
+        tests: `${API_BASE_URL}/api/tests`,
+        plans: `${API_BASE_URL}/api/plans`,
+        studySummary: `${API_BASE_URL}/api/dashboard/study-summary`,
+        pomodoro: `${API_BASE_URL}/api/pomodoro/my`
+    };
 
-const subjectInsightList = document.getElementById("subjectInsightList");
-const recommendationList = document.getElementById("recommendationList");
-const chartBarsContainer = document.getElementById("chartBars");
-const chartLabelsContainer = document.getElementById("chartLabels");
-const exportReportBtn = document.querySelector(".export-report-btn");
+    const els = {
+        filter: document.querySelector(".analytics-filter select"),
+        exportBtn: document.querySelector(".export-report-btn"),
 
-const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
-const SUBJECTS_API_URL = `${API_BASE_URL}/api/subjects`;
-const TASKS_API_URL    = `${API_BASE_URL}/api/tasks`;
-const REVISIONS_API_URL = `${API_BASE_URL}/api/revisions`;
-const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
-const PLANS_API_URL = `${API_BASE_URL}/api/plans`;
+        overallStudyProgressValue: document.getElementById("overallStudyProgressValue"),
+        averageTestScoreValue: document.getElementById("averageTestScoreValue"),
+        completedSessionsValue: document.getElementById("completedSessionsValue"),
+        weeklyConsistencyValue: document.getElementById("weeklyConsistencyValue"),
 
-const analyticsStore = {
-    subjects: [],
-    tasks: [],
-    revisions: [],
-    tests: [],
-    plans: []
-};
+        mockTestsValue: document.getElementById("mockTestsValue"),
+        revisionAccuracyValue: document.getElementById("revisionAccuracyValue"),
+        taskCompletionValue: document.getElementById("taskCompletionValue"),
+        focusEfficiencyValue: document.getElementById("focusEfficiencyValue"),
 
-// ─────────────────────────────────────────────────────────────
-// Utilities
-// ─────────────────────────────────────────────────────────────
+        subjectInsightList: document.getElementById("subjectInsightList"),
+        recommendationList: document.getElementById("recommendationList"),
+        chartBars: document.getElementById("chartBars"),
+        chartLabels: document.getElementById("chartLabels"),
+        chartInsight: document.getElementById("analyticsChartInsight"),
 
-function getStoredUserObject() {
-    try {
-        return JSON.parse(localStorage.getItem("edumind_logged_in_user"));
-    } catch {
+        strongestSubjectBadge: document.getElementById("strongestSubjectBadge"),
+        weakestSubjectBadge: document.getElementById("weakestSubjectBadge")
+    };
+
+    const store = {
+        subjects: [],
+        tasks: [],
+        revisions: [],
+        tests: [],
+        plans: [],
+        pomodoro: [],
+        studySummary: null,
+        loaded: false
+    };
+
+    function getToken() {
+        return (localStorage.getItem("token") || "").trim();
+    }
+
+    function parseStoredJson(value) {
+        try {
+            return JSON.parse(value);
+        } catch {
+            return null;
+        }
+    }
+
+    function getStoredUser() {
+        const possibleKeys = [
+            "edumind_logged_in_user",
+            "loggedInUser",
+            "currentUser",
+            "user",
+            "authUser",
+            "studyPlannerUser"
+        ];
+
+        for (const key of possibleKeys) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+
+            const parsed = parseStoredJson(raw);
+            if (parsed && typeof parsed === "object") return parsed;
+        }
+
         return null;
     }
-}
 
-function getCurrentUserId() {
-    const user = getStoredUserObject();
-    if (user && user.id != null && user.id !== "") return Number(user.id);
-    throw new Error("Logged-in user id not found.");
-}
-
-function buildApiUrlWithUserId(baseUrl) {
-    const userId = getCurrentUserId();
-    const sep = baseUrl.includes("?") ? "&" : "?";
-    return `${baseUrl}${sep}userId=${encodeURIComponent(userId)}`;
-}
-
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-function parseDateOnly(dateValue) {
-    if (!dateValue) return null;
-    const normalized = String(dateValue).slice(0, 10);
-    const parsed = new Date(`${normalized}T00:00:00`);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function formatDateToYMD(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-}
-
-function getTodayString() {
-    return formatDateToYMD(new Date());
-}
-
-function getSelectedRange() {
-    return analyticsFilterSelect ? analyticsFilterSelect.value : "This Week";
-}
-
-function safePercent(value) {
-    if (!Number.isFinite(value)) return 0;
-    return Math.max(0, Math.min(100, Math.round(value)));
-}
-
-function average(numbers) {
-    const valid = numbers.filter(Number.isFinite);
-    if (!valid.length) return 0;
-    return Math.round(valid.reduce((sum, n) => sum + n, 0) / valid.length);
-}
-
-function isDarkTheme() {
-    return (
-        document.body.classList.contains("dark-theme") ||
-        document.body.classList.contains("preview-dark") ||
-        document.documentElement.classList.contains("dark-theme") ||
-        document.documentElement.classList.contains("dark") ||
-        document.body.dataset.theme === "dark" ||
-        document.documentElement.dataset.theme === "dark"
-    );
-}
-
-function textKey(value) {
-    return String(value || "").trim().toLowerCase();
-}
-
-function getRecent7DaysWindow() {
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
-
-    const start = new Date();
-    start.setDate(start.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
-
-    return { start, end };
-}
-
-function getWeekRange(date = new Date()) {
-    const current = new Date(date);
-    const day = current.getDay();
-    const diffToMonday = day === 0 ? -6 : 1 - day;
-
-    const start = new Date(current);
-    start.setDate(current.getDate() + diffToMonday);
-    start.setHours(0, 0, 0, 0);
-
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    end.setHours(23, 59, 59, 999);
-
-    return { start, end };
-}
-
-function isDateInCurrentWeek(dateValue) {
-    const parsed = parseDateOnly(dateValue);
-    if (!parsed) return false;
-    const { start, end } = getWeekRange();
-    return parsed >= start && parsed <= end;
-}
-
-function isDateInSelectedRange(dateValue, rangeValue) {
-    if (!dateValue) return false;
-
-    const parsed = parseDateOnly(dateValue);
-    if (!parsed) return false;
-
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-
-    if (rangeValue === "Overall") return true;
-    if (rangeValue === "This Week") return isDateInCurrentWeek(dateValue);
-
-    if (rangeValue === "This Month") {
-        return parsed.getFullYear() === today.getFullYear() &&
-            parsed.getMonth() === today.getMonth();
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
 
-    if (rangeValue === "Last 30 Days") {
-        const start = new Date();
-        start.setDate(start.getDate() - 29);
+    function safeNumber(value, fallback = 0) {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : fallback;
+    }
+
+    function percent(part, total) {
+        if (!total || total <= 0) return 0;
+        return clamp(Math.round((part * 100) / total), 0, 100);
+    }
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function average(values) {
+        const nums = values.filter((value) => Number.isFinite(value));
+        if (!nums.length) return 0;
+        return Math.round(nums.reduce((sum, value) => sum + value, 0) / nums.length);
+    }
+
+    function textKey(value) {
+        return String(value || "").trim().toLowerCase();
+    }
+
+    function firstAvailable(obj, keys, fallback = "") {
+        if (!obj || typeof obj !== "object") return fallback;
+
+        for (const key of keys) {
+            const value = obj[key];
+            if (value !== undefined && value !== null && value !== "") return value;
+        }
+
+        return fallback;
+    }
+
+    function getArrayFromResponse(data, fallbackKey) {
+        if (Array.isArray(data)) return data;
+        if (!data || typeof data !== "object") return [];
+
+        const keys = [
+            fallbackKey,
+            "data",
+            "content",
+            "items",
+            "results",
+            "list",
+            "subjects",
+            "tasks",
+            "revisions",
+            "tests",
+            "plans",
+            "sessions"
+        ];
+
+        for (const key of keys) {
+            if (Array.isArray(data[key])) return data[key];
+        }
+
+        return [];
+    }
+
+    function parseDateValue(value) {
+        if (!value) return null;
+
+        if (value instanceof Date) {
+            return Number.isNaN(value.getTime()) ? null : value;
+        }
+
+        const raw = String(value).trim();
+        if (!raw) return null;
+
+        const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+            ? `${raw}T00:00:00`
+            : raw;
+
+        const date = new Date(normalized);
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function toYmd(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    }
+
+    function todayYmd() {
+        return toYmd(new Date());
+    }
+
+    function dateToYmd(value) {
+        const date = parseDateValue(value);
+        return date ? toYmd(date) : "";
+    }
+
+    function dayLabel(date) {
+        return date.toLocaleDateString("en-US", { weekday: "short" });
+    }
+
+    function isSameDay(a, b) {
+        const da = parseDateValue(a);
+        const db = parseDateValue(b);
+        if (!da || !db) return false;
+        return toYmd(da) === toYmd(db);
+    }
+
+    function getWeekRange(date = new Date()) {
+        const current = new Date(date);
+        const day = current.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+
+        const start = new Date(current);
+        start.setDate(current.getDate() + diffToMonday);
         start.setHours(0, 0, 0, 0);
-        return parsed >= start && parsed <= today;
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+
+        return { start, end };
     }
 
-    return true;
-}
+    function isInSelectedRange(dateValue, rangeValue) {
+        if (rangeValue === "Overall") return true;
 
-function getPerformanceTone(percent) {
-    if (percent >= 80) return "Excellent";
-    if (percent >= 65) return "Strong";
-    if (percent >= 45) return "Steady";
-    if (percent > 0) return "Improving";
-    return "Not enough data";
-}
+        const date = parseDateValue(dateValue);
+        if (!date) return false;
 
-function ensureSummaryNote(cardSelector, noteId) {
-    const card = document.querySelector(cardSelector);
-    const info = card?.querySelector(".asc-info");
-    if (!info) return null;
+        const now = new Date();
+        now.setHours(23, 59, 59, 999);
 
-    let note = info.querySelector(".analytics-summary-note");
-    if (!note) {
-        note = document.createElement("span");
-        note.className = "analytics-summary-note";
-        if (noteId) note.id = noteId;
-        info.appendChild(note);
-    }
-    return note;
-}
+        if (rangeValue === "This Week") {
+            const { start, end } = getWeekRange();
+            return date >= start && date <= end;
+        }
 
-function ensureChartHighlightChipRow() {
-    const card = document.querySelector(".progress-chart-card");
-    const sectionTitle = card?.querySelector(".analytics-section-title");
-    if (!card || !sectionTitle) return null;
+        if (rangeValue === "This Month") {
+            return date.getFullYear() === now.getFullYear() &&
+                date.getMonth() === now.getMonth();
+        }
 
-    let row = document.getElementById("analyticsChartHighlightRow");
-    if (!row) {
-        row = document.createElement("div");
-        row.id = "analyticsChartHighlightRow";
-        row.className = "analytics-highlight-chip-row";
-        sectionTitle.insertAdjacentElement("afterend", row);
-    }
-    return row;
-}
+        if (rangeValue === "Last 30 Days") {
+            const start = new Date();
+            start.setDate(start.getDate() - 29);
+            start.setHours(0, 0, 0, 0);
+            return date >= start && date <= now;
+        }
 
-function ensureChartMiniInsight() {
-    const card = document.querySelector(".progress-chart-card");
-    if (!card) return null;
-
-    let text = document.getElementById("analyticsChartMiniInsight");
-    if (!text) {
-        text = document.createElement("div");
-        text.id = "analyticsChartMiniInsight";
-        text.className = "analytics-mini-insight";
-        const insight = document.getElementById("analyticsChartInsight");
-        if (insight) insight.insertAdjacentElement("beforebegin", text);
-    }
-    return text;
-}
-
-function setScoreCardDescription(valueElement, text) {
-    if (!valueElement) return;
-    const item = valueElement.closest(".score-stat-item");
-    if (!item) return;
-    const paragraph = item.querySelector(".score-stat-info p");
-    if (paragraph) paragraph.textContent = text;
-}
-
-function extractSubjectName(value) {
-    if (!value) return "";
-    if (typeof value === "string") return value.trim();
-    return String(value.name || value.subjectName || value.title || "").trim();
-}
-
-function ensureAnalyticsRuntimeStyles() {
-    let style = document.getElementById("analyticsRuntimeThemeStyles");
-    if (!style) {
-        style = document.createElement("style");
-        style.id = "analyticsRuntimeThemeStyles";
-        document.head.appendChild(style);
+        return true;
     }
 
-    style.textContent = `
-        .analytics-summary-note{
-            display:block;
-            margin-top:6px;
-            font-size:12px;
-            line-height:1.45;
-            opacity:0.88;
+    function getSelectedRange() {
+        return els.filter ? els.filter.value : "This Week";
+    }
+
+    function isDarkTheme() {
+        return document.body.classList.contains("preview-dark") ||
+            document.body.classList.contains("dark-theme") ||
+            document.documentElement.classList.contains("dark") ||
+            document.documentElement.classList.contains("dark-theme") ||
+            document.body.dataset.theme === "dark" ||
+            document.documentElement.dataset.theme === "dark";
+    }
+
+    async function fetchJson(url, fallbackKey) {
+        const token = getToken();
+
+        const response = await fetch(url, {
+            headers: {
+                "Accept": "application/json",
+                "Authorization": token ? `Bearer ${token}` : ""
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.clear();
+            window.location.href = "login.html";
+            return null;
         }
 
-        .analytics-highlight-chip-row{
-            display:flex;
-            flex-wrap:wrap;
-            gap:12px;
-            margin:16px 0 18px;
+        const text = await response.text();
+        let data = null;
+
+        if (text) {
+            try {
+                data = JSON.parse(text);
+            } catch {
+                data = null;
+            }
         }
 
-        .analytics-highlight-chip{
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            padding:10px 14px;
-            border-radius:999px;
-            font-size:14px;
-            font-weight:700;
+        if (!response.ok) {
+            console.warn("Analytics API failed:", url, response.status, data || text);
+            return fallbackKey ? [] : null;
         }
 
-        .analytics-mini-insight{
-            margin-top:14px;
-            margin-bottom:10px;
-            font-size:15px;
-            font-weight:600;
-            line-height:1.5;
+        return fallbackKey ? getArrayFromResponse(data, fallbackKey) : data;
+    }
+
+    function normalizeSubject(subject) {
+        if (typeof subject === "string") {
+            return {
+                id: null,
+                name: subject.trim(),
+                progress: 0
+            };
         }
 
-        #chartBars{
-            display:grid !important;
-            grid-template-columns:repeat(7, minmax(0, 1fr));
-            gap:14px;
-            align-items:stretch;
-            min-height:340px;
-        }
+        const name = firstAvailable(subject, ["subjectName", "name", "title"], "Subject");
 
-        #chartLabels{
-            display:none !important;
-        }
+        return {
+            id: firstAvailable(subject, ["id", "subjectId"], null),
+            name: String(name || "Subject").trim(),
+            progress: safeNumber(firstAvailable(subject, ["progress", "completionPercentage", "coverage"], 0), 0),
+            difficulty: firstAvailable(subject, ["difficultyLevel", "difficulty"], "")
+        };
+    }
 
-        .analytics-bar-group{
-            position:relative;
-            display:flex;
-            flex-direction:column;
-            justify-content:flex-end;
-            min-height:320px;
-            padding:14px 10px 12px;
-            border-radius:22px;
-            overflow:hidden;
-        }
+    function extractSubjectName(value) {
+        if (!value) return "";
+        if (typeof value === "string") return value.trim();
+        return String(value.subjectName || value.name || value.title || "").trim();
+    }
 
-        .analytics-bar-group-topline{
-            position:absolute;
-            inset:0 0 auto 0;
-            height:4px;
-        }
+    function extractSubjectId(obj) {
+        if (!obj || typeof obj !== "object") return "";
+        if (obj.subjectId) return String(obj.subjectId);
+        if (obj.subject && typeof obj.subject === "object") return String(obj.subject.id || obj.subject.subjectId || "");
+        return "";
+    }
 
-        .analytics-bar-group-head{
-            display:flex;
-            justify-content:center;
-            margin-top:8px;
-            margin-bottom:12px;
-        }
+    function normalizeStatus(value) {
+        const status = textKey(value);
+        if (["completed", "complete", "done"].includes(status)) return "COMPLETED";
+        if (["in progress", "progress", "active", "ongoing"].includes(status)) return "IN_PROGRESS";
+        if (["cancelled", "canceled", "interrupted"].includes(status)) return "INTERRUPTED";
+        return "PENDING";
+    }
 
-        .analytics-day-total{
-            min-width:48px;
-            height:46px;
-            padding:0 14px;
-            border-radius:999px;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            font-size:18px;
-            font-weight:800;
-        }
+    function normalizeTask(task) {
+        const dueDate = firstAvailable(task, ["dueDate", "date", "createdAt", "updatedAt"], "");
+        const status = normalizeStatus(firstAvailable(task, ["status", "taskStatus"], "PENDING"));
+        const today = parseDateValue(todayYmd());
+        const due = parseDateValue(dueDate);
+        const isOverdue = status !== "COMPLETED" && due && today && due < today;
 
-        .analytics-bar-group-body{
-            flex:1;
-            display:flex;
-            align-items:flex-end;
-            justify-content:center;
-            gap:8px;
-            min-height:205px;
-        }
+        return {
+            id: firstAvailable(task, ["id", "taskId"], null),
+            title: firstAvailable(task, ["title", "taskTitle", "name"], "Untitled Task"),
+            subjectId: extractSubjectId(task),
+            subjectName: firstAvailable(task, ["subjectName"], "") || extractSubjectName(task.subject),
+            date: dateToYmd(dueDate),
+            status: isOverdue ? "OVERDUE" : status,
+            priority: firstAvailable(task, ["priority"], "Normal")
+        };
+    }
 
-        .analytics-single-bar-wrap{
-            flex:1;
-            min-width:0;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:flex-end;
-            gap:6px;
-        }
+    function normalizeRevision(revision) {
+        return {
+            id: firstAvailable(revision, ["id", "revisionId"], null),
+            title: firstAvailable(revision, ["title", "topic", "name"], "Revision Topic"),
+            subjectName: firstAvailable(revision, ["subject", "subjectName"], "") || extractSubjectName(revision.subject),
+            date: dateToYmd(firstAvailable(revision, ["revisionDate", "date", "createdAt"], "")),
+            status: normalizeStatus(firstAvailable(revision, ["status", "priority"], "PENDING")),
+            priority: firstAvailable(revision, ["priority"], "")
+        };
+    }
 
-        .analytics-single-bar-value{
-            font-size:12px;
-            font-weight:800;
-            line-height:1;
-            min-height:14px;
-        }
+    function normalizePlan(plan) {
+        return {
+            id: firstAvailable(plan, ["id", "planId"], null),
+            title: firstAvailable(plan, ["title", "topic", "planTitle", "name"], "Study Plan"),
+            subjectName: firstAvailable(plan, ["subject", "subjectName"], "") || extractSubjectName(plan.subject),
+            date: dateToYmd(firstAvailable(plan, ["date", "planDate", "createdAt"], "")),
+            status: normalizeStatus(firstAvailable(plan, ["status"], "PENDING"))
+        };
+    }
 
-        .analytics-single-bar{
-            width:100%;
-            border-radius:10px 10px 6px 6px;
-            min-height:4px;
-            transition:all 0.2s ease;
-        }
+    function normalizeTest(test) {
+        const rawScore = firstAvailable(test, ["score", "percentage", "marks", "obtainedScore"], null);
+        const score = rawScore === null || rawScore === "" ? null : Number(rawScore);
 
-        .analytics-group-empty{
-            flex:1;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:center;
-            gap:10px;
-            text-align:center;
-        }
+        return {
+            id: firstAvailable(test, ["id", "testId"], null),
+            title: firstAvailable(test, ["title", "testName", "name"], "Test"),
+            subjectName: firstAvailable(test, ["subject", "subjectName"], "") || extractSubjectName(test.subject),
+            date: dateToYmd(firstAvailable(test, ["testDate", "date", "createdAt"], "")),
+            score: Number.isFinite(score) ? score : null,
+            status: Number.isFinite(score) ? "COMPLETED" : normalizeStatus(firstAvailable(test, ["status", "adminStatus"], "PENDING"))
+        };
+    }
 
-        .analytics-group-empty-icon{
-            width:38px;
-            height:38px;
-            border-radius:50%;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            font-size:15px;
-        }
+    function normalizePomodoro(session) {
+        const dateValue = firstAvailable(session, ["sessionDate", "startedAt", "createdAt", "startTime"], "");
+        const minutes = safeNumber(firstAvailable(session, ["actualDurationMinutes", "focusMinutes", "actualMinutes"], 0), 0);
 
-        .analytics-day-label{
-            margin-top:14px;
-            text-align:center;
-            font-size:14px;
-            font-weight:800;
-            line-height:1.2;
-        }
+        return {
+            id: firstAvailable(session, ["id", "sessionId"], null),
+            subjectName: firstAvailable(session, ["linkedSubjectName", "subjectName", "topic"], "Focus Session"),
+            date: dateToYmd(dateValue),
+            minutes,
+            status: normalizeStatus(firstAvailable(session, ["status"], "PENDING")),
+            sessionType: firstAvailable(session, ["sessionType", "type"], "POMODORO")
+        };
+    }
 
-        .analytics-today-badge{
-            position:absolute;
-            top:12px;
-            right:10px;
-            padding:5px 10px;
-            border-radius:999px;
-            font-size:11px;
-            font-weight:800;
-            line-height:1;
-            z-index:2;
-        }
+    function isCompleted(item) {
+        return item && item.status === "COMPLETED";
+    }
 
-        .chart-footer-legend{
-            display:flex;
-            flex-wrap:wrap;
-            gap:12px;
-            margin-top:16px;
-        }
+    function isCompletedTest(test) {
+        return test && Number.isFinite(test.score);
+    }
 
-        .chart-footer-legend .chart-legend-item{
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            padding:10px 16px;
-            border-radius:999px;
-        }
+    async function loadAllData() {
+        const [subjects, tasks, revisions, tests, plans, studySummary, pomodoro] = await Promise.all([
+            fetchJson(ENDPOINTS.subjects, "subjects"),
+            fetchJson(ENDPOINTS.tasks, "tasks"),
+            fetchJson(ENDPOINTS.revisions, "revisions"),
+            fetchJson(ENDPOINTS.tests, "tests"),
+            fetchJson(ENDPOINTS.plans, "plans"),
+            fetchJson(ENDPOINTS.studySummary, null),
+            fetchJson(ENDPOINTS.pomodoro, "sessions")
+        ]);
 
-        .chart-footer-legend .cfl-label{
-            font-size:13px;
-            font-weight:700;
-        }
+        store.subjects = (subjects || []).map(normalizeSubject).filter((item) => item.name);
+        store.tasks = (tasks || []).map(normalizeTask);
+        store.revisions = (revisions || []).map(normalizeRevision);
+        store.tests = (tests || []).map(normalizeTest);
+        store.plans = (plans || []).map(normalizePlan);
+        store.studySummary = studySummary || null;
+        store.pomodoro = (pomodoro || []).map(normalizePomodoro);
+        store.loaded = true;
+    }
 
-        .chart-footer-legend .cfl-dot{
-            width:12px !important;
-            height:12px !important;
-            border-radius:50%;
-            display:inline-block;
-            flex-shrink:0;
-        }
+    function filterByRange(list, dateKey, rangeValue) {
+        return list.filter((item) => isInSelectedRange(item[dateKey], rangeValue));
+    }
 
-        .subject-insight-meta{
-            margin:6px 0 10px;
-            font-size:12px;
-            line-height:1.6;
-            opacity:0.92;
-        }
+    function getFilteredData() {
+        const range = getSelectedRange();
 
-        body.dark-theme .progress-chart-card,
-        body.preview-dark .progress-chart-card,
-        html.dark-theme .progress-chart-card,
-        html.dark .progress-chart-card,
-        body[data-theme="dark"] .progress-chart-card,
-        html[data-theme="dark"] .progress-chart-card,
-        body.dark-theme .score-overview-card,
-        body.preview-dark .score-overview-card,
-        html.dark-theme .score-overview-card,
-        html.dark .score-overview-card,
-        body[data-theme="dark"] .score-overview-card,
-        html[data-theme="dark"] .score-overview-card,
-        body.dark-theme .subject-insights-card,
-        body.preview-dark .subject-insights-card,
-        html.dark-theme .subject-insights-card,
-        html.dark .subject-insights-card,
-        body[data-theme="dark"] .subject-insights-card,
-        html[data-theme="dark"] .subject-insights-card,
-        body.dark-theme .recommendations-card,
-        body.preview-dark .recommendations-card,
-        html.dark-theme .recommendations-card,
-        html.dark .recommendations-card,
-        body[data-theme="dark"] .recommendations-card,
-        html[data-theme="dark"] .recommendations-card{
-            color:#f8fafc !important;
-        }
+        return {
+            range,
+            subjects: store.subjects,
+            tasks: filterByRange(store.tasks, "date", range),
+            revisions: filterByRange(store.revisions, "date", range),
+            tests: filterByRange(store.tests, "date", range),
+            plans: filterByRange(store.plans, "date", range),
+            pomodoro: filterByRange(store.pomodoro, "date", range)
+        };
+    }
 
-        body.dark-theme .progress-chart-card p,
-        body.preview-dark .progress-chart-card p,
-        html.dark-theme .progress-chart-card p,
-        html.dark .progress-chart-card p,
-        body[data-theme="dark"] .progress-chart-card p,
-        html[data-theme="dark"] .progress-chart-card p,
-        body.dark-theme .progress-chart-card span,
-        body.preview-dark .progress-chart-card span,
-        html.dark-theme .progress-chart-card span,
-        html.dark .progress-chart-card span,
-        body[data-theme="dark"] .progress-chart-card span,
-        html[data-theme="dark"] .progress-chart-card span,
-        body.dark-theme .score-overview-card p,
-        body.preview-dark .score-overview-card p,
-        html.dark-theme .score-overview-card p,
-        html.dark .score-overview-card p,
-        body[data-theme="dark"] .score-overview-card p,
-        html[data-theme="dark"] .score-overview-card p,
-        body.dark-theme .subject-insights-card p,
-        body.preview-dark .subject-insights-card p,
-        html.dark-theme .subject-insights-card p,
-        html.dark .subject-insights-card p,
-        body[data-theme="dark"] .subject-insights-card p,
-        html[data-theme="dark"] .subject-insights-card p,
-        body.dark-theme .recommendations-card p,
-        body.preview-dark .recommendations-card p,
-        html.dark-theme .recommendations-card p,
-        html.dark .recommendations-card p,
-        body[data-theme="dark"] .recommendations-card p,
-        html[data-theme="dark"] .recommendations-card p{
-            color:#cbd5e1 !important;
-        }
+    function calculateMetrics(data) {
+        const completedTasks = data.tasks.filter(isCompleted).length;
+        const totalTasks = data.tasks.length;
+        const taskCompletion = percent(completedTasks, totalTasks);
 
-        body.dark-theme .subject-insights-card h4,
-        body.preview-dark .subject-insights-card h4,
-        html.dark-theme .subject-insights-card h4,
-        html.dark .subject-insights-card h4,
-        body[data-theme="dark"] .subject-insights-card h4,
-        html[data-theme="dark"] .subject-insights-card h4,
-        body.dark-theme .recommendations-card h4,
-        body.preview-dark .recommendations-card h4,
-        html.dark-theme .recommendations-card h4,
-        html.dark .recommendations-card h4,
-        body[data-theme="dark"] .recommendations-card h4,
-        html[data-theme="dark"] .recommendations-card h4,
-        body.dark-theme .score-overview-card h4,
-        body.preview-dark .score-overview-card h4,
-        html.dark-theme .score-overview-card h4,
-        html.dark .score-overview-card h4,
-        body[data-theme="dark"] .score-overview-card h4,
-        html[data-theme="dark"] .score-overview-card h4{
-            color:#ffffff !important;
-        }
+        const completedRevisions = data.revisions.filter(isCompleted).length;
+        const totalRevisions = data.revisions.length;
+        const revisionCompletion = percent(completedRevisions, totalRevisions);
 
-        body.dark-theme #analyticsChartInsight,
-        body.preview-dark #analyticsChartInsight,
-        html.dark-theme #analyticsChartInsight,
-        html.dark #analyticsChartInsight,
-        body[data-theme="dark"] #analyticsChartInsight,
-        html[data-theme="dark"] #analyticsChartInsight{
-            color:#f8fafc !important;
-        }
-
-        body.dark-theme #analyticsChartMiniInsight,
-        body.preview-dark #analyticsChartMiniInsight,
-        html.dark-theme #analyticsChartMiniInsight,
-        html.dark #analyticsChartMiniInsight,
-        body[data-theme="dark"] #analyticsChartMiniInsight,
-        html[data-theme="dark"] #analyticsChartMiniInsight{
-            color:#cbd5e1 !important;
-        }
-    `;
-}
-
-function getChartTypeMeta(type) {
-    const dark = isDarkTheme();
-    const metaMap = {
-        tasks: {
-            key: "tasks",
-            label: "Tasks",
-            dot: "#7c6cff",
-            bg: dark ? "rgba(124,108,255,0.18)" : "#f3f0ff",
-            border: dark ? "rgba(124,108,255,0.34)" : "#ddd6fe",
-            text: dark ? "#e9e5ff" : "#5b4ef5",
-            badgeBg: dark ? "rgba(124,108,255,0.22)" : "#ede9fe",
-            badgeText: dark ? "#ffffff" : "#5b4ef5"
-        },
-        revisions: {
-            key: "revisions",
-            label: "Revisions",
-            dot: "#3b82f6",
-            bg: dark ? "rgba(59,130,246,0.16)" : "#eff6ff",
-            border: dark ? "rgba(59,130,246,0.34)" : "#bfdbfe",
-            text: dark ? "#dbeafe" : "#2563eb",
-            badgeBg: dark ? "rgba(59,130,246,0.22)" : "#dbeafe",
-            badgeText: dark ? "#ffffff" : "#2563eb"
-        },
-        plans: {
-            key: "plans",
-            label: "Plans",
-            dot: "#10b981",
-            bg: dark ? "rgba(16,185,129,0.16)" : "#ecfdf5",
-            border: dark ? "rgba(16,185,129,0.34)" : "#bbf7d0",
-            text: dark ? "#d1fae5" : "#059669",
-            badgeBg: dark ? "rgba(16,185,129,0.22)" : "#d1fae5",
-            badgeText: dark ? "#ffffff" : "#059669"
-        },
-        tests: {
-            key: "tests",
-            label: "Tests",
-            dot: "#f59e0b",
-            bg: dark ? "rgba(245,158,11,0.16)" : "#fff7ed",
-            border: dark ? "rgba(245,158,11,0.34)" : "#fed7aa",
-            text: dark ? "#fde68a" : "#d97706",
-            badgeBg: dark ? "rgba(245,158,11,0.22)" : "#ffedd5",
-            badgeText: dark ? "#ffffff" : "#d97706"
-        }
-    };
-    return metaMap[type];
-}
-
-function isCompletedTest(test) {
-    return test.type === "Completed" || Number.isFinite(test.score);
-}
-
-function isDonePlan(plan) {
-    return plan.status === "Done";
-}
-
-// ─────────────────────────────────────────────────────────────
-// Normalizers
-// ─────────────────────────────────────────────────────────────
-
-function normalizeSubjectName(subject) {
-    if (typeof subject === "string") return subject.trim();
-    if (!subject || typeof subject !== "object") return "";
-    return String(subject.name ?? subject.subjectName ?? subject.title ?? "").trim();
-}
-
-function normalizeTaskStatus(text) {
-    const v = String(text || "").toLowerCase().trim();
-    if (v === "completed" || v === "done") return "Completed";
-    if (v === "in progress") return "In Progress";
-    if (v === "overdue") return "Overdue";
-    return "Pending";
-}
-
-function getTaskDisplayStatus(rawStatus, dueDate) {
-    const n = normalizeTaskStatus(rawStatus);
-    const parsed = parseDateOnly(dueDate);
-    const today = parseDateOnly(getTodayString());
-
-    if (n === "Completed") return "Completed";
-    if (n === "Overdue") return "Overdue";
-    if (n === "In Progress") return "In Progress";
-    if (parsed && today && parsed < today) return "Overdue";
-    return "Pending";
-}
-
-function normalizeTestType(typeText, score) {
-    const v = String(typeText || "").trim().toLowerCase();
-    if (Number.isFinite(score)) return "Completed";
-    if (v === "completed") return "Completed";
-    if (v === "upcoming") return "Upcoming";
-    if (v === "this week") return "This Week";
-    if (v === "mock test" || v === "mock tests") return "Mock Test";
-    return "Upcoming";
-}
-
-function normalizePlanStatus(statusText) {
-    const v = String(statusText || "").toLowerCase().trim();
-    if (v === "done" || v === "completed") return "Done";
-    if (v === "in progress") return "In Progress";
-    return "Pending";
-}
-
-function normalizeRevisionTopic(topic) {
-    return {
-        id: topic?.id ?? null,
-        title: String(topic?.title || topic?.topic || "").trim(),
-        subject: extractSubjectName(topic?.subject),
-        priority: String(topic?.priority || "").trim(),
-        date: String(topic?.date || topic?.revisionDate || "").trim(),
-        status: String(topic?.status || "").trim()
-    };
-}
-
-function normalizeTask(task) {
-    const subjectName = extractSubjectName(task?.subject) || String(task?.subjectName || "").trim();
-    const dueDate = String(task?.dueDate || task?.date || "").trim();
-    const rawStatus = normalizeTaskStatus(task?.status || "Pending");
-
-    return {
-        id: task?.id ?? null,
-        title: String(task?.title || "").trim(),
-        dueDate,
-        status: rawStatus,
-        displayStatus: getTaskDisplayStatus(rawStatus, dueDate),
-        priority: String(task?.priority || "").trim(),
-        subjectName
-    };
-}
-
-function normalizeTest(test) {
-    const rawScore = test?.score;
-    const numericScore = rawScore === null || rawScore === undefined || rawScore === ""
-        ? null
-        : Number(rawScore);
-
-    return {
-        id: test?.id ?? null,
-        title: String(test?.title || "").trim(),
-        subject: extractSubjectName(test?.subject),
-        date: String(test?.date || test?.testDate || "").trim(),
-        type: normalizeTestType(test?.type || test?.testType || "", numericScore),
-        score: Number.isFinite(numericScore) ? numericScore : null,
-        focusArea: String(test?.focusArea || "").trim(),
-        testTip: String(test?.testTip || "").trim()
-    };
-}
-
-function normalizePlan(plan) {
-    return {
-        id: plan?.id ?? null,
-        title: String(plan?.title || "").trim(),
-        subject: extractSubjectName(plan?.subject),
-        date: String(plan?.date || plan?.planDate || "").trim(),
-        status: normalizePlanStatus(plan?.status || "Pending")
-    };
-}
-
-function isCompletedRevision(topic) {
-    const status = textKey(topic?.status);
-    const priority = textKey(topic?.priority);
-    return status === "completed" || priority === "completed";
-}
-
-function isWeakRevision(topic) {
-    const status = textKey(topic?.status);
-    const priority = textKey(topic?.priority);
-    return status === "weak topic" || priority === "weak topic";
-}
-
-// ─────────────────────────────────────────────────────────────
-// Fetch
-// ─────────────────────────────────────────────────────────────
-
-async function fetchJson(url) {
-
-    const token = (localStorage.getItem("token") || "").trim();
-    const response = await fetch(url, {
-        headers: {
-            "Accept": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    });
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Request failed: ${url} (${response.status})`);
-    if (response.status === 204) return null;
-
-    const contentType = response.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) return response.json();
-
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
-}
-
-async function loadAllAnalyticsData() {
-    const results = await Promise.allSettled([
-         fetchJson(SUBJECTS_API_URL),    
-         fetchJson(TASKS_API_URL),
-         fetchJson(REVISIONS_API_URL),
-         fetchJson(TESTS_API_URL),
-        fetchJson(PLANS_API_URL)
-    ]);
-
-    const [subR, taskR, revR, testR, planR] = results;
-
-    analyticsStore.subjects =
-        subR.status === "fulfilled" && Array.isArray(subR.value)
-            ? subR.value.map(normalizeSubjectName).filter(Boolean)
-            : [];
-
-    analyticsStore.tasks =
-        taskR.status === "fulfilled" && Array.isArray(taskR.value)
-            ? taskR.value.map(normalizeTask)
-            : [];
-
-    analyticsStore.revisions =
-        revR.status === "fulfilled" && Array.isArray(revR.value)
-            ? revR.value.map(normalizeRevisionTopic)
-            : [];
-
-    analyticsStore.tests =
-        testR.status === "fulfilled" && Array.isArray(testR.value)
-            ? testR.value.map(normalizeTest)
-            : [];
-
-    analyticsStore.plans =
-        planR.status === "fulfilled" && Array.isArray(planR.value)
-            ? planR.value.map(normalizePlan)
-            : [];
-}
-
-// ─────────────────────────────────────────────────────────────
-// Filter + Metrics
-// ─────────────────────────────────────────────────────────────
-
-function getFilteredAnalyticsData() {
-    const rangeValue = getSelectedRange();
-
-    return {
-        rangeValue,
-        subjects: analyticsStore.subjects,
-        tasks: analyticsStore.tasks.filter((t) => isDateInSelectedRange(t.dueDate, rangeValue)),
-        revisions: analyticsStore.revisions.filter((r) => isDateInSelectedRange(r.date, rangeValue)),
-        tests: analyticsStore.tests.filter((t) => isDateInSelectedRange(t.date, rangeValue)),
-        plans: analyticsStore.plans.filter((p) => isDateInSelectedRange(p.date, rangeValue))
-    };
-}
-
-function calculateTaskMetrics(tasks) {
-    const total = tasks.length;
-    const completed = tasks.filter((t) => t.displayStatus === "Completed").length;
-    const overdue = tasks.filter((t) => t.displayStatus === "Overdue").length;
-    return {
-        total,
-        completed,
-        overdue,
-        completionPercent: total > 0 ? safePercent((completed / total) * 100) : 0
-    };
-}
-
-function calculateRevisionMetrics(revisions) {
-    const total = revisions.length;
-    const completed = revisions.filter(isCompletedRevision).length;
-    const weak = revisions.filter(isWeakRevision).length;
-    return {
-        total,
-        completed,
-        weak,
-        completionPercent: total > 0 ? safePercent((completed / total) * 100) : 0
-    };
-}
-
-function calculateTestMetrics(tests) {
-    const withScore = tests.filter((t) => isCompletedTest(t) && Number.isFinite(t.score));
-    const averageScore =
-        withScore.length > 0
-            ? safePercent(withScore.reduce((s, t) => s + Number(t.score), 0) / withScore.length)
+        const scoredTests = data.tests.filter(isCompletedTest);
+        const averageTestScore = scoredTests.length
+            ? average(scoredTests.map((test) => clamp(Number(test.score), 0, 100)))
             : 0;
 
-    const upcomingCount = tests.filter((t) => !isCompletedTest(t)).length;
-    return { completedCount: withScore.length, averageScore, upcomingCount };
-}
+        const completedPlans = data.plans.filter(isCompleted).length;
+        const totalPlans = data.plans.length;
+        const planCompletion = percent(completedPlans, totalPlans);
 
-function calculatePlanMetrics(plans) {
-    const total = plans.length;
-    const done = plans.filter(isDonePlan).length;
-    const weekPlans = plans.filter((p) => isDateInCurrentWeek(p.date));
-    const weekDone = weekPlans.filter(isDonePlan).length;
+        const completedPomodoro = data.pomodoro.filter(isCompleted);
+        const focusMinutes = completedPomodoro.reduce((sum, session) => sum + safeNumber(session.minutes), 0);
+        const focusEfficiency = completedPomodoro.length
+            ? clamp(Math.round((focusMinutes / completedPomodoro.length / 25) * 100), 0, 100)
+            : 0;
 
-    return {
-        total,
-        done,
-        completionPercent: total > 0 ? safePercent((done / total) * 100) : 0,
-        weeklyFocusPercent: weekPlans.length > 0 ? safePercent((weekDone / weekPlans.length) * 100) : 0
-    };
-}
+        const activeDays = new Set([
+            ...data.tasks.filter(isCompleted).map((item) => item.date),
+            ...data.revisions.filter(isCompleted).map((item) => item.date),
+            ...data.tests.filter(isCompletedTest).map((item) => item.date),
+            ...data.plans.filter(isCompleted).map((item) => item.date),
+            ...completedPomodoro.map((item) => item.date)
+        ].filter(Boolean));
 
-function calculateOverallStudyProgress(tM, rM, testM, pM) {
-    const scores = [];
-    if (tM.total > 0) scores.push(tM.completionPercent);
-    if (rM.total > 0) scores.push(rM.completionPercent);
-    if (testM.completedCount > 0) scores.push(testM.averageScore);
-    if (pM.total > 0) scores.push(pM.completionPercent);
-    return scores.length > 0 ? average(scores) : 0;
-}
+        const overallStudyProgress = average([
+            totalTasks ? taskCompletion : NaN,
+            totalRevisions ? revisionCompletion : NaN,
+            scoredTests.length ? averageTestScore : NaN,
+            totalPlans ? planCompletion : NaN,
+            completedPomodoro.length ? focusEfficiency : NaN
+        ]);
 
-function calculateWeeklyConsistency(filteredData) {
-    const activeDays = new Set();
+        const weeklyActiveDays = store.studySummary?.weekly?.activeDays;
+        const weeklyConsistency = getSelectedRange() === "This Week" && Number.isFinite(Number(weeklyActiveDays))
+            ? clamp(Number(weeklyActiveDays), 0, 7)
+            : clamp(activeDays.size, 0, 7);
 
-    filteredData.tasks.forEach((t) => { if (isDateInCurrentWeek(t.dueDate)) activeDays.add(t.dueDate); });
-    filteredData.revisions.forEach((r) => { if (isDateInCurrentWeek(r.date)) activeDays.add(r.date); });
-    filteredData.tests.forEach((t) => { if (isDateInCurrentWeek(t.date)) activeDays.add(t.date); });
-    filteredData.plans.forEach((p) => { if (isDateInCurrentWeek(p.date)) activeDays.add(p.date); });
-
-    return Math.min(activeDays.size, 7);
-}
-
-function buildMetrics(filteredData) {
-    const tM = calculateTaskMetrics(filteredData.tasks);
-    const rM = calculateRevisionMetrics(filteredData.revisions);
-    const testM = calculateTestMetrics(filteredData.tests);
-    const pM = calculatePlanMetrics(filteredData.plans);
-
-    return {
-        overallStudyProgress: calculateOverallStudyProgress(tM, rM, testM, pM),
-        averageTestScore: testM.averageScore,
-        completedSessions: pM.done,
-        weeklyConsistency: calculateWeeklyConsistency(filteredData),
-        taskCompletion: tM.completionPercent,
-        revisionCompletion: rM.completionPercent,
-        focusEfficiency: pM.weeklyFocusPercent,
-        extra: { tM, rM, testM, pM }
-    };
-}
-
-// ─────────────────────────────────────────────────────────────
-// Summary Cards + Score Overview
-// ─────────────────────────────────────────────────────────────
-
-function updateSummaryCards(metrics, filteredData, subjectInsights) {
-    if (overallStudyProgressValue) overallStudyProgressValue.textContent = `${metrics.overallStudyProgress}%`;
-    if (averageTestScoreValue) averageTestScoreValue.textContent = `${metrics.averageTestScore}%`;
-    if (completedSessionsValue) completedSessionsValue.textContent = String(metrics.completedSessions);
-    if (weeklyConsistencyValue) weeklyConsistencyValue.textContent = `${metrics.weeklyConsistency} Days`;
-
-    const overallNote = ensureSummaryNote(".asc-progress", "overallProgressNote");
-    const scoreNote = ensureSummaryNote(".asc-score", "averageScoreNote");
-    const sessionsNote = ensureSummaryNote(".asc-sessions", "completedSessionsNote");
-    const consistencyNote = ensureSummaryNote(".asc-consistency", "weeklyConsistencyNote");
-
-    const strongest = subjectInsights[0];
-    const completedTests = filteredData.tests.filter((t) => isCompletedTest(t) && Number.isFinite(t.score)).length;
-    const activeRangeDays = new Set([
-        ...filteredData.tasks.map((t) => t.dueDate).filter(Boolean),
-        ...filteredData.revisions.map((r) => r.date).filter(Boolean),
-        ...filteredData.tests.map((t) => t.date).filter(Boolean),
-        ...filteredData.plans.map((p) => p.date).filter(Boolean)
-    ]).size;
-
-    if (overallNote) {
-        overallNote.textContent = strongest
-            ? `${getPerformanceTone(metrics.overallStudyProgress)} performance · Best subject: ${strongest.subjectName}`
-            : "Complete tasks, plans, revisions, or tests to unlock progress insights";
+        return {
+            overallStudyProgress,
+            averageTestScore,
+            completedSessions: completedPomodoro.length,
+            weeklyConsistency,
+            taskCompletion,
+            revisionCompletion,
+            planCompletion,
+            focusEfficiency,
+            focusMinutes,
+            totalTasks,
+            completedTasks,
+            totalRevisions,
+            completedRevisions,
+            scoredTests: scoredTests.length,
+            completedPlans,
+            totalPlans,
+            activeDays: activeDays.size
+        };
     }
 
-    if (scoreNote) {
-        scoreNote.textContent = completedTests > 0
-            ? `${completedTests} scored test${completedTests > 1 ? "s" : ""} in this range`
-            : "No scored tests yet in this range";
+    function setText(el, text) {
+        if (el) el.textContent = text;
     }
 
-    if (sessionsNote) {
-        sessionsNote.textContent = filteredData.plans.length > 0
-            ? `${metrics.extra.pM.done}/${filteredData.plans.length} plans completed`
-            : "No planner sessions found in this range";
-    }
+    function ensureNote(cardSelector) {
+        const card = document.querySelector(cardSelector);
+        const info = card?.querySelector(".asc-info");
+        if (!info) return null;
 
-    if (consistencyNote) {
-        consistencyNote.textContent = activeRangeDays > 0
-            ? `${activeRangeDays} active date${activeRangeDays > 1 ? "s" : ""} recorded`
-            : "No activity dates available yet";
-    }
-}
-
-function updateScoreOverview(metrics, filteredData) {
-    if (mockTestsValue) mockTestsValue.textContent = `${metrics.averageTestScore}%`;
-    if (revisionAccuracyValue) revisionAccuracyValue.textContent = `${metrics.revisionCompletion}%`;
-    if (taskCompletionValue) taskCompletionValue.textContent = `${metrics.taskCompletion}%`;
-    if (focusEfficiencyValue) focusEfficiencyValue.textContent = `${metrics.focusEfficiency}%`;
-
-    const completedTests = filteredData.tests.filter((t) => isCompletedTest(t) && Number.isFinite(t.score)).length;
-    const totalRevisions = filteredData.revisions.length;
-    const completedRevisions = filteredData.revisions.filter(isCompletedRevision).length;
-    const totalTasks = filteredData.tasks.length;
-    const completedTasks = filteredData.tasks.filter((t) => t.displayStatus === "Completed").length;
-    const weekPlans = filteredData.plans.filter((p) => isDateInCurrentWeek(p.date));
-    const weekDonePlans = weekPlans.filter(isDonePlan);
-
-    setScoreCardDescription(
-        mockTestsValue,
-        completedTests > 0
-            ? `${completedTests} completed test${completedTests > 1 ? "s" : ""} se average bana hai`
-            : "Abhi completed scored tests nahi mile"
-    );
-
-    setScoreCardDescription(
-        revisionAccuracyValue,
-        totalRevisions > 0
-            ? `${completedRevisions}/${totalRevisions} revision topic${totalRevisions > 1 ? "s" : ""} completed`
-            : "Abhi revision data available nahi hai"
-    );
-
-    setScoreCardDescription(
-        taskCompletionValue,
-        totalTasks > 0
-            ? `${completedTasks}/${totalTasks} task${totalTasks > 1 ? "s" : ""} completed`
-            : "Abhi task completion data available nahi hai"
-    );
-
-    setScoreCardDescription(
-        focusEfficiencyValue,
-        weekPlans.length > 0
-            ? `${weekDonePlans.length}/${weekPlans.length} planner block${weekPlans.length > 1 ? "s" : ""} done this week`
-            : "Is week planner focus data available nahi hai"
-    );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Grouped Activity Chart
-// ─────────────────────────────────────────────────────────────
-
-function buildRecent7DayTrend(filteredData) {
-    const { start } = getRecent7DaysWindow();
-    const todayYmd = getTodayString();
-    const days = [];
-
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(start);
-        date.setDate(start.getDate() + i);
-
-        const ymd = formatDateToYMD(date);
-        const label = date.toLocaleDateString("en-US", { weekday: "short" });
-        const isToday = ymd === todayYmd;
-
-        const tasks = filteredData.tasks.filter(
-            (t) => t.dueDate === ymd && t.displayStatus === "Completed"
-        ).length;
-
-        const revisions = filteredData.revisions.filter(
-            (r) => r.date === ymd && isCompletedRevision(r)
-        ).length;
-
-        const plans = filteredData.plans.filter(
-            (p) => p.date === ymd && isDonePlan(p)
-        ).length;
-
-        const tests = filteredData.tests.filter(
-            (t) => t.date === ymd && isCompletedTest(t)
-        ).length;
-
-        const total = tasks + revisions + plans + tests;
-
-        days.push({ label, ymd, isToday, tasks, revisions, plans, tests, total });
-    }
-
-    return days;
-}
-
-function getDominantTrendType(trend) {
-    const totals = trend.reduce((acc, d) => {
-        acc.tasks += d.tasks;
-        acc.revisions += d.revisions;
-        acc.plans += d.plans;
-        acc.tests += d.tests;
-        return acc;
-    }, { tasks: 0, revisions: 0, plans: 0, tests: 0 });
-
-    const map = { tasks: "Tasks", revisions: "Revisions", plans: "Plans", tests: "Tests" };
-    const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-    if (!top || top[1] <= 0) return "No focus yet";
-    return map[top[0]] || "Mixed";
-}
-
-function renderChartHighlightChips(trend) {
-    const row = ensureChartHighlightChipRow();
-    if (!row) return;
-
-    const total = trend.reduce((sum, day) => sum + day.total, 0);
-    const activeDays = trend.filter((day) => day.total > 0).length;
-    const bestDay = trend.reduce((a, b) => a.total >= b.total ? a : b, trend[0]);
-    const focus = getDominantTrendType(trend);
-
-    const totalMeta = getChartTypeMeta("tasks");
-    const activeMeta = getChartTypeMeta("plans");
-    const bestMeta = getChartTypeMeta("revisions");
-    const focusMeta = getChartTypeMeta("tests");
-
-    row.innerHTML = `
-        <span class="analytics-highlight-chip" style="background:${totalMeta.bg};border:1px solid ${totalMeta.border};color:${totalMeta.text};">
-            <i class="fa-solid fa-layer-group" style="color:${totalMeta.dot};"></i>
-            <span>Total: ${total}</span>
-        </span>
-
-        <span class="analytics-highlight-chip" style="background:${activeMeta.bg};border:1px solid ${activeMeta.border};color:${activeMeta.text};">
-            <i class="fa-solid fa-calendar-check" style="color:${activeMeta.dot};"></i>
-            <span>Active Days: ${activeDays}</span>
-        </span>
-
-        <span class="analytics-highlight-chip" style="background:${bestMeta.bg};border:1px solid ${bestMeta.border};color:${bestMeta.text};">
-            <i class="fa-solid fa-trophy" style="color:${bestMeta.dot};"></i>
-            <span>Best Day: ${bestDay && bestDay.total > 0 ? escapeHtml(bestDay.label) : "—"}</span>
-        </span>
-
-        <span class="analytics-highlight-chip" style="background:${focusMeta.bg};border:1px solid ${focusMeta.border};color:${focusMeta.text};">
-            <i class="fa-solid fa-bullseye" style="color:${focusMeta.dot};"></i>
-            <span>Focus: ${escapeHtml(focus)}</span>
-        </span>
-    `;
-}
-
-function colorizeChartLegend() {
-    const legendItems = document.querySelectorAll(".chart-footer-legend .chart-legend-item");
-
-    legendItems.forEach((item) => {
-        const labelEl = item.querySelector(".cfl-label");
-        const dotEl = item.querySelector(".cfl-dot");
-        const text = (labelEl?.textContent || "").trim().toLowerCase();
-
-        let meta = getChartTypeMeta("tasks");
-        if (text.includes("revision")) meta = getChartTypeMeta("revisions");
-        else if (text.includes("plan")) meta = getChartTypeMeta("plans");
-        else if (text.includes("test")) meta = getChartTypeMeta("tests");
-
-        item.style.background = meta.bg;
-        item.style.border = `1px solid ${meta.border}`;
-        item.style.color = meta.text;
-
-        if (labelEl) {
-            labelEl.style.color = meta.text;
-            labelEl.style.fontWeight = "700";
+        let note = info.querySelector(".analytics-summary-note");
+        if (!note) {
+            note = document.createElement("span");
+            note.className = "analytics-summary-note";
+            info.appendChild(note);
         }
 
-        if (dotEl) {
-            dotEl.style.background = meta.dot;
-            dotEl.style.boxShadow = `0 0 0 4px ${meta.bg}`;
-        }
-    });
-}
-
-function renderTrendChart(filteredData) {
-    if (!chartBarsContainer || !chartLabelsContainer) return;
-
-    const trend = buildRecent7DayTrend(filteredData);
-    const dark = isDarkTheme();
-
-    renderChartHighlightChips(trend);
-
-    const yAxisEl = document.querySelector(".chart-y-axis");
-    const maxBarValue = Math.max(
-        1,
-        ...trend.flatMap((d) => [d.tasks, d.revisions, d.plans, d.tests])
-    );
-
-    if (yAxisEl) {
-        yAxisEl.innerHTML = `
-            <span>${maxBarValue}</span>
-            <span>${Math.ceil(maxBarValue / 2)}</span>
-            <span>0</span>
-        `;
+        return note;
     }
 
-    chartLabelsContainer.innerHTML = "";
-    chartLabelsContainer.style.display = "none";
-    chartBarsContainer.innerHTML = "";
+    function performanceTone(score) {
+        if (score >= 85) return "Excellent";
+        if (score >= 70) return "Strong";
+        if (score >= 50) return "Improving";
+        if (score > 0) return "Needs focus";
+        return "No data yet";
+    }
 
-    const categoriesOrder = ["tasks", "revisions", "plans", "tests"];
+    function renderSummary(metrics, subjectInsights) {
+        setText(els.overallStudyProgressValue, `${metrics.overallStudyProgress}%`);
+        setText(els.averageTestScoreValue, `${metrics.averageTestScore}%`);
+        setText(els.completedSessionsValue, `${metrics.completedSessions}`);
+        setText(els.weeklyConsistencyValue, `${metrics.weeklyConsistency} Days`);
 
-    trend.forEach((day) => {
-        const card = document.createElement("div");
-        card.className = "analytics-bar-group";
+        const strongest = subjectInsights[0];
 
-        const normalCardBg = dark ? "#0f172a" : "#ffffff";
-        const normalCardBorder = dark ? "rgba(255,255,255,0.08)" : "#e5e7eb";
-        const normalCardShadow = dark ? "0 14px 28px rgba(0,0,0,0.24)" : "0 8px 20px rgba(15,23,42,0.06)";
-        const todayBorder = dark ? "#8b7cff" : "#8b5cf6";
-        const todayText = dark ? "#ffffff" : "#5b4ef5";
-        const emptyText = dark ? "#94a3b8" : "#94a3b8";
+        const overallNote = ensureNote(".asc-progress");
+        const scoreNote = ensureNote(".asc-score");
+        const sessionNote = ensureNote(".asc-sessions");
+        const consistencyNote = ensureNote(".asc-consistency");
 
-        card.style.background = day.isToday
-            ? (dark ? "linear-gradient(180deg, rgba(108,99,255,0.18), rgba(91,78,245,0.12))" : "linear-gradient(180deg,#f5f3ff,#eef2ff)")
-            : normalCardBg;
-
-        card.style.border = day.isToday
-            ? `2px solid ${todayBorder}`
-            : `1px solid ${normalCardBorder}`;
-
-        card.style.boxShadow = normalCardShadow;
-
-        const topLine = document.createElement("div");
-        topLine.className = "analytics-bar-group-topline";
-        topLine.style.background = day.isToday
-            ? "linear-gradient(90deg,#7c6cff,#5b4ef5)"
-            : (dark ? "linear-gradient(90deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02))" : "linear-gradient(90deg,#ede9fe,#eef2ff)");
-        card.appendChild(topLine);
-
-        if (day.isToday) {
-            const todayBadge = document.createElement("span");
-            todayBadge.className = "analytics-today-badge";
-            todayBadge.textContent = "Today";
-            todayBadge.style.background = dark ? "rgba(255,255,255,0.12)" : "#ede9fe";
-            todayBadge.style.border = `1px solid ${dark ? "rgba(255,255,255,0.18)" : "#d8ccff"}`;
-            todayBadge.style.color = dark ? "#ffffff" : "#5b4ef5";
-            card.appendChild(todayBadge);
+        if (overallNote) {
+            overallNote.textContent = strongest
+                ? `${performanceTone(metrics.overallStudyProgress)} · Best subject: ${strongest.subjectName}`
+                : "Complete study activity to unlock progress insights";
         }
 
-        const head = document.createElement("div");
-        head.className = "analytics-bar-group-head";
+        if (scoreNote) {
+            scoreNote.textContent = metrics.scoredTests
+                ? `${metrics.scoredTests} scored test${metrics.scoredTests > 1 ? "s" : ""} included`
+                : "No scored test found in this range";
+        }
 
-        const totalBubble = document.createElement("span");
-        totalBubble.className = "analytics-day-total";
-        totalBubble.textContent = day.total;
-        totalBubble.style.background = day.isToday
-            ? "linear-gradient(135deg,#7c6cff,#5b4ef5)"
-            : (dark ? "rgba(255,255,255,0.10)" : "#f3f0ff");
-        totalBubble.style.color = day.isToday ? "#ffffff" : "#5b4ef5";
+        if (sessionNote) {
+            sessionNote.textContent = metrics.completedSessions
+                ? `${metrics.focusMinutes} focus minutes tracked`
+                : "Start Pomodoro to track focus sessions";
+        }
 
-        head.appendChild(totalBubble);
-        card.appendChild(head);
+        if (consistencyNote) {
+            consistencyNote.textContent = metrics.weeklyConsistency
+                ? `${metrics.weeklyConsistency}/7 active days`
+                : "No active day recorded yet";
+        }
+    }
 
-        const body = document.createElement("div");
-        body.className = "analytics-bar-group-body";
+    function setScoreDescription(valueElement, text) {
+        const item = valueElement?.closest(".score-stat-item");
+        const paragraph = item?.querySelector(".score-stat-info p");
+        if (paragraph) paragraph.textContent = text;
+    }
 
-        if (day.total === 0) {
-            const empty = document.createElement("div");
-            empty.className = "analytics-group-empty";
+    function renderScoreOverview(metrics) {
+        setText(els.mockTestsValue, `${metrics.averageTestScore}%`);
+        setText(els.revisionAccuracyValue, `${metrics.revisionCompletion}%`);
+        setText(els.taskCompletionValue, `${metrics.taskCompletion}%`);
+        setText(els.focusEfficiencyValue, `${metrics.focusEfficiency}%`);
 
-            const icon = document.createElement("span");
-            icon.className = "analytics-group-empty-icon";
-            icon.innerHTML = `<i class="fa-regular fa-bell-slash"></i>`;
-            icon.style.background = dark ? "rgba(255,255,255,0.06)" : "#f3f4f6";
-            icon.style.color = emptyText;
+        setScoreDescription(
+            els.mockTestsValue,
+            metrics.scoredTests ? `${metrics.scoredTests} scored test result${metrics.scoredTests > 1 ? "s" : ""}` : "No scored test result available yet"
+        );
 
-            const text = document.createElement("span");
-            text.textContent = "No activity";
-            text.style.fontSize = "13px";
-            text.style.fontWeight = "700";
-            text.style.lineHeight = "1.45";
-            text.style.color = emptyText;
+        setScoreDescription(
+            els.revisionAccuracyValue,
+            metrics.totalRevisions ? `${metrics.completedRevisions}/${metrics.totalRevisions} revisions completed` : "No revision data in this range"
+        );
 
-            empty.appendChild(icon);
-            empty.appendChild(text);
-            body.appendChild(empty);
-        } else {
-            categoriesOrder.forEach((key) => {
-                const meta = getChartTypeMeta(key);
-                const value = day[key];
-                const wrap = document.createElement("div");
-                wrap.className = "analytics-single-bar-wrap";
+        setScoreDescription(
+            els.taskCompletionValue,
+            metrics.totalTasks ? `${metrics.completedTasks}/${metrics.totalTasks} tasks completed` : "No task data in this range"
+        );
 
-                const valueEl = document.createElement("span");
-                valueEl.className = "analytics-single-bar-value";
-                valueEl.textContent = value;
-                valueEl.style.color = value > 0 ? meta.text : (dark ? "#94a3b8" : "#94a3b8");
+        setScoreDescription(
+            els.focusEfficiencyValue,
+            metrics.completedSessions ? `${metrics.focusMinutes} minutes from ${metrics.completedSessions} Pomodoro sessions` : "No Pomodoro focus data yet"
+        );
+    }
 
-                const bar = document.createElement("div");
-                bar.className = "analytics-single-bar";
-                bar.style.background = value > 0
-                    ? `linear-gradient(180deg, ${meta.dot}, ${meta.dot})`
-                    : (dark ? "rgba(255,255,255,0.06)" : "#edf2f7");
+    function createTooltip() {
+        let tooltip = document.getElementById("analyticsPremiumTooltip");
+        if (tooltip) return tooltip;
 
-                bar.style.border = value > 0
-                    ? `1px solid ${meta.border}`
-                    : `1px solid ${dark ? "rgba(255,255,255,0.06)" : "#e5e7eb"}`;
+        tooltip = document.createElement("div");
+        tooltip.id = "analyticsPremiumTooltip";
+        tooltip.className = "analytics-premium-tooltip hidden";
+        document.body.appendChild(tooltip);
+        return tooltip;
+    }
 
-                const height = value > 0
-                    ? Math.max(18, Math.round((value / maxBarValue) * 150))
-                    : 6;
+    function showTooltip(html, event) {
+        const tooltip = createTooltip();
+        tooltip.innerHTML = html;
+        tooltip.classList.remove("hidden");
+        moveTooltip(event);
+    }
 
-                bar.style.height = `${height}px`;
-                bar.title = `${meta.label}: ${value}`;
+    function moveTooltip(event) {
+        const tooltip = createTooltip();
+        const padding = 14;
+        const tooltipWidth = tooltip.offsetWidth || 260;
+        const tooltipHeight = tooltip.offsetHeight || 120;
 
-                wrap.appendChild(valueEl);
-                wrap.appendChild(bar);
-                body.appendChild(wrap);
+        let left = event.clientX + padding;
+        let top = event.clientY + padding;
+
+        if (left + tooltipWidth > window.innerWidth - 12) {
+            left = event.clientX - tooltipWidth - padding;
+        }
+
+        if (top + tooltipHeight > window.innerHeight - 12) {
+            top = event.clientY - tooltipHeight - padding;
+        }
+
+        tooltip.style.left = `${Math.max(12, left)}px`;
+        tooltip.style.top = `${Math.max(12, top)}px`;
+    }
+
+    function hideTooltip() {
+        createTooltip().classList.add("hidden");
+    }
+
+    function chartMeta(type) {
+        const dark = isDarkTheme();
+        const map = {
+            tasks: {
+                label: "Tasks",
+                icon: "fa-list-check",
+                color: "#7c6cff",
+                bg: dark ? "rgba(124,108,255,0.18)" : "#f3f0ff",
+                text: dark ? "#ede9fe" : "#5b4ef5"
+            },
+            revisions: {
+                label: "Revisions",
+                icon: "fa-rotate",
+                color: "#3b82f6",
+                bg: dark ? "rgba(59,130,246,0.18)" : "#eff6ff",
+                text: dark ? "#dbeafe" : "#2563eb"
+            },
+            plans: {
+                label: "Plans",
+                icon: "fa-calendar-days",
+                color: "#10b981",
+                bg: dark ? "rgba(16,185,129,0.18)" : "#ecfdf5",
+                text: dark ? "#d1fae5" : "#059669"
+            },
+            tests: {
+                label: "Tests",
+                icon: "fa-file-lines",
+                color: "#f59e0b",
+                bg: dark ? "rgba(245,158,11,0.18)" : "#fff7ed",
+                text: dark ? "#fde68a" : "#d97706"
+            },
+            focus: {
+                label: "Focus",
+                icon: "fa-stopwatch",
+                color: "#ef4444",
+                bg: dark ? "rgba(239,68,68,0.17)" : "#fff1f2",
+                text: dark ? "#fecaca" : "#dc2626"
+            }
+        };
+
+        return map[type];
+    }
+
+    function buildTrendData() {
+        const start = new Date();
+        start.setDate(start.getDate() - 6);
+        start.setHours(0, 0, 0, 0);
+
+        const days = [];
+        const today = todayYmd();
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(start);
+            date.setDate(start.getDate() + i);
+            const ymd = toYmd(date);
+
+            const tasks = store.tasks.filter((item) => item.date === ymd && isCompleted(item)).length;
+            const revisions = store.revisions.filter((item) => item.date === ymd && isCompleted(item)).length;
+            const plans = store.plans.filter((item) => item.date === ymd && isCompleted(item)).length;
+            const tests = store.tests.filter((item) => item.date === ymd && isCompletedTest(item)).length;
+            const focusMinutes = store.pomodoro
+                .filter((item) => item.date === ymd && isCompleted(item))
+                .reduce((sum, item) => sum + safeNumber(item.minutes), 0);
+            const focusBlocks = focusMinutes > 0 ? Math.max(1, Math.round(focusMinutes / 25)) : 0;
+
+            const total = tasks + revisions + plans + tests + focusBlocks;
+
+            days.push({
+                date,
+                ymd,
+                label: dayLabel(date),
+                isToday: ymd === today,
+                tasks,
+                revisions,
+                plans,
+                tests,
+                focus: focusBlocks,
+                focusMinutes,
+                total
             });
         }
 
-        card.appendChild(body);
+        return days;
+    }
 
-        const footer = document.createElement("div");
-        footer.className = "analytics-day-label";
-        footer.textContent = day.label;
-        footer.style.color = day.isToday
-            ? todayText
-            : (dark ? "#e2e8f0" : "#64748b");
+    function dominantType(trend) {
+        const totals = trend.reduce((acc, day) => {
+            acc.tasks += day.tasks;
+            acc.revisions += day.revisions;
+            acc.plans += day.plans;
+            acc.tests += day.tests;
+            acc.focus += day.focus;
+            return acc;
+        }, { tasks: 0, revisions: 0, plans: 0, tests: 0, focus: 0 });
 
-        card.appendChild(footer);
-        chartBarsContainer.appendChild(card);
-    });
+        const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+        if (!top || top[1] <= 0) return "No focus yet";
+        return chartMeta(top[0])?.label || "Mixed";
+    }
 
-    colorizeChartLegend();
-    renderChartInsightLine(trend);
-}
+    function ensureHighlightRow() {
+        const card = document.querySelector(".progress-chart-card");
+        const title = card?.querySelector(".analytics-section-title");
+        if (!card || !title) return null;
 
-function renderChartInsightLine(trend) {
-    const insightEl = document.getElementById("analyticsChartInsight");
-    const miniInsightEl = ensureChartMiniInsight();
-    if (!insightEl) return;
-
-    const total = trend.reduce((s, d) => s + d.total, 0);
-    const activeDays = trend.filter((d) => d.total > 0).length;
-    const busiest = trend.reduce((a, b) => a.total >= b.total ? a : b, trend[0]);
-    const todayData = trend.find((d) => d.isToday);
-    const dominantType = getDominantTrendType(trend);
-
-    if (total === 0) {
-        if (miniInsightEl) {
-            miniInsightEl.textContent = "This section tracks tasks, revisions, planner completions, and tests across the last 7 days.";
+        let row = document.getElementById("analyticsChartHighlightRow");
+        if (!row) {
+            row = document.createElement("div");
+            row.id = "analyticsChartHighlightRow";
+            row.className = "analytics-highlight-chip-row";
+            title.insertAdjacentElement("afterend", row);
         }
-        insightEl.textContent = "No completed activity recorded in the last 7 days. Complete one task, revision, planner item, or test to start your recent performance trend.";
-        return;
+
+        return row;
     }
 
-    if (miniInsightEl) {
-        miniInsightEl.textContent = `Last 7 days show ${getPerformanceTone(Math.round((activeDays / 7) * 100)).toLowerCase()} consistency, with ${dominantType.toLowerCase()} contributing the most.`;
+    function ensureMiniInsight() {
+        const insight = els.chartInsight;
+        if (!insight) return null;
+
+        let mini = document.getElementById("analyticsChartMiniInsight");
+        if (!mini) {
+            mini = document.createElement("div");
+            mini.id = "analyticsChartMiniInsight";
+            mini.className = "analytics-mini-insight";
+            insight.insertAdjacentElement("beforebegin", mini);
+        }
+
+        return mini;
     }
 
-    let insightText = `${total} completed activit${total > 1 ? "ies" : "y"} tracked in the last 7 days.`;
+    function renderHighlightChips(trend) {
+        const row = ensureHighlightRow();
+        if (!row) return;
 
-    if (busiest && busiest.total > 0) {
-        insightText += ` ${busiest.label} is your strongest day with ${busiest.total} activit${busiest.total > 1 ? "ies" : "y"}.`;
-    }
+        const total = trend.reduce((sum, day) => sum + day.total, 0);
+        const activeDays = trend.filter((day) => day.total > 0).length;
+        const bestDay = trend.reduce((best, day) => day.total > best.total ? day : best, trend[0]);
+        const focus = dominantType(trend);
 
-    insightText += ` You stayed active on ${activeDays} day${activeDays > 1 ? "s" : ""}.`;
+        const chips = [
+            { label: "Total", value: total, type: "tasks", icon: "fa-layer-group" },
+            { label: "Active Days", value: activeDays, type: "plans", icon: "fa-calendar-check" },
+            { label: "Best Day", value: bestDay && bestDay.total > 0 ? bestDay.label : "—", type: "revisions", icon: "fa-trophy" },
+            { label: "Main Focus", value: focus, type: "tests", icon: "fa-bullseye" }
+        ];
 
-    if (todayData && todayData.total > 0) {
-        insightText += ` Today already has ${todayData.total} completed activit${todayData.total > 1 ? "ies" : "y"}.`;
-    } else {
-        insightText += ` No completed activity is tracked for today yet.`;
-    }
-
-    insightEl.textContent = insightText;
-}
-
-// ─────────────────────────────────────────────────────────────
-// Subject Insights
-// ─────────────────────────────────────────────────────────────
-
-function getAllSubjectNames(filteredData) {
-    const subjectMap = new Map();
-
-    const add = (value) => {
-        const display = String(value || "").trim();
-        if (!display) return;
-        const key = textKey(display);
-        if (!subjectMap.has(key)) subjectMap.set(key, display);
-    };
-
-    analyticsStore.subjects.forEach(add);
-    filteredData.tasks.forEach((t) => add(t.subjectName));
-    filteredData.revisions.forEach((r) => add(r.subject));
-    filteredData.tests.forEach((t) => add(t.subject));
-    filteredData.plans.forEach((p) => add(p.subject));
-
-    return [...subjectMap.values()];
-}
-
-function buildSubjectInsights(filteredData) {
-    const subjectNames = getAllSubjectNames(filteredData);
-
-    const subjectStats = subjectNames.map((name) => {
-        const key = textKey(name);
-
-        const sTasks = filteredData.tasks.filter((t) => textKey(t.subjectName) === key);
-        const sRevisions = filteredData.revisions.filter((r) => textKey(r.subject) === key);
-        const sTests = filteredData.tests.filter((t) => textKey(t.subject) === key);
-        const sPlans = filteredData.plans.filter((p) => textKey(p.subject) === key);
-
-        const completedTasks = sTasks.filter((t) => t.displayStatus === "Completed");
-        const completedRevisions = sRevisions.filter(isCompletedRevision);
-        const completedPlans = sPlans.filter(isDonePlan);
-        const scoredTests = sTests.filter((t) => isCompletedTest(t) && Number.isFinite(t.score));
-
-        const taskScore = sTasks.length > 0
-            ? safePercent((completedTasks.length / sTasks.length) * 100)
-            : null;
-
-        const revisionScore = sRevisions.length > 0
-            ? safePercent((completedRevisions.length / sRevisions.length) * 100)
-            : null;
-
-        const testScore = scoredTests.length > 0
-            ? safePercent(scoredTests.reduce((sum, item) => sum + Number(item.score), 0) / scoredTests.length)
-            : null;
-
-        const planScore = sPlans.length > 0
-            ? safePercent((completedPlans.length / sPlans.length) * 100)
-            : null;
-
-        const finalScore = average(
-            [taskScore, revisionScore, testScore, planScore].filter(Number.isFinite)
-        );
-
-        return {
-            subjectName: name,
-            finalScore,
-            taskCount: sTasks.length,
-            revisionCount: sRevisions.length,
-            testCount: sTests.length,
-            planCount: sPlans.length,
-            completedTaskCount: completedTasks.length,
-            completedRevisionCount: completedRevisions.length,
-            completedPlanCount: completedPlans.length,
-            scoredTestCount: scoredTests.length,
-            activityCount: sTasks.length + sRevisions.length + sTests.length + sPlans.length
-        };
-    });
-
-    return subjectStats
-        .filter((s) => s.activityCount > 0)
-        .sort((a, b) => {
-            if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
-            return b.activityCount - a.activityCount;
-        });
-}
-
-function renderSubjectInsights(subjectInsights) {
-    if (!subjectInsightList) return;
-
-    const strongestEl = document.getElementById("strongestSubjectBadge");
-    const weakestEl = document.getElementById("weakestSubjectBadge");
-
-    if (subjectInsights.length > 0 && strongestEl) {
-        strongestEl.querySelector("span").textContent =
-            `Strongest: ${subjectInsights[0].subjectName} (${subjectInsights[0].finalScore}%)`;
-    } else if (strongestEl) {
-        strongestEl.querySelector("span").textContent = "Strongest: —";
-    }
-
-    if (subjectInsights.length > 1 && weakestEl) {
-        const weakest = [...subjectInsights].sort((a, b) => a.finalScore - b.finalScore)[0];
-        weakestEl.querySelector("span").textContent =
-            `Needs Focus: ${weakest.subjectName} (${weakest.finalScore}%)`;
-    } else if (weakestEl) {
-        weakestEl.querySelector("span").textContent = "Needs Focus: —";
-    }
-
-    if (subjectInsights.length === 0) {
-        subjectInsightList.innerHTML = `
-            <div class="analytics-empty-state">
-                <i class="fa-solid fa-book-open"></i>
-                <h4>No subject insight yet</h4>
-                <p>Add tasks, revisions, plans, or completed tests to unlock subject-wise analytics.</p>
-            </div>
-        `;
-        return;
-    }
-
-    const weakestSubject = [...subjectInsights].sort((a, b) => a.finalScore - b.finalScore)[0];
-
-    subjectInsightList.innerHTML = subjectInsights.slice(0, 5).map((item, index) => {
-        const pctClass = item.finalScore >= 70 ? "pct-high" : item.finalScore >= 50 ? "pct-mid" : "pct-low";
-        const isStrongest = index === 0 && subjectInsights.length > 1;
-        const isWeakest =
-            weakestSubject &&
-            item.subjectName === weakestSubject.subjectName &&
-            weakestSubject.finalScore < subjectInsights[0].finalScore;
-
-        let badge = "";
-        if (isStrongest) {
-            badge = `
-                <span class="subject-rank-badge rank-top"
-                      style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:700;">
-                    <i class="fa-solid fa-trophy"></i> Top
+        row.innerHTML = chips.map((chip) => {
+            const meta = chartMeta(chip.type);
+            return `
+                <span class="analytics-highlight-chip" style="background:${meta.bg};color:${meta.text};border-color:${meta.color}22;">
+                    <i class="fa-solid ${chip.icon}" style="color:${meta.color};"></i>
+                    <span>${escapeHtml(chip.label)}:</span>
+                    <strong>${escapeHtml(chip.value)}</strong>
                 </span>
             `;
-        } else if (isWeakest) {
-            badge = `
-                <span class="subject-rank-badge rank-focus"
-                      style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:700;">
-                    <i class="fa-solid fa-arrow-trend-up"></i> Focus
-                </span>
+        }).join("");
+    }
+
+    function renderTrendChart() {
+        if (!els.chartBars) return;
+
+        const trend = buildTrendData();
+        const maxValue = Math.max(1, ...trend.flatMap((day) => [day.tasks, day.revisions, day.plans, day.tests, day.focus]));
+        const categories = ["tasks", "revisions", "plans", "tests", "focus"];
+        const dark = isDarkTheme();
+
+        renderHighlightChips(trend);
+
+        const yAxis = document.querySelector(".chart-y-axis");
+        if (yAxis) {
+            yAxis.innerHTML = `
+                <span>${maxValue}</span>
+                <span>${Math.ceil(maxValue / 2)}</span>
+                <span>0</span>
             `;
         }
 
-        const fillStyle = isStrongest
-            ? "background:linear-gradient(90deg,#10b981,#34d399);box-shadow:0 6px 14px rgba(16,185,129,0.16);"
-            : isWeakest
-                ? "background:linear-gradient(90deg,#f59e0b,#fbbf24);box-shadow:0 6px 14px rgba(245,158,11,0.16);"
-                : "background:linear-gradient(90deg,#7c6cff,#8b5cf6);";
+        if (els.chartLabels) {
+            els.chartLabels.innerHTML = "";
+            els.chartLabels.style.display = "none";
+        }
 
-        return `
-            <div class="subject-insight-item ${isStrongest ? "item-top" : ""} ${isWeakest ? "item-focus" : ""}">
-                <div class="subject-insight-top">
-                    <div style="display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap;">
-                        <h4>${escapeHtml(item.subjectName)}</h4>
-                        ${badge}
+        els.chartBars.innerHTML = trend.map((day) => {
+            const tooltipRows = categories.map((type) => {
+                const meta = chartMeta(type);
+                const value = type === "focus" ? `${day.focusMinutes} min` : day[type];
+                return `
+                    <div class="apt-row">
+                        <span><i class="fa-solid ${meta.icon}" style="color:${meta.color}"></i> ${meta.label}</span>
+                        <strong>${value}</strong>
                     </div>
-                    <span class="insight-pct ${pctClass}">${item.finalScore}%</span>
+                `;
+            }).join("");
+
+            const tooltip = `
+                <div class="apt-title">${day.label} • ${day.ymd}</div>
+                ${tooltipRows}
+                <div class="apt-total">Total activity score: ${day.total}</div>
+            `;
+
+            const bars = categories.map((type) => {
+                const meta = chartMeta(type);
+                const value = day[type];
+                const height = value > 0 ? Math.max(22, Math.round((value / maxValue) * 155)) : 7;
+                return `
+                    <div class="analytics-single-bar-wrap" data-tooltip="${escapeHtml(`<div class='apt-title'>${meta.label}</div><div class='apt-total'>${type === "focus" ? day.focusMinutes + " focus minutes" : value + " completed"}</div>`)}">
+                        <span class="analytics-single-bar-value" style="color:${value > 0 ? meta.text : dark ? "#64748b" : "#94a3b8"}">${type === "focus" && day.focusMinutes > 0 ? day.focusMinutes : value || ""}</span>
+                        <div class="analytics-single-bar" style="height:${height}px;background:${value > 0 ? `linear-gradient(180deg, ${meta.color}, ${meta.color})` : dark ? "rgba(255,255,255,0.06)" : "#eef2f7"};box-shadow:${value > 0 ? `0 10px 22px ${meta.color}25` : "none"};"></div>
+                    </div>
+                `;
+            }).join("");
+
+            return `
+                <div class="analytics-bar-group ${day.isToday ? "today" : ""}" data-tooltip="${escapeHtml(tooltip)}">
+                    ${day.isToday ? `<span class="analytics-today-badge">Today</span>` : ""}
+                    <div class="analytics-bar-group-head">
+                        <span class="analytics-day-total">${day.total}</span>
+                    </div>
+                    <div class="analytics-bar-group-body">
+                        ${day.total > 0 ? bars : `
+                            <div class="analytics-group-empty">
+                                <span class="analytics-group-empty-icon"><i class="fa-regular fa-bell-slash"></i></span>
+                                <span>No activity</span>
+                            </div>
+                        `}
+                    </div>
+                    <div class="analytics-day-label">${day.label}</div>
                 </div>
+            `;
+        }).join("");
 
-                <div class="subject-insight-meta">
-                    Tasks: ${item.completedTaskCount}/${item.taskCount}
-                    &nbsp;•&nbsp;
-                    Revisions: ${item.completedRevisionCount}/${item.revisionCount}
-                    &nbsp;•&nbsp;
-                    Plans: ${item.completedPlanCount}/${item.planCount}
-                    &nbsp;•&nbsp;
-                    Tests: ${item.scoredTestCount}/${item.testCount}
+        bindTooltipEvents();
+        renderChartLegend();
+        renderChartInsight(trend);
+    }
+
+    function renderChartLegend() {
+        const legend = document.querySelector(".chart-footer-legend");
+        if (!legend) return;
+
+        const items = ["tasks", "revisions", "plans", "tests", "focus"];
+
+        legend.innerHTML = items.map((type) => {
+            const meta = chartMeta(type);
+            return `
+                <div class="chart-legend-item" style="background:${meta.bg};border-color:${meta.color}22;color:${meta.text};">
+                    <span class="cfl-dot" style="background:${meta.color};box-shadow:0 0 0 4px ${meta.bg};"></span>
+                    <span class="cfl-label" style="color:${meta.text};">${meta.label}</span>
                 </div>
+            `;
+        }).join("");
+    }
 
-                <div class="subject-progress-bar">
-                    <div class="subject-progress-fill" style="width:${item.finalScore}%;${fillStyle}"></div>
+    function renderChartInsight(trend) {
+        if (!els.chartInsight) return;
+
+        const mini = ensureMiniInsight();
+        const total = trend.reduce((sum, day) => sum + day.total, 0);
+        const activeDays = trend.filter((day) => day.total > 0).length;
+        const bestDay = trend.reduce((best, day) => day.total > best.total ? day : best, trend[0]);
+        const today = trend.find((day) => day.isToday);
+        const focus = dominantType(trend);
+
+        if (total === 0) {
+            if (mini) {
+                mini.textContent = "This chart tracks tasks, revisions, planner completion, tests, and Pomodoro focus blocks.";
+            }
+            els.chartInsight.textContent = "No completed activity recorded in the last 7 days. Complete one task, revision, planner item, test, or Pomodoro session to start your analytics trend.";
+            return;
+        }
+
+        if (mini) {
+            mini.textContent = `Your last 7 days show ${performanceTone(Math.round((activeDays / 7) * 100)).toLowerCase()} consistency, with ${focus.toLowerCase()} contributing the most.`;
+        }
+
+        let text = `${total} activity points tracked across ${activeDays} active day${activeDays > 1 ? "s" : ""}.`;
+
+        if (bestDay && bestDay.total > 0) {
+            text += ` ${bestDay.label} was your strongest day with ${bestDay.total} activity point${bestDay.total > 1 ? "s" : ""}.`;
+        }
+
+        if (today && today.total > 0) {
+            text += ` Today already has ${today.total} tracked activity point${today.total > 1 ? "s" : ""}.`;
+        } else {
+            text += " No completed activity is tracked for today yet.";
+        }
+
+        els.chartInsight.textContent = text;
+    }
+
+    function bindTooltipEvents() {
+        document.querySelectorAll("[data-tooltip]").forEach((node) => {
+            node.addEventListener("mouseenter", (event) => {
+                const html = node.getAttribute("data-tooltip");
+                if (html) showTooltip(html, event);
+            });
+
+            node.addEventListener("mousemove", moveTooltip);
+            node.addEventListener("mouseleave", hideTooltip);
+        });
+    }
+
+    function getSubjectNames(data) {
+        const map = new Map();
+
+        const add = (name) => {
+            const display = String(name || "").trim();
+            if (!display) return;
+            const key = textKey(display);
+            if (!map.has(key)) map.set(key, display);
+        };
+
+        store.subjects.forEach((subject) => add(subject.name));
+        data.tasks.forEach((item) => add(item.subjectName));
+        data.revisions.forEach((item) => add(item.subjectName));
+        data.tests.forEach((item) => add(item.subjectName));
+        data.plans.forEach((item) => add(item.subjectName));
+        data.pomodoro.forEach((item) => add(item.subjectName));
+
+        return [...map.values()];
+    }
+
+    function buildSubjectInsights(data) {
+        const names = getSubjectNames(data);
+
+        const insights = names.map((name) => {
+            const key = textKey(name);
+            const subject = store.subjects.find((item) => textKey(item.name) === key);
+
+            const tasks = data.tasks.filter((item) => textKey(item.subjectName) === key);
+            const revisions = data.revisions.filter((item) => textKey(item.subjectName) === key);
+            const tests = data.tests.filter((item) => textKey(item.subjectName) === key);
+            const plans = data.plans.filter((item) => textKey(item.subjectName) === key);
+            const pomodoro = data.pomodoro.filter((item) => textKey(item.subjectName) === key);
+
+            const taskScore = tasks.length ? percent(tasks.filter(isCompleted).length, tasks.length) : NaN;
+            const revisionScore = revisions.length ? percent(revisions.filter(isCompleted).length, revisions.length) : NaN;
+            const testScore = tests.filter(isCompletedTest).length
+                ? average(tests.filter(isCompletedTest).map((item) => clamp(Number(item.score), 0, 100)))
+                : NaN;
+            const planScore = plans.length ? percent(plans.filter(isCompleted).length, plans.length) : NaN;
+            const focusMinutes = pomodoro.filter(isCompleted).reduce((sum, item) => sum + safeNumber(item.minutes), 0);
+            const focusScore = focusMinutes ? clamp(Math.round((focusMinutes / Math.max(25, pomodoro.length * 25)) * 100), 0, 100) : NaN;
+            const explicitProgress = subject && subject.progress > 0 ? subject.progress : NaN;
+
+            const finalScore = average([taskScore, revisionScore, testScore, planScore, focusScore, explicitProgress]);
+            const activityCount = tasks.length + revisions.length + tests.length + plans.length + pomodoro.length;
+
+            return {
+                subjectName: name,
+                finalScore,
+                activityCount,
+                tasks: tasks.length,
+                completedTasks: tasks.filter(isCompleted).length,
+                revisions: revisions.length,
+                completedRevisions: revisions.filter(isCompleted).length,
+                tests: tests.length,
+                scoredTests: tests.filter(isCompletedTest).length,
+                plans: plans.length,
+                completedPlans: plans.filter(isCompleted).length,
+                focusMinutes
+            };
+        });
+
+        return insights
+            .filter((item) => item.activityCount > 0 || item.finalScore > 0)
+            .sort((a, b) => {
+                if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
+                return b.activityCount - a.activityCount;
+            });
+    }
+
+    function renderSubjectInsights(insights) {
+        if (!els.subjectInsightList) return;
+
+        const strongest = insights[0];
+        const weakest = insights.length > 1
+            ? [...insights].sort((a, b) => a.finalScore - b.finalScore)[0]
+            : null;
+
+        const strongSpan = els.strongestSubjectBadge?.querySelector("span");
+        const weakSpan = els.weakestSubjectBadge?.querySelector("span");
+
+        if (strongSpan) {
+            strongSpan.textContent = strongest
+                ? `Strongest: ${strongest.subjectName} (${strongest.finalScore}%)`
+                : "Strongest: —";
+        }
+
+        if (weakSpan) {
+            weakSpan.textContent = weakest
+                ? `Needs Focus: ${weakest.subjectName} (${weakest.finalScore}%)`
+                : "Needs Focus: —";
+        }
+
+        if (!insights.length) {
+            els.subjectInsightList.innerHTML = `
+                <div class="analytics-empty-state">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h4>No subject insight yet</h4>
+                    <p>Add tasks, revisions, tests, plans, or Pomodoro sessions to unlock subject-wise analytics.</p>
                 </div>
-            </div>
-        `;
-    }).join("");
-}
+            `;
+            return;
+        }
 
-// ─────────────────────────────────────────────────────────────
-// Recommendations
-// ─────────────────────────────────────────────────────────────
+        els.subjectInsightList.innerHTML = insights.slice(0, 6).map((item, index) => {
+            const isStrongest = index === 0 && insights.length > 1;
+            const isWeakest = weakest && item.subjectName === weakest.subjectName && weakest.finalScore < strongest.finalScore;
+            const pctClass = item.finalScore >= 70 ? "pct-high" : item.finalScore >= 45 ? "pct-mid" : "pct-low";
+            const fill = isStrongest
+                ? "linear-gradient(90deg,#10b981,#34d399)"
+                : isWeakest
+                    ? "linear-gradient(90deg,#f59e0b,#fbbf24)"
+                    : "linear-gradient(90deg,#6c63ff,#8b7cff)";
 
-function generateRecommendations(filteredData, metrics, subjectInsights) {
-    const recs = [];
-    const overdueTasks = filteredData.tasks.filter((t) => t.displayStatus === "Overdue").length;
-    const weakRevisions = filteredData.revisions.filter(isWeakRevision).length;
-    const upcomingTests = filteredData.tests.filter((t) => !isCompletedTest(t)).length;
-    const weakest = [...subjectInsights].sort((a, b) => a.finalScore - b.finalScore)[0];
-    const strongest = [...subjectInsights].sort((a, b) => b.finalScore - a.finalScore)[0];
+            const badge = isStrongest
+                ? `<span class="subject-rank-badge rank-top"><i class="fa-solid fa-trophy"></i> Top</span>`
+                : isWeakest
+                    ? `<span class="subject-rank-badge rank-focus"><i class="fa-solid fa-arrow-trend-up"></i> Focus</span>`
+                    : "";
 
-    if (overdueTasks > 0) {
-        recs.push({
-            type: "warn",
-            text: `You have ${overdueTasks} overdue task${overdueTasks > 1 ? "s" : ""}. Clear overdue work first to reduce study backlog.`
-        });
+            return `
+                <div class="subject-insight-item" data-tooltip="${escapeHtml(`<div class='apt-title'>${item.subjectName}</div><div class='apt-row'><span>Tasks</span><strong>${item.completedTasks}/${item.tasks}</strong></div><div class='apt-row'><span>Revisions</span><strong>${item.completedRevisions}/${item.revisions}</strong></div><div class='apt-row'><span>Plans</span><strong>${item.completedPlans}/${item.plans}</strong></div><div class='apt-row'><span>Tests</span><strong>${item.scoredTests}/${item.tests}</strong></div><div class='apt-total'>Focus: ${item.focusMinutes} min</div>`)}">
+                    <div class="subject-insight-top">
+                        <div class="subject-title-wrap">
+                            <h4>${escapeHtml(item.subjectName)}</h4>
+                            ${badge}
+                        </div>
+                        <span class="insight-pct ${pctClass}">${item.finalScore}%</span>
+                    </div>
+                    <div class="subject-insight-meta">
+                        Tasks ${item.completedTasks}/${item.tasks} · Revisions ${item.completedRevisions}/${item.revisions} · Focus ${item.focusMinutes}m
+                    </div>
+                    <div class="subject-progress-bar">
+                        <div class="subject-progress-fill" style="width:${item.finalScore}%;background:${fill};"></div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        bindTooltipEvents();
     }
 
-    if (weakRevisions > 0) {
-        recs.push({
-            type: "warn",
-            text: `You have ${weakRevisions} weak revision topic${weakRevisions > 1 ? "s" : ""}. Revise weak areas before starting new topics.`
-        });
+    function buildRecommendations(data, metrics, insights) {
+        const recs = [];
+        const overdue = data.tasks.filter((item) => item.status === "OVERDUE").length;
+        const pendingTasks = data.tasks.filter((item) => !isCompleted(item)).length;
+        const pendingRevisions = data.revisions.filter((item) => !isCompleted(item)).length;
+        const upcomingTests = data.tests.filter((item) => !isCompletedTest(item)).length;
+        const weakest = insights.length ? [...insights].sort((a, b) => a.finalScore - b.finalScore)[0] : null;
+        const strongest = insights[0];
+
+        if (overdue > 0) {
+            recs.push({
+                type: "warn",
+                text: `${overdue} overdue task${overdue > 1 ? "s" : ""} pending hain. Pehle overdue work clear karo.`
+            });
+        }
+
+        if (weakest && weakest.finalScore < 55) {
+            recs.push({
+                type: "warn",
+                text: `${weakest.subjectName} needs focus. Is subject ke liye 2 Pomodoro sessions aur revision add karo.`
+            });
+        }
+
+        if (pendingRevisions > 0) {
+            recs.push({
+                type: "tip",
+                text: `${pendingRevisions} revision item${pendingRevisions > 1 ? "s" : ""} pending hain. Daily 20-minute quick revision slot rakho.`
+            });
+        }
+
+        if (metrics.completedSessions === 0) {
+            recs.push({
+                type: "tip",
+                text: "Pomodoro data abhi empty hai. Study Timer se 1 focus session complete karo to focus analytics improve hogi."
+            });
+        }
+
+        if (metrics.averageTestScore > 0 && metrics.averageTestScore < 70) {
+            recs.push({
+                type: "warn",
+                text: "Average test score 70% se low hai. Mock test ke mistakes ko revise karo."
+            });
+        }
+
+        if (upcomingTests > 0) {
+            recs.push({
+                type: "info",
+                text: `${upcomingTests} upcoming test${upcomingTests > 1 ? "s" : ""} found. Test date se pehle revision plan schedule karo.`
+            });
+        }
+
+        if (pendingTasks > 0 && overdue === 0) {
+            recs.push({
+                type: "tip",
+                text: `${pendingTasks} task${pendingTasks > 1 ? "s" : ""} pending hain. High priority task se start karo.`
+            });
+        }
+
+        if (strongest && strongest.finalScore >= 80) {
+            recs.push({
+                type: "success",
+                text: `${strongest.subjectName} strong chal raha hai (${strongest.finalScore}%). Is momentum ko maintain rakho.`
+            });
+        }
+
+        if (!recs.length) {
+            recs.push({
+                type: "info",
+                text: "More activities add karo — tasks, revisions, tests, plans aur Pomodoro sessions — smart recommendations aur accurate hongi."
+            });
+        }
+
+        return [...new Map(recs.map((item) => [item.text, item])).values()].slice(0, 5);
     }
 
-    if (metrics.averageTestScore > 0 && metrics.averageTestScore < 70) {
-        recs.push({
-            type: "tip",
-            text: "Your average test score is below 70%. Add one extra mock test and revise mistakes before the next exam."
-        });
+    function renderRecommendations(recommendations) {
+        if (!els.recommendationList) return;
+
+        const config = {
+            warn: { icon: "fa-triangle-exclamation", cls: "rec-warn" },
+            tip: { icon: "fa-lightbulb", cls: "rec-tip" },
+            info: { icon: "fa-circle-info", cls: "rec-info" },
+            success: { icon: "fa-circle-check", cls: "rec-success" }
+        };
+
+        els.recommendationList.innerHTML = recommendations.map((rec) => {
+            const item = config[rec.type] || config.tip;
+            return `
+                <div class="recommendation-item ${item.cls}">
+                    <div class="rec-icon-wrap">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <span>${escapeHtml(rec.text)}</span>
+                </div>
+            `;
+        }).join("");
     }
 
-    if (weakest && weakest.finalScore < 65) {
-        recs.push({
-            type: "warn",
-            text: `Focus more on ${weakest.subjectName} — its combined performance score (${weakest.finalScore}%) is currently the lowest.`
-        });
+    function renderAnalytics() {
+        injectPremiumStyles();
+
+        const data = getFilteredData();
+        const subjectInsights = buildSubjectInsights(data);
+        const metrics = calculateMetrics(data);
+        const recommendations = buildRecommendations(data, metrics, subjectInsights);
+
+        renderSummary(metrics, subjectInsights);
+        renderScoreOverview(metrics);
+        renderTrendChart();
+        renderSubjectInsights(subjectInsights);
+        renderRecommendations(recommendations);
     }
 
-    if (metrics.focusEfficiency > 0 && metrics.focusEfficiency < 60) {
-        recs.push({
-            type: "tip",
-            text: "Your focus efficiency is low in this range. Try shorter study blocks with fixed breaks for better retention."
-        });
+    function buildExportText() {
+        const data = getFilteredData();
+        const subjectInsights = buildSubjectInsights(data);
+        const metrics = calculateMetrics(data);
+        const recommendations = buildRecommendations(data, metrics, subjectInsights);
+
+        const lines = [
+            "EduMind AI — Student Analytics Report",
+            "----------------------------------------",
+            `Range: ${getSelectedRange()}`,
+            `Generated: ${new Date().toLocaleString()}`,
+            "",
+            "SUMMARY",
+            `Overall Study Progress: ${metrics.overallStudyProgress}%`,
+            `Average Test Score: ${metrics.averageTestScore}%`,
+            `Completed Pomodoro Sessions: ${metrics.completedSessions}`,
+            `Weekly Consistency: ${metrics.weeklyConsistency} Days`,
+            `Focus Minutes: ${metrics.focusMinutes}`,
+            "",
+            "SCORE OVERVIEW",
+            `Task Completion: ${metrics.taskCompletion}%`,
+            `Revision Completion: ${metrics.revisionCompletion}%`,
+            `Focus Efficiency: ${metrics.focusEfficiency}%`,
+            "",
+            "SUBJECT INSIGHTS",
+            ...(subjectInsights.length
+                ? subjectInsights.map((item, index) => `${index + 1}. ${item.subjectName} — ${item.finalScore}% | Focus ${item.focusMinutes}m`)
+                : ["No subject insights available."]),
+            "",
+            "RECOMMENDATIONS",
+            ...recommendations.map((item, index) => `${index + 1}. ${item.text}`)
+        ];
+
+        return lines.join("\n");
     }
 
-    if (upcomingTests > 0) {
-        recs.push({
-            type: "info",
-            text: `You have ${upcomingTests} upcoming test${upcomingTests > 1 ? "s" : ""}. Schedule revision before test dates for stronger performance.`
-        });
+    function exportReport() {
+        const blob = new Blob([buildExportText()], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const range = getSelectedRange().toLowerCase().replace(/\s+/g, "-");
+
+        link.href = url;
+        link.download = `edumind-analytics-${range}-${todayYmd()}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
     }
 
-    if (strongest && strongest.finalScore >= 80) {
-        recs.push({
-            type: "success",
-            text: `Maintain your momentum in ${strongest.subjectName} (${strongest.finalScore}%) — it is your strongest subject right now.`
-        });
-    }
+    function attachProfileDropdown() {
+        const profileToggle = document.getElementById("profileMenuToggle");
+        const profileDropdown = document.getElementById("dashboardProfileDropdown");
 
-    if (recs.length === 0) {
-        recs.push({
-            type: "info",
-            text: "Add more study activity in tasks, planner, revision, and tests to unlock smarter analytics insights."
-        });
-    }
+        if (!profileToggle || !profileDropdown) return;
 
-    return [...new Map(recs.map((r) => [r.text, r])).values()].slice(0, 4);
-}
-
-function renderRecommendations(recommendations, filteredData) {
-    if (!recommendationList) return;
-
-    const hasData =
-        filteredData.tasks.length > 0 ||
-        filteredData.revisions.length > 0 ||
-        filteredData.tests.length > 0 ||
-        filteredData.plans.length > 0;
-
-    if (!hasData) {
-        recommendationList.innerHTML = `
-            <div class="analytics-empty-state">
-                <i class="fa-solid fa-lightbulb"></i>
-                <h4>No recommendations yet</h4>
-                <p>Add tasks, plans, revisions, or tests to see smart recommendations here.</p>
-            </div>
-        `;
-        return;
-    }
-
-    const iconMap = {
-        warn: "fa-triangle-exclamation",
-        success: "fa-circle-check",
-        info: "fa-circle-info",
-        tip: "fa-lightbulb"
-    };
-
-    const classMap = {
-        warn: "rec-warn",
-        success: "rec-success",
-        info: "rec-info",
-        tip: "rec-tip"
-    };
-
-    recommendationList.innerHTML = recommendations.map((rec) => `
-        <div class="recommendation-item ${classMap[rec.type] || "rec-tip"}">
-            <div class="rec-icon-wrap">
-                <i class="fa-solid ${iconMap[rec.type] || "fa-lightbulb"}"></i>
-            </div>
-            <span>${escapeHtml(rec.text)}</span>
-        </div>
-    `).join("");
-}
-
-// ─────────────────────────────────────────────────────────────
-// Main Render
-// ─────────────────────────────────────────────────────────────
-
-function renderAnalytics() {
-    ensureAnalyticsRuntimeStyles();
-
-    const filteredData = getFilteredAnalyticsData();
-    const metrics = buildMetrics(filteredData);
-    const subjectInsights = buildSubjectInsights(filteredData);
-    const recommendations = generateRecommendations(filteredData, metrics, subjectInsights);
-
-    updateSummaryCards(metrics, filteredData, subjectInsights);
-    updateScoreOverview(metrics, filteredData);
-    renderTrendChart(filteredData);
-    renderSubjectInsights(subjectInsights);
-    renderRecommendations(recommendations, filteredData);
-}
-
-// ─────────────────────────────────────────────────────────────
-// Export
-// ─────────────────────────────────────────────────────────────
-
-function getRangeFileLabel(rangeValue) {
-    return String(rangeValue || "overall").toLowerCase().replace(/\s+/g, "-");
-}
-
-function buildExportText() {
-    const filteredData = getFilteredAnalyticsData();
-    const metrics = buildMetrics(filteredData);
-    const subjectInsights = buildSubjectInsights(filteredData);
-    const recommendations = generateRecommendations(filteredData, metrics, subjectInsights);
-
-    const lines = [
-        "EduMind AI — Analytics Report",
-        "----------------------------------------",
-        `Range: ${getSelectedRange()}`,
-        `Generated: ${new Date().toLocaleString()}`,
-        "",
-        "SUMMARY",
-        `Overall Study Progress : ${metrics.overallStudyProgress}%`,
-        `Average Test Score     : ${metrics.averageTestScore}%`,
-        `Completed Sessions     : ${metrics.completedSessions}`,
-        `Weekly Consistency     : ${metrics.weeklyConsistency} Days`,
-        "",
-        "SCORE OVERVIEW",
-        `Mock Tests         : ${metrics.averageTestScore}%`,
-        `Revision Accuracy  : ${metrics.revisionCompletion}%`,
-        `Task Completion    : ${metrics.taskCompletion}%`,
-        `Focus Efficiency   : ${metrics.focusEfficiency}%`,
-        "",
-        "SUBJECT INSIGHTS",
-        ...(subjectInsights.length > 0
-            ? subjectInsights.slice(0, 6).map((s, i) => `${i + 1}. ${s.subjectName} — ${s.finalScore}%`)
-            : ["No subject data available."]),
-        "",
-        "RECOMMENDATIONS",
-        ...recommendations.map((r, i) => `${i + 1}. ${r.text}`),
-        "",
-        "RAW COUNTS",
-        `Tasks     : ${filteredData.tasks.length}`,
-        `Revisions : ${filteredData.revisions.length}`,
-        `Tests     : ${filteredData.tests.length}`,
-        `Plans     : ${filteredData.plans.length}`
-    ];
-
-    return lines.join("\n");
-}
-
-function exportAnalyticsReport() {
-    const blob = new Blob([buildExportText()], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `analytics-${getRangeFileLabel(getSelectedRange())}-${formatDateToYMD(new Date())}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// ─────────────────────────────────────────────────────────────
-// Theme + Init
-// ─────────────────────────────────────────────────────────────
-
-function attachThemeAwareRerender() {
-    const rerenderIfReady = () => {
-        if (chartBarsContainer && document.body) renderAnalytics();
-    };
-
-    const observer = new MutationObserver(() => {
-        rerenderIfReady();
-    });
-
-    if (document.body) {
-        observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ["class", "data-theme"]
-        });
-    }
-
-    if (document.documentElement) {
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["class", "data-theme"]
-        });
-    }
-
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-            setTimeout(rerenderIfReady, 60);
-        });
-    }
-}
-
-function attachProfileDropdown() {
-    const profileToggle = document.getElementById("profileMenuToggle");
-    const profileDropdown = document.getElementById("dashboardProfileDropdown");
-
-    if (profileToggle && profileDropdown) {
-        profileToggle.addEventListener("click", (e) => {
-            e.stopPropagation();
+        profileToggle.addEventListener("click", (event) => {
+            event.stopPropagation();
             profileDropdown.classList.toggle("hidden");
+        });
+
+        profileDropdown.addEventListener("click", (event) => {
+            event.stopPropagation();
         });
 
         document.addEventListener("click", () => {
             profileDropdown.classList.add("hidden");
         });
     }
-}
 
-async function initializeAnalyticsPage() {
-    const pageReady =
-        overallStudyProgressValue &&
-        averageTestScoreValue &&
-        completedSessionsValue &&
-        weeklyConsistencyValue &&
-        mockTestsValue &&
-        revisionAccuracyValue &&
-        taskCompletionValue &&
-        focusEfficiencyValue &&
-        subjectInsightList &&
-        recommendationList &&
-        chartBarsContainer &&
-        chartLabelsContainer;
+    function renderProfileInfo() {
+        const user = getStoredUser() || {};
+        const fullName = user.fullName || user.name || user.username || "Student";
+        const firstName = fullName.split(" ")[0] || "Student";
+        const role = user.role || user.course || "Student";
+        const userId = user.id;
 
-    if (!pageReady) return;
+        let avatar = user.profilePhoto || user.avatar || user.photoUrl || "../assets/avatar/default-user.png";
+        if (userId) {
+            const stored = localStorage.getItem(`edumind_profile_photo_${userId}`);
+            if (stored) avatar = stored;
+        }
 
-    ensureAnalyticsRuntimeStyles();
+        const nameEl = document.getElementById("analyticsProfileName");
+        const roleEl = document.getElementById("analyticsProfileRole");
+        const avatarEl = document.getElementById("analyticsProfileAvatar");
+        const nameDropEl = document.getElementById("analyticsProfileNameDropdown");
 
-    if (analyticsFilterSelect) {
-        analyticsFilterSelect.addEventListener("change", renderAnalytics);
+        if (nameEl) nameEl.textContent = firstName;
+        if (roleEl) roleEl.textContent = role;
+        if (avatarEl) {
+            avatarEl.src = avatar;
+            avatarEl.alt = fullName;
+            avatarEl.onerror = function () {
+                avatarEl.src = "../assets/avatar/default-user.png";
+            };
+        }
+        if (nameDropEl) nameDropEl.textContent = fullName;
     }
 
-    if (exportReportBtn) {
-        exportReportBtn.addEventListener("click", exportAnalyticsReport);
+    function attachThemeObserver() {
+        const rerender = () => {
+            if (store.loaded) {
+                clearTimeout(attachThemeObserver.timer);
+                attachThemeObserver.timer = setTimeout(renderAnalytics, 80);
+            }
+        };
+
+        const observer = new MutationObserver(rerender);
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class", "data-theme"]
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class", "data-theme"]
+        });
     }
 
-    attachProfileDropdown();
-    attachThemeAwareRerender();
+    function showLoadingState() {
+        if (els.chartBars) {
+            els.chartBars.innerHTML = `
+                <div class="analytics-loading-state">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Loading analytics...</span>
+                </div>
+            `;
+        }
+    }
 
-    try {
-        await loadAllAnalyticsData();
+    function injectPremiumStyles() {
+        let style = document.getElementById("analyticsPremiumRuntimeStyles");
+        if (!style) {
+            style = document.createElement("style");
+            style.id = "analyticsPremiumRuntimeStyles";
+            document.head.appendChild(style);
+        }
+
+        style.textContent = `
+            .analytics-summary-note {
+                display: block;
+                margin-top: 6px;
+                font-size: 11.5px;
+                line-height: 1.5;
+                font-weight: 600;
+                color: #94a3b8;
+            }
+
+            .analytics-highlight-chip-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin: 4px 0 16px;
+            }
+
+            .analytics-highlight-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                padding: 9px 13px;
+                border-radius: 999px;
+                border: 1px solid transparent;
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+            .analytics-highlight-chip strong {
+                font-weight: 800;
+            }
+
+            .analytics-mini-insight {
+                margin: 12px 0 10px;
+                color: #64748b;
+                font-size: 12.5px;
+                line-height: 1.65;
+                font-weight: 600;
+            }
+
+            .chart-placeholder.large,
+            body.preview-dark .chart-placeholder.large {
+                display: block !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                min-height: auto !important;
+            }
+
+            .chart-y-axis,
+            #chartLabels {
+                display: none !important;
+            }
+
+            .chart-inner {
+                display: block !important;
+                width: 100%;
+            }
+
+            #chartBars {
+                display: grid !important;
+                grid-template-columns: repeat(7, minmax(0, 1fr));
+                gap: 12px;
+                align-items: stretch;
+                justify-content: stretch;
+                min-height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+
+            #chartBars::after {
+                display: none !important;
+            }
+
+            .analytics-bar-group {
+                position: relative;
+                overflow: hidden;
+                min-height: 318px;
+                padding: 16px 10px 14px;
+                border-radius: 22px;
+                background: #ffffff;
+                border: 1px solid #e8edf5;
+                box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+                transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+            }
+
+            .analytics-bar-group:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 18px 34px rgba(15, 23, 42, 0.11);
+                border-color: rgba(108, 99, 255, 0.26);
+            }
+
+            .analytics-bar-group.today {
+                background: linear-gradient(180deg, #f5f3ff, #eef2ff);
+                border: 2px solid #8b7cff;
+            }
+
+            .analytics-today-badge {
+                position: absolute;
+                top: 12px;
+                right: 10px;
+                z-index: 2;
+                padding: 5px 10px;
+                border-radius: 999px;
+                background: #ede9fe;
+                color: #5b4ef5;
+                font-size: 10.5px;
+                font-weight: 800;
+            }
+
+            .analytics-bar-group-head {
+                display: flex;
+                justify-content: center;
+                margin: 12px 0;
+            }
+
+            .analytics-day-total {
+                min-width: 48px;
+                height: 46px;
+                padding: 0 14px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 999px;
+                background: #f3f0ff;
+                color: #5b4ef5;
+                font-size: 18px;
+                font-weight: 800;
+            }
+
+            .analytics-bar-group.today .analytics-day-total {
+                background: linear-gradient(135deg, #7c6cff, #5b4ef5);
+                color: #ffffff;
+            }
+
+            .analytics-bar-group-body {
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                gap: 7px;
+                min-height: 195px;
+            }
+
+            .analytics-single-bar-wrap {
+                flex: 1;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 6px;
+            }
+
+            .analytics-single-bar-value {
+                min-height: 14px;
+                font-size: 11px;
+                font-weight: 800;
+                line-height: 1;
+            }
+
+            .analytics-single-bar {
+                width: 100%;
+                min-height: 7px;
+                border-radius: 10px 10px 6px 6px;
+                transition: all .22s ease;
+            }
+
+            .analytics-single-bar-wrap:hover .analytics-single-bar {
+                transform: translateY(-3px);
+                filter: brightness(1.05);
+            }
+
+            .analytics-day-label {
+                margin-top: 14px;
+                text-align: center;
+                color: #64748b;
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            .analytics-group-empty {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                color: #94a3b8;
+                font-size: 12px;
+                font-weight: 700;
+                text-align: center;
+            }
+
+            .analytics-group-empty-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 999px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #f1f5f9;
+                color: #94a3b8;
+            }
+
+            .chart-footer-legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 14px;
+                padding-top: 14px;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .chart-footer-legend .chart-legend-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                border-radius: 999px;
+                border: 1px solid transparent;
+            }
+
+            .chart-footer-legend .cfl-label {
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+            .chart-footer-legend .cfl-dot {
+                width: 12px !important;
+                height: 12px !important;
+                border-radius: 999px;
+                flex-shrink: 0;
+            }
+
+            .analytics-chart-insight {
+                margin-top: 12px;
+                padding: 13px 15px;
+                border-radius: 16px;
+                background: linear-gradient(180deg, #f7f7ff, #f3f7ff);
+                border: 1px solid #e2e8ff;
+                color: #5b6472;
+                font-size: 12.5px;
+                line-height: 1.7;
+                font-weight: 600;
+            }
+
+            .subject-title-wrap {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                min-width: 0;
+            }
+
+            .subject-rank-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 3px 9px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 800;
+            }
+
+            .rank-top {
+                background: #ecfdf5;
+                color: #047857;
+            }
+
+            .rank-focus {
+                background: #fff7ed;
+                color: #c2410c;
+            }
+
+            .subject-insight-meta {
+                margin: 2px 0 2px;
+                color: #64748b;
+                font-size: 12px;
+                line-height: 1.6;
+                font-weight: 600;
+            }
+
+            .analytics-empty-state {
+                min-height: 170px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                text-align: center;
+                padding: 20px 16px;
+                border: 1px dashed #dbe3ee;
+                border-radius: 16px;
+                background: linear-gradient(180deg, #fbfcfe, #f8fafc);
+            }
+
+            .analytics-empty-state i {
+                width: 44px;
+                height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 999px;
+                background: #f1f5f9;
+                color: #94a3b8;
+                font-size: 18px;
+            }
+
+            .analytics-empty-state h4 {
+                color: #334155;
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            .analytics-empty-state p {
+                max-width: 320px;
+                color: #94a3b8;
+                font-size: 12.5px;
+                line-height: 1.6;
+            }
+
+            .analytics-loading-state {
+                grid-column: 1 / -1;
+                min-height: 220px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                color: #6c63ff;
+                font-weight: 700;
+            }
+
+            .analytics-premium-tooltip {
+                position: fixed;
+                z-index: 999999;
+                width: max-content;
+                max-width: 280px;
+                padding: 12px 13px;
+                border-radius: 14px;
+                background: rgba(15, 23, 42, 0.96);
+                color: #f8fafc;
+                box-shadow: 0 18px 44px rgba(0,0,0,0.28);
+                pointer-events: none;
+                font-family: Poppins, sans-serif;
+                font-size: 12px;
+                line-height: 1.45;
+                backdrop-filter: blur(14px);
+            }
+
+            .analytics-premium-tooltip.hidden {
+                display: none;
+            }
+
+            .apt-title {
+                font-size: 12.5px;
+                font-weight: 800;
+                margin-bottom: 8px;
+                color: #ffffff;
+            }
+
+            .apt-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                margin: 5px 0;
+                color: #cbd5e1;
+            }
+
+            .apt-row span {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+            }
+
+            .apt-row strong,
+            .apt-total {
+                color: #ffffff;
+                font-weight: 800;
+            }
+
+            .apt-total {
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid rgba(255,255,255,0.12);
+            }
+
+            body.preview-dark .analytics-summary-note,
+            body.dark-theme .analytics-summary-note,
+            html.dark .analytics-summary-note {
+                color: #94a3b8;
+            }
+
+            body.preview-dark .analytics-bar-group,
+            body.dark-theme .analytics-bar-group,
+            html.dark .analytics-bar-group {
+                background: #0f172a;
+                border-color: rgba(255,255,255,0.08);
+                box-shadow: 0 16px 34px rgba(0,0,0,0.28);
+            }
+
+            body.preview-dark .analytics-bar-group.today,
+            body.dark-theme .analytics-bar-group.today,
+            html.dark .analytics-bar-group.today {
+                background: linear-gradient(180deg, rgba(108,99,255,0.20), rgba(15,23,42,0.95));
+                border-color: rgba(139,124,255,0.78);
+            }
+
+            body.preview-dark .analytics-day-total,
+            body.dark-theme .analytics-day-total,
+            html.dark .analytics-day-total {
+                background: rgba(255,255,255,0.08);
+                color: #ffffff;
+            }
+
+            body.preview-dark .analytics-day-label,
+            body.dark-theme .analytics-day-label,
+            html.dark .analytics-day-label {
+                color: #e2e8f0;
+            }
+
+            body.preview-dark .analytics-group-empty-icon,
+            body.dark-theme .analytics-group-empty-icon,
+            html.dark .analytics-group-empty-icon {
+                background: rgba(255,255,255,0.06);
+            }
+
+            body.preview-dark .chart-footer-legend,
+            body.dark-theme .chart-footer-legend,
+            html.dark .chart-footer-legend {
+                border-top-color: rgba(255,255,255,0.08);
+            }
+
+            body.preview-dark .analytics-chart-insight,
+            body.dark-theme .analytics-chart-insight,
+            html.dark .analytics-chart-insight {
+                background: linear-gradient(180deg, rgba(108,99,255,0.12), rgba(59,130,246,0.08));
+                border-color: rgba(108,99,255,0.22);
+                color: #cbd5e1;
+            }
+
+            body.preview-dark .analytics-mini-insight,
+            body.dark-theme .analytics-mini-insight,
+            html.dark .analytics-mini-insight,
+            body.preview-dark .subject-insight-meta,
+            body.dark-theme .subject-insight-meta,
+            html.dark .subject-insight-meta {
+                color: #94a3b8;
+            }
+
+            body.preview-dark .analytics-empty-state,
+            body.dark-theme .analytics-empty-state,
+            html.dark .analytics-empty-state {
+                background: linear-gradient(180deg, #111827, #0f172a);
+                border-color: rgba(255,255,255,0.08);
+            }
+
+            body.preview-dark .analytics-empty-state h4,
+            body.dark-theme .analytics-empty-state h4,
+            html.dark .analytics-empty-state h4 {
+                color: #f1f5f9;
+            }
+
+            body.preview-dark .rank-top,
+            body.dark-theme .rank-top,
+            html.dark .rank-top {
+                background: rgba(16,185,129,0.14);
+                color: #34d399;
+            }
+
+            body.preview-dark .rank-focus,
+            body.dark-theme .rank-focus,
+            html.dark .rank-focus {
+                background: rgba(245,158,11,0.14);
+                color: #fbbf24;
+            }
+
+            @media (max-width: 1050px) {
+                #chartBars {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+            }
+
+            @media (max-width: 576px) {
+                #chartBars {
+                    grid-template-columns: 1fr;
+                }
+
+                .analytics-bar-group {
+                    min-height: 250px;
+                }
+
+                .chart-footer-legend .chart-legend-item,
+                .analytics-highlight-chip {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+        `;
+    }
+
+    async function init() {
+        const ready = els.overallStudyProgressValue &&
+            els.averageTestScoreValue &&
+            els.completedSessionsValue &&
+            els.weeklyConsistencyValue &&
+            els.chartBars;
+
+        if (!ready) return;
+
+        injectPremiumStyles();
+        renderProfileInfo();
+        attachProfileDropdown();
+        attachThemeObserver();
+        showLoadingState();
+
+        if (els.filter) {
+            els.filter.addEventListener("change", renderAnalytics);
+        }
+
+        if (els.exportBtn) {
+            els.exportBtn.addEventListener("click", exportReport);
+        }
+
+        try {
+            await loadAllData();
+        } catch (error) {
+            console.error("Analytics loading failed:", error);
+        }
+
         renderAnalytics();
-    } catch (error) {
-        console.error("Analytics init failed:", error);
-        renderAnalytics();
     }
-}
 
-initializeAnalyticsPage();
+    init();
+});

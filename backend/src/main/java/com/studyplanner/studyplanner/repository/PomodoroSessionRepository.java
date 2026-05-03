@@ -6,107 +6,157 @@ import com.studyplanner.studyplanner.model.PomodoroSession.SessionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-@Repository
 public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession, Long> {
 
-     // ─── Basic Fetch ──────────────────────────────────────────────────────────
+     /*
+      * Admin: latest sessions first.
+      */
+     List<PomodoroSession> findAllByOrderByCreatedAtDesc();
 
-     // Sare sessions ek user ke
-     List<PomodoroSession> findByUserIdOrderByCreatedAtDesc(Long userId);
+     /*
+      * Student: logged-in student's sessions.
+      */
+     List<PomodoroSession> findByStudentIdOrderByCreatedAtDesc(Long studentId);
 
-     // Ek specific session (user-owned check ke saath)
-     Optional<PomodoroSession> findByIdAndUserId(Long id, Long userId);
+     /*
+      * Admin: filter sessions by status.
+      */
+     List<PomodoroSession> findByStatusIgnoreCaseOrderByCreatedAtDesc(String status);
 
-     // ─── Analytics Queries ────────────────────────────────────────────────────
+     /*
+      * Admin: filter sessions by session type.
+      */
+     List<PomodoroSession> findBySessionTypeIgnoreCaseOrderByCreatedAtDesc(String sessionType);
 
-     // Last N days ke completed FOCUS sessions
-     @Query("SELECT p FROM PomodoroSession p WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.sessionDate >= :fromDate " +
-               "ORDER BY p.sessionDate ASC")
+     /*
+      * Admin: filter sessions by subject.
+      */
+     List<PomodoroSession> findBySubjectNameIgnoreCaseOrderByCreatedAtDesc(String subjectName);
+
+     /*
+      * Admin/student: sessions within date range.
+      */
+     List<PomodoroSession> findByCreatedAtBetweenOrderByCreatedAtDesc(
+               LocalDateTime startDate,
+               LocalDateTime endDate);
+
+     /*
+      * Admin: sessions for one student in date range.
+      */
+     List<PomodoroSession> findByStudentIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+               Long studentId,
+               LocalDateTime startDate,
+               LocalDateTime endDate);
+
+     long countByStatusIgnoreCase(String status);
+
+     long countByStudentId(Long studentId);
+
+     /*
+      * DashboardService support:
+      * Completed focus sessions from a date.
+      *
+      * Supports both:
+      * FOCUS = old dashboard naming
+      * POMODORO = new admin pomodoro naming
+      */
+     @Query("""
+               SELECT p
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.status) = 'COMPLETED'
+                 AND (
+                       UPPER(p.sessionType) = 'FOCUS'
+                       OR UPPER(p.sessionType) = 'POMODORO'
+                       OR UPPER(p.sessionType) = 'DEEP_WORK'
+                     )
+                 AND p.sessionDate >= :fromDate
+               ORDER BY p.createdAt DESC
+               """)
      List<PomodoroSession> findCompletedFocusSessionsFromDate(
                @Param("userId") Long userId,
                @Param("fromDate") LocalDate fromDate);
 
-     // Daily focus minutes — last 7 days grouped by date
-     @Query("SELECT p.sessionDate, SUM(p.actualDurationMinutes) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.sessionDate >= :fromDate " +
-               "GROUP BY p.sessionDate " +
-               "ORDER BY p.sessionDate ASC")
+     /*
+      * DashboardService support:
+      * Total completed focus minutes.
+      */
+     @Query("""
+               SELECT COALESCE(SUM(p.focusMinutes), 0)
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.status) = 'COMPLETED'
+               """)
+     long sumTotalFocusMinutes(@Param("userId") Long userId);
+
+     /*
+      * DashboardService support:
+      * Old service passes enum values. Entity stores them as String,
+      * so we compare enum.name() with stored string.
+      */
+     @Query("""
+               SELECT COUNT(p)
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.sessionType) = UPPER(:#{#sessionType.name()})
+                 AND UPPER(p.status) = UPPER(:#{#status.name()})
+               """)
+     long countByUserIdAndSessionTypeAndStatus(
+               @Param("userId") Long userId,
+               @Param("sessionType") SessionType sessionType,
+               @Param("status") SessionStatus status);
+
+     /*
+      * DashboardService support:
+      * Count completed sessions linked with subjects.
+      */
+     @Query("""
+               SELECT COUNT(p)
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.status) = 'COMPLETED'
+                 AND (
+                       p.subjectId IS NOT NULL
+                       OR p.subjectName IS NOT NULL
+                     )
+               """)
+     long countSubjectLinkedCompletedSessions(@Param("userId") Long userId);
+
+     /*
+      * DashboardService support:
+      * Daily focus minutes from a date.
+      */
+     @Query("""
+               SELECT p.sessionDate, COALESCE(SUM(p.focusMinutes), 0)
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.status) = 'COMPLETED'
+                 AND p.sessionDate >= :fromDate
+               GROUP BY p.sessionDate
+               ORDER BY p.sessionDate ASC
+               """)
      List<Object[]> findDailyFocusMinutes(
                @Param("userId") Long userId,
                @Param("fromDate") LocalDate fromDate);
 
-     // Subject-wise focus time
-     @Query("SELECT p.linkedSubjectName, SUM(p.actualDurationMinutes) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.linkedSubjectName IS NOT NULL " +
-               "GROUP BY p.linkedSubjectName " +
-               "ORDER BY SUM(p.actualDurationMinutes) DESC")
-     List<Object[]> findSubjectWiseFocusMinutes(@Param("userId") Long userId);
-
-     // Total completed focus sessions count
-     long countByUserIdAndSessionTypeAndStatus(
-               Long userId, SessionType sessionType, SessionStatus status);
-
-     // Total interrupted sessions count
-     long countByUserIdAndSessionTypeAndStatusIn(
-               Long userId, SessionType sessionType, List<SessionStatus> statuses);
-
-     // Distinct active days in a date range (for consistency score)
-     @Query("SELECT COUNT(DISTINCT p.sessionDate) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.sessionDate >= :fromDate AND p.sessionDate <= :toDate")
+     /*
+      * DashboardService support:
+      * Count active focus days.
+      */
+     @Query("""
+               SELECT COUNT(DISTINCT p.sessionDate)
+               FROM PomodoroSession p
+               WHERE p.studentId = :userId
+                 AND UPPER(p.status) = 'COMPLETED'
+                 AND p.sessionDate BETWEEN :fromDate AND :toDate
+               """)
      long countDistinctActiveDays(
                @Param("userId") Long userId,
                @Param("fromDate") LocalDate fromDate,
                @Param("toDate") LocalDate toDate);
-
-     // Weekly sessions — last 4 weeks
-     @Query("SELECT WEEK(p.sessionDate), COUNT(p) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.sessionDate >= :fromDate " +
-               "GROUP BY WEEK(p.sessionDate) " +
-               "ORDER BY WEEK(p.sessionDate) ASC")
-     List<Object[]> findWeeklySessionCounts(
-               @Param("userId") Long userId,
-               @Param("fromDate") LocalDate fromDate);
-
-     // Subject-linked sessions count (for productivity score bonus)
-     @Query("SELECT COUNT(p) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED' " +
-               "AND p.linkedSubjectName IS NOT NULL")
-     long countSubjectLinkedCompletedSessions(@Param("userId") Long userId);
-
-     // Total focus minutes (all time)
-     @Query("SELECT COALESCE(SUM(p.actualDurationMinutes), 0) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType = 'FOCUS' " +
-               "AND p.status = 'COMPLETED'")
-     long sumTotalFocusMinutes(@Param("userId") Long userId);
-
-     // Break sessions count
-     @Query("SELECT COUNT(p) FROM PomodoroSession p " +
-               "WHERE p.user.id = :userId " +
-               "AND p.sessionType IN ('SHORT_BREAK', 'LONG_BREAK') " +
-               "AND p.status = 'COMPLETED'")
-     long countCompletedBreakSessions(@Param("userId") Long userId);
 }

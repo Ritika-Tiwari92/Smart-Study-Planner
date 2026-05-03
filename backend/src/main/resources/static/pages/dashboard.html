@@ -10,7 +10,9 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
+
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
      <link rel="stylesheet" href="../assets/css/dashboard-study.css">
      <link rel="stylesheet" href="../assets/css/variables.css">
      <link rel="stylesheet" href="../assets/css/base.css">
@@ -23,6 +25,7 @@
 
 <body data-page-role="student">
      <div class="dashboard-layout">
+
           <aside class="sidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -75,7 +78,7 @@
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
                          <i class="fa-solid fa-right-from-bracket"></i>
                          <span>Logout</span>
                     </a>
@@ -83,10 +86,11 @@
           </aside>
 
           <main class="dashboard-main">
+
                <header class="dashboard-header">
                     <div class="header-left">
                          <div>
-                              <h1 id="dashboardGreetingTitle">Hello, Ritika 👋</h1>
+                              <h1 id="dashboardGreetingTitle">Hello, Student 👋</h1>
                               <p id="dashboardGreetingSubtitle">Let's make today productive and well planned.</p>
                          </div>
                     </div>
@@ -94,66 +98,35 @@
                     <div class="header-search" id="dashboardSearchBox">
                          <i class="fa-solid fa-magnifying-glass"></i>
                          <input type="text" id="dashboardSearchInput" placeholder="Search subjects, tasks, planner...">
-                         <div class="dashboard-search-results hidden" id="dashboardSearchResults">
-                              <div class="search-result-item">
-                                   <i class="fa-solid fa-book"></i>
-                                   <div>
-                                        <h4>Java Programming</h4>
-                                        <p>Subject</p>
-                                   </div>
-                              </div>
-                         </div>
+                         <div class="dashboard-search-results hidden" id="dashboardSearchResults"></div>
                     </div>
 
                     <div class="header-actions">
                          <div class="notification-btn-wrapper">
-                              <button class="icon-btn" id="notificationToggleBtn">
+                              <button class="icon-btn" id="notificationToggleBtn" type="button" title="Notifications">
                                    <i class="fa-solid fa-bell"></i>
-                                   <span class="notif-badge" id="notifBadgeDot"></span>
+                                   <span class="notif-badge hidden" id="notifBadgeDot"></span>
                               </button>
 
                               <div class="dashboard-notification-dropdown hidden" id="dashboardNotificationDropdown">
                                    <div class="dropdown-header">
                                         <span>Notifications</span>
                                    </div>
-                                   <div class="notification-item">
-                                        <div class="notif-icon-wrap notif-task">
-                                             <i class="fa-solid fa-list-check"></i>
-                                        </div>
-                                        <div>
-                                             <h4>Task Reminder</h4>
-                                             <p>Complete Java Assignment before 6 PM.</p>
-                                        </div>
-                                   </div>
-                                   <div class="notification-item">
-                                        <div class="notif-icon-wrap notif-revision">
-                                             <i class="fa-solid fa-rotate"></i>
-                                        </div>
-                                        <div>
-                                             <h4>Revision Alert</h4>
-                                             <p>DBMS revision session is scheduled for tonight.</p>
-                                        </div>
-                                   </div>
-                                   <div class="notification-item">
-                                        <div class="notif-icon-wrap notif-test">
-                                             <i class="fa-solid fa-file-lines"></i>
-                                        </div>
-                                        <div>
-                                             <h4>Upcoming Test</h4>
-                                             <p>You have a Java mock test tomorrow.</p>
-                                        </div>
+                                   <div class="notif-empty-state">
+                                        <i class="fa-solid fa-bell-slash"></i>
+                                        <p>Loading notifications...</p>
                                    </div>
                               </div>
                          </div>
 
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
                               <i class="fa-solid fa-moon"></i>
                          </button>
 
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User" id="dashboardProfileAvatar">
                               <div>
-                                   <h4 id="dashboardProfileName">Ritika</h4>
+                                   <h4 id="dashboardProfileName">Student</h4>
                                    <p id="dashboardProfileRole">Student</p>
                               </div>
                          </div>
@@ -163,7 +136,7 @@
                                    <img src="../assets/avatar/default-user.png" alt="User"
                                         id="dashboardProfileAvatarDropdown">
                                    <div>
-                                        <h4 id="dashboardProfileNameDropdown">Ritika</h4>
+                                        <h4 id="dashboardProfileNameDropdown">Student</h4>
                                         <p id="dashboardProfileRoleDropdown">Student</p>
                                    </div>
                               </div>
@@ -191,11 +164,13 @@
                          <div class="welcome-text">
                               <div class="welcome-date-pill" id="welcomeDatePill">
                                    <i class="fa-regular fa-calendar"></i>
-                                   <span id="welcomeDateText">Monday, 21 April 2025</span>
+                                   <span id="welcomeDateText">Today</span>
                               </div>
+
                               <h2>Smart Study Planning Dashboard</h2>
-                              <p id="welcomeBannerSubtitle">Track your subjects, tasks, and study progress from one
-                                   place.</p>
+                              <p id="welcomeBannerSubtitle">
+                                   Track your subjects, tasks, Pomodoro sessions, and study progress from one place.
+                              </p>
 
                               <div class="welcome-banner-insights" id="welcomeBannerInsights">
                                    <span class="welcome-banner-chip" id="welcomeInsightPrimary">
@@ -224,10 +199,9 @@
                                    <i class="fa-solid fa-book"></i>
                               </div>
                               <div class="stat-info">
-                                   <h3 id="totalSubjectsCount">05</h3>
+                                   <h3 id="totalSubjectsCount">00</h3>
                                    <p class="stat-label">Total Subjects</p>
-                                   <span class="stat-helper-text" id="totalSubjectsHint">Your active study subjects
-                                        overview.</span>
+                                   <span class="stat-helper-text" id="totalSubjectsHint">Loading subjects...</span>
                               </div>
                          </div>
 
@@ -236,10 +210,9 @@
                                    <i class="fa-solid fa-hourglass-half"></i>
                               </div>
                               <div class="stat-info">
-                                   <h3 id="pendingTasksCount">12</h3>
+                                   <h3 id="pendingTasksCount">00</h3>
                                    <p class="stat-label">Pending Tasks</p>
-                                   <span class="stat-helper-text" id="pendingTasksHint">Track what still needs your
-                                        attention.</span>
+                                   <span class="stat-helper-text" id="pendingTasksHint">Loading tasks...</span>
                               </div>
                          </div>
 
@@ -248,10 +221,9 @@
                                    <i class="fa-solid fa-circle-check"></i>
                               </div>
                               <div class="stat-info">
-                                   <h3 id="completedTasksCount">08</h3>
+                                   <h3 id="completedTasksCount">00</h3>
                                    <p class="stat-label">Completed Tasks</p>
-                                   <span class="stat-helper-text" id="completedTasksHint">See how much work you’ve
-                                        finished.</span>
+                                   <span class="stat-helper-text" id="completedTasksHint">Loading progress...</span>
                               </div>
                          </div>
 
@@ -260,16 +232,15 @@
                                    <i class="fa-solid fa-chart-pie"></i>
                               </div>
                               <div class="stat-info">
-                                   <h3 id="studyProgressCount">76%</h3>
+                                   <h3 id="studyProgressCount">0%</h3>
                                    <p class="stat-label">Study Progress</p>
-                                   <span class="stat-helper-text" id="studyProgressHint">Your current study completion
-                                        snapshot.</span>
+                                   <span class="stat-helper-text" id="studyProgressHint">Loading completion
+                                        snapshot...</span>
                               </div>
                          </div>
                     </div>
 
-                    <div class="smart-insights-strip" id="smartInsightsStrip">
-                    </div>
+                    <div class="smart-insights-strip" id="smartInsightsStrip"></div>
 
                     <div class="dashboard-lower-grid">
 
@@ -278,6 +249,7 @@
                                    <h3><i class="fa-solid fa-bolt section-title-icon"></i> Quick Actions</h3>
                                    <p>Access your most-used features quickly.</p>
                               </div>
+
                               <div class="quick-actions-grid">
                                    <a href="subjects.html" class="quick-action-btn qa-subjects">
                                         <i class="fa-solid fa-book"></i>
@@ -305,45 +277,21 @@
                          <div class="dashboard-bottom-grid">
                               <div class="subject-progress-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-bars-progress section-title-icon"></i> Subject
-                                             Progress</h3>
+                                        <h3>
+                                             <i class="fa-solid fa-bars-progress section-title-icon"></i>
+                                             Subject Progress
+                                        </h3>
                                         <p>Track how much you have covered in each subject.</p>
                                    </div>
+
                                    <div class="subject-progress-list" id="subjectProgressList">
                                         <div class="subject-progress-item">
                                              <div class="subject-row">
-                                                  <span>Java Programming</span>
-                                                  <span class="progress-pct pct-high">80%</span>
+                                                  <span class="subject-name-text">Loading subjects...</span>
+                                                  <span class="progress-pct pct-low">0%</span>
                                              </div>
                                              <div class="progress-bar">
-                                                  <div class="progress-fill" style="width: 80%;"></div>
-                                             </div>
-                                        </div>
-                                        <div class="subject-progress-item">
-                                             <div class="subject-row">
-                                                  <span>DBMS</span>
-                                                  <span class="progress-pct pct-mid">65%</span>
-                                             </div>
-                                             <div class="progress-bar">
-                                                  <div class="progress-fill" style="width: 65%;"></div>
-                                             </div>
-                                        </div>
-                                        <div class="subject-progress-item">
-                                             <div class="subject-row">
-                                                  <span>Computer Networks</span>
-                                                  <span class="progress-pct pct-low">55%</span>
-                                             </div>
-                                             <div class="progress-bar">
-                                                  <div class="progress-fill" style="width: 55%;"></div>
-                                             </div>
-                                        </div>
-                                        <div class="subject-progress-item">
-                                             <div class="subject-row">
-                                                  <span>Operating System</span>
-                                                  <span class="progress-pct pct-high">72%</span>
-                                             </div>
-                                             <div class="progress-bar">
-                                                  <div class="progress-fill" style="width: 72%;"></div>
+                                                  <div class="progress-fill" style="width:0%;"></div>
                                              </div>
                                         </div>
                                    </div>
@@ -351,36 +299,21 @@
 
                               <div class="upcoming-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-clock section-title-icon"></i> Upcoming Schedule</h3>
+                                        <h3>
+                                             <i class="fa-solid fa-clock section-title-icon"></i>
+                                             Upcoming Schedule
+                                        </h3>
                                         <p>Your next important study activities.</p>
                                    </div>
+
                                    <div class="upcoming-list" id="upcomingScheduleList">
                                         <div class="upcoming-item">
                                              <div class="upcoming-icon">
-                                                  <i class="fa-solid fa-book-open"></i>
+                                                  <i class="fa-solid fa-spinner fa-spin"></i>
                                              </div>
                                              <div class="upcoming-info">
-                                                  <h4>Java Revision Session</h4>
-                                                  <p><span class="day-badge today-badge">Today</span> 6:00 PM – 7:00 PM
-                                                  </p>
-                                             </div>
-                                        </div>
-                                        <div class="upcoming-item">
-                                             <div class="upcoming-icon">
-                                                  <i class="fa-solid fa-file-pen"></i>
-                                             </div>
-                                             <div class="upcoming-info">
-                                                  <h4>DBMS Assignment Submission</h4>
-                                                  <p><span class="day-badge tomorrow-badge">Tomorrow</span> 11:00 AM</p>
-                                             </div>
-                                        </div>
-                                        <div class="upcoming-item">
-                                             <div class="upcoming-icon">
-                                                  <i class="fa-solid fa-laptop-code"></i>
-                                             </div>
-                                             <div class="upcoming-info">
-                                                  <h4>Coding Practice</h4>
-                                                  <p><span class="day-badge tomorrow-badge">Tomorrow</span> 8:00 PM</p>
+                                                  <h4>Loading schedule...</h4>
+                                                  <p>Your upcoming plans will appear here.</p>
                                              </div>
                                         </div>
                                    </div>
@@ -389,30 +322,20 @@
 
                          <div class="today-tasks-card">
                               <div class="section-title">
-                                   <h3><i class="fa-solid fa-list-check section-title-icon"></i> Today's Tasks</h3>
+                                   <h3>
+                                        <i class="fa-solid fa-list-check section-title-icon"></i>
+                                        Today's Tasks
+                                   </h3>
                                    <p>Your important tasks for today.</p>
                               </div>
+
                               <div class="task-list" id="todayTasksList">
-                                   <div class="task-item priority-high">
+                                   <div class="task-item">
                                         <div class="task-info">
-                                             <h4>Complete Java Assignment</h4>
-                                             <p>Due today • High Priority</p>
+                                             <h4>Loading tasks...</h4>
+                                             <p>Your tasks for today will appear here.</p>
                                         </div>
-                                        <span class="task-badge pending">Pending</span>
-                                   </div>
-                                   <div class="task-item priority-normal">
-                                        <div class="task-info">
-                                             <h4>Revise DBMS Notes</h4>
-                                             <p>2 chapters • Evening session</p>
-                                        </div>
-                                        <span class="task-badge progress">In Progress</span>
-                                   </div>
-                                   <div class="task-item priority-done">
-                                        <div class="task-info">
-                                             <h4>Practice Aptitude Questions</h4>
-                                             <p>30 questions • Night practice</p>
-                                        </div>
-                                        <span class="task-badge done">Done</span>
+                                        <span class="task-badge pending">Loading</span>
                                    </div>
                               </div>
                          </div>
@@ -421,7 +344,9 @@
                     <div class="overview-chart-card">
                          <div class="chart-header">
                               <div class="section-title">
-                                   <h3><i class="fa-solid fa-chart-column section-title-icon"></i> Weekly Study Activity
+                                   <h3>
+                                        <i class="fa-solid fa-chart-column section-title-icon"></i>
+                                        Weekly Study Activity
                                    </h3>
                                    <p>Track tasks, planner items, revisions, and tests across the last 7 days.</p>
                               </div>
@@ -447,19 +372,12 @@
                          </div>
 
                          <div class="chart-area chart-area-activity-tracker">
-                              <div class="chart-bars activity-tracker-grid" id="weeklyOverviewChartBars">
-                              </div>
+                              <div class="chart-bars activity-tracker-grid" id="weeklyOverviewChartBars"></div>
                          </div>
 
                          <div class="chart-insight-line" id="chartInsightLine"></div>
                     </div>
-                    <!-- ═══════════════════════════════════════════
-     STUDY ENGINE SECTION — NEW
-     Paste karo .dashboard-content ke andar,
-     .overview-chart-card ke baad
-     ═══════════════════════════════════════════ -->
 
-                    <!-- Study Stats Row -->
                     <div class="ds-stats-row" id="dsStatsRow">
 
                          <div class="ds-stat-card">
@@ -519,33 +437,34 @@
 
                     </div>
 
-                    <!-- Daily Target Progress -->
                     <div class="ds-target-card">
                          <div class="ds-target-header">
                               <div class="ds-target-left">
                                    <i class="fa-solid fa-bullseye"></i>
                                    <span>Daily Study Target</span>
                               </div>
+
                               <a href="pomodoro.html" class="ds-target-link">
-                                   <i class="fa-solid fa-stopwatch"></i> Open Study Timer
+                                   <i class="fa-solid fa-stopwatch"></i>
+                                   Open Study Timer
                               </a>
                          </div>
+
                          <div class="ds-target-bar-wrap">
                               <div class="ds-target-bar">
                                    <div class="ds-target-fill" id="dsTargetFill" style="width:0%"></div>
                               </div>
                               <span class="ds-target-pct" id="dsTargetPct">0%</span>
                          </div>
+
                          <div class="ds-target-footer">
                               <span id="dsTargetLabel">0 of 3 videos completed today</span>
-                              <span id="dsTargetStatus" class="ds-target-status"></span>
+                              <span id="dsTargetStatus" class="ds-target-status">Loading</span>
                          </div>
                     </div>
 
-                    <!-- Activity Calendar + Badges Row -->
                     <div class="ds-lower-row">
 
-                         <!-- 30-Day Activity Calendar -->
                          <div class="ds-calendar-card">
                               <div class="section-title">
                                    <h3>
@@ -554,9 +473,9 @@
                                    </h3>
                                    <p>Your study activity over the last 30 days.</p>
                               </div>
-                              <div class="ds-calendar-grid" id="dsCalendarGrid">
-                                   <!-- Filled by JS -->
-                              </div>
+
+                              <div class="ds-calendar-grid" id="dsCalendarGrid"></div>
+
                               <div class="ds-calendar-legend">
                                    <span>Less</span>
                                    <span class="ds-legend-box ds-level-0"></span>
@@ -568,7 +487,6 @@
                               </div>
                          </div>
 
-                         <!-- Achievement Badges -->
                          <div class="ds-badges-card">
                               <div class="section-title">
                                    <h3>
@@ -577,22 +495,21 @@
                                    </h3>
                                    <p>Unlock badges by studying consistently.</p>
                               </div>
-                              <div class="ds-badges-grid" id="dsBadgesGrid">
-                                   <!-- Filled by JS -->
-                              </div>
+
+                              <div class="ds-badges-grid" id="dsBadgesGrid"></div>
                          </div>
 
                     </div>
 
-                    <!-- Weekly Study Analytics -->
                     <div class="ds-weekly-card">
                          <div class="section-title">
                               <h3>
                                    <i class="fa-solid fa-chart-bar section-title-icon"></i>
                                    Weekly Study Analytics
                               </h3>
-                              <p>Your Pomodoro focus time and video completions this week.</p>
+                              <p>Your Pomodoro focus time and study completions this week.</p>
                          </div>
+
                          <div class="ds-weekly-stats">
                               <div class="ds-weekly-stat">
                                    <span class="ds-weekly-icon" style="background:#f5f3ff;color:#6c63ff">
@@ -603,15 +520,17 @@
                                         <span class="ds-weekly-value" id="dsWeeklyFocus">0 min</span>
                                    </div>
                               </div>
+
                               <div class="ds-weekly-stat">
                                    <span class="ds-weekly-icon" style="background:#ecfdf5;color:#059669">
                                         <i class="fa-solid fa-video"></i>
                                    </span>
                                    <div>
-                                        <span class="ds-weekly-label">Videos Watched</span>
+                                        <span class="ds-weekly-label">Study Sessions</span>
                                         <span class="ds-weekly-value" id="dsWeeklyVideos">0</span>
                                    </div>
                               </div>
+
                               <div class="ds-weekly-stat">
                                    <span class="ds-weekly-icon" style="background:#fffbeb;color:#d97706">
                                         <i class="fa-solid fa-stopwatch"></i>
@@ -621,19 +540,38 @@
                                         <span class="ds-weekly-value" id="dsWeeklySessions">0</span>
                                    </div>
                               </div>
+
                               <div class="ds-weekly-stat">
                                    <span class="ds-weekly-icon" style="background:#eff6ff;color:#2563eb">
                                         <i class="fa-solid fa-calendar-check"></i>
                                    </span>
                                    <div>
                                         <span class="ds-weekly-label">Active Days</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyActiveDays">0</span>
+                                   </div>
+                              </div>
+
+                              <div class="ds-weekly-stat">
+                                   <span class="ds-weekly-icon" style="background:#fdf4ff;color:#a21caf">
+                                        <i class="fa-solid fa-crown"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Best Day</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyBestDay">—</span>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+
                </section>
           </main>
      </div>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/dashboard.js"></script>
+
      <script>
           (function () {
                const el = document.getElementById("welcomeDateText");

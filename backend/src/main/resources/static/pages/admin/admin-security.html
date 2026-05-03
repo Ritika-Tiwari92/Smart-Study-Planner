@@ -1,45 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Security Logs | EduMind AI Admin</title>
-     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+     <link rel="icon" href="data:," />
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet" />
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
      <style>
           :root {
                --bg: #080d1a;
                --bg2: #0c1220;
                --bg3: #101828;
                --card: #111827;
-               --border: rgba(20, 184, 166, 0.12);
-               --border2: rgba(255, 255, 255, 0.06);
+               --card2: #162032;
+               --border: rgba(20, 184, 166, 0.14);
+               --border2: rgba(255, 255, 255, 0.08);
                --teal: #14b8a6;
                --cyan: #06b6d4;
                --purple: #8b5cf6;
                --amber: #f59e0b;
                --rose: #f43f5e;
                --green: #10b981;
-               --text: #f1f5f9;
-               --text2: #94a3b8;
-               --text3: #475569;
+               --text: #f8fafc;
+               --text2: #a8b3c7;
+               --text3: #64748b;
                --sidebar-w: 260px;
                --sidebar-collapsed: 72px;
                --header-h: 68px;
-               --radius: 14px;
-               --radius-sm: 10px;
-               --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+               --tr: 0.25s ease;
           }
 
-          [data-theme="light"] {
+          html[data-theme="light"],
+          body[data-theme="light"] {
                --bg: #f0f4f8;
-               --bg2: #e8edf5;
-               --bg3: #dde4ef;
+               --bg2: #ffffff;
+               --bg3: #eef3f9;
                --card: #ffffff;
-               --border: rgba(20, 184, 166, 0.15);
-               --border2: rgba(0, 0, 0, 0.07);
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.18);
+               --border2: rgba(15, 23, 42, 0.08);
                --text: #0f172a;
                --text2: #475569;
                --text3: #94a3b8;
@@ -52,26 +57,184 @@
           }
 
           body {
-               font-family: 'DM Sans', sans-serif;
-               background: var(--bg);
+               min-height: 100vh;
+               font-family: "Poppins", sans-serif;
+               background:
+                    radial-gradient(circle at 15% 15%, rgba(20, 184, 166, .09), transparent 28%),
+                    radial-gradient(circle at 85% 10%, rgba(59, 130, 246, .10), transparent 32%),
+                    var(--bg);
                color: var(--text);
                display: flex;
-               min-height: 100vh;
+               overflow-x: hidden;
+          }
+
+          button,
+          input,
+          select {
+               font-family: inherit;
+          }
+
+          button {
+               cursor: pointer;
+          }
+
+          a {
+               color: inherit;
+          }
+
+          .hidden {
+               display: none !important;
+          }
+
+          .spin-now {
+               animation: spin .75s linear infinite;
+          }
+
+          @keyframes spin {
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          #pageLoader {
+               position: fixed;
+               inset: 0;
+               z-index: 99999;
+               background: var(--bg);
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               justify-content: center;
+               gap: 20px;
+               transition: opacity .35s, visibility .35s;
+          }
+
+          #pageLoader.hidden {
+               opacity: 0;
+               visibility: hidden;
+          }
+
+          .loader-logo {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+          }
+
+          .loader-logo-wrap,
+          .brand-logo-wrap {
+               width: 44px;
+               height: 44px;
+               display: grid;
+               place-items: center;
+          }
+
+          .brand-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+          }
+
+          .loader-logo-text {
+               font-size: 22px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .loader-bar {
+               width: 210px;
+               height: 6px;
+               border-radius: 999px;
+               background: rgba(255, 255, 255, .08);
+               overflow: hidden;
+          }
+
+          .loader-bar-fill {
+               height: 100%;
+               border-radius: inherit;
+               background: linear-gradient(90deg, var(--teal), var(--cyan), var(--purple));
+               animation: loaderMove 1.1s ease-in-out infinite alternate;
+          }
+
+          @keyframes loaderMove {
+               from {
+                    transform: translateX(-70%);
+               }
+
+               to {
+                    transform: translateX(130%);
+               }
+          }
+
+          .nn-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, .45));
+          }
+
+          @keyframes hexRot {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes lineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .hex-outer {
+               animation: hexRot 18s linear infinite;
+          }
+
+          .conn-line {
+               stroke-dasharray: 12;
+               animation: lineFlow 3s linear infinite;
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, .58);
+               z-index: 900;
+          }
+
+          .mobile-overlay.show {
+               display: block;
           }
 
           .sidebar {
                width: var(--sidebar-w);
                height: 100vh;
-               background: var(--bg2);
-               border-right: 1px solid var(--border);
+               position: fixed;
+               top: 0;
+               left: 0;
+               z-index: 1000;
+               background: rgba(12, 18, 32, .96);
+               backdrop-filter: blur(16px);
+               border-right: 1px solid var(--border2);
                display: flex;
                flex-direction: column;
-               position: fixed;
-               left: 0;
-               top: 0;
-               z-index: 200;
-               transition: width var(--tr);
-               overflow: hidden;
+               transition: width var(--tr), transform var(--tr);
+          }
+
+          html[data-theme="light"] .sidebar {
+               background: rgba(255, 255, 255, .96);
           }
 
           .sidebar.collapsed {
@@ -79,18 +242,21 @@
           }
 
           .sidebar-brand {
-               padding: 20px 18px;
+               height: var(--header-h);
+               padding: 14px 18px;
                display: flex;
                align-items: center;
                gap: 12px;
                border-bottom: 1px solid var(--border2);
-               min-height: var(--header-h);
-               flex-shrink: 0;
+          }
+
+          .brand-text {
+               white-space: nowrap;
+               overflow: hidden;
           }
 
           .brand-text h2 {
-               font-family: 'Syne', sans-serif;
-               font-size: 16px;
+               font-size: 17px;
                font-weight: 800;
                background: linear-gradient(135deg, var(--teal), var(--cyan));
                -webkit-background-clip: text;
@@ -101,28 +267,26 @@
           .brand-text span {
                font-size: 10px;
                color: var(--text3);
-               letter-spacing: 0.1em;
+               letter-spacing: .12em;
                text-transform: uppercase;
           }
 
           .sidebar-toggle {
                position: absolute;
+               top: 22px;
                right: -14px;
-               top: 24px;
                width: 28px;
                height: 28px;
-               background: var(--card);
-               border: 1px solid var(--border);
                border-radius: 50%;
+               border: 1px solid var(--border);
+               background: var(--card);
+               color: var(--teal);
                display: flex;
                align-items: center;
                justify-content: center;
-               cursor: pointer;
-               color: var(--teal);
-               font-size: 11px;
-               transition: all var(--tr);
-               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+               font-size: 12px;
                z-index: 10;
+               transition: all var(--tr);
           }
 
           .sidebar-toggle:hover {
@@ -132,69 +296,73 @@
 
           .sidebar-nav {
                flex: 1;
+               padding: 12px 10px 120px;
                overflow-y: auto;
-               overflow-x: hidden;
-               padding: 12px 10px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar {
+               width: 5px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar-thumb {
+               background: rgba(20, 184, 166, .25);
+               border-radius: 999px;
           }
 
           .nav-section-label {
+               padding: 10px 10px 6px;
                font-size: 10px;
-               font-weight: 600;
-               letter-spacing: 0.12em;
-               text-transform: uppercase;
+               font-weight: 700;
                color: var(--text3);
-               padding: 10px 8px 6px;
+               text-transform: uppercase;
+               letter-spacing: .12em;
                white-space: nowrap;
-               overflow: hidden;
-          }
-
-          .sidebar.collapsed .nav-section-label {
-               opacity: 0;
           }
 
           .nav-item {
                display: flex;
                align-items: center;
                gap: 12px;
+               min-height: 42px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
-               cursor: pointer;
+               border-radius: 12px;
                color: var(--text2);
                text-decoration: none;
                font-size: 13.5px;
                font-weight: 500;
+               margin-bottom: 3px;
                transition: all var(--tr);
                white-space: nowrap;
-               margin-bottom: 2px;
-          }
-
-          .nav-item:hover {
-               background: rgba(20, 184, 166, 0.08);
-               color: var(--teal);
-          }
-
-          .nav-item.active {
-               background: linear-gradient(90deg, rgba(20, 184, 166, 0.18), rgba(20, 184, 166, 0.06));
-               color: var(--teal);
-               border-left: 2px solid var(--teal);
           }
 
           .nav-item i {
                width: 20px;
                text-align: center;
                font-size: 15px;
-               flex-shrink: 0;
           }
 
-          .sidebar.collapsed .nav-item span,
-          .sidebar.collapsed .nav-section-label {
+          .nav-item:hover {
+               color: var(--teal);
+               background: rgba(20, 184, 166, .08);
+          }
+
+          .nav-item.active {
+               color: var(--teal);
+               background: linear-gradient(90deg, rgba(20, 184, 166, .17), rgba(20, 184, 166, .05));
+               box-shadow: inset 2px 0 0 var(--teal);
+          }
+
+          .sidebar.collapsed .brand-text,
+          .sidebar.collapsed .nav-label,
+          .sidebar.collapsed .nav-section-label,
+          .sidebar.collapsed .admin-info,
+          .sidebar.collapsed .logout-btn span {
                display: none;
           }
 
           .sidebar-bottom {
                padding: 12px 10px;
                border-top: 1px solid var(--border2);
-               flex-shrink: 0;
           }
 
           .admin-profile {
@@ -202,110 +370,114 @@
                align-items: center;
                gap: 10px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
-               background: rgba(255, 255, 255, 0.04);
+               border-radius: 14px;
+               background: rgba(255, 255, 255, .04);
                margin-bottom: 8px;
-               overflow: hidden;
+          }
+
+          html[data-theme="light"] .admin-profile {
+               background: rgba(15, 23, 42, .04);
           }
 
           .admin-avatar {
-               width: 34px;
-               height: 34px;
-               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               width: 36px;
+               height: 36px;
                border-radius: 50%;
                display: flex;
                align-items: center;
                justify-content: center;
-               font-size: 14px;
-               font-weight: 700;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
                color: #fff;
+               font-weight: 800;
+               font-size: 14px;
                flex-shrink: 0;
           }
 
           .admin-info p {
                font-size: 13px;
-               font-weight: 600;
-               white-space: nowrap;
-               overflow: hidden;
-               text-overflow: ellipsis;
+               font-weight: 700;
+               color: var(--text);
           }
 
           .admin-info span {
                font-size: 11px;
                color: var(--teal);
-          }
-
-          .sidebar.collapsed .admin-info {
-               display: none;
+               font-weight: 500;
           }
 
           .logout-btn {
+               width: 100%;
+               border: none;
+               background: transparent;
+               color: var(--rose);
                display: flex;
                align-items: center;
                gap: 10px;
                padding: 10px 12px;
-               border-radius: var(--radius-sm);
-               cursor: pointer;
-               color: var(--rose);
-               font-size: 13.5px;
-               font-weight: 500;
+               border-radius: 12px;
+               font-size: 13px;
+               font-weight: 600;
                transition: all var(--tr);
-               border: none;
-               background: none;
-               width: 100%;
           }
 
           .logout-btn:hover {
-               background: rgba(244, 63, 94, 0.1);
-          }
-
-          .logout-btn i {
-               width: 20px;
-               text-align: center;
-               flex-shrink: 0;
-          }
-
-          .sidebar.collapsed .logout-btn span {
-               display: none;
+               background: rgba(244, 63, 94, .10);
           }
 
           .main {
-               margin-left: var(--sidebar-w);
                flex: 1;
-               transition: margin-left var(--tr);
+               margin-left: var(--sidebar-w);
                min-height: 100vh;
-               display: flex;
-               flex-direction: column;
+               width: calc(100vw - var(--sidebar-w));
+               max-width: calc(100vw - var(--sidebar-w));
+               overflow-x: hidden;
+               transition: margin-left var(--tr), width var(--tr), max-width var(--tr);
           }
 
           .main.expanded {
                margin-left: var(--sidebar-collapsed);
+               width: calc(100vw - var(--sidebar-collapsed));
+               max-width: calc(100vw - var(--sidebar-collapsed));
           }
 
           .topbar {
-               height: var(--header-h);
-               background: var(--bg2);
-               border-bottom: 1px solid var(--border2);
-               display: flex;
-               align-items: center;
-               padding: 0 28px;
-               gap: 16px;
                position: sticky;
                top: 0;
                z-index: 100;
+               min-height: var(--header-h);
+               display: flex;
+               align-items: center;
+               gap: 16px;
+               padding: 10px 28px;
+               background: rgba(12, 18, 32, .92);
+               backdrop-filter: blur(18px);
+               border-bottom: 1px solid var(--border2);
+          }
+
+          html[data-theme="light"] .topbar {
+               background: rgba(255, 255, 255, .92);
+          }
+
+          .mobile-topbar-toggle {
+               display: none;
+               border: none;
+               background: transparent;
+               color: var(--text);
+               font-size: 20px;
           }
 
           .topbar-left {
                flex: 1;
+               min-width: 0;
           }
 
           .topbar-left h1 {
-               font-family: 'Syne', sans-serif;
                font-size: 20px;
-               font-weight: 700;
+               font-weight: 800;
           }
 
           .topbar-left p {
+               margin-top: 2px;
                font-size: 12px;
                color: var(--text2);
           }
@@ -314,164 +486,264 @@
                display: flex;
                align-items: center;
                gap: 10px;
+               flex-wrap: wrap;
+               justify-content: flex-end;
+               flex-shrink: 0;
+          }
+
+          .topbar-time,
+          .topbar-btn,
+          .topbar-action {
+               height: 38px;
+               border-radius: 12px;
+               border: 1px solid var(--border2);
+               background: var(--card);
+               color: var(--text2);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               font-weight: 700;
+               transition: all var(--tr);
+          }
+
+          .topbar-time {
+               padding: 0 13px;
           }
 
           .topbar-btn {
                width: 38px;
-               height: 38px;
-               background: var(--card);
-               border: 1px solid var(--border2);
-               border-radius: 10px;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               cursor: pointer;
-               color: var(--text2);
-               font-size: 15px;
-               transition: all var(--tr);
           }
 
-          .topbar-btn:hover {
-               border-color: var(--teal);
+          .topbar-action {
+               padding: 0 14px;
+               gap: 8px;
+          }
+
+          .topbar-btn:hover,
+          .topbar-action:hover {
                color: var(--teal);
-          }
-
-          .mobile-toggle {
-               display: none;
-               background: none;
-               border: none;
-               color: var(--text);
-               font-size: 20px;
-               cursor: pointer;
-               padding: 4px;
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, .10);
           }
 
           .content {
                padding: 28px;
-               flex: 1;
+               padding-bottom: 90px;
+          }
+
+          .welcome-banner {
+               position: relative;
+               overflow: hidden;
+               background: linear-gradient(135deg, var(--card2), var(--card));
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               padding: 24px 28px;
+               display: flex;
+               align-items: center;
+               gap: 18px;
+               margin-bottom: 24px;
+          }
+
+          .welcome-banner::before {
+               content: "";
+               position: absolute;
+               right: -50px;
+               top: -60px;
+               width: 190px;
+               height: 190px;
+               background: radial-gradient(circle, rgba(20, 184, 166, .18), transparent 70%);
+          }
+
+          .welcome-icon {
+               width: 58px;
+               height: 58px;
+               border-radius: 18px;
+               background: rgba(20, 184, 166, .12);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 26px;
+               flex-shrink: 0;
+          }
+
+          .welcome-text {
+               position: relative;
+               z-index: 1;
+          }
+
+          .welcome-text h2 {
+               font-size: 23px;
+               font-weight: 800;
+          }
+
+          .welcome-text p {
+               margin-top: 5px;
+               color: var(--text2);
+               font-size: 13px;
+               line-height: 1.6;
+          }
+
+          .welcome-text span {
+               color: var(--teal);
+               font-weight: 800;
           }
 
           .stats-row {
                display: grid;
-               grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+               grid-template-columns: repeat(4, minmax(0, 1fr));
                gap: 16px;
-               margin-bottom: 28px;
+               margin-bottom: 24px;
           }
 
           .stat-card {
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: var(--radius);
-               padding: 18px 20px;
+               border-radius: 18px;
+               padding: 20px;
                display: flex;
                align-items: center;
                gap: 14px;
+               min-width: 0;
+               transition: all var(--tr);
+          }
+
+          .stat-card:hover {
+               border-color: var(--border);
+               transform: translateY(-2px);
           }
 
           .stat-icon {
-               width: 44px;
-               height: 44px;
-               border-radius: 10px;
+               width: 48px;
+               height: 48px;
+               border-radius: 15px;
                display: flex;
                align-items: center;
                justify-content: center;
-               font-size: 18px;
+               font-size: 20px;
                flex-shrink: 0;
           }
 
           .stat-info p {
-               font-size: 11px;
+               font-size: 12px;
                color: var(--text2);
-               margin-bottom: 3px;
-               font-weight: 500;
+               margin-bottom: 4px;
+               font-weight: 600;
           }
 
           .stat-info h3 {
-               font-family: 'Syne', sans-serif;
-               font-size: 24px;
+               font-size: 26px;
                font-weight: 800;
+               line-height: 1.1;
           }
 
           .icon-teal {
-               background: rgba(20, 184, 166, 0.15);
+               background: rgba(20, 184, 166, .15);
                color: var(--teal);
           }
 
           .icon-green {
-               background: rgba(16, 185, 129, 0.15);
+               background: rgba(16, 185, 129, .15);
                color: var(--green);
           }
 
           .icon-amber {
-               background: rgba(245, 158, 11, 0.15);
+               background: rgba(245, 158, 11, .15);
                color: var(--amber);
           }
 
           .icon-rose {
-               background: rgba(244, 63, 94, 0.15);
+               background: rgba(244, 63, 94, .15);
                color: var(--rose);
           }
 
           .toolbar {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 18px;
                display: flex;
                align-items: center;
-               gap: 12px;
-               margin-bottom: 20px;
+               justify-content: space-between;
+               gap: 16px;
+               flex-wrap: wrap;
+               margin-bottom: 24px;
+          }
+
+          .toolbar-left h3 {
+               font-size: 16px;
+               font-weight: 800;
+          }
+
+          .toolbar-left p {
+               margin-top: 4px;
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .toolbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
                flex-wrap: wrap;
           }
 
-          .search-wrap {
-               position: relative;
-               flex: 1;
-               min-width: 220px;
-          }
-
-          .search-wrap i {
-               position: absolute;
-               left: 12px;
-               top: 50%;
-               transform: translateY(-50%);
-               color: var(--text3);
-               font-size: 14px;
-          }
-
-          .search-input {
-               width: 100%;
-               background: var(--card);
+          .filter-input,
+          .filter-select {
+               min-height: 42px;
+               border-radius: 13px;
+               background: var(--bg3);
                border: 1px solid var(--border2);
-               border-radius: 10px;
-               padding: 10px 14px 10px 38px;
-               font-family: 'DM Sans', sans-serif;
-               font-size: 13.5px;
                color: var(--text);
+               padding: 0 14px;
                outline: none;
-               transition: border-color 0.2s;
+               font-size: 12px;
+               font-weight: 700;
           }
 
-          .search-input:focus {
+          .filter-input {
+               min-width: 240px;
+          }
+
+          .filter-input:focus,
+          .filter-select:focus {
                border-color: var(--teal);
           }
 
-          .search-input::placeholder {
-               color: var(--text3);
+          .toolbar-btn {
+               min-height: 42px;
+               border: none;
+               border-radius: 13px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #fff;
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               gap: 8px;
+               padding: 0 16px;
+               font-size: 12px;
+               font-weight: 800;
+               box-shadow: 0 14px 30px rgba(20, 184, 166, .18);
           }
 
-          .filter-select {
-               background: var(--card);
+          .toolbar-btn.secondary {
                border: 1px solid var(--border2);
-               border-radius: 10px;
-               padding: 10px 14px;
-               font-family: 'DM Sans', sans-serif;
-               font-size: 13px;
-               color: var(--text);
-               outline: none;
-               cursor: pointer;
+               background: var(--card);
+               color: var(--text2);
+               box-shadow: none;
+          }
+
+          .toolbar-btn.secondary:hover {
+               color: var(--teal);
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, .08);
           }
 
           .logs-card {
                background: var(--card);
                border: 1px solid var(--border2);
-               border-radius: var(--radius);
+               border-radius: 18px;
                overflow: hidden;
           }
 
@@ -481,20 +753,21 @@
                display: flex;
                align-items: center;
                justify-content: space-between;
+               gap: 14px;
           }
 
           .logs-header h3 {
-               font-family: 'Syne', sans-serif;
-               font-size: 15px;
-               font-weight: 700;
+               font-size: 16px;
+               font-weight: 800;
           }
 
           .logs-header span {
                font-size: 12px;
                color: var(--text2);
                background: var(--bg3);
-               padding: 4px 10px;
-               border-radius: 100px;
+               padding: 5px 11px;
+               border-radius: 999px;
+               font-weight: 800;
           }
 
           .log-list {
@@ -506,7 +779,7 @@
                display: flex;
                align-items: flex-start;
                gap: 14px;
-               padding: 14px 22px;
+               padding: 16px 22px;
                border-bottom: 1px solid var(--border2);
                transition: background var(--tr);
           }
@@ -516,19 +789,23 @@
           }
 
           .log-item:hover {
-               background: rgba(20, 184, 166, 0.03);
+               background: rgba(20, 184, 166, .04);
           }
 
           .log-dot {
-               width: 10px;
-               height: 10px;
+               width: 11px;
+               height: 11px;
                border-radius: 50%;
                flex-shrink: 0;
-               margin-top: 5px;
+               margin-top: 6px;
           }
 
           .dot-info {
                background: var(--teal);
+          }
+
+          .dot-success {
+               background: var(--green);
           }
 
           .dot-warning {
@@ -539,23 +816,40 @@
                background: var(--rose);
           }
 
-          .dot-success {
-               background: var(--green);
-          }
-
           .log-content {
                flex: 1;
+               min-width: 0;
           }
 
           .log-content p {
                font-size: 13.5px;
-               font-weight: 500;
-               margin-bottom: 3px;
+               font-weight: 800;
+               margin-bottom: 4px;
+               color: var(--text);
           }
 
           .log-content span {
                font-size: 12px;
                color: var(--text2);
+               line-height: 1.55;
+               display: block;
+          }
+
+          .log-extra {
+               margin-top: 8px;
+               display: flex;
+               gap: 6px;
+               flex-wrap: wrap;
+          }
+
+          .chip {
+               font-size: 10px;
+               font-weight: 800;
+               color: var(--text3);
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 999px;
+               padding: 3px 8px;
           }
 
           .log-meta {
@@ -567,42 +861,44 @@
                display: inline-flex;
                align-items: center;
                gap: 4px;
-               padding: 2px 9px;
-               border-radius: 100px;
-               font-size: 11px;
-               font-weight: 600;
+               padding: 4px 10px;
+               border-radius: 999px;
+               font-size: 10px;
+               font-weight: 900;
+               text-transform: uppercase;
           }
 
           .badge-info {
-               background: rgba(20, 184, 166, 0.15);
+               background: rgba(20, 184, 166, .12);
                color: var(--teal);
           }
 
+          .badge-success {
+               background: rgba(16, 185, 129, .12);
+               color: #34d399;
+          }
+
           .badge-warning {
-               background: rgba(245, 158, 11, 0.15);
-               color: var(--amber);
+               background: rgba(245, 158, 11, .12);
+               color: #fcd34d;
           }
 
           .badge-critical {
-               background: rgba(244, 63, 94, 0.1);
-               color: var(--rose);
-          }
-
-          .badge-success {
-               background: rgba(16, 185, 129, 0.15);
-               color: var(--green);
+               background: rgba(244, 63, 94, .10);
+               color: #fb7185;
           }
 
           .log-time {
                font-size: 11px;
                color: var(--text3);
-               margin-top: 4px;
+               margin-top: 6px;
                display: block;
+               font-weight: 700;
           }
 
           .empty-state {
                text-align: center;
-               padding: 48px 24px;
+               padding: 52px 24px;
                color: var(--text2);
           }
 
@@ -613,15 +909,66 @@
                margin-bottom: 12px;
           }
 
-          .mobile-overlay {
-               display: none;
-               position: fixed;
-               inset: 0;
-               background: rgba(0, 0, 0, 0.6);
-               z-index: 150;
+          .empty-state p {
+               font-weight: 800;
+               color: var(--text2);
           }
 
-          @media(max-width:768px) {
+          .toast {
+               position: fixed;
+               top: 82px;
+               right: 22px;
+               z-index: 99999;
+               min-width: 280px;
+               max-width: 390px;
+               padding: 14px 16px;
+               border-radius: 14px;
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-size: 13px;
+               font-weight: 700;
+               box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+               animation: toastIn .3s ease;
+          }
+
+          @keyframes toastIn {
+               from {
+                    opacity: 0;
+                    transform: translateX(20px);
+               }
+
+               to {
+                    opacity: 1;
+                    transform: translateX(0);
+               }
+          }
+
+          .toast.success {
+               background: #065f46;
+               color: #6ee7b7;
+               border: 1px solid rgba(52, 211, 153, .3);
+          }
+
+          .toast.error {
+               background: #7f1d1d;
+               color: #fca5a5;
+               border: 1px solid rgba(248, 113, 113, .3);
+          }
+
+          .toast.info {
+               background: #164e63;
+               color: #67e8f9;
+               border: 1px solid rgba(34, 211, 238, .3);
+          }
+
+          @media(max-width:1200px) {
+               .stats-row {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+               }
+          }
+
+          @media(max-width:900px) {
                .sidebar {
                     transform: translateX(-100%);
                     width: var(--sidebar-w) !important;
@@ -631,104 +978,258 @@
                     transform: translateX(0);
                }
 
-               .mobile-overlay.show {
-                    display: block;
-               }
-
-               .main {
-                    margin-left: 0 !important;
-               }
-
-               .mobile-toggle {
-                    display: block;
-               }
-
                .sidebar-toggle {
+                    display: none;
+               }
+
+               .main,
+               .main.expanded {
+                    margin-left: 0;
+                    width: 100vw;
+                    max-width: 100vw;
+               }
+
+               .mobile-topbar-toggle {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+               }
+
+               .topbar {
+                    padding: 10px 16px;
+                    flex-wrap: wrap;
+               }
+
+               .topbar-left {
+                    min-width: calc(100% - 42px);
+               }
+
+               .topbar-right {
+                    width: 100%;
+                    justify-content: flex-start;
+               }
+
+               .topbar-time {
                     display: none;
                }
 
                .content {
                     padding: 16px;
+                    padding-bottom: 90px;
                }
 
-               .topbar {
-                    padding: 0 16px;
+               .toolbar-right {
+                    width: 100%;
                }
 
+               .filter-input,
+               .filter-select,
+               .toolbar-btn {
+                    flex: 1;
+                    min-width: 150px;
+               }
+          }
+
+          @media(max-width:620px) {
                .stats-row {
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr;
+               }
+
+               .welcome-banner {
+                    align-items: flex-start;
+                    padding: 20px;
+               }
+
+               .welcome-text h2 {
+                    font-size: 20px;
+               }
+
+               .log-item {
+                    flex-direction: column;
+               }
+
+               .log-meta {
+                    text-align: left;
                }
           }
      </style>
 </head>
 
-<body>
-     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
+<body data-page-role="admin">
+
+     <div id="pageLoader">
+          <div class="loader-logo">
+               <div class="loader-logo-wrap">
+                    <svg class="nn-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11" stroke="url(#lG1)"
+                              stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#lG2)" opacity="0.15" />
+                         <circle cx="22" cy="15" r="2.5" fill="url(#lG1)" />
+                         <circle cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#lG3)" stroke-width="1" />
+                         <circle cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="lG1" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="lG2" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="lG3" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+               <span class="loader-logo-text">EduMind AI</span>
+          </div>
+          <div class="loader-bar">
+               <div class="loader-bar-fill"></div>
+          </div>
+     </div>
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
      <nav class="sidebar" id="sidebar">
           <div class="sidebar-brand">
-               <svg width="34" height="34" viewBox="0 0 42 42" fill="none" style="flex-shrink:0">
-                    <polygon points="21,2 38,11 38,31 21,40 4,31 4,11" fill="none" stroke="#14b8a6" stroke-width="2" />
-                    <polygon points="21,7 34,14 34,28 21,35 8,28 8,14" fill="rgba(20,184,166,0.15)" stroke="#14b8a6"
-                         stroke-width="1" /><text x="21" y="26" text-anchor="middle" font-size="13" font-weight="bold"
-                         fill="#14b8a6" font-family="sans-serif">AI</text>
-               </svg>
+               <div class="brand-logo-wrap">
+                    <svg class="nn-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11" stroke="url(#sG1)"
+                              stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#sG2)" opacity="0.15" />
+                         <circle cx="22" cy="15" r="2.5" fill="url(#sG1)" />
+                         <circle cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#sG3)" stroke-width="1" />
+                         <circle cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="sG1" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="sG2" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="sG3" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
                <div class="brand-text">
                     <h2>EduMind AI</h2><span>Admin Panel</span>
                </div>
           </div>
-          <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left" id="toggleIcon"></i>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
           </div>
+
           <div class="sidebar-nav">
                <div class="nav-section-label">Main</div>
-               <a href="admin-dashboard.html" class="nav-item"><i
-                         class="fas fa-chart-tree-map"></i><span>Dashboard</span></a>
-               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
-               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span>Subjects</span></a>
+               <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-gauge-high"></i><span
+                         class="nav-label">Dashboard</span></a>
+               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span
+                         class="nav-label">Students</span></a>
+               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span
+                         class="nav-label">Subjects</span></a>
+
                <div class="nav-section-label">Content</div>
-               <a href="admin-planner.html" class="nav-item"><i
-                         class="fas fa-calendar-days"></i><span>Planner</span></a>
-               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span>Tasks</span></a>
-               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span>Revisions</span></a>
-               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span>Tests</span></a>
-               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span>Question
-                         Bank</span></a>
+               <a href="admin-planner.html" class="nav-item"><i class="fas fa-calendar-days"></i><span
+                         class="nav-label">Planner</span></a>
+               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span
+                         class="nav-label">Tasks</span></a>
+               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span
+                         class="nav-label">Revisions</span></a>
+               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span
+                         class="nav-label">Tests</span></a>
+               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span
+                         class="nav-label">Question Bank</span></a>
+
                <div class="nav-section-label">Insights</div>
-               <a href="admin-analytics.html" class="nav-item"><i
-                         class="fas fa-chart-line"></i><span>Analytics</span></a>
-               <a href="admin-notifications.html" class="nav-item"><i
-                         class="fas fa-bell"></i><span>Notifications</span></a>
-               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span>Settings</span></a>
-               <a href="admin-security.html" class="nav-item active"><i class="fas fa-shield-halved"></i><span>Security
-                         Logs</span></a>
+               <a href="admin-analytics.html" class="nav-item"><i class="fas fa-chart-line"></i><span
+                         class="nav-label">Analytics</span></a>
+               <a href="admin-assistant.html" class="nav-item"><i class="fas fa-robot"></i><span
+                         class="nav-label">Assistant Logs</span></a>
+               <a href="admin-pomodoro.html" class="nav-item"><i class="fas fa-stopwatch"></i><span
+                         class="nav-label">Pomodoro</span></a>
+
+               <div class="nav-section-label">Manage</div>
+               <a href="admin-notifications.html" class="nav-item"><i class="fas fa-bell"></i><span
+                         class="nav-label">Notifications</span></a>
+               <a href="admin-reports.html" class="nav-item"><i class="fas fa-file-lines"></i><span
+                         class="nav-label">Reports</span></a>
+               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span
+                         class="nav-label">Settings</span></a>
+               <a href="admin-security.html" class="nav-item active"><i class="fas fa-shield-halved"></i><span
+                         class="nav-label">Security Logs</span></a>
           </div>
+
           <div class="sidebar-bottom">
                <div class="admin-profile">
                     <div class="admin-avatar" id="adminAvatar">A</div>
                     <div class="admin-info">
-                         <p id="adminName">Admin</p><span>Administrator</span>
+                         <p id="sidebarAdminName">Admin</p><span>Administrator</span>
                     </div>
                </div>
-               <button class="logout-btn" onclick="handleLogout()"><i
-                         class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i><span>Logout</span>
+               </button>
           </div>
      </nav>
+
      <div class="main" id="main">
           <div class="topbar">
-               <button class="mobile-toggle" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
+
                <div class="topbar-left">
                     <h1>Security Logs</h1>
-                    <p>Monitor login activity and system events.</p>
+                    <p>Monitor realtime admin, login, token, and system security events.</p>
                </div>
+
                <div class="topbar-right">
-                    <div class="topbar-btn" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></div>
-                    <div class="topbar-btn" onclick="renderLogs()" title="Refresh"><i class="fas fa-rotate-right"></i>
-                    </div>
+                    <div class="topbar-time" id="liveTime">--:--</div>
+                    <button class="topbar-action" type="button" onclick="exportCSV()">
+                         <i class="fas fa-file-csv"></i>CSV
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="toggleTheme()" id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="loadSecurityLogs(true)">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
                </div>
           </div>
-          <div class="content">
-               <div class="stats-row">
+
+          <main class="content">
+               <section class="welcome-banner">
+                    <div class="welcome-icon"><i class="fas fa-shield-halved"></i></div>
+                    <div class="welcome-text">
+                         <h2>Security Activity Center</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. Track login events, failed attempts, admin
+                              actions, warnings, and critical security events from the database.</p>
+                    </div>
+               </section>
+
+               <section class="stats-row">
                     <div class="stat-card">
-                         <div class="stat-icon icon-teal"><i class="fas fa-right-to-bracket"></i></div>
+                         <div class="stat-icon icon-teal"><i class="fas fa-layer-group"></i></div>
                          <div class="stat-info">
                               <p>Total Events</p>
                               <h3 id="statTotal">–</h3>
@@ -737,7 +1238,7 @@
                     <div class="stat-card">
                          <div class="stat-icon icon-green"><i class="fas fa-circle-check"></i></div>
                          <div class="stat-info">
-                              <p>Successful Logins</p>
+                              <p>Success Events</p>
                               <h3 id="statSuccess">–</h3>
                          </div>
                     </div>
@@ -751,102 +1252,592 @@
                     <div class="stat-card">
                          <div class="stat-icon icon-rose"><i class="fas fa-ban"></i></div>
                          <div class="stat-info">
-                              <p>Failed Attempts</p>
+                              <p>Failed/Critical</p>
                               <h3 id="statFailed">–</h3>
                          </div>
                     </div>
-               </div>
-               <div class="toolbar">
-                    <div class="search-wrap"><i class="fas fa-magnifying-glass"></i><input type="text"
-                              class="search-input" id="searchInput" placeholder="Search logs..."
-                              oninput="filterLogs()" /></div>
-                    <select class="filter-select" id="severityFilter" onchange="filterLogs()">
-                         <option value="all">All Severity</option>
-                         <option value="info">Info</option>
-                         <option value="success">Success</option>
-                         <option value="warning">Warning</option>
-                         <option value="critical">Critical</option>
-                    </select>
-               </div>
-               <div class="logs-card">
-                    <div class="logs-header">
-                         <h3>Activity Timeline</h3><span id="logCount">Loading...</span>
+               </section>
+
+               <section class="toolbar">
+                    <div class="toolbar-left">
+                         <h3>Security Filters</h3>
+                         <p>Search by user, email, action, device, IP, or description.</p>
                     </div>
-                    <div class="log-list" id="logList"></div>
-               </div>
-          </div>
+
+                    <div class="toolbar-right">
+                         <input type="text" class="filter-input" id="searchInput" placeholder="Search security logs..."
+                              oninput="renderLogs()" />
+
+                         <select class="filter-select" id="severityFilter" onchange="renderLogs()">
+                              <option value="all">All Severity</option>
+                              <option value="INFO">Info</option>
+                              <option value="SUCCESS">Success</option>
+                              <option value="WARNING">Warning</option>
+                              <option value="CRITICAL">Critical</option>
+                         </select>
+
+                         <select class="filter-select" id="actionFilter" onchange="renderLogs()">
+                              <option value="all">All Actions</option>
+                              <option value="LOGIN">Login</option>
+                              <option value="LOGOUT">Logout</option>
+                              <option value="FAILED_LOGIN">Failed Login</option>
+                              <option value="ADMIN_ACTION">Admin Action</option>
+                              <option value="SETTINGS_UPDATE">Settings Update</option>
+                              <option value="NOTIFICATION_SENT">Notification Sent</option>
+                              <option value="REPORT_EXPORTED">Report Exported</option>
+                              <option value="UNAUTHORIZED_ACCESS">Unauthorized Access</option>
+                         </select>
+
+                         <button class="toolbar-btn secondary" type="button" onclick="clearFilters()">
+                              <i class="fas fa-filter-circle-xmark"></i>Clear
+                         </button>
+
+                         <button class="toolbar-btn" type="button" onclick="createTestLog()">
+                              <i class="fas fa-plus"></i>Add Test Log
+                         </button>
+                    </div>
+               </section>
+
+               <section class="logs-card">
+                    <div class="logs-header">
+                         <h3>Activity Timeline</h3>
+                         <span id="logCount">Loading...</span>
+                    </div>
+
+                    <div class="log-list" id="logList">
+                         <div class="empty-state">
+                              <i class="fas fa-spinner spin-now"></i>
+                              <p>Loading security logs...</p>
+                         </div>
+                    </div>
+               </section>
+          </main>
      </div>
+
      <script>
-          const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin'; const adminEmail = localStorage.getItem('adminEmail') || 'admin';
-          if (!token || role !== 'ADMIN') window.location.href = '/pages/login.html';
-          document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+          const API = window.location.port === "8080" ? "" : "http://localhost:8080";
 
-          // Generate security logs from localStorage data
-          function generateLogs() {
-               const logs = [];
-               const now = new Date();
-               // Admin login log
-               logs.push({ type: 'success', severity: 'success', msg: `Admin ${name} logged in successfully`, detail: `Email: ${adminEmail}`, time: new Date(now - 60000).toISOString() });
-               logs.push({ type: 'info', severity: 'info', msg: 'Admin panel accessed', detail: 'Dashboard loaded', time: new Date(now - 55000).toISOString() });
-               // Notification history
-               const notifs = JSON.parse(localStorage.getItem('adminNotifHistory') || '[]');
-               notifs.slice(0, 5).forEach(n => {
-                    logs.push({ type: 'info', severity: 'info', msg: `Notification sent: "${n.title}"`, detail: `Type: ${n.type} | Target: ${n.target}`, time: n.sentAt });
-               });
-               // Session info
-               logs.push({ type: 'info', severity: 'info', msg: 'JWT token issued', detail: 'Access token valid for 15 minutes', time: new Date(now - 120000).toISOString() });
-               logs.push({ type: 'warning', severity: 'warning', msg: 'Note: Some student accounts have failed login attempts', detail: 'Check user accounts for locked status', time: new Date(now - 300000).toISOString() });
-               logs.push({ type: 'info', severity: 'info', msg: 'Admin module initialized', detail: 'EduMind AI Admin Panel v1.0', time: new Date(now - 600000).toISOString() });
-               return logs.sort((a, b) => new Date(b.time) - new Date(a.time));
-          }
-
+          let sidebarCollapsed = false;
           let allLogs = [];
+
+          function parseJsonSafe(value) {
+               try {
+                    return JSON.parse(value);
+               } catch {
+                    return null;
+               }
+          }
+
+          function getToken() {
+               return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+          }
+
+          function getRole() {
+               return localStorage.getItem("adminRole") || localStorage.getItem("userRole") || "";
+          }
+
+          function softGuard() {
+               const token = getToken();
+               const role = getRole();
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+
+               if (!token || (!isLoggedIn && role !== "ADMIN")) {
+                    window.location.href = "/pages/admin/admin-login.html";
+                    return;
+               }
+
+               if (role && role !== "ADMIN") {
+                    window.location.href = "/pages/dashboard.html";
+               }
+          }
+
+          function getAdminName() {
+               const savedName = localStorage.getItem("adminName");
+               if (savedName) return savedName;
+
+               const user = parseJsonSafe(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseJsonSafe(localStorage.getItem("loggedInUser")) ||
+                    parseJsonSafe(localStorage.getItem("currentUser")) ||
+                    {};
+
+               return user.fullName || user.name || user.email || "Admin";
+          }
+
+          function getAdminEmail() {
+               const savedEmail = localStorage.getItem("adminEmail");
+               if (savedEmail) return savedEmail;
+
+               const user = parseJsonSafe(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseJsonSafe(localStorage.getItem("loggedInUser")) ||
+                    parseJsonSafe(localStorage.getItem("currentUser")) ||
+                    {};
+
+               return user.email || "";
+          }
+
+          function setupIdentity() {
+               const name = getAdminName();
+               const initial = name.charAt(0).toUpperCase();
+
+               setText("sidebarAdminName", name);
+               setText("adminAvatar", initial);
+               setText("welcomeName", name.split(" ")[0] || "Admin");
+          }
+
+          function setText(id, value) {
+               const el = document.getElementById(id);
+               if (el) el.textContent = value;
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+          }
+
+          function showToast(message, type = "success") {
+               const old = document.querySelector(".toast");
+               if (old) old.remove();
+
+               const icon = type === "success" ? "circle-check" : type === "info" ? "circle-info" : "triangle-exclamation";
+               const toast = document.createElement("div");
+
+               toast.className = `toast ${type}`;
+               toast.innerHTML = `<i class="fa-solid fa-${icon}"></i><span>${escapeHtml(message)}</span>`;
+
+               document.body.appendChild(toast);
+               setTimeout(() => toast.remove(), 3500);
+          }
+
+          function updateClock() {
+               const el = document.getElementById("liveTime");
+               if (!el) return;
+
+               el.textContent = new Date().toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
+          }
+
+          function hideLoader() {
+               const loader = document.getElementById("pageLoader");
+               if (!loader) return;
+
+               setTimeout(() => {
+                    loader.classList.add("hidden");
+                    setTimeout(() => loader.remove(), 400);
+               }, 550);
+          }
+
+          async function apiRequest(path, options = {}) {
+               const token = getToken();
+
+               const response = await fetch(`${API}${path}`, {
+                    ...options,
+                    headers: {
+                         "Accept": "application/json",
+                         "Content-Type": "application/json",
+                         ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+                         ...(options.headers || {})
+                    }
+               });
+
+               const text = await response.text();
+               let data = null;
+
+               if (text) {
+                    try {
+                         data = JSON.parse(text);
+                    } catch {
+                         data = { success: false, message: text };
+                    }
+               }
+
+               if (response.status === 401 || response.status === 403) {
+                    showToast("Session expired. Please login again.", "error");
+                    setTimeout(() => {
+                         localStorage.removeItem("adminToken");
+                         localStorage.removeItem("adminRole");
+                         localStorage.removeItem("edumind_is_logged_in");
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+                    throw new Error(data?.message || "Unauthorized");
+               }
+
+               if (!response.ok) {
+                    throw new Error(data?.message || `Request failed with status ${response.status}`);
+               }
+
+               return data;
+          }
+
+          function unwrapLogs(data) {
+               if (Array.isArray(data)) return data;
+               if (data && Array.isArray(data.logs)) return data.logs;
+               if (data && Array.isArray(data.data)) return data.data;
+               if (data && Array.isArray(data.content)) return data.content;
+               return [];
+          }
+
+          async function loadSecurityLogs(showRefreshToast = false) {
+               const icon = document.getElementById("refreshIcon");
+               if (icon) icon.classList.add("spin-now");
+
+               try {
+                    const [logsData, summaryData] = await Promise.all([
+                         apiRequest("/api/admin/security-logs", { method: "GET" }),
+                         apiRequest("/api/admin/security-logs/summary", { method: "GET" }).catch(() => null)
+                    ]);
+
+                    allLogs = unwrapLogs(logsData);
+                    renderSummary(summaryData?.summary || null);
+                    renderLogs();
+
+                    if (showRefreshToast) {
+                         showToast("Security logs refreshed.", "success");
+                    }
+               } catch (error) {
+                    console.error("Security logs load failed:", error);
+                    showToast(error.message || "Security logs load failed.", "error");
+                    renderEmpty("Unable to load security logs. Check backend console.");
+               } finally {
+                    if (icon) icon.classList.remove("spin-now");
+               }
+          }
+
+          function renderSummary(summary) {
+               if (summary) {
+                    setText("statTotal", summary.total ?? 0);
+                    setText("statSuccess", summary.success ?? 0);
+                    setText("statWarn", summary.warnings ?? 0);
+                    setText("statFailed", summary.failed ?? summary.critical ?? 0);
+                    return;
+               }
+
+               const success = allLogs.filter(log => normalize(log.severity) === "SUCCESS" || normalize(log.status) === "SUCCESS").length;
+               const warnings = allLogs.filter(log => normalize(log.severity) === "WARNING").length;
+               const failed = allLogs.filter(log =>
+                    normalize(log.status) === "FAILED" ||
+                    normalize(log.action) === "FAILED_LOGIN" ||
+                    normalize(log.severity) === "CRITICAL"
+               ).length;
+
+               setText("statTotal", allLogs.length);
+               setText("statSuccess", success);
+               setText("statWarn", warnings);
+               setText("statFailed", failed);
+          }
+
+          function normalize(value) {
+               return String(value || "").trim().toUpperCase();
+          }
+
+          function getFilteredLogs() {
+               const query = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+               const severity = normalize(document.getElementById("severityFilter")?.value || "all");
+               const action = normalize(document.getElementById("actionFilter")?.value || "all");
+
+               return allLogs.filter(log => {
+                    const logSeverity = normalize(log.severity);
+                    const logAction = normalize(log.action);
+
+                    if (severity !== "ALL" && logSeverity !== severity) return false;
+                    if (action !== "ALL" && logAction !== action) return false;
+
+                    if (query) {
+                         const haystack = `
+                              ${log.userName || ""}
+                              ${log.email || ""}
+                              ${log.role || ""}
+                              ${log.action || ""}
+                              ${log.severity || ""}
+                              ${log.status || ""}
+                              ${log.description || ""}
+                              ${log.ipAddress || ""}
+                              ${log.deviceInfo || ""}
+                         `.toLowerCase();
+
+                         if (!haystack.includes(query)) return false;
+                    }
+
+                    return true;
+               });
+          }
+
           function renderLogs() {
-               allLogs = generateLogs();
-               updateStats(allLogs);
-               displayLogs(allLogs);
+               const logs = getFilteredLogs();
+               const list = document.getElementById("logList");
+
+               if (!list) return;
+
+               setText("logCount", `${logs.length} events`);
+
+               if (!logs.length) {
+                    renderEmpty("No security events found for selected filters.");
+                    return;
+               }
+
+               list.innerHTML = logs.map(log => {
+                    const severity = normalize(log.severity || "INFO").toLowerCase();
+                    const safeSeverity = ["info", "success", "warning", "critical"].includes(severity) ? severity : "info";
+                    const title = buildLogTitle(log);
+                    const detail = log.description || "Security event recorded.";
+                    const createdAt = log.createdAt || log.time;
+
+                    return `
+                         <div class="log-item">
+                              <div class="log-dot dot-${safeSeverity}"></div>
+
+                              <div class="log-content">
+                                   <p>${escapeHtml(title)}</p>
+                                   <span>${escapeHtml(detail)}</span>
+                                   <div class="log-extra">
+                                        <span class="chip"><i class="fas fa-user"></i> ${escapeHtml(log.userName || "Unknown")}</span>
+                                        <span class="chip"><i class="fas fa-envelope"></i> ${escapeHtml(log.email || "No email")}</span>
+                                        <span class="chip"><i class="fas fa-user-shield"></i> ${escapeHtml(log.role || "ADMIN")}</span>
+                                        <span class="chip"><i class="fas fa-network-wired"></i> ${escapeHtml(log.ipAddress || "No IP")}</span>
+                                   </div>
+                              </div>
+
+                              <div class="log-meta">
+                                   ${severityBadge(safeSeverity)}
+                                   <span class="log-time">${formatTime(createdAt)}</span>
+                              </div>
+                         </div>
+                    `;
+               }).join("");
           }
-          function updateStats(logs) {
-               document.getElementById('statTotal').textContent = logs.length;
-               document.getElementById('statSuccess').textContent = logs.filter(l => l.severity === 'success').length;
-               document.getElementById('statWarn').textContent = logs.filter(l => l.severity === 'warning').length;
-               document.getElementById('statFailed').textContent = logs.filter(l => l.severity === 'critical').length;
+
+          function buildLogTitle(log) {
+               const action = normalize(log.action || "ADMIN_ACTION").replaceAll("_", " ");
+               const status = normalize(log.status || "SUCCESS");
+
+               return `${action} • ${status}`;
           }
-          function displayLogs(logs) {
-               const list = document.getElementById('logList');
-               document.getElementById('logCount').textContent = logs.length + ' events';
-               if (!logs.length) { list.innerHTML = `<div class="empty-state"><i class="fas fa-shield-halved"></i><p>No security events found.</p></div>`; return; }
-               list.innerHTML = logs.map(l => `
-    <div class="log-item">
-        <div class="log-dot dot-${l.severity}"></div>
-        <div class="log-content">
-            <p>${l.msg}</p>
-            <span>${l.detail}</span>
-        </div>
-        <div class="log-meta">
-            ${severityBadge(l.severity)}
-            <span class="log-time">${formatTime(l.time)}</span>
-        </div>
-    </div>`).join('');
+
+          function renderEmpty(message) {
+               const list = document.getElementById("logList");
+               if (!list) return;
+
+               setText("logCount", "0 events");
+
+               list.innerHTML = `
+                    <div class="empty-state">
+                         <i class="fas fa-shield-halved"></i>
+                         <p>${escapeHtml(message)}</p>
+                    </div>
+               `;
           }
-          function severityBadge(s) { const map = { info: 'badge-info', success: 'badge-success', warning: 'badge-warning', critical: 'badge-critical' }; const labels = { info: 'Info', success: 'Success', warning: 'Warning', critical: 'Critical' }; return `<span class="badge ${map[s] || 'badge-info'}">${labels[s] || s}</span>`; }
-          function filterLogs() {
-               const q = document.getElementById('searchInput').value.toLowerCase();
-               const sev = document.getElementById('severityFilter').value;
-               let f = allLogs;
-               if (q) f = f.filter(l => l.msg.toLowerCase().includes(q) || l.detail.toLowerCase().includes(q));
-               if (sev !== 'all') f = f.filter(l => l.severity === sev);
-               displayLogs(f);
+
+          function severityBadge(severity) {
+               const labels = {
+                    info: "Info",
+                    success: "Success",
+                    warning: "Warning",
+                    critical: "Critical"
+               };
+
+               return `<span class="badge badge-${severity}">${labels[severity] || "Info"}</span>`;
           }
-          function formatTime(str) { try { const d = new Date(str); const now = new Date(); const diff = Math.floor((now - d) / 60000); if (diff < 1) return 'Just now'; if (diff < 60) return diff + 'm ago'; if (diff < 1440) return Math.floor(diff / 60) + 'h ago'; return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return 'Recently'; } }
-          let collapsed = false;
-          function toggleSidebar() { collapsed = !collapsed; document.getElementById('sidebar').classList.toggle('collapsed', collapsed); document.getElementById('main').classList.toggle('expanded', collapsed); document.getElementById('toggleIcon').className = collapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'; }
-          function openMobile() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.add('show'); }
-          function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
-          function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } }
-          (function () { if (localStorage.getItem('adminTheme') === 'light') { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; } })();
-          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/login.html'; } }
-          renderLogs();
+
+          function formatTime(value) {
+               if (!value) return "Recently";
+
+               const date = new Date(value);
+
+               if (isNaN(date.getTime())) {
+                    return "Recently";
+               }
+
+               const now = new Date();
+               const diff = now - date;
+
+               if (diff < 60000) return "Just now";
+               if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+               if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+
+               return date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit"
+               });
+          }
+
+          function clearFilters() {
+               document.getElementById("searchInput").value = "";
+               document.getElementById("severityFilter").value = "all";
+               document.getElementById("actionFilter").value = "all";
+               renderLogs();
+               showToast("Security filters cleared.", "info");
+          }
+
+          async function createTestLog() {
+               try {
+                    const body = {
+                         userName: getAdminName(),
+                         email: getAdminEmail(),
+                         role: "ADMIN",
+                         action: "ADMIN_ACTION",
+                         severity: "INFO",
+                         status: "SUCCESS",
+                         description: "Admin created a manual test security log from Security Logs page."
+                    };
+
+                    await apiRequest("/api/admin/security-logs", {
+                         method: "POST",
+                         body: JSON.stringify(body)
+                    });
+
+                    showToast("Test security log created.", "success");
+                    await loadSecurityLogs(false);
+               } catch (error) {
+                    console.error("Create test log failed:", error);
+                    showToast(error.message || "Failed to create test log.", "error");
+               }
+          }
+
+          function exportCSV() {
+               const logs = getFilteredLogs();
+
+               if (!logs.length) {
+                    showToast("No security logs available to export.", "error");
+                    return;
+               }
+
+               const rows = [
+                    ["ID", "User", "Email", "Role", "Action", "Severity", "Status", "Description", "IP Address", "Device", "Created At"],
+                    ...logs.map(log => [
+                         log.id || "",
+                         log.userName || "",
+                         log.email || "",
+                         log.role || "",
+                         log.action || "",
+                         log.severity || "",
+                         log.status || "",
+                         log.description || "",
+                         log.ipAddress || "",
+                         log.deviceInfo || "",
+                         log.createdAt || ""
+                    ])
+               ];
+
+               const csv = rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+               const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+               const url = URL.createObjectURL(blob);
+
+               const link = document.createElement("a");
+               link.href = url;
+               link.download = `edumind-security-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+               link.click();
+
+               URL.revokeObjectURL(url);
+               showToast("Security logs CSV exported.", "success");
+          }
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+               sidebar?.classList.toggle("collapsed", sidebarCollapsed);
+               main?.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebar() {
+               if (localStorage.getItem("adminSidebarCollapsed") !== "true") return;
+
+               sidebarCollapsed = true;
+               document.getElementById("sidebar")?.classList.add("collapsed");
+               document.getElementById("main")?.classList.add("expanded");
+
+               const icon = document.getElementById("toggleIcon");
+               if (icon) icon.className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar")?.classList.add("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar")?.classList.remove("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("edumind-admin-theme") || localStorage.getItem("adminTheme") || "dark";
+               document.documentElement.setAttribute("data-theme", theme);
+
+               if (theme === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(theme);
+          }
+
+          function updateThemeIcon(theme) {
+               const btn = document.getElementById("themeBtn");
+               if (!btn) return;
+
+               btn.innerHTML = theme === "light" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+          }
+
+          function toggleTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               if (next === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(next);
+          }
+
+          function handleLogout() {
+               if (!confirm("Logout from admin panel?")) return;
+
+               [
+                    "adminToken",
+                    "adminRole",
+                    "adminName",
+                    "adminEmail",
+                    "token",
+                    "userRole",
+                    "edumind_is_logged_in",
+                    "edumind_logged_in_user"
+               ].forEach(key => localStorage.removeItem(key));
+
+               window.location.href = "/pages/admin/admin-login.html";
+          }
+
+          document.addEventListener("DOMContentLoaded", () => {
+               softGuard();
+               setupIdentity();
+               applySavedTheme();
+               restoreSidebar();
+               updateClock();
+               setInterval(updateClock, 1000);
+               hideLoader();
+               loadSecurityLogs(false);
+          });
      </script>
 </body>
 

@@ -10,6 +10,7 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
+
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -22,10 +23,10 @@
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 
-<body>
+<body data-page-role="student">
 
-     <body data-page-role="student"></body>
      <div class="dashboard-layout">
+
           <aside class="sidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -39,38 +40,47 @@
                          <i class="fa-solid fa-house"></i>
                          <span>Dashboard</span>
                     </a>
+
                     <a href="planner.html" class="nav-item">
                          <i class="fa-solid fa-calendar-days"></i>
                          <span>Planner</span>
                     </a>
+
                     <a href="subjects.html" class="nav-item">
                          <i class="fa-solid fa-book"></i>
                          <span>Subjects</span>
                     </a>
+
                     <a href="tasks.html" class="nav-item">
                          <i class="fa-solid fa-list-check"></i>
                          <span>Tasks</span>
                     </a>
+
                     <a href="revision.html" class="nav-item">
                          <i class="fa-solid fa-rotate"></i>
                          <span>Revision</span>
                     </a>
+
                     <a href="tests.html" class="nav-item">
                          <i class="fa-solid fa-file-lines"></i>
                          <span>Tests</span>
                     </a>
+
                     <a href="analytics.html" class="nav-item active">
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
+
                     <a href="pomodoro.html" class="nav-item">
                          <i class="fa-solid fa-stopwatch"></i>
                          <span>Study Timer</span>
                     </a>
+
                     <a href="assistant.html" class="nav-item">
                          <i class="fa-solid fa-robot"></i>
                          <span>Assistant</span>
                     </a>
+
                     <a href="settings.html" class="nav-item">
                          <i class="fa-solid fa-gear"></i>
                          <span>Settings</span>
@@ -78,7 +88,7 @@
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
                          <i class="fa-solid fa-right-from-bracket"></i>
                          <span>Logout</span>
                     </a>
@@ -86,21 +96,23 @@
           </aside>
 
           <main class="dashboard-main">
+
                <header class="dashboard-header">
                     <div class="header-left">
                          <div>
                               <h1>Analytics</h1>
-                              <p>Track your study progress, performance trends, and learning insights.</p>
+                              <p>Track your study progress, focus sessions, performance trends, and learning insights.
+                              </p>
                          </div>
                     </div>
 
                     <div class="header-actions">
-                         <button class="export-report-btn">
+                         <button class="export-report-btn" type="button">
                               <i class="fa-solid fa-download"></i>
                               <span>Export Report</span>
                          </button>
 
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
                               <i class="fa-solid fa-moon"></i>
                          </button>
 
@@ -114,23 +126,34 @@
 
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <div class="profile-dropdown-header">
-                                   <img src="../assets/avatar/default-user.png" alt="User">
+                                   <img src="../assets/avatar/default-user.png" alt="User"
+                                        id="analyticsProfileAvatarDropdown">
                                    <div>
                                         <h4 id="analyticsProfileNameDropdown">Student</h4>
-                                        <p>Student</p>
+                                        <p id="analyticsProfileRoleDropdown">Student</p>
                                    </div>
                               </div>
+
                               <div class="profile-dropdown-divider"></div>
+
                               <a href="settings.html" class="profile-menu-item">
                                    <i class="fa-solid fa-user-gear"></i>
                                    <span>Profile Settings</span>
                               </a>
-                              <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
+
+                              <a href="dashboard.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-house"></i>
+                                   <span>Dashboard</span>
                               </a>
+
+                              <a href="pomodoro.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-stopwatch"></i>
+                                   <span>Study Timer</span>
+                              </a>
+
                               <div class="profile-dropdown-divider"></div>
-                              <a href="login.html" class="profile-menu-item logout">
+
+                              <a href="login.html" class="profile-menu-item logout" id="profileLogoutBtn">
                                    <i class="fa-solid fa-right-from-bracket"></i>
                                    <span>Logout</span>
                               </a>
@@ -140,7 +163,6 @@
 
                <section class="analytics-content">
 
-                    <!-- Summary Cards — 4 with icons + color accents -->
                     <div class="analytics-summary-grid">
                          <div class="analytics-summary-card asc-progress">
                               <div class="asc-icon-wrap">
@@ -164,11 +186,11 @@
 
                          <div class="analytics-summary-card asc-sessions">
                               <div class="asc-icon-wrap">
-                                   <i class="fa-solid fa-circle-check"></i>
+                                   <i class="fa-solid fa-stopwatch"></i>
                               </div>
                               <div class="asc-info">
                                    <h3 id="completedSessionsValue">0</h3>
-                                   <p>Completed Sessions</p>
+                                   <p>Completed Focus Sessions</p>
                               </div>
                          </div>
 
@@ -183,15 +205,15 @@
                          </div>
                     </div>
 
-                    <!-- Toolbar — filter only (search removed from HTML, keep select for JS) -->
                     <div class="analytics-toolbar">
                          <div class="analytics-toolbar-left">
                               <i class="fa-solid fa-chart-line toolbar-icon"></i>
                               <span class="toolbar-label">Performance Overview</span>
                          </div>
+
                          <div class="analytics-filter">
                               <i class="fa-solid fa-calendar-days"></i>
-                              <select>
+                              <select id="analyticsRangeFilter">
                                    <option>This Week</option>
                                    <option>This Month</option>
                                    <option>Last 30 Days</option>
@@ -200,21 +222,24 @@
                          </div>
                     </div>
 
-                    <!-- Main Grid: Trend Chart + Score Overview -->
                     <div class="analytics-main-grid">
 
-                         <!-- Study Progress Trend Chart -->
                          <div class="progress-chart-card">
                               <div class="analytics-section-title">
                                    <div>
-                                        <h3><i class="fa-solid fa-chart-column section-title-icon"></i> Study Progress
-                                             Trend</h3>
-                                        <p>Your recent study performance based on completed activities.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-chart-column section-title-icon"></i>
+                                             Weekly Activity Trend
+                                        </h3>
+                                        <p>
+                                             Your real activity based on completed tasks, revisions, planner items,
+                                             tests,
+                                             and Pomodoro focus blocks.
+                                        </p>
                                    </div>
                               </div>
 
                               <div class="chart-placeholder large">
-                                   <!-- Y-axis labels -->
                                    <div class="chart-y-axis">
                                         <span>High</span>
                                         <span>Mid</span>
@@ -223,17 +248,13 @@
 
                                    <div class="chart-inner">
                                         <div class="chart-bars" id="chartBars">
-                                             <!-- JS renders bars here — id preserved -->
-                                             <div class="chart-bar" style="height: 55%;"></div>
-                                             <div class="chart-bar" style="height: 72%;"></div>
-                                             <div class="chart-bar" style="height: 68%;"></div>
-                                             <div class="chart-bar" style="height: 82%;"></div>
-                                             <div class="chart-bar" style="height: 76%;"></div>
-                                             <div class="chart-bar" style="height: 88%;"></div>
-                                             <div class="chart-bar" style="height: 79%;"></div>
+                                             <div class="analytics-loading-state">
+                                                  <i class="fa-solid fa-spinner fa-spin"></i>
+                                                  <span>Loading analytics...</span>
+                                             </div>
                                         </div>
+
                                         <div class="chart-labels" id="chartLabels">
-                                             <!-- JS renders labels here — id preserved -->
                                              <span>Mon</span>
                                              <span>Tue</span>
                                              <span>Wed</span>
@@ -245,25 +266,39 @@
                                    </div>
                               </div>
 
-                              <!-- Chart legend -->
                               <div class="chart-footer-legend">
-                                   <div class="chart-legend-item"><span class="cfl-dot cfl-dot-tasks"></span><span
-                                             class="cfl-label">Tasks</span></div>
-                                   <div class="chart-legend-item"><span class="cfl-dot cfl-dot-revisions"></span><span
-                                             class="cfl-label">Revisions</span></div>
-                                   <div class="chart-legend-item"><span class="cfl-dot cfl-dot-plans"></span><span
-                                             class="cfl-label">Plans</span></div>
-                                   <div class="chart-legend-item"><span class="cfl-dot cfl-dot-tests"></span><span
-                                             class="cfl-label">Tests</span></div>
+                                   <div class="chart-legend-item">
+                                        <span class="cfl-dot cfl-dot-tasks"></span>
+                                        <span class="cfl-label">Tasks</span>
+                                   </div>
+
+                                   <div class="chart-legend-item">
+                                        <span class="cfl-dot cfl-dot-revisions"></span>
+                                        <span class="cfl-label">Revisions</span>
+                                   </div>
+
+                                   <div class="chart-legend-item">
+                                        <span class="cfl-dot cfl-dot-plans"></span>
+                                        <span class="cfl-label">Plans</span>
+                                   </div>
+
+                                   <div class="chart-legend-item">
+                                        <span class="cfl-dot cfl-dot-tests"></span>
+                                        <span class="cfl-label">Tests</span>
+                                   </div>
                               </div>
-                              <div class="analytics-chart-insight" id="analyticsChartInsight"></div>
+
+                              <div class="analytics-chart-insight" id="analyticsChartInsight">
+                                   Loading weekly activity insights...
+                              </div>
                          </div>
 
-                         <!-- Score Overview -->
                          <div class="score-overview-card">
                               <div class="analytics-section-title">
                                    <div>
-                                        <h3><i class="fa-solid fa-gauge-high section-title-icon"></i> Score Overview
+                                        <h3>
+                                             <i class="fa-solid fa-gauge-high section-title-icon"></i>
+                                             Score Overview
                                         </h3>
                                         <p>Performance breakdown across key study areas.</p>
                                    </div>
@@ -276,7 +311,7 @@
                                         </div>
                                         <div class="score-stat-info">
                                              <h4>Mock Tests</h4>
-                                             <p>Average performance in practice tests</p>
+                                             <p>Average performance in scored tests.</p>
                                         </div>
                                         <span id="mockTestsValue" class="score-badge">0%</span>
                                    </div>
@@ -287,7 +322,7 @@
                                         </div>
                                         <div class="score-stat-info">
                                              <h4>Revision Accuracy</h4>
-                                             <p>Retention level after revision sessions</p>
+                                             <p>Completed revision topics in selected range.</p>
                                         </div>
                                         <span id="revisionAccuracyValue" class="score-badge">0%</span>
                                    </div>
@@ -298,7 +333,7 @@
                                         </div>
                                         <div class="score-stat-info">
                                              <h4>Task Completion</h4>
-                                             <p>Completed study tasks on time</p>
+                                             <p>Completed study tasks in selected range.</p>
                                         </div>
                                         <span id="taskCompletionValue" class="score-badge">0%</span>
                                    </div>
@@ -309,7 +344,7 @@
                                         </div>
                                         <div class="score-stat-info">
                                              <h4>Focus Efficiency</h4>
-                                             <p>Consistency during study blocks</p>
+                                             <p>Consistency from Pomodoro focus sessions.</p>
                                         </div>
                                         <span id="focusEfficiencyValue" class="score-badge">0%</span>
                                    </div>
@@ -317,24 +352,25 @@
                          </div>
                     </div>
 
-                    <!-- Bottom Grid: Subject Insights + Recommendations -->
                     <div class="analytics-bottom-grid">
 
-                         <!-- Subject Insights -->
                          <div class="subject-insights-card">
                               <div class="analytics-section-title">
                                    <div>
-                                        <h3><i class="fa-solid fa-book section-title-icon"></i> Subject Insights</h3>
-                                        <p>Compare subject-wise study and performance progress.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-book section-title-icon"></i>
+                                             Subject Insights
+                                        </h3>
+                                        <p>Compare subject-wise progress, activity, tests, and focus minutes.</p>
                                    </div>
                               </div>
 
-                              <!-- Strongest / Weakest indicator row — JS will update these -->
                               <div class="insight-indicator-row" id="insightIndicatorRow">
                                    <div class="insight-indicator strongest" id="strongestSubjectBadge">
                                         <i class="fa-solid fa-trophy"></i>
                                         <span>Strongest: —</span>
                                    </div>
+
                                    <div class="insight-indicator weakest" id="weakestSubjectBadge">
                                         <i class="fa-solid fa-triangle-exclamation"></i>
                                         <span>Needs Focus: —</span>
@@ -342,81 +378,30 @@
                               </div>
 
                               <div class="subject-insight-list" id="subjectInsightList">
-                                   <!-- JS renders here — id preserved -->
-                                   <div class="subject-insight-item">
-                                        <div class="subject-insight-top">
-                                             <h4>Java Programming</h4>
-                                             <span class="insight-pct pct-high">82%</span>
-                                        </div>
-                                        <div class="subject-progress-bar">
-                                             <div class="subject-progress-fill" style="width: 82%;"></div>
-                                        </div>
-                                   </div>
-                                   <div class="subject-insight-item">
-                                        <div class="subject-insight-top">
-                                             <h4>DBMS</h4>
-                                             <span class="insight-pct pct-high">76%</span>
-                                        </div>
-                                        <div class="subject-progress-bar">
-                                             <div class="subject-progress-fill" style="width: 76%;"></div>
-                                        </div>
-                                   </div>
-                                   <div class="subject-insight-item">
-                                        <div class="subject-insight-top">
-                                             <h4>Computer Networks</h4>
-                                             <span class="insight-pct pct-mid">68%</span>
-                                        </div>
-                                        <div class="subject-progress-bar">
-                                             <div class="subject-progress-fill" style="width: 68%;"></div>
-                                        </div>
-                                   </div>
-                                   <div class="subject-insight-item">
-                                        <div class="subject-insight-top">
-                                             <h4>Operating System</h4>
-                                             <span class="insight-pct pct-high">79%</span>
-                                        </div>
-                                        <div class="subject-progress-bar">
-                                             <div class="subject-progress-fill" style="width: 79%;"></div>
-                                        </div>
+                                   <div class="analytics-empty-state">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                        <h4>Loading subject insights...</h4>
+                                        <p>Your subject-wise analytics will appear here.</p>
                                    </div>
                               </div>
                          </div>
 
-                         <!-- Recommendations -->
                          <div class="recommendations-card">
                               <div class="analytics-section-title">
                                    <div>
-                                        <h3><i class="fa-solid fa-lightbulb section-title-icon"></i> Recommendations
+                                        <h3>
+                                             <i class="fa-solid fa-lightbulb section-title-icon"></i>
+                                             Smart Recommendations
                                         </h3>
-                                        <p>Smart suggestions based on your recent performance.</p>
+                                        <p>Study suggestions based on your real activity and performance.</p>
                                    </div>
                               </div>
 
                               <div class="recommendation-list" id="recommendationList">
-                                   <!-- JS renders here — id preserved -->
-                                   <div class="recommendation-item rec-tip">
-                                        <div class="rec-icon-wrap">
-                                             <i class="fa-solid fa-lightbulb"></i>
-                                        </div>
-                                        <span>Increase DBMS revision frequency this week.</span>
-                                   </div>
-                                   <div class="recommendation-item rec-warn">
-                                        <div class="rec-icon-wrap">
-                                             <i class="fa-solid fa-triangle-exclamation"></i>
-                                        </div>
-                                        <span>Focus on weak concepts in Computer Networks before the next test.</span>
-                                   </div>
-                                   <div class="recommendation-item rec-tip">
-                                        <div class="rec-icon-wrap">
-                                             <i class="fa-solid fa-lightbulb"></i>
-                                        </div>
-                                        <span>Maintain your current Java practice streak for better consistency.</span>
-                                   </div>
-                                   <div class="recommendation-item rec-success">
-                                        <div class="rec-icon-wrap">
-                                             <i class="fa-solid fa-circle-check"></i>
-                                        </div>
-                                        <span>Try one extra mock test this weekend for score improvement.</span>
+                                   <div class="analytics-empty-state">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                        <h4>Loading recommendations...</h4>
+                                        <p>Smart suggestions will appear after analytics data loads.</p>
                                    </div>
                               </div>
                          </div>
@@ -430,84 +415,7 @@
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/analytics.js"></script>
-     <!-- Duplicate script tag removed -->
 
-     <!-- Profile info from localStorage -->
-     <script>
-          (function () {
-               try {
-                    const raw = localStorage.getItem("edumind_logged_in_user");
-                    if (!raw) return;
-                    const user = JSON.parse(raw);
-                    const firstName = (user.fullName || user.name || user.username || "Student").split(" ")[0];
-                    const fullName = user.fullName || user.name || user.username || "Student";
-                    const role = user.role || user.course || "Student";
-
-                    const userId = user.id;
-                    let avatar = "../assets/avatar/default-user.png";
-                    if (userId) {
-                         const stored = localStorage.getItem(`edumind_profile_photo_${userId}`);
-                         if (stored) avatar = stored;
-                    }
-
-                    const nameEl = document.getElementById("analyticsProfileName");
-                    const roleEl = document.getElementById("analyticsProfileRole");
-                    const avatarEl = document.getElementById("analyticsProfileAvatar");
-                    const nameDropEl = document.getElementById("analyticsProfileNameDropdown");
-
-                    if (nameEl) nameEl.textContent = firstName;
-                    if (roleEl) roleEl.textContent = role;
-                    if (avatarEl) { avatarEl.src = avatar; avatarEl.alt = fullName; }
-                    if (nameDropEl) nameDropEl.textContent = fullName;
-               } catch (e) { /* silent */ }
-          })();
-
-
-          (function () {
-               "use strict";
-               const LOGIN_PAGE = "login.html";
-               const STUDENT_HOME = "dashboard.html";
-               const ADMIN_HOME = "admin-dashboard.html";
-               const token = localStorage.getItem("token");
-               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
-               const userRole = localStorage.getItem("userRole") || "STUDENT";
-               function goTo(page) {
-                    // Already on that page? Skip redirect to avoid loop
-                    if (window.location.href.includes(page)) return;
-                    window.location.href = page;
-               }
-               if (!token || !isLoggedIn) {
-                    goTo(LOGIN_PAGE);
-                    return; // script execution rok do
-               }
-               document.addEventListener("DOMContentLoaded", function () {
-
-                    const body = document.body;
-                    const pageRole = body ? body.getAttribute("data-page-role") : null;
-
-                    // data-page-role set nahi hai toh guard kuch nahi karega
-                    if (!pageRole) return;
-
-                    if (pageRole === "admin" && userRole !== "ADMIN") {
-                         // Student admin page pe aaya → student home pe bhejo
-                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
-                         goTo(STUDENT_HOME);
-                         return;
-                    }
-
-                    if (pageRole === "student" && userRole === "ADMIN") {
-                         // Admin student page pe aaya → admin home pe bhejo
-                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
-                         goTo(ADMIN_HOME);
-                         return;
-                    }
-
-                    // Role sahi hai → page load hone do
-                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
-               });
-
-          })();
-     </script>
 </body>
 
 </html>
