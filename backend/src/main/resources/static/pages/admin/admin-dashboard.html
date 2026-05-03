@@ -919,7 +919,7 @@
           const adminName = localStorage.getItem('adminName') || 'Admin';
 
           if (!adminToken || adminRole !== 'ADMIN') {
-               window.location.href = 'admin-login.html';
+               window.location.href = 'login.html';
           }
 
           document.getElementById('welcomeName').textContent = adminName.split(' ')[0];
@@ -1012,7 +1012,7 @@
                     });
                     if (res.status === 401 || res.status === 403) {
                          localStorage.clear();
-                         window.location.href = 'admin-login.html';
+                         window.location.href = 'login.html';
                          return;
                     }
                     const data = await res.json();

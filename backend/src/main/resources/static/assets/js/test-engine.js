@@ -45,7 +45,6 @@ const legendAnsweredMarkedCount = document.getElementById("legendAnsweredMarkedC
 const engineQuestionPalette = document.getElementById("engineQuestionPalette");
 const enginePaletteCollapseBtn = document.getElementById("enginePaletteCollapseBtn");
 
-/* Submit summary modal */
 const submitSummaryOverlay = document.getElementById("submitSummaryOverlay");
 const closeSubmitSummaryBtn = document.getElementById("closeSubmitSummaryBtn");
 const cancelSubmitSummaryBtn = document.getElementById("cancelSubmitSummaryBtn");
@@ -88,6 +87,50 @@ function parseStoredJson(value) {
     }
 }
 
+function decodeJwtPayload(token) {
+    try {
+        if (!token || !token.includes(".")) return null;
+
+        const payload = token.split(".")[1];
+        const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const decoded = atob(normalizedPayload);
+        return JSON.parse(decoded);
+    } catch (error) {
+        return null;
+    }
+}
+
+function getAuthToken() {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("jwtToken") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("adminToken") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("jwtToken") ||
+        sessionStorage.getItem("accessToken") ||
+        ""
+    );
+}
+
+function requireAuthToken() {
+    const token = getAuthToken();
+
+    if (!token || !String(token).trim()) {
+        throw new Error("Missing login token. Please login again.");
+    }
+
+    return token.trim();
+}
+
+function redirectToLoginSoon(message) {
+    showEngineToast(message || "Session expired. Please login again.", "error");
+
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 1200);
+}
+
 function getStoredUserObject() {
     const possibleKeys = [
         "edumind_logged_in_user",
@@ -100,8 +143,9 @@ function getStoredUserObject() {
     ];
 
     for (const key of possibleKeys) {
-        const raw = localStorage.getItem(key);
+        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
         if (!raw) continue;
+
         const parsed = parseStoredJson(raw);
         if (parsed && typeof parsed === "object") {
             return parsed;
@@ -118,17 +162,56 @@ function getCurrentUserId() {
         return Number(user.id);
     }
 
-    throw new Error("Logged-in user id not found in localStorage.");
+    if (user && user.userId != null && user.userId !== "") {
+        return Number(user.userId);
+    }
+
+    if (user && user.studentId != null && user.studentId !== "") {
+        return Number(user.studentId);
+    }
+
+    const directUserId =
+        localStorage.getItem("userId") ||
+        localStorage.getItem("studentId") ||
+        sessionStorage.getItem("userId") ||
+        sessionStorage.getItem("studentId");
+
+    if (directUserId && !Number.isNaN(Number(directUserId))) {
+        return Number(directUserId);
+    }
+
+    const tokenPayload = decodeJwtPayload(getAuthToken());
+
+    const jwtUserId =
+        tokenPayload?.userId ||
+        tokenPayload?.id ||
+        tokenPayload?.studentId ||
+        tokenPayload?.uid;
+
+    if (jwtUserId != null && jwtUserId !== "" && !Number.isNaN(Number(jwtUserId))) {
+        return Number(jwtUserId);
+    }
+
+    if (tokenPayload?.sub != null && !Number.isNaN(Number(tokenPayload.sub))) {
+        return Number(tokenPayload.sub);
+    }
+
+    throw new Error("Logged-in user id not found. Please login again.");
 }
 
 function getCurrentUserName() {
     const user = getStoredUserObject();
-    if (!user) return "Student";
+
+    if (!user) {
+        const payload = decodeJwtPayload(getAuthToken());
+        return payload?.name || payload?.fullName || payload?.email || "Student";
+    }
 
     const candidate =
         user.name ||
         user.fullName ||
         user.username ||
+        user.email ||
         [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
 
     return candidate || "Student";
@@ -174,35 +257,49 @@ function buildSubmitAttemptApiUrl(attemptId) {
     return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}/submit?userId=${encodeURIComponent(userId)}`;
 }
 
+function buildAttemptDetailsUrl(attemptId) {
+    const userId = getCurrentUserId();
+    return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}?userId=${encodeURIComponent(userId)}`;
+}
+
 function extractApiErrorMessage(responseText, responseStatus) {
     if (!responseText) return `HTTP ${responseStatus}`;
 
     try {
         const parsed = JSON.parse(responseText);
         if (parsed && typeof parsed === "object") {
-            return parsed.message || parsed.error || `HTTP ${responseStatus}`;
+            return parsed.message || parsed.error || parsed.field || `HTTP ${responseStatus}`;
         }
     } catch (error) {
-        // ignore
+        // ignore invalid json
     }
 
     return responseText;
 }
 
 async function fetchJson(url, options = {}) {
-    const response = await fetch(url, {
+    const token = requireAuthToken();
+
+    const finalOptions = {
+        ...options,
         headers: {
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
             ...(options.headers || {})
-        },
-        ...options
-    });
+        }
+    };
+
+    const response = await fetch(url, finalOptions);
 
     let responseText = "";
     try {
         responseText = await response.text();
     } catch (error) {
         responseText = "";
+    }
+
+    if (response.status === 401 || response.status === 403) {
+        throw new Error("Unauthorized. Missing or invalid token.");
     }
 
     if (!response.ok) {
@@ -216,6 +313,86 @@ async function fetchJson(url, options = {}) {
     } catch (error) {
         return null;
     }
+}
+
+function showEngineToast(message, type = "info") {
+    const oldToast = document.querySelector(".engine-toast");
+    if (oldToast) oldToast.remove();
+
+    const toast = document.createElement("div");
+    toast.className = `engine-toast ${type}`;
+
+    const iconClass =
+        type === "success"
+            ? "fa-circle-check"
+            : type === "error"
+                ? "fa-triangle-exclamation"
+                : "fa-circle-info";
+
+    toast.innerHTML = `
+        <i class="fa-solid ${iconClass}"></i>
+        <span>${escapeHtml(message)}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    if (!document.getElementById("engineToastStyle")) {
+        const style = document.createElement("style");
+        style.id = "engineToastStyle";
+        style.textContent = `
+            .engine-toast {
+                position: fixed;
+                top: 22px;
+                right: 22px;
+                z-index: 999999;
+                min-width: 280px;
+                max-width: 430px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 16px;
+                border-radius: 14px;
+                font-family: "Poppins", sans-serif;
+                font-size: 13px;
+                font-weight: 700;
+                line-height: 1.5;
+                color: #ffffff;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+                animation: engineToastIn 0.25s ease;
+            }
+
+            .engine-toast.info {
+                background: #164e63;
+                border: 1px solid rgba(103,232,249,0.35);
+            }
+
+            .engine-toast.success {
+                background: #065f46;
+                border: 1px solid rgba(110,231,183,0.35);
+            }
+
+            .engine-toast.error {
+                background: #7f1d1d;
+                border: 1px solid rgba(252,165,165,0.35);
+            }
+
+            @keyframes engineToastIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
 }
 
 function normalizeQuestion(rawQuestion) {
@@ -348,54 +525,24 @@ function updateTopInfo() {
     const subjectName = examSession.subject || "General Test";
     const examTitle = examSession.title || "Test";
 
-    if (examCandidateName) {
-        examCandidateName.textContent = candidateName;
-    }
-
-    if (examNameValue) {
-        examNameValue.textContent = examTitle;
-    }
-
-    if (examSubjectValue) {
-        examSubjectValue.textContent = subjectName;
-    }
-
-    if (examTotalQuestionsValue) {
-        examTotalQuestionsValue.textContent = String(totalQuestions);
-    }
-
-    if (engineSectionName) {
-        engineSectionName.textContent = subjectName;
-    }
+    if (examCandidateName) examCandidateName.textContent = candidateName;
+    if (examNameValue) examNameValue.textContent = examTitle;
+    if (examSubjectValue) examSubjectValue.textContent = subjectName;
+    if (examTotalQuestionsValue) examTotalQuestionsValue.textContent = String(totalQuestions);
+    if (engineSectionName) engineSectionName.textContent = subjectName;
 
     if (engineQuestionProgressChip) {
         engineQuestionProgressChip.textContent = `Question ${currentQuestionIndex} of ${totalQuestions}`;
     }
 
-    if (sidebarCandidateName) {
-        sidebarCandidateName.textContent = candidateName;
-    }
-
-    if (sidebarCandidateSubject) {
-        sidebarCandidateSubject.textContent = subjectName;
-    }
-
-    if (sidebarExamName) {
-        sidebarExamName.textContent = examTitle;
-    }
-
-    if (sidebarCurrentQuestion) {
-        sidebarCurrentQuestion.textContent = `Q${currentQuestionIndex}`;
-    }
+    if (sidebarCandidateName) sidebarCandidateName.textContent = candidateName;
+    if (sidebarCandidateSubject) sidebarCandidateSubject.textContent = subjectName;
+    if (sidebarExamName) sidebarExamName.textContent = examTitle;
+    if (sidebarCurrentQuestion) sidebarCurrentQuestion.textContent = `Q${currentQuestionIndex}`;
 
     if (currentQuestion) {
-        if (engineQuestionTypeTop) {
-            engineQuestionTypeTop.textContent = currentQuestion.questionType || "MCQ";
-        }
-
-        if (engineCurrentQuestionTop) {
-            engineCurrentQuestionTop.textContent = `Q${currentQuestionIndex}`;
-        }
+        if (engineQuestionTypeTop) engineQuestionTypeTop.textContent = currentQuestion.questionType || "MCQ";
+        if (engineCurrentQuestionTop) engineCurrentQuestionTop.textContent = `Q${currentQuestionIndex}`;
     }
 }
 
@@ -416,19 +563,11 @@ function renderQuestionMeta() {
     }
 
     if (currentQuestion.focusTopic && currentQuestion.focusTopic.trim()) {
-        if (engineFocusTopic) {
-            engineFocusTopic.textContent = currentQuestion.focusTopic;
-        }
-        if (engineFocusTopicWrap) {
-            engineFocusTopicWrap.classList.remove("hidden");
-        }
+        if (engineFocusTopic) engineFocusTopic.textContent = currentQuestion.focusTopic;
+        if (engineFocusTopicWrap) engineFocusTopicWrap.classList.remove("hidden");
     } else {
-        if (engineFocusTopic) {
-            engineFocusTopic.textContent = "";
-        }
-        if (engineFocusTopicWrap) {
-            engineFocusTopicWrap.classList.add("hidden");
-        }
+        if (engineFocusTopic) engineFocusTopic.textContent = "";
+        if (engineFocusTopicWrap) engineFocusTopicWrap.classList.add("hidden");
     }
 }
 
@@ -439,33 +578,34 @@ function renderQuestionInputArea() {
     const savedAnswer = getSavedAnswer(currentQuestion.id);
 
     if (currentQuestion.questionType === "THEORY") {
-        if (engineOptionsList) {
-            engineOptionsList.innerHTML = "";
-        }
-        if (engineTheoryWrap) {
-            engineTheoryWrap.classList.remove("hidden");
-        }
-        if (engineTheoryAnswer) {
-            engineTheoryAnswer.value = savedAnswer || "";
-        }
+        if (engineOptionsList) engineOptionsList.innerHTML = "";
+        if (engineTheoryWrap) engineTheoryWrap.classList.remove("hidden");
+        if (engineTheoryAnswer) engineTheoryAnswer.value = savedAnswer || "";
         return;
     }
 
-    if (engineTheoryWrap) {
-        engineTheoryWrap.classList.add("hidden");
-    }
-    if (engineTheoryAnswer) {
-        engineTheoryAnswer.value = "";
-    }
+    if (engineTheoryWrap) engineTheoryWrap.classList.add("hidden");
+    if (engineTheoryAnswer) engineTheoryAnswer.value = "";
 
     if (engineOptionsList) {
-        engineOptionsList.innerHTML = currentQuestion.options.map((option) => {
+        const options = Array.isArray(currentQuestion.options) ? currentQuestion.options : [];
+
+        if (!options.length) {
+            engineOptionsList.innerHTML = `
+                <div class="engine-empty-options">
+                    No options found for this MCQ question.
+                </div>
+            `;
+            return;
+        }
+
+        engineOptionsList.innerHTML = options.map((option) => {
             const selected = savedAnswer === option.optionLabel ? "selected" : "";
             return `
-                <div class="engine-option-item ${selected}" data-option-label="${option.optionLabel}">
+                <div class="engine-option-item ${selected}" data-option-label="${escapeHtml(option.optionLabel)}">
                     <div class="engine-option-radio"></div>
                     <div class="engine-option-content">
-                        <span class="engine-option-label">${option.optionLabel}</span>
+                        <span class="engine-option-label">${escapeHtml(option.optionLabel)}</span>
                         <span class="engine-option-text">${escapeHtml(option.optionText || "")}</span>
                     </div>
                 </div>
@@ -477,13 +617,8 @@ function renderQuestionInputArea() {
 function updateNavButtons() {
     if (!examSession) return;
 
-    if (enginePrevBtn) {
-        enginePrevBtn.disabled = examSession.currentIndex === 0;
-    }
-
-    if (engineNextBtn) {
-        engineNextBtn.disabled = examSession.currentIndex === examSession.questions.length - 1;
-    }
+    if (enginePrevBtn) enginePrevBtn.disabled = examSession.currentIndex === 0;
+    if (engineNextBtn) engineNextBtn.disabled = examSession.currentIndex === examSession.questions.length - 1;
 }
 
 function computeStatusSummary() {
@@ -516,21 +651,11 @@ function computeStatusSummary() {
 function renderLegendCounts() {
     const summary = computeStatusSummary();
 
-    if (legendNotVisitedCount) {
-        legendNotVisitedCount.textContent = String(summary.notVisited);
-    }
-    if (legendNotAnsweredCount) {
-        legendNotAnsweredCount.textContent = String(summary.notAnswered);
-    }
-    if (legendAnsweredCount) {
-        legendAnsweredCount.textContent = String(summary.answered);
-    }
-    if (legendMarkedCount) {
-        legendMarkedCount.textContent = String(summary.marked);
-    }
-    if (legendAnsweredMarkedCount) {
-        legendAnsweredMarkedCount.textContent = String(summary.answeredMarked);
-    }
+    if (legendNotVisitedCount) legendNotVisitedCount.textContent = String(summary.notVisited);
+    if (legendNotAnsweredCount) legendNotAnsweredCount.textContent = String(summary.notAnswered);
+    if (legendAnsweredCount) legendAnsweredCount.textContent = String(summary.answered);
+    if (legendMarkedCount) legendMarkedCount.textContent = String(summary.marked);
+    if (legendAnsweredMarkedCount) legendAnsweredMarkedCount.textContent = String(summary.answeredMarked);
 }
 
 function renderPalette() {
@@ -672,8 +797,6 @@ function getAnsweredCount() {
         .length;
 }
 
-/* Submit summary modal */
-
 function isSummaryModalOpen() {
     return submitSummaryOverlay && !submitSummaryOverlay.classList.contains("hidden");
 }
@@ -683,41 +806,15 @@ function openSubmitSummaryModal() {
 
     const summary = computeStatusSummary();
 
-    if (summaryExamName) {
-        summaryExamName.textContent = examSession.title || "Test";
-    }
-
-    if (summarySubjectName) {
-        summarySubjectName.textContent = examSession.subject || "-";
-    }
-
-    if (summaryRemainingTime) {
-        summaryRemainingTime.textContent = examRemainingTime ? examRemainingTime.textContent : "00:00:00";
-    }
-
-    if (summaryTotalQuestions) {
-        summaryTotalQuestions.textContent = String(summary.total);
-    }
-
-    if (summaryAnswered) {
-        summaryAnswered.textContent = String(summary.answered);
-    }
-
-    if (summaryNotAnswered) {
-        summaryNotAnswered.textContent = String(summary.notAnswered);
-    }
-
-    if (summaryMarked) {
-        summaryMarked.textContent = String(summary.marked);
-    }
-
-    if (summaryAnsweredMarked) {
-        summaryAnsweredMarked.textContent = String(summary.answeredMarked);
-    }
-
-    if (summaryNotVisited) {
-        summaryNotVisited.textContent = String(summary.notVisited);
-    }
+    if (summaryExamName) summaryExamName.textContent = examSession.title || "Test";
+    if (summarySubjectName) summarySubjectName.textContent = examSession.subject || "-";
+    if (summaryRemainingTime) summaryRemainingTime.textContent = examRemainingTime ? examRemainingTime.textContent : "00:00:00";
+    if (summaryTotalQuestions) summaryTotalQuestions.textContent = String(summary.total);
+    if (summaryAnswered) summaryAnswered.textContent = String(summary.answered);
+    if (summaryNotAnswered) summaryNotAnswered.textContent = String(summary.notAnswered);
+    if (summaryMarked) summaryMarked.textContent = String(summary.marked);
+    if (summaryAnsweredMarked) summaryAnsweredMarked.textContent = String(summary.answeredMarked);
+    if (summaryNotVisited) summaryNotVisited.textContent = String(summary.notVisited);
 
     submitSummaryOverlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -773,19 +870,30 @@ async function submitExam(forceSubmit = false) {
             body: JSON.stringify(buildSubmitPayload())
         });
 
-        const scoreText =
-            result && result.totalMarks != null
-                ? `${result.score ?? 0}/${result.totalMarks}`
-                : `${result?.score ?? 0}`;
+        if (!result || !result.attemptId) {
+            throw new Error("Invalid submit response received from backend.");
+        }
 
-        sessionStorage.setItem("edumind_latest_attempt_id", String(examSession.attemptId));
+        sessionStorage.setItem("edumind_latest_attempt_id", String(result.attemptId));
+        showEngineToast("Test submitted successfully.", "success");
 
         closeSubmitSummaryModal();
-        window.location.href = `test-result.html?attemptId=${encodeURIComponent(examSession.attemptId)}`;
+
+        setTimeout(() => {
+            window.location.href = `test-result.html?attemptId=${encodeURIComponent(result.attemptId)}`;
+        }, 650);
 
     } catch (error) {
         console.error("Exam submit failed:", error);
-        alert(`Test submit nahi hua: ${error.message}`);
+
+        if (String(error.message || "").toLowerCase().includes("unauthorized")) {
+            redirectToLoginSoon("Session expired. Please login again.");
+            return;
+        }
+
+        showEngineToast(`Test submit failed: ${error.message}`, "error");
+        startExamTimerFromExistingEndTime();
+
     } finally {
         submitInProgress = false;
 
@@ -800,8 +908,6 @@ async function submitExam(forceSubmit = false) {
         }
     }
 }
-
-/* Timer */
 
 function parseDurationToSeconds(durationValue) {
     if (durationValue == null) return 0;
@@ -885,35 +991,23 @@ function stopExamTimer(resetUi = false) {
         timerInterval = null;
     }
 
-    timerEndAt = null;
-
     if (resetUi) {
+        timerEndAt = null;
+
         if (examRemainingTime) {
             examRemainingTime.textContent = "00:00:00";
         }
+
         if (engineHeaderTimer) {
             engineHeaderTimer.classList.remove("warning", "danger");
         }
     }
 }
 
-function startExamTimer(durationValue) {
+function startExamTimerFromExistingEndTime() {
+    if (!timerEndAt || submitInProgress) return;
+
     stopExamTimer(false);
-
-    const totalSeconds = parseDurationToSeconds(durationValue);
-
-    if (totalSeconds <= 0) {
-        if (examRemainingTime) {
-            examRemainingTime.textContent = "No Limit";
-        }
-        if (engineHeaderTimer) {
-            engineHeaderTimer.classList.remove("warning", "danger");
-        }
-        return;
-    }
-
-    timerEndAt = Date.now() + totalSeconds * 1000;
-    updateTimerUi(totalSeconds);
 
     timerInterval = setInterval(async () => {
         const remaining = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
@@ -924,14 +1018,34 @@ function startExamTimer(durationValue) {
 
             if (!submitInProgress) {
                 closeSubmitSummaryModal();
-                alert("Time is up. Your test will be submitted automatically.");
+                showEngineToast("Time is up. Your test will be submitted automatically.", "info");
                 await submitExam(true);
             }
         }
     }, 1000);
 }
 
-/* Start exam */
+function startExamTimer(durationValue) {
+    stopExamTimer(true);
+
+    const totalSeconds = parseDurationToSeconds(durationValue);
+
+    if (totalSeconds <= 0) {
+        if (examRemainingTime) {
+            examRemainingTime.textContent = "No Limit";
+        }
+
+        if (engineHeaderTimer) {
+            engineHeaderTimer.classList.remove("warning", "danger");
+        }
+
+        return;
+    }
+
+    timerEndAt = Date.now() + totalSeconds * 1000;
+    updateTimerUi(totalSeconds);
+    startExamTimerFromExistingEndTime();
+}
 
 async function startExamSession(testId) {
     const response = await fetchJson(buildStartTestApiUrl(testId), {
@@ -939,6 +1053,7 @@ async function startExamSession(testId) {
     });
 
     const questions = normalizeQuestions(response?.questions || []);
+
     if (!questions.length) {
         throw new Error("No questions found for this test.");
     }
@@ -960,6 +1075,7 @@ async function startExamSession(testId) {
     setCandidateImage();
     visitQuestion(0);
     startExamTimer(examSession.duration);
+    showEngineToast("Test loaded successfully.", "success");
 }
 
 function bindOptionSelection() {
@@ -1013,18 +1129,21 @@ function bindActionButtons() {
     engineSaveMarkReviewBtn?.addEventListener("click", handleSaveAndMarkReview);
     engineMarkReviewNextBtn?.addEventListener("click", handleMarkReviewAndNext);
     enginePrevBtn?.addEventListener("click", goToPreviousQuestion);
+
     engineNextBtn?.addEventListener("click", () => {
         saveCurrentAnswerFromUi();
         goToNextQuestion();
     });
+
     engineSubmitBtn?.addEventListener("click", handleOpenSubmitSummary);
 }
 
 function bindLanguageSelector() {
     examLanguageSelect?.addEventListener("change", () => {
         const selected = examLanguageSelect.value;
+
         if (selected === "Hindi") {
-            alert("Hindi language UI ready hai, but translated question content backend se aana chahiye.");
+            showEngineToast("Hindi UI is ready, but translated question content must come from backend.", "info");
         }
     });
 }
@@ -1032,9 +1151,11 @@ function bindLanguageSelector() {
 function bindPaletteCollapse() {
     enginePaletteCollapseBtn?.addEventListener("click", () => {
         paletteCollapsed = !paletteCollapsed;
+
         if (engineQuestionPalette) {
             engineQuestionPalette.classList.toggle("hidden", paletteCollapsed);
         }
+
         enginePaletteCollapseBtn.innerHTML = paletteCollapsed
             ? `<i class="fa-solid fa-chevron-left"></i>`
             : `<i class="fa-solid fa-chevron-right"></i>`;
@@ -1071,6 +1192,9 @@ function bindKeyboardShortcuts() {
 
 async function initializeTestEngine() {
     try {
+        requireAuthToken();
+        getCurrentUserId();
+
         bindOptionSelection();
         bindTheoryInput();
         bindPaletteNavigation();
@@ -1083,17 +1207,38 @@ async function initializeTestEngine() {
         setCandidateImage();
 
         const testId = getQueryParam("testId");
+
         if (!testId) {
-            alert("Test id not found.");
-            window.location.href = "tests.html";
+            showEngineToast("Test id not found.", "error");
+
+            setTimeout(() => {
+                window.location.href = "tests.html";
+            }, 1000);
+
             return;
         }
 
         await startExamSession(testId);
+
     } catch (error) {
         console.error("Test engine init failed:", error);
-        alert(`Test engine load nahi hua: ${error.message}`);
-        window.location.href = "tests.html";
+
+        const message = String(error.message || "");
+
+        if (
+            message.toLowerCase().includes("token") ||
+            message.toLowerCase().includes("unauthorized") ||
+            message.toLowerCase().includes("user id")
+        ) {
+            redirectToLoginSoon(message);
+            return;
+        }
+
+        showEngineToast(`Test engine load failed: ${message}`, "error");
+
+        setTimeout(() => {
+            window.location.href = "tests.html";
+        }, 1500);
     }
 }
 

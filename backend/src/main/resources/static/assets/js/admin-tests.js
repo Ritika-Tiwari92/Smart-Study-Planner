@@ -227,7 +227,7 @@ function clearAdminSessionAndRedirect() {
     });
 
     setTimeout(function () {
-        window.location.href = "/pages/admin/admin-login.html";
+        window.location.href = "/pages/login.html";
     }, 900);
 }
 

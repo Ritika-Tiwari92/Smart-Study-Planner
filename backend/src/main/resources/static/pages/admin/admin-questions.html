@@ -553,7 +553,7 @@
                localStorage.removeItem("edumind_is_logged_in");
                localStorage.removeItem("edumind_logged_in_user");
 
-               window.location.href = "/pages/admin/admin-login.html";
+               window.location.href = "/pages/login.html";
           }
 
           function hidePageLoader() {
@@ -581,7 +581,7 @@
                const hasLegacySession = token && isLoggedIn;
 
                if (!hasNewAdminSession && !hasLegacySession) {
-                    window.location.href = "/pages/admin/admin-login.html";
+                    window.location.href = "/pages/login.html";
                     return;
                }
 

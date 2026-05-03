@@ -25,12 +25,28 @@ const errorBackToTestsBtn = document.getElementById("errorBackToTestsBtn");
 const reviewAnswersBtn = document.getElementById("reviewAnswersBtn");
 const resultAnswersSection = document.getElementById("resultAnswersSection");
 
-const API_BASE_URL = window.location.origin;
+const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
 const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
+
+let loadedResultDetails = null;
 
 function parseStoredJson(value) {
     try {
         return JSON.parse(value);
+    } catch (error) {
+        return null;
+    }
+}
+
+function decodeJwtPayload(token) {
+    try {
+        if (!token || !token.includes(".")) return null;
+
+        const payload = token.split(".")[1];
+        const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+        const decoded = atob(normalizedPayload);
+
+        return JSON.parse(decoded);
     } catch (error) {
         return null;
     }
@@ -48,10 +64,14 @@ function getStoredUserObject() {
     ];
 
     for (const key of possibleKeys) {
-        const rawValue = localStorage.getItem(key);
+        const rawValue =
+            localStorage.getItem(key) ||
+            sessionStorage.getItem(key);
+
         if (!rawValue) continue;
 
         const parsed = parseStoredJson(rawValue);
+
         if (parsed && typeof parsed === "object") {
             return parsed;
         }
@@ -65,6 +85,7 @@ function extractUserIdFromObject(obj) {
 
     if (obj.id != null && obj.id !== "") return Number(obj.id);
     if (obj.userId != null && obj.userId !== "") return Number(obj.userId);
+    if (obj.studentId != null && obj.studentId !== "") return Number(obj.studentId);
 
     if (obj.user && obj.user.id != null && obj.user.id !== "") {
         return Number(obj.user.id);
@@ -77,6 +98,28 @@ function extractUserIdFromObject(obj) {
     return null;
 }
 
+function getStoredToken() {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("jwtToken") ||
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("jwtToken") ||
+        sessionStorage.getItem("accessToken") ||
+        ""
+    ).trim();
+}
+
+function requireAuthToken() {
+    const token = getStoredToken();
+
+    if (!token) {
+        throw new Error("Missing login token. Please login again.");
+    }
+
+    return token;
+}
+
 function getCurrentUserId() {
     const storedUser = getStoredUserObject();
     const extractedUserId = extractUserIdFromObject(storedUser);
@@ -85,23 +128,41 @@ function getCurrentUserId() {
         return Number(extractedUserId);
     }
 
-    const localUserId = localStorage.getItem("userId");
+    const localUserId =
+        localStorage.getItem("userId") ||
+        localStorage.getItem("studentId") ||
+        sessionStorage.getItem("userId") ||
+        sessionStorage.getItem("studentId");
+
     if (localUserId != null && localUserId !== "" && !Number.isNaN(Number(localUserId))) {
         return Number(localUserId);
     }
 
-    throw new Error("Logged-in user id not found in localStorage.");
-}
+    const payload = decodeJwtPayload(getStoredToken());
 
-function getStoredToken() {
-    return (localStorage.getItem("token") || "").trim();
+    const jwtUserId =
+        payload?.userId ||
+        payload?.id ||
+        payload?.studentId ||
+        payload?.uid;
+
+    if (jwtUserId != null && jwtUserId !== "" && !Number.isNaN(Number(jwtUserId))) {
+        return Number(jwtUserId);
+    }
+
+    if (payload?.sub != null && !Number.isNaN(Number(payload.sub))) {
+        return Number(payload.sub);
+    }
+
+    throw new Error("Logged-in user id not found. Please login again.");
 }
 
 function getAuthHeaders(extraHeaders = {}) {
-    const token = getStoredToken();
+    const token = requireAuthToken();
 
     return {
-        "Authorization": `Bearer ${token}`,
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
         ...extraHeaders
     };
 }
@@ -112,6 +173,7 @@ function getQueryParam(name) {
 
 function buildAttemptDetailsApiUrl(attemptId) {
     const userId = getCurrentUserId();
+
     return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}?userId=${encodeURIComponent(userId)}`;
 }
 
@@ -122,8 +184,9 @@ function extractApiErrorMessage(responseText, responseStatus) {
 
     try {
         const parsed = JSON.parse(responseText);
+
         if (parsed && typeof parsed === "object") {
-            return parsed.message || parsed.error || `HTTP ${responseStatus}`;
+            return parsed.message || parsed.error || parsed.field || `HTTP ${responseStatus}`;
         }
     } catch (error) {
         // raw text fallback
@@ -133,19 +196,25 @@ function extractApiErrorMessage(responseText, responseStatus) {
 }
 
 async function fetchJson(url, options = {}) {
-    const response = await fetch(url, {
+    const finalOptions = {
+        ...options,
         headers: {
-            Accept: "application/json",
             ...getAuthHeaders(options.headers || {})
-        },
-        ...options
-    });
+        }
+    };
+
+    const response = await fetch(url, finalOptions);
 
     let responseText = "";
+
     try {
         responseText = await response.text();
     } catch (error) {
         responseText = "";
+    }
+
+    if (response.status === 401 || response.status === 403) {
+        throw new Error("Unauthorized. Your session may have expired. Please login again.");
     }
 
     if (!response.ok) {
@@ -163,8 +232,97 @@ async function fetchJson(url, options = {}) {
     }
 }
 
+function showResultToast(message, type = "info") {
+    const oldToast = document.querySelector(".result-toast");
+    if (oldToast) oldToast.remove();
+
+    const toast = document.createElement("div");
+    toast.className = `result-toast ${type}`;
+
+    const iconClass =
+        type === "success"
+            ? "fa-circle-check"
+            : type === "error"
+                ? "fa-triangle-exclamation"
+                : "fa-circle-info";
+
+    toast.innerHTML = `
+        <i class="fa-solid ${iconClass}"></i>
+        <span>${escapeHtml(message)}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    if (!document.getElementById("resultToastStyle")) {
+        const style = document.createElement("style");
+        style.id = "resultToastStyle";
+        style.textContent = `
+            .result-toast {
+                position: fixed;
+                top: 22px;
+                right: 22px;
+                z-index: 999999;
+                min-width: 280px;
+                max-width: 430px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 16px;
+                border-radius: 14px;
+                font-family: "Poppins", sans-serif;
+                font-size: 13px;
+                font-weight: 700;
+                line-height: 1.5;
+                color: #ffffff;
+                box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+                animation: resultToastIn 0.25s ease;
+            }
+
+            .result-toast.info {
+                background: #164e63;
+                border: 1px solid rgba(103,232,249,0.35);
+            }
+
+            .result-toast.success {
+                background: #065f46;
+                border: 1px solid rgba(110,231,183,0.35);
+            }
+
+            .result-toast.error {
+                background: #7f1d1d;
+                border: 1px solid rgba(252,165,165,0.35);
+            }
+
+            @keyframes resultToastIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}
+
+function redirectToLoginSoon(message) {
+    showResultToast(message || "Please login again.", "error");
+
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 1200);
+}
+
 function escapeHtml(value) {
-    return String(value || "")
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -180,6 +338,7 @@ function parseDateValue(dateValue) {
     }
 
     const parsed = new Date(dateValue);
+
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
@@ -198,7 +357,14 @@ function formatDateTime(dateValue) {
 
 function normalizeText(value, fallback = "") {
     const text = String(value ?? "").trim();
+
     return text || fallback;
+}
+
+function normalizeNumber(value, fallback = 0) {
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : fallback;
 }
 
 function getStatusClass(answer) {
@@ -215,6 +381,186 @@ function getStatusLabel(answer) {
     if (!submitted) return "Not Answered";
     if (answer?.isCorrect === true) return "Correct";
     return "Incorrect";
+}
+
+function getPerformanceLevel(percentage) {
+    const safePercentage = normalizeNumber(percentage);
+
+    if (safePercentage >= 85) {
+        return {
+            label: "Excellent",
+            message: "Excellent performance. Keep revising consistently and maintain this momentum.",
+            className: "excellent"
+        };
+    }
+
+    if (safePercentage >= 70) {
+        return {
+            label: "Very Good",
+            message: "Strong performance. Review minor mistakes and practice mixed questions.",
+            className: "good"
+        };
+    }
+
+    if (safePercentage >= 50) {
+        return {
+            label: "Good Attempt",
+            message: "Good attempt. Focus on weak areas and reattempt after revision.",
+            className: "average"
+        };
+    }
+
+    return {
+        label: "Needs Improvement",
+        message: "Revise core concepts first, then solve short practice sets before reattempting.",
+        className: "weak"
+    };
+}
+
+function ensurePerformanceSummaryCard() {
+    let card = document.getElementById("resultPerformanceSummaryCard");
+
+    if (card) return card;
+
+    const heroCard = document.querySelector(".result-hero-card");
+
+    if (!heroCard) return null;
+
+    card = document.createElement("section");
+    card.id = "resultPerformanceSummaryCard";
+    card.className = "result-performance-summary-card";
+
+    heroCard.insertAdjacentElement("afterend", card);
+
+    if (!document.getElementById("resultPerformanceStyle")) {
+        const style = document.createElement("style");
+        style.id = "resultPerformanceStyle";
+        style.textContent = `
+            .result-performance-summary-card {
+                background: var(--result-surface);
+                border: 1px solid var(--result-border);
+                border-radius: 16px;
+                padding: 18px;
+                display: grid;
+                grid-template-columns: 220px minmax(0, 1fr);
+                gap: 18px;
+                box-shadow: var(--result-shadow);
+            }
+
+            .result-performance-grade {
+                border-radius: 16px;
+                padding: 18px;
+                color: #ffffff;
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 6px;
+                background: linear-gradient(135deg, #0b63b6, #0ea5e9);
+            }
+
+            .result-performance-grade.excellent {
+                background: linear-gradient(135deg, #15803d, #16a34a);
+            }
+
+            .result-performance-grade.good {
+                background: linear-gradient(135deg, #0369a1, #0ea5e9);
+            }
+
+            .result-performance-grade.average {
+                background: linear-gradient(135deg, #c2410c, #f97316);
+            }
+
+            .result-performance-grade.weak {
+                background: linear-gradient(135deg, #b91c1c, #ef4444);
+            }
+
+            .result-performance-grade span {
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                opacity: 0.9;
+            }
+
+            .result-performance-grade strong {
+                font-size: 26px;
+                line-height: 1.2;
+            }
+
+            .result-performance-details {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                justify-content: center;
+            }
+
+            .result-performance-details h3 {
+                margin: 0;
+                font-size: 18px;
+                color: var(--result-text);
+            }
+
+            .result-performance-details p {
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.8;
+                color: var(--result-text-soft);
+            }
+
+            .result-progress-wrap {
+                width: 100%;
+                height: 10px;
+                border-radius: 999px;
+                background: rgba(148, 163, 184, 0.22);
+                overflow: hidden;
+            }
+
+            .result-progress-fill {
+                height: 100%;
+                border-radius: inherit;
+                background: linear-gradient(90deg, #0b63b6, #16a34a);
+                width: 0%;
+                transition: width 0.5s ease;
+            }
+
+            @media (max-width: 780px) {
+                .result-performance-summary-card {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    return card;
+}
+
+function renderPerformanceSummary(details) {
+    const card = ensurePerformanceSummaryCard();
+
+    if (!card) return;
+
+    const percentage = Math.round(normalizeNumber(details?.percentage));
+    const performance = getPerformanceLevel(percentage);
+
+    card.innerHTML = `
+        <div class="result-performance-grade ${performance.className}">
+            <span>Performance Level</span>
+            <strong>${escapeHtml(performance.label)}</strong>
+            <small>${percentage}% Score</small>
+        </div>
+
+        <div class="result-performance-details">
+            <h3>Personalized Result Insight</h3>
+            <p>${escapeHtml(performance.message)}</p>
+
+            <div class="result-progress-wrap">
+                <div class="result-progress-fill" style="width: ${Math.max(0, Math.min(100, percentage))}%;"></div>
+            </div>
+        </div>
+    `;
 }
 
 function showLoading() {
@@ -246,7 +592,7 @@ function renderAnswers(answers) {
         resultAnswersList.innerHTML = `
             <div class="result-answer-empty">
                 <i class="fa-regular fa-file-lines"></i>
-                <p>Question review will appear here.</p>
+                <p>No question review is available for this attempt.</p>
             </div>
         `;
         return;
@@ -260,14 +606,15 @@ function renderAnswers(answers) {
         const questionText = normalizeText(answer.questionText, "Question text not available.");
         const submittedAnswer = normalizeText(answer.submittedAnswer, "Not Answered");
         const correctAnswer = normalizeText(answer.correctAnswer, "Not available");
-        const awardedMarks = Number(answer.marksAwarded ?? 0);
-        const totalMarks = Number(answer.totalMarks ?? 0);
+        const awardedMarks = normalizeNumber(answer.marksAwarded);
+        const totalMarks = normalizeNumber(answer.totalMarks);
+        const questionOrder = normalizeNumber(answer.questionOrder, index + 1);
 
         return `
-            <div class="result-answer-card">
+            <div class="result-answer-card ${statusClass}">
                 <div class="result-answer-top">
                     <div class="result-answer-top-left">
-                        <span class="result-question-index">Question ${index + 1}</span>
+                        <span class="result-question-index">Question ${questionOrder}</span>
 
                         <div class="result-question-meta">
                             <span class="result-meta-chip">${escapeHtml(questionType)}</span>
@@ -281,18 +628,18 @@ function renderAnswers(answers) {
                 <h4 class="result-answer-question">${escapeHtml(questionText)}</h4>
 
                 <div class="result-answer-grid">
-                    <div class="result-answer-block">
+                    <div class="result-answer-block ${statusClass}">
                         <span>Your Answer</span>
                         <p>${escapeHtml(submittedAnswer)}</p>
                     </div>
 
-                    <div class="result-answer-block">
+                    <div class="result-answer-block correct-answer">
                         <span>Correct Answer</span>
                         <p>${escapeHtml(correctAnswer)}</p>
                     </div>
 
-                    <div class="result-answer-block">
-                        <span>Marks</span>
+                    <div class="result-answer-block marks-box">
+                        <span>Marks Awarded</span>
                         <p>${escapeHtml(`${awardedMarks}/${totalMarks}`)}</p>
                     </div>
                 </div>
@@ -302,11 +649,14 @@ function renderAnswers(answers) {
 }
 
 function renderResultPage(details) {
+    loadedResultDetails = details || {};
+
     const answers = Array.isArray(details?.answers) ? details.answers : [];
-    const totalMarks = answers.reduce((sum, item) => sum + Number(item?.totalMarks || 0), 0);
-    const totalQuestions = Number(details?.totalQuestions || 0);
-    const answeredQuestions = Number(details?.answeredQuestions || 0);
-    const correctAnswers = Number(details?.correctAnswers || 0);
+    const calculatedTotalMarks = answers.reduce((sum, item) => sum + normalizeNumber(item?.totalMarks), 0);
+    const totalMarks = calculatedTotalMarks > 0 ? calculatedTotalMarks : normalizeNumber(details?.totalMarks);
+    const totalQuestions = normalizeNumber(details?.totalQuestions);
+    const answeredQuestions = normalizeNumber(details?.answeredQuestions);
+    const correctAnswers = normalizeNumber(details?.correctAnswers);
     const incorrectAnswers = Math.max(0, answeredQuestions - correctAnswers);
     const accuracy = answeredQuestions > 0
         ? Math.round((correctAnswers / answeredQuestions) * 100)
@@ -332,12 +682,12 @@ function renderResultPage(details) {
 
     if (resultScoreMain) {
         resultScoreMain.textContent = totalMarks > 0
-            ? `${Number(details?.score ?? 0)}/${totalMarks}`
-            : `${Number(details?.score ?? 0)}`;
+            ? `${normalizeNumber(details?.score)}/${totalMarks}`
+            : `${normalizeNumber(details?.score)}`;
     }
 
     if (resultPercentageMain) {
-        resultPercentageMain.textContent = `${Math.round(Number(details?.percentage ?? 0))}%`;
+        resultPercentageMain.textContent = `${Math.round(normalizeNumber(details?.percentage))}%`;
     }
 
     if (resultTotalQuestions) {
@@ -368,6 +718,7 @@ function renderResultPage(details) {
         resultTestTip.textContent = normalizeText(details?.testTip, "No test tip available.");
     }
 
+    renderPerformanceSummary(details);
     renderAnswers(answers);
     showContent();
 }
@@ -375,6 +726,9 @@ function renderResultPage(details) {
 async function loadResultPage() {
     try {
         showLoading();
+
+        requireAuthToken();
+        getCurrentUserId();
 
         const attemptId =
             getQueryParam("attemptId") ||
@@ -389,9 +743,24 @@ async function loadResultPage() {
         });
 
         renderResultPage(details || {});
+        showResultToast("Result loaded successfully.", "success");
+
     } catch (error) {
         console.error("Result page load failed:", error);
-        showError(error.message || "We could not load this result.");
+
+        const message = String(error.message || "");
+
+        if (
+            message.toLowerCase().includes("token") ||
+            message.toLowerCase().includes("unauthorized") ||
+            message.toLowerCase().includes("user id")
+        ) {
+            showError("Your session has expired. Redirecting to login...");
+            redirectToLoginSoon(message);
+            return;
+        }
+
+        showError(message || "We could not load this result.");
     }
 }
 

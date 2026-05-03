@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Reports | EduMind AI Admin</title>
+     <link rel="icon" href="data:," />
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+     <style>
+          :root {
+               --bg: #080d1a;
+               --bg2: #0c1220;
+               --bg3: #101828;
+               --card: #111827;
+               --card2: #162032;
+               --border: rgba(20, 184, 166, 0.14);
+               --border2: rgba(255, 255, 255, 0.08);
+               --teal: #14b8a6;
+               --cyan: #06b6d4;
+               --purple: #8b5cf6;
+               --blue: #3b82f6;
+               --amber: #f59e0b;
+               --rose: #f43f5e;
+               --green: #10b981;
+               --text: #f8fafc;
+               --text2: #a8b3c7;
+               --text3: #64748b;
+               --sidebar-w: 260px;
+               --sidebar-collapsed: 72px;
+               --header-h: 68px;
+               --tr: 0.25s ease;
+          }
+
+          html[data-theme="light"],
+          body[data-theme="light"] {
+               --bg: #f0f4f8;
+               --bg2: #ffffff;
+               --bg3: #eef3f9;
+               --card: #ffffff;
+               --card2: #f8fafc;
+               --border: rgba(20, 184, 166, 0.18);
+               --border2: rgba(15, 23, 42, 0.08);
+               --text: #0f172a;
+               --text2: #475569;
+               --text3: #94a3b8;
+          }
+
+          * {
+               margin: 0;
+               padding: 0;
+               box-sizing: border-box;
+          }
+
+          body {
+               min-height: 100vh;
+               font-family: "Poppins", sans-serif;
+               background:
+                    radial-gradient(circle at 15% 15%, rgba(20, 184, 166, .09), transparent 28%),
+                    radial-gradient(circle at 85% 10%, rgba(59, 130, 246, .10), transparent 32%),
+                    var(--bg);
+               color: var(--text);
+               display: flex;
+               overflow-x: hidden;
+          }
+
+          button,
+          input,
+          select {
+               font-family: inherit;
+          }
+
+          button {
+               cursor: pointer;
+          }
+
+          a {
+               color: inherit;
+          }
+
+          .hidden {
+               display: none !important;
+          }
+
+          .spin-now {
+               animation: spin .75s linear infinite;
+          }
+
+          @keyframes spin {
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          #pageLoader {
+               position: fixed;
+               inset: 0;
+               z-index: 99999;
+               background: var(--bg);
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               justify-content: center;
+               gap: 20px;
+               transition: opacity .35s, visibility .35s;
+          }
+
+          #pageLoader.hidden {
+               opacity: 0;
+               visibility: hidden;
+          }
+
+          .loader-logo {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+          }
+
+          .loader-logo-wrap {
+               width: 46px;
+               height: 46px;
+               display: grid;
+               place-items: center;
+          }
+
+          .loader-logo-text {
+               font-size: 22px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .loader-bar {
+               width: 210px;
+               height: 6px;
+               border-radius: 999px;
+               background: rgba(255, 255, 255, .08);
+               overflow: hidden;
+          }
+
+          .loader-bar-fill {
+               height: 100%;
+               border-radius: inherit;
+               background: linear-gradient(90deg, var(--teal), var(--cyan), var(--purple));
+               animation: loaderMove 1.1s ease-in-out infinite alternate;
+          }
+
+          @keyframes loaderMove {
+               from {
+                    transform: translateX(-70%);
+               }
+
+               to {
+                    transform: translateX(130%);
+               }
+          }
+
+          .brand-logo-wrap {
+               width: 38px;
+               height: 38px;
+               flex: 0 0 38px;
+               display: grid;
+               place-items: center;
+          }
+
+          .nn-svg {
+               width: 100%;
+               height: 100%;
+               overflow: visible;
+               filter: drop-shadow(0 0 14px rgba(20, 184, 166, .45));
+          }
+
+          @keyframes hexRot {
+               from {
+                    transform: rotate(0deg);
+                    transform-origin: 22px 22px;
+               }
+
+               to {
+                    transform: rotate(360deg);
+                    transform-origin: 22px 22px;
+               }
+          }
+
+          @keyframes lineFlow {
+               from {
+                    stroke-dashoffset: 20;
+               }
+
+               to {
+                    stroke-dashoffset: 0;
+               }
+          }
+
+          .hex-outer {
+               animation: hexRot 18s linear infinite;
+          }
+
+          .conn-line {
+               stroke-dasharray: 12;
+               animation: lineFlow 3s linear infinite;
+          }
+
+          .mobile-overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(0, 0, 0, .58);
+               z-index: 900;
+          }
+
+          .mobile-overlay.show {
+               display: block;
+          }
+
+          .sidebar {
+               width: var(--sidebar-w);
+               height: 100vh;
+               position: fixed;
+               top: 0;
+               left: 0;
+               z-index: 1000;
+               background: rgba(12, 18, 32, .96);
+               backdrop-filter: blur(16px);
+               border-right: 1px solid var(--border2);
+               display: flex;
+               flex-direction: column;
+               transition: width var(--tr), transform var(--tr);
+          }
+
+          html[data-theme="light"] .sidebar {
+               background: rgba(255, 255, 255, .96);
+          }
+
+          .sidebar.collapsed {
+               width: var(--sidebar-collapsed);
+          }
+
+          .sidebar-brand {
+               height: var(--header-h);
+               padding: 14px 18px;
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               border-bottom: 1px solid var(--border2);
+          }
+
+          .brand-text {
+               white-space: nowrap;
+               overflow: hidden;
+          }
+
+          .brand-text h2 {
+               font-size: 17px;
+               font-weight: 800;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+          }
+
+          .brand-text span {
+               font-size: 10px;
+               color: var(--text3);
+               letter-spacing: .12em;
+               text-transform: uppercase;
+          }
+
+          .sidebar-toggle {
+               position: absolute;
+               top: 22px;
+               right: -14px;
+               width: 28px;
+               height: 28px;
+               border-radius: 50%;
+               border: 1px solid var(--border);
+               background: var(--card);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               z-index: 10;
+               transition: all var(--tr);
+          }
+
+          .sidebar-toggle:hover {
+               background: var(--teal);
+               color: #fff;
+          }
+
+          .sidebar-nav {
+               flex: 1;
+               padding: 12px 10px 120px;
+               overflow-y: auto;
+          }
+
+          .sidebar-nav::-webkit-scrollbar {
+               width: 5px;
+          }
+
+          .sidebar-nav::-webkit-scrollbar-thumb {
+               background: rgba(20, 184, 166, .25);
+               border-radius: 999px;
+          }
+
+          .nav-section-label {
+               padding: 10px 10px 6px;
+               font-size: 10px;
+               font-weight: 700;
+               color: var(--text3);
+               text-transform: uppercase;
+               letter-spacing: .12em;
+               white-space: nowrap;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               min-height: 42px;
+               padding: 10px 12px;
+               border-radius: 12px;
+               color: var(--text2);
+               text-decoration: none;
+               font-size: 13.5px;
+               font-weight: 500;
+               margin-bottom: 3px;
+               transition: all var(--tr);
+               white-space: nowrap;
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+               font-size: 15px;
+          }
+
+          .nav-item:hover {
+               color: var(--teal);
+               background: rgba(20, 184, 166, .08);
+          }
+
+          .nav-item.active {
+               color: var(--teal);
+               background: linear-gradient(90deg, rgba(20, 184, 166, .17), rgba(20, 184, 166, .05));
+               box-shadow: inset 2px 0 0 var(--teal);
+          }
+
+          .sidebar.collapsed .brand-text,
+          .sidebar.collapsed .nav-label,
+          .sidebar.collapsed .nav-section-label,
+          .sidebar.collapsed .admin-info,
+          .sidebar.collapsed .logout-btn span {
+               display: none;
+          }
+
+          .sidebar-bottom {
+               padding: 12px 10px;
+               border-top: 1px solid var(--border2);
+          }
+
+          .admin-profile {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: 14px;
+               background: rgba(255, 255, 255, .04);
+               margin-bottom: 8px;
+          }
+
+          html[data-theme="light"] .admin-profile {
+               background: rgba(15, 23, 42, .04);
+          }
+
+          .admin-avatar {
+               width: 36px;
+               height: 36px;
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #fff;
+               font-weight: 800;
+               font-size: 14px;
+               flex-shrink: 0;
+          }
+
+          .admin-info p {
+               font-size: 13px;
+               font-weight: 700;
+               color: var(--text);
+          }
+
+          .admin-info span {
+               font-size: 11px;
+               color: var(--teal);
+               font-weight: 500;
+          }
+
+          .logout-btn {
+               width: 100%;
+               border: none;
+               background: transparent;
+               color: var(--rose);
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 10px 12px;
+               border-radius: 12px;
+               font-size: 13px;
+               font-weight: 600;
+               transition: all var(--tr);
+          }
+
+          .logout-btn:hover {
+               background: rgba(244, 63, 94, .10);
+          }
+
+          .main {
+               flex: 1;
+               margin-left: var(--sidebar-w);
+               min-height: 100vh;
+               width: calc(100vw - var(--sidebar-w));
+               max-width: calc(100vw - var(--sidebar-w));
+               overflow-x: hidden;
+               transition: margin-left var(--tr), width var(--tr), max-width var(--tr);
+          }
+
+          .main.expanded {
+               margin-left: var(--sidebar-collapsed);
+               width: calc(100vw - var(--sidebar-collapsed));
+               max-width: calc(100vw - var(--sidebar-collapsed));
+          }
+
+          .topbar {
+               position: sticky;
+               top: 0;
+               z-index: 100;
+               min-height: var(--header-h);
+               display: flex;
+               align-items: center;
+               gap: 16px;
+               padding: 10px 28px;
+               background: rgba(12, 18, 32, .92);
+               backdrop-filter: blur(18px);
+               border-bottom: 1px solid var(--border2);
+          }
+
+          html[data-theme="light"] .topbar {
+               background: rgba(255, 255, 255, .92);
+          }
+
+          .mobile-topbar-toggle {
+               display: none;
+               border: none;
+               background: transparent;
+               color: var(--text);
+               font-size: 20px;
+          }
+
+          .topbar-left {
+               flex: 1;
+               min-width: 0;
+          }
+
+          .topbar-left h1 {
+               font-size: 20px;
+               font-weight: 800;
+          }
+
+          .topbar-left p {
+               margin-top: 2px;
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .topbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               flex-wrap: wrap;
+               justify-content: flex-end;
+               flex-shrink: 0;
+          }
+
+          .topbar-time,
+          .topbar-btn,
+          .topbar-action {
+               height: 38px;
+               border-radius: 12px;
+               border: 1px solid var(--border2);
+               background: var(--card);
+               color: var(--text2);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               font-weight: 700;
+               transition: all var(--tr);
+          }
+
+          .topbar-time {
+               padding: 0 13px;
+          }
+
+          .topbar-btn {
+               width: 38px;
+          }
+
+          .topbar-action {
+               padding: 0 14px;
+               gap: 8px;
+          }
+
+          .topbar-btn:hover,
+          .topbar-action:hover {
+               color: var(--teal);
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, .10);
+          }
+
+          .content {
+               padding: 28px;
+               padding-bottom: 90px;
+          }
+
+          .welcome-banner {
+               position: relative;
+               overflow: hidden;
+               background: linear-gradient(135deg, var(--card2), var(--card));
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               padding: 24px 28px;
+               display: flex;
+               align-items: center;
+               gap: 18px;
+               margin-bottom: 24px;
+          }
+
+          .welcome-banner::before {
+               content: "";
+               position: absolute;
+               right: -50px;
+               top: -60px;
+               width: 190px;
+               height: 190px;
+               background: radial-gradient(circle, rgba(20, 184, 166, .18), transparent 70%);
+          }
+
+          .welcome-icon {
+               width: 58px;
+               height: 58px;
+               border-radius: 18px;
+               background: rgba(20, 184, 166, .12);
+               color: var(--teal);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 26px;
+               flex-shrink: 0;
+          }
+
+          .welcome-text {
+               position: relative;
+               z-index: 1;
+          }
+
+          .welcome-text h2 {
+               font-size: 23px;
+               font-weight: 800;
+          }
+
+          .welcome-text p {
+               margin-top: 5px;
+               color: var(--text2);
+               font-size: 13px;
+               line-height: 1.6;
+          }
+
+          .welcome-text span {
+               color: var(--teal);
+               font-weight: 800;
+          }
+
+          .stats-row {
+               display: grid;
+               grid-template-columns: repeat(4, minmax(0, 1fr));
+               gap: 16px;
+               margin-bottom: 24px;
+          }
+
+          .stat-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 20px;
+               display: flex;
+               align-items: center;
+               gap: 14px;
+               min-width: 0;
+               transition: all var(--tr);
+          }
+
+          .stat-card:hover {
+               border-color: var(--border);
+               transform: translateY(-2px);
+          }
+
+          .stat-icon {
+               width: 48px;
+               height: 48px;
+               border-radius: 15px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 20px;
+               flex-shrink: 0;
+          }
+
+          .stat-info {
+               min-width: 0;
+          }
+
+          .stat-info p {
+               font-size: 12px;
+               color: var(--text2);
+               margin-bottom: 4px;
+               font-weight: 600;
+          }
+
+          .stat-info h3 {
+               font-size: 25px;
+               font-weight: 800;
+               line-height: 1.1;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .icon-teal {
+               background: rgba(20, 184, 166, .15);
+               color: var(--teal);
+          }
+
+          .icon-green {
+               background: rgba(16, 185, 129, .15);
+               color: var(--green);
+          }
+
+          .icon-purple {
+               background: rgba(139, 92, 246, .15);
+               color: var(--purple);
+          }
+
+          .icon-amber {
+               background: rgba(245, 158, 11, .15);
+               color: var(--amber);
+          }
+
+          .icon-cyan {
+               background: rgba(6, 182, 212, .15);
+               color: var(--cyan);
+          }
+
+          .icon-rose {
+               background: rgba(244, 63, 94, .15);
+               color: var(--rose);
+          }
+
+          .toolbar {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 18px;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 16px;
+               flex-wrap: wrap;
+               margin-bottom: 24px;
+          }
+
+          .toolbar-left h3 {
+               font-size: 16px;
+               font-weight: 800;
+          }
+
+          .toolbar-left p {
+               margin-top: 4px;
+               font-size: 12px;
+               color: var(--text2);
+          }
+
+          .toolbar-right {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               flex-wrap: wrap;
+          }
+
+          .filter-input,
+          .filter-select,
+          .filter-date {
+               min-height: 42px;
+               border-radius: 13px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               color: var(--text);
+               padding: 0 14px;
+               outline: none;
+               font-size: 12px;
+               font-weight: 700;
+          }
+
+          .filter-input {
+               min-width: 220px;
+          }
+
+          .filter-input:focus,
+          .filter-select:focus,
+          .filter-date:focus {
+               border-color: var(--teal);
+          }
+
+          .toolbar-btn {
+               min-height: 42px;
+               border: none;
+               border-radius: 13px;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               color: #fff;
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               gap: 8px;
+               padding: 0 16px;
+               font-size: 12px;
+               font-weight: 800;
+               box-shadow: 0 14px 30px rgba(20, 184, 166, .18);
+          }
+
+          .toolbar-btn.secondary {
+               border: 1px solid var(--border2);
+               background: var(--card);
+               color: var(--text2);
+               box-shadow: none;
+          }
+
+          .toolbar-btn.secondary:hover {
+               color: var(--teal);
+               border-color: var(--teal);
+               background: rgba(20, 184, 166, .08);
+          }
+
+          .report-grid {
+               display: grid;
+               grid-template-columns: repeat(2, minmax(0, 1fr));
+               gap: 20px;
+               margin-bottom: 24px;
+          }
+
+          .report-card {
+               background: var(--card);
+               border: 1px solid var(--border2);
+               border-radius: 18px;
+               padding: 22px;
+               min-width: 0;
+          }
+
+          .report-card.full {
+               grid-column: 1 / -1;
+          }
+
+          .card-head {
+               display: flex;
+               align-items: flex-start;
+               justify-content: space-between;
+               gap: 12px;
+               margin-bottom: 18px;
+          }
+
+          .card-title {
+               font-size: 16px;
+               font-weight: 800;
+               display: flex;
+               align-items: center;
+               gap: 9px;
+          }
+
+          .card-title i {
+               color: var(--teal);
+          }
+
+          .card-subtitle {
+               color: var(--text2);
+               font-size: 12px;
+               line-height: 1.6;
+               margin-top: 4px;
+          }
+
+          .mini-badge {
+               padding: 6px 10px;
+               border-radius: 999px;
+               border: 1px solid var(--border2);
+               background: var(--bg3);
+               color: var(--text2);
+               font-size: 11px;
+               font-weight: 800;
+               white-space: nowrap;
+          }
+
+          .progress-list {
+               display: flex;
+               flex-direction: column;
+               gap: 14px;
+          }
+
+          .progress-item {
+               padding: 14px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+               border-radius: 14px;
+          }
+
+          .progress-top {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               gap: 12px;
+               margin-bottom: 9px;
+          }
+
+          .progress-label {
+               font-size: 13px;
+               font-weight: 800;
+               display: flex;
+               align-items: center;
+               gap: 8px;
+          }
+
+          .progress-value {
+               font-size: 13px;
+               font-weight: 800;
+               color: var(--teal);
+          }
+
+          .progress-track {
+               height: 9px;
+               border-radius: 999px;
+               background: rgba(148, 163, 184, .18);
+               overflow: hidden;
+          }
+
+          .progress-fill {
+               height: 100%;
+               border-radius: inherit;
+               width: 0%;
+               transition: width 1s ease;
+          }
+
+          .rank-list {
+               display: flex;
+               flex-direction: column;
+               gap: 10px;
+               max-height: 360px;
+               overflow-y: auto;
+               padding-right: 4px;
+          }
+
+          .rank-list::-webkit-scrollbar {
+               width: 4px;
+          }
+
+          .rank-list::-webkit-scrollbar-thumb {
+               background: rgba(20, 184, 166, .25);
+               border-radius: 999px;
+          }
+
+          .rank-item {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 12px 14px;
+               border-radius: 14px;
+               background: var(--bg3);
+               border: 1px solid var(--border2);
+          }
+
+          .rank-num {
+               width: 28px;
+               height: 28px;
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               font-weight: 900;
+               flex-shrink: 0;
+               color: #fff;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+          }
+
+          .rank-main {
+               flex: 1;
+               min-width: 0;
+          }
+
+          .rank-main strong {
+               display: block;
+               font-size: 13px;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+          }
+
+          .rank-main span {
+               display: block;
+               color: var(--text2);
+               font-size: 11px;
+               margin-top: 3px;
+          }
+
+          .rank-score {
+               font-size: 15px;
+               font-weight: 900;
+               color: var(--teal);
+               white-space: nowrap;
+          }
+
+          .table-wrap {
+               overflow-x: auto;
+               border: 1px solid var(--border2);
+               border-radius: 16px;
+          }
+
+          table {
+               width: 100%;
+               border-collapse: collapse;
+               min-width: 850px;
+          }
+
+          thead {
+               background: var(--bg3);
+          }
+
+          th,
+          td {
+               padding: 13px 14px;
+               text-align: left;
+               border-bottom: 1px solid var(--border2);
+               font-size: 12px;
+               vertical-align: middle;
+          }
+
+          th {
+               color: var(--text2);
+               font-weight: 800;
+               text-transform: uppercase;
+               letter-spacing: .05em;
+               font-size: 11px;
+          }
+
+          tbody tr:hover {
+               background: rgba(20, 184, 166, .05);
+          }
+
+          tbody tr:last-child td {
+               border-bottom: none;
+          }
+
+          .status-badge {
+               display: inline-flex;
+               align-items: center;
+               gap: 6px;
+               padding: 5px 10px;
+               border-radius: 999px;
+               font-size: 10px;
+               font-weight: 900;
+               text-transform: uppercase;
+               white-space: nowrap;
+          }
+
+          .status-good {
+               background: rgba(16, 185, 129, .12);
+               color: #34d399;
+          }
+
+          .status-warn {
+               background: rgba(245, 158, 11, .12);
+               color: #fcd34d;
+          }
+
+          .status-bad {
+               background: rgba(244, 63, 94, .12);
+               color: #fb7185;
+          }
+
+          .status-info {
+               background: rgba(6, 182, 212, .12);
+               color: #67e8f9;
+          }
+
+          .empty-state {
+               padding: 46px 20px;
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               justify-content: center;
+               gap: 10px;
+               color: var(--text3);
+               text-align: center;
+          }
+
+          .empty-state i {
+               font-size: 34px;
+          }
+
+          .empty-state p {
+               font-size: 13px;
+               color: var(--text2);
+               font-weight: 700;
+          }
+
+          .toast {
+               position: fixed;
+               top: 82px;
+               right: 22px;
+               z-index: 99999;
+               min-width: 280px;
+               max-width: 390px;
+               padding: 14px 16px;
+               border-radius: 14px;
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               font-size: 13px;
+               font-weight: 700;
+               box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+               animation: toastIn .3s ease;
+          }
+
+          @keyframes toastIn {
+               from {
+                    opacity: 0;
+                    transform: translateX(20px);
+               }
+
+               to {
+                    opacity: 1;
+                    transform: translateX(0);
+               }
+          }
+
+          .toast.success {
+               background: #065f46;
+               color: #6ee7b7;
+               border: 1px solid rgba(52, 211, 153, .3);
+          }
+
+          .toast.error {
+               background: #7f1d1d;
+               color: #fca5a5;
+               border: 1px solid rgba(248, 113, 113, .3);
+          }
+
+          .toast.info {
+               background: #164e63;
+               color: #67e8f9;
+               border: 1px solid rgba(34, 211, 238, .3);
+          }
+
+          @media print {
+
+               .sidebar,
+               .topbar,
+               .toolbar,
+               #pageLoader,
+               .mobile-overlay {
+                    display: none !important;
+               }
+
+               .main {
+                    margin-left: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+               }
+
+               body {
+                    background: #fff !important;
+                    color: #000 !important;
+               }
+
+               .content {
+                    padding: 0 !important;
+               }
+
+               .report-card,
+               .stat-card,
+               .welcome-banner {
+                    break-inside: avoid;
+                    border: 1px solid #ccc !important;
+                    background: #fff !important;
+                    color: #000 !important;
+               }
+          }
+
+          @media(max-width:1300px) {
+               .stats-row {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+               }
+          }
+
+          @media(max-width:1050px) {
+               .report-grid {
+                    grid-template-columns: 1fr;
+               }
+          }
+
+          @media(max-width:900px) {
+               .sidebar {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-w) !important;
+               }
+
+               .sidebar.mobile-open {
+                    transform: translateX(0);
+               }
+
+               .sidebar-toggle {
+                    display: none;
+               }
+
+               .main,
+               .main.expanded {
+                    margin-left: 0;
+                    width: 100vw;
+                    max-width: 100vw;
+               }
+
+               .mobile-topbar-toggle {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+               }
+
+               .topbar {
+                    padding: 10px 16px;
+                    flex-wrap: wrap;
+               }
+
+               .topbar-left {
+                    min-width: calc(100% - 42px);
+               }
+
+               .topbar-right {
+                    width: 100%;
+                    justify-content: flex-start;
+               }
+
+               .topbar-time {
+                    display: none;
+               }
+
+               .content {
+                    padding: 16px;
+                    padding-bottom: 90px;
+               }
+
+               .toolbar-right {
+                    width: 100%;
+               }
+
+               .filter-input,
+               .filter-select,
+               .filter-date,
+               .toolbar-btn {
+                    flex: 1;
+                    min-width: 150px;
+               }
+          }
+
+          @media(max-width:620px) {
+               .stats-row {
+                    grid-template-columns: 1fr;
+               }
+
+               .welcome-banner {
+                    align-items: flex-start;
+                    padding: 20px;
+               }
+
+               .welcome-text h2 {
+                    font-size: 20px;
+               }
+          }
+     </style>
+</head>
+
+<body data-page-role="admin">
+
+     <div id="pageLoader">
+          <div class="loader-logo">
+               <div class="loader-logo-wrap">
+                    <svg class="nn-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11" stroke="url(#lG1)"
+                              stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#lG2)" opacity="0.15" />
+                         <circle cx="22" cy="15" r="2.5" fill="url(#lG1)" />
+                         <circle cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#lG3)" stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#lG3)" stroke-width="1" />
+                         <circle cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="lG1" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="lG2" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="lG3" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+               <span class="loader-logo-text">EduMind AI</span>
+          </div>
+          <div class="loader-bar">
+               <div class="loader-bar-fill"></div>
+          </div>
+     </div>
+
+     <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+     <nav class="sidebar" id="sidebar">
+          <div class="sidebar-brand">
+               <div class="brand-logo-wrap">
+                    <svg class="nn-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <polygon class="hex-outer" points="22,2 38,11 38,33 22,42 6,33 6,11" stroke="url(#sG1)"
+                              stroke-width="1.5" fill="none" opacity="0.65" />
+                         <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#sG2)" opacity="0.15" />
+                         <circle cx="22" cy="15" r="2.5" fill="url(#sG1)" />
+                         <circle cx="14" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="30" cy="24" r="2" fill="#0fe0c0" />
+                         <circle cx="22" cy="30" r="1.8" fill="#38bdf8" />
+                         <line class="conn-line" x1="22" y1="15" x2="14" y2="24" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="22" y1="15" x2="30" y2="24" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="14" y1="24" x2="22" y2="30" stroke="url(#sG3)" stroke-width="1" />
+                         <line class="conn-line" x1="30" y1="24" x2="22" y2="30" stroke="url(#sG3)" stroke-width="1" />
+                         <circle cx="22" cy="22" r="1.2" fill="white" />
+                         <defs>
+                              <linearGradient id="sG1" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="sG2" x1="6" y1="2" x2="38" y2="42">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                              <linearGradient id="sG3" x1="0" y1="0" x2="44" y2="44">
+                                   <stop offset="0%" stop-color="#0fe0c0" />
+                                   <stop offset="100%" stop-color="#38bdf8" />
+                              </linearGradient>
+                         </defs>
+                    </svg>
+               </div>
+               <div class="brand-text">
+                    <h2>EduMind AI</h2><span>Admin Panel</span>
+               </div>
+          </div>
+
+          <div class="sidebar-toggle" onclick="toggleSidebar()">
+               <i class="fas fa-chevron-left" id="toggleIcon"></i>
+          </div>
+
+          <div class="sidebar-nav">
+               <div class="nav-section-label">Main</div>
+               <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-gauge-high"></i><span
+                         class="nav-label">Dashboard</span></a>
+               <a href="admin-students.html" class="nav-item"><i class="fas fa-users"></i><span
+                         class="nav-label">Students</span></a>
+               <a href="admin-subjects.html" class="nav-item"><i class="fas fa-book-open"></i><span
+                         class="nav-label">Subjects</span></a>
+
+               <div class="nav-section-label">Content</div>
+               <a href="admin-planner.html" class="nav-item"><i class="fas fa-calendar-days"></i><span
+                         class="nav-label">Planner</span></a>
+               <a href="admin-tasks.html" class="nav-item"><i class="fas fa-circle-check"></i><span
+                         class="nav-label">Tasks</span></a>
+               <a href="admin-revisions.html" class="nav-item"><i class="fas fa-rotate"></i><span
+                         class="nav-label">Revisions</span></a>
+               <a href="admin-tests.html" class="nav-item"><i class="fas fa-file-pen"></i><span
+                         class="nav-label">Tests</span></a>
+               <a href="admin-question-bank.html" class="nav-item"><i class="fas fa-database"></i><span
+                         class="nav-label">Question Bank</span></a>
+
+               <div class="nav-section-label">Insights</div>
+               <a href="admin-analytics.html" class="nav-item"><i class="fas fa-chart-line"></i><span
+                         class="nav-label">Analytics</span></a>
+               <a href="admin-assistant.html" class="nav-item"><i class="fas fa-robot"></i><span
+                         class="nav-label">Assistant Logs</span></a>
+               <a href="admin-pomodoro.html" class="nav-item"><i class="fas fa-stopwatch"></i><span
+                         class="nav-label">Pomodoro</span></a>
+
+               <div class="nav-section-label">Manage</div>
+               <a href="admin-notifications.html" class="nav-item"><i class="fas fa-bell"></i><span
+                         class="nav-label">Notifications</span></a>
+               <a href="admin-reports.html" class="nav-item active"><i class="fas fa-file-lines"></i><span
+                         class="nav-label">Reports</span></a>
+               <a href="admin-settings.html" class="nav-item"><i class="fas fa-gear"></i><span
+                         class="nav-label">Settings</span></a>
+               <a href="admin-security.html" class="nav-item"><i class="fas fa-shield-halved"></i><span
+                         class="nav-label">Security Logs</span></a>
+          </div>
+
+          <div class="sidebar-bottom">
+               <div class="admin-profile">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-info">
+                         <p id="sidebarAdminName">Admin</p><span>Administrator</span>
+                    </div>
+               </div>
+               <button class="logout-btn" type="button" onclick="handleLogout()">
+                    <i class="fas fa-right-from-bracket"></i><span>Logout</span>
+               </button>
+          </div>
+     </nav>
+
+     <div class="main" id="main">
+          <div class="topbar">
+               <button class="mobile-topbar-toggle" type="button" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+               </button>
+
+               <div class="topbar-left">
+                    <h1>Reports</h1>
+                    <p>Generate realtime academic, activity, test, and module reports from admin data.</p>
+               </div>
+
+               <div class="topbar-right">
+                    <div class="topbar-time" id="liveTime">--:--</div>
+                    <button class="topbar-action" type="button" onclick="exportCSV()">
+                         <i class="fas fa-file-csv"></i>CSV
+                    </button>
+                    <button class="topbar-action" type="button" onclick="window.print()">
+                         <i class="fas fa-print"></i>Print
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="toggleTheme()" id="themeBtn">
+                         <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="topbar-btn" type="button" onclick="loadAll(true)">
+                         <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                    </button>
+               </div>
+          </div>
+
+          <main class="content">
+               <section class="welcome-banner">
+                    <div class="welcome-icon"><i class="fas fa-file-lines"></i></div>
+                    <div class="welcome-text">
+                         <h2>Admin Reports Center</h2>
+                         <p>Hello, <span id="welcomeName">Admin</span>. View realtime report summaries, module
+                              performance, student activity, subject engagement, and export project records for review.
+                         </p>
+                    </div>
+               </section>
+
+               <section class="stats-row">
+                    <div class="stat-card">
+                         <div class="stat-icon icon-teal"><i class="fas fa-users"></i></div>
+                         <div class="stat-info">
+                              <p>Total Students</p>
+                              <h3 id="statStudents">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-green"><i class="fas fa-book-open"></i></div>
+                         <div class="stat-info">
+                              <p>Total Subjects</p>
+                              <h3 id="statSubjects">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-purple"><i class="fas fa-list-check"></i></div>
+                         <div class="stat-info">
+                              <p>Task Completion</p>
+                              <h3 id="statTaskRate">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-amber"><i class="fas fa-file-pen"></i></div>
+                         <div class="stat-info">
+                              <p>Tests Published</p>
+                              <h3 id="statTestRate">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-cyan"><i class="fas fa-calendar-days"></i></div>
+                         <div class="stat-info">
+                              <p>Total Plans</p>
+                              <h3 id="statPlans">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-rose"><i class="fas fa-rotate"></i></div>
+                         <div class="stat-info">
+                              <p>Total Revisions</p>
+                              <h3 id="statRevisions">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-teal"><i class="fas fa-bell"></i></div>
+                         <div class="stat-info">
+                              <p>Notifications</p>
+                              <h3 id="statNotifications">–</h3>
+                         </div>
+                    </div>
+                    <div class="stat-card">
+                         <div class="stat-icon icon-green"><i class="fas fa-layer-group"></i></div>
+                         <div class="stat-info">
+                              <p>Total Records</p>
+                              <h3 id="statRecords">–</h3>
+                         </div>
+                    </div>
+               </section>
+
+               <section class="toolbar">
+                    <div class="toolbar-left">
+                         <h3>Report Filters</h3>
+                         <p>Search records, filter module-wise, or select a date range.</p>
+                    </div>
+                    <div class="toolbar-right">
+                         <input type="text" class="filter-input" id="searchInput" placeholder="Search reports..."
+                              oninput="renderReports()" />
+                         <select class="filter-select" id="moduleFilter" onchange="renderReports()">
+                              <option value="ALL">All Modules</option>
+                              <option value="TASK">Tasks</option>
+                              <option value="PLAN">Planner</option>
+                              <option value="REVISION">Revisions</option>
+                              <option value="TEST">Tests</option>
+                              <option value="NOTIFICATION">Notifications</option>
+                         </select>
+                         <input type="date" class="filter-date" id="startDate" onchange="renderReports()" />
+                         <input type="date" class="filter-date" id="endDate" onchange="renderReports()" />
+                         <button class="toolbar-btn secondary" type="button" onclick="clearFilters()">
+                              <i class="fas fa-filter-circle-xmark"></i>Clear
+                         </button>
+                         <button class="toolbar-btn" type="button" onclick="loadAll(true)">
+                              <i class="fas fa-rotate-right"></i>Refresh
+                         </button>
+                    </div>
+               </section>
+
+               <section class="report-grid">
+                    <div class="report-card">
+                         <div class="card-head">
+                              <div>
+                                   <div class="card-title"><i class="fas fa-chart-simple"></i> Module Performance</div>
+                                   <p class="card-subtitle">Completion/publish rate based on realtime backend records.
+                                   </p>
+                              </div>
+                              <span class="mini-badge" id="moduleRecordBadge">0 records</span>
+                         </div>
+                         <div class="progress-list" id="modulePerformanceList"></div>
+                    </div>
+
+                    <div class="report-card">
+                         <div class="card-head">
+                              <div>
+                                   <div class="card-title"><i class="fas fa-book-open-reader"></i> Subject Engagement
+                                   </div>
+                                   <p class="card-subtitle">Subjects ranked by tasks, tests, plans, and revisions.</p>
+                              </div>
+                              <span class="mini-badge">Top Subjects</span>
+                         </div>
+                         <div class="rank-list" id="subjectRankList"></div>
+                    </div>
+
+                    <div class="report-card">
+                         <div class="card-head">
+                              <div>
+                                   <div class="card-title"><i class="fas fa-user-graduate"></i> Student Activity</div>
+                                   <p class="card-subtitle">Students ranked by activity count from available records.
+                                   </p>
+                              </div>
+                              <span class="mini-badge">Top Students</span>
+                         </div>
+                         <div class="rank-list" id="studentRankList"></div>
+                    </div>
+
+                    <div class="report-card">
+                         <div class="card-head">
+                              <div>
+                                   <div class="card-title"><i class="fas fa-lightbulb"></i> Smart Report Summary</div>
+                                   <p class="card-subtitle">Quick insights generated from current module data.</p>
+                              </div>
+                              <span class="mini-badge">Realtime</span>
+                         </div>
+                         <div class="progress-list" id="smartSummaryList"></div>
+                    </div>
+
+                    <div class="report-card full">
+                         <div class="card-head">
+                              <div>
+                                   <div class="card-title"><i class="fas fa-table-list"></i> Detailed Activity Report
+                                   </div>
+                                   <p class="card-subtitle">All module records combined in one searchable report table.
+                                   </p>
+                              </div>
+                              <span class="mini-badge" id="filteredCountBadge">0 shown</span>
+                         </div>
+
+                         <div class="table-wrap">
+                              <table>
+                                   <thead>
+                                        <tr>
+                                             <th>Module</th>
+                                             <th>Title</th>
+                                             <th>Student / Target</th>
+                                             <th>Subject</th>
+                                             <th>Status</th>
+                                             <th>Date</th>
+                                             <th>Remarks</th>
+                                        </tr>
+                                   </thead>
+                                   <tbody id="reportTableBody">
+                                        <tr>
+                                             <td colspan="7">
+                                                  <div class="empty-state">
+                                                       <i class="fas fa-spinner spin-now"></i>
+                                                       <p>Loading report data...</p>
+                                                  </div>
+                                             </td>
+                                        </tr>
+                                   </tbody>
+                              </table>
+                         </div>
+                    </div>
+               </section>
+          </main>
+     </div>
+
+     <script>
+          const API = window.location.port === "8080" ? "" : "http://localhost:8080";
+
+          let sidebarCollapsed = false;
+
+          const state = {
+               summary: {},
+               students: [],
+               subjects: [],
+               tasks: [],
+               tests: [],
+               plans: [],
+               revisions: [],
+               notifications: [],
+               records: []
+          };
+
+          function parseJsonSafe(value) {
+               try {
+                    return JSON.parse(value);
+               } catch {
+                    return null;
+               }
+          }
+
+          function getToken() {
+               return localStorage.getItem("adminToken") || localStorage.getItem("token") || "";
+          }
+
+          function getRole() {
+               return localStorage.getItem("adminRole") || localStorage.getItem("userRole") || "";
+          }
+
+          function softGuard() {
+               const token = getToken();
+               const role = getRole();
+               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
+
+               if (!token || (!isLoggedIn && role !== "ADMIN")) {
+                    window.location.href = "/pages/admin/admin-login.html";
+                    return;
+               }
+
+               if (role && role !== "ADMIN") {
+                    window.location.href = "/pages/dashboard.html";
+               }
+          }
+
+          function getAdminName() {
+               const savedName = localStorage.getItem("adminName");
+               if (savedName) return savedName;
+
+               const user = parseJsonSafe(localStorage.getItem("edumind_logged_in_user")) ||
+                    parseJsonSafe(localStorage.getItem("loggedInUser")) ||
+                    parseJsonSafe(localStorage.getItem("currentUser")) ||
+                    {};
+
+               return user.fullName || user.name || user.email || "Admin";
+          }
+
+          function setupIdentity() {
+               const name = getAdminName();
+               const initial = name.charAt(0).toUpperCase();
+
+               setText("sidebarAdminName", name);
+               setText("adminAvatar", initial);
+               setText("welcomeName", name.split(" ")[0] || "Admin");
+          }
+
+          function setText(id, value) {
+               const el = document.getElementById(id);
+               if (el) el.textContent = value;
+          }
+
+          function escapeHtml(value) {
+               return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+          }
+
+          function showToast(message, type = "success") {
+               const old = document.querySelector(".toast");
+               if (old) old.remove();
+
+               const icon = type === "success" ? "circle-check" : type === "info" ? "circle-info" : "triangle-exclamation";
+               const toast = document.createElement("div");
+
+               toast.className = `toast ${type}`;
+               toast.innerHTML = `<i class="fa-solid fa-${icon}"></i><span>${escapeHtml(message)}</span>`;
+
+               document.body.appendChild(toast);
+               setTimeout(() => toast.remove(), 3500);
+          }
+
+          function updateClock() {
+               const el = document.getElementById("liveTime");
+               if (!el) return;
+
+               el.textContent = new Date().toLocaleTimeString("en-IN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+               });
+          }
+
+          function hideLoader() {
+               const loader = document.getElementById("pageLoader");
+               if (!loader) return;
+
+               setTimeout(() => {
+                    loader.classList.add("hidden");
+                    setTimeout(() => loader.remove(), 400);
+               }, 550);
+          }
+
+          async function fetchJson(path) {
+               const token = getToken();
+
+               const response = await fetch(`${API}${path}`, {
+                    headers: {
+                         "Accept": "application/json",
+                         ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                    }
+               });
+
+               const text = await response.text();
+
+               if (response.status === 401 || response.status === 403) {
+                    showToast("Session expired. Please login again.", "error");
+                    setTimeout(() => {
+                         localStorage.clear();
+                         window.location.href = "/pages/admin/admin-login.html";
+                    }, 900);
+                    throw new Error("Unauthorized");
+               }
+
+               if (!response.ok) {
+                    throw new Error(text || `HTTP ${response.status}`);
+               }
+
+               if (!text) return null;
+
+               try {
+                    return JSON.parse(text);
+               } catch {
+                    return null;
+               }
+          }
+
+          function unwrap(data, key) {
+               if (Array.isArray(data)) return data;
+               if (data && Array.isArray(data[key])) return data[key];
+               if (data && Array.isArray(data.data)) return data.data;
+               if (data && Array.isArray(data.content)) return data.content;
+               if (data && Array.isArray(data.items)) return data.items;
+               return [];
+          }
+
+          async function safeFetch(path, key) {
+               try {
+                    const data = await fetchJson(path);
+                    return key ? unwrap(data, key) : data;
+               } catch (error) {
+                    console.warn(`${path} failed:`, error);
+                    return key ? [] : {};
+               }
+          }
+
+          async function loadAll(showRefreshToast = false) {
+               const icon = document.getElementById("refreshIcon");
+               if (icon) icon.classList.add("spin-now");
+
+               try {
+                    const [summary, students, subjects, tasks, tests, plans, revisions, notifications] = await Promise.all([
+                         safeFetch("/api/admin/dashboard-summary", null),
+                         safeFetch("/api/admin/students", "students"),
+                         safeFetch("/api/admin/subjects", "subjects"),
+                         safeFetch("/api/admin/tasks", "tasks"),
+                         safeFetch("/api/admin/tests", "tests"),
+                         safeFetch("/api/admin/plans", "plans"),
+                         safeFetch("/api/admin/revisions", "revisions"),
+                         safeFetch("/api/admin/notifications", "notifications")
+                    ]);
+
+                    state.summary = summary || {};
+                    state.students = students || [];
+                    state.subjects = subjects || [];
+                    state.tasks = tasks || [];
+                    state.tests = tests || [];
+                    state.plans = plans || [];
+                    state.revisions = revisions || [];
+                    state.notifications = notifications || [];
+
+                    state.records = buildRecords();
+
+                    renderStats();
+                    renderReports();
+
+                    if (showRefreshToast) {
+                         showToast("Reports refreshed successfully.", "success");
+                    }
+               } catch (error) {
+                    console.error(error);
+                    showToast("Report load failed. Check backend and console.", "error");
+               } finally {
+                    if (icon) icon.classList.remove("spin-now");
+               }
+          }
+
+          function isCompleted(status) {
+               const value = String(status || "").trim().toLowerCase();
+               return value === "completed" || value === "done";
+          }
+
+          function isPublished(test) {
+               return Boolean(test?.published) ||
+                    String(test?.adminStatus || "").toUpperCase() === "PUBLISHED" ||
+                    String(test?.status || "").toUpperCase() === "PUBLISHED";
+          }
+
+          function getDate(record, fields) {
+               for (const field of fields) {
+                    const value = record?.[field];
+                    if (!value) continue;
+
+                    const date = new Date(value);
+                    if (!isNaN(date.getTime())) return date;
+               }
+
+               return null;
+          }
+
+          function formatDate(date) {
+               if (!date) return "–";
+
+               return date.toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+               });
+          }
+
+          function getStudentId(record) {
+               return record?.studentId ||
+                    record?.userId ||
+                    record?.ownerId ||
+                    record?.student?.id ||
+                    record?.user?.id ||
+                    "unknown";
+          }
+
+          function getStudentName(record) {
+               return record?.studentName ||
+                    record?.fullName ||
+                    record?.name ||
+                    record?.userName ||
+                    record?.student?.fullName ||
+                    record?.student?.name ||
+                    record?.user?.fullName ||
+                    record?.user?.name ||
+                    record?.email ||
+                    record?.studentEmail ||
+                    "Unknown Student";
+          }
+
+          function getSubjectName(record) {
+               return record?.subjectName ||
+                    record?.subject ||
+                    record?.subject?.subjectName ||
+                    record?.subject?.name ||
+                    record?.testSubject ||
+                    "General";
+          }
+
+          function buildRecords() {
+               const records = [];
+
+               state.tasks.forEach(item => {
+                    const date = getDate(item, ["completedAt", "dueDate", "createdAt", "updatedAt"]);
+                    records.push({
+                         module: "TASK",
+                         title: item.title || item.taskTitle || item.taskName || "Task",
+                         student: getStudentName(item),
+                         studentId: getStudentId(item),
+                         subject: getSubjectName(item),
+                         status: item.status || "Pending",
+                         date,
+                         remarks: isCompleted(item.status) ? "Task completed" : "Task pending"
+                    });
+               });
+
+               state.plans.forEach(item => {
+                    const date = getDate(item, ["date", "planDate", "createdAt", "updatedAt"]);
+                    records.push({
+                         module: "PLAN",
+                         title: item.title || item.topic || item.planTitle || "Planner Entry",
+                         student: getStudentName(item),
+                         studentId: getStudentId(item),
+                         subject: getSubjectName(item),
+                         status: item.status || "Scheduled",
+                         date,
+                         remarks: isCompleted(item.status) ? "Plan completed" : "Plan active"
+                    });
+               });
+
+               state.revisions.forEach(item => {
+                    const date = getDate(item, ["revisionDate", "completedAt", "createdAt", "updatedAt"]);
+                    records.push({
+                         module: "REVISION",
+                         title: item.topic || item.title || item.revisionTitle || "Revision",
+                         student: getStudentName(item),
+                         studentId: getStudentId(item),
+                         subject: getSubjectName(item),
+                         status: item.status || "Pending",
+                         date,
+                         remarks: isCompleted(item.status) ? "Revision completed" : "Revision pending"
+                    });
+               });
+
+               state.tests.forEach(item => {
+                    const date = getDate(item, ["testDate", "createdAt", "updatedAt"]);
+                    records.push({
+                         module: "TEST",
+                         title: item.title || item.testTitle || item.name || "Test",
+                         student: "All / Admin Created",
+                         studentId: "admin",
+                         subject: getSubjectName(item),
+                         status: isPublished(item) ? "Published" : "Draft",
+                         date,
+                         remarks: isPublished(item) ? "Available for students" : "Not published yet"
+                    });
+               });
+
+               state.notifications.forEach(item => {
+                    const date = getDate(item, ["sentAt", "createdAt", "updatedAt"]);
+                    records.push({
+                         module: "NOTIFICATION",
+                         title: item.title || "Notification",
+                         student: item.targetLabel || item.target || "All Students",
+                         studentId: item.targetStudentId || "all",
+                         subject: item.type || "General",
+                         status: item.status || "Sent",
+                         date,
+                         remarks: item.message || "Notification sent"
+                    });
+               });
+
+               return records.sort((a, b) => {
+                    const da = a.date ? a.date.getTime() : 0;
+                    const db = b.date ? b.date.getTime() : 0;
+                    return db - da;
+               });
+          }
+
+          function percent(part, total) {
+               if (!total) return 0;
+               return Math.round((part / total) * 100);
+          }
+
+          function renderStats() {
+               const completedTasks = state.tasks.filter(t => isCompleted(t.status)).length;
+               const publishedTests = state.tests.filter(isPublished).length;
+
+               setText("statStudents", state.summary.totalStudents ?? state.students.length ?? 0);
+               setText("statSubjects", state.summary.totalSubjects ?? state.subjects.length ?? 0);
+               setText("statTaskRate", `${percent(completedTasks, state.tasks.length)}%`);
+               setText("statTestRate", `${publishedTests}/${state.tests.length}`);
+               setText("statPlans", state.summary.totalPlans ?? state.plans.length ?? 0);
+               setText("statRevisions", state.summary.totalRevisions ?? state.revisions.length ?? 0);
+               setText("statNotifications", state.notifications.length ?? 0);
+               setText("statRecords", state.records.length ?? 0);
+          }
+
+          function getFilteredRecords() {
+               const module = document.getElementById("moduleFilter")?.value || "ALL";
+               const query = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+               const startDateValue = document.getElementById("startDate")?.value || "";
+               const endDateValue = document.getElementById("endDate")?.value || "";
+
+               const start = startDateValue ? new Date(`${startDateValue}T00:00:00`) : null;
+               const end = endDateValue ? new Date(`${endDateValue}T23:59:59`) : null;
+
+               return state.records.filter(record => {
+                    if (module !== "ALL" && record.module !== module) return false;
+
+                    if (query) {
+                         const haystack = `${record.module} ${record.title} ${record.student} ${record.subject} ${record.status} ${record.remarks}`.toLowerCase();
+                         if (!haystack.includes(query)) return false;
+                    }
+
+                    if (start && record.date && record.date < start) return false;
+                    if (end && record.date && record.date > end) return false;
+
+                    return true;
+               });
+          }
+
+          function renderReports() {
+               renderModulePerformance();
+               renderSubjectReport();
+               renderStudentReport();
+               renderSmartSummary();
+               renderActivityTable();
+          }
+
+          function renderModulePerformance() {
+               const tasksDone = state.tasks.filter(t => isCompleted(t.status)).length;
+               const revisionsDone = state.revisions.filter(r => isCompleted(r.status)).length;
+               const plansDone = state.plans.filter(p => isCompleted(p.status)).length;
+               const testsPublished = state.tests.filter(isPublished).length;
+
+               const items = [
+                    {
+                         label: "Task Completion",
+                         icon: "fa-list-check",
+                         done: tasksDone,
+                         total: state.tasks.length,
+                         color: "linear-gradient(90deg, #10b981, #34d399)"
+                    },
+                    {
+                         label: "Revision Completion",
+                         icon: "fa-rotate",
+                         done: revisionsDone,
+                         total: state.revisions.length,
+                         color: "linear-gradient(90deg, #8b5cf6, #a78bfa)"
+                    },
+                    {
+                         label: "Planner Completion",
+                         icon: "fa-calendar-days",
+                         done: plansDone,
+                         total: state.plans.length,
+                         color: "linear-gradient(90deg, #f59e0b, #fcd34d)"
+                    },
+                    {
+                         label: "Test Publish Rate",
+                         icon: "fa-file-pen",
+                         done: testsPublished,
+                         total: state.tests.length,
+                         color: "linear-gradient(90deg, #06b6d4, #67e8f9)"
+                    },
+                    {
+                         label: "Notifications Sent",
+                         icon: "fa-bell",
+                         done: state.notifications.length,
+                         total: state.notifications.length || 1,
+                         color: "linear-gradient(90deg, #14b8a6, #06b6d4)"
+                    }
+               ];
+
+               const container = document.getElementById("modulePerformanceList");
+               if (!container) return;
+
+               container.innerHTML = items.map(item => {
+                    const rate = percent(item.done, item.total);
+
+                    return `
+                         <div class="progress-item">
+                              <div class="progress-top">
+                                   <div class="progress-label"><i class="fas ${item.icon}"></i>${escapeHtml(item.label)}</div>
+                                   <div class="progress-value">${item.done}/${item.total} • ${rate}%</div>
+                              </div>
+                              <div class="progress-track">
+                                   <div class="progress-fill" style="width:${rate}%;background:${item.color}"></div>
+                              </div>
+                         </div>
+                    `;
+               }).join("");
+
+               setText("moduleRecordBadge", `${state.records.length} records`);
+          }
+
+          function renderSubjectReport() {
+               const map = new Map();
+
+               state.records.forEach(record => {
+                    const subject = record.subject || "General";
+                    if (!map.has(subject)) {
+                         map.set(subject, { name: subject, count: 0 });
+                    }
+                    map.get(subject).count++;
+               });
+
+               const ranked = Array.from(map.values())
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 8);
+
+               const container = document.getElementById("subjectRankList");
+               if (!container) return;
+
+               if (!ranked.length) {
+                    container.innerHTML = `
+                         <div class="empty-state">
+                              <i class="fas fa-book-open"></i>
+                              <p>No subject report data found.</p>
+                         </div>
+                    `;
+                    return;
+               }
+
+               container.innerHTML = ranked.map((item, index) => `
+                    <div class="rank-item">
+                         <div class="rank-num">${index + 1}</div>
+                         <div class="rank-main">
+                              <strong>${escapeHtml(item.name)}</strong>
+                              <span>Activity records linked with this subject</span>
+                         </div>
+                         <div class="rank-score">${item.count}</div>
+                    </div>
+               `).join("");
+          }
+
+          function renderStudentReport() {
+               const map = new Map();
+
+               state.records.forEach(record => {
+                    if (record.studentId === "admin" || record.module === "NOTIFICATION") return;
+
+                    const key = String(record.studentId || record.student || "unknown");
+                    if (!map.has(key)) {
+                         map.set(key, { name: record.student || "Unknown Student", count: 0 });
+                    }
+                    map.get(key).count++;
+               });
+
+               const ranked = Array.from(map.values())
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 8);
+
+               const container = document.getElementById("studentRankList");
+               if (!container) return;
+
+               if (!ranked.length) {
+                    container.innerHTML = `
+                         <div class="empty-state">
+                              <i class="fas fa-user-graduate"></i>
+                              <p>No student activity report data found.</p>
+                         </div>
+                    `;
+                    return;
+               }
+
+               container.innerHTML = ranked.map((item, index) => `
+                    <div class="rank-item">
+                         <div class="rank-num">${index + 1}</div>
+                         <div class="rank-main">
+                              <strong>${escapeHtml(item.name)}</strong>
+                              <span>Total activities across tasks, plans and revisions</span>
+                         </div>
+                         <div class="rank-score">${item.count}</div>
+                    </div>
+               `).join("");
+          }
+
+          function renderSmartSummary() {
+               const completedTasks = state.tasks.filter(t => isCompleted(t.status)).length;
+               const publishedTests = state.tests.filter(isPublished).length;
+               const taskRate = percent(completedTasks, state.tasks.length);
+               const testRate = percent(publishedTests, state.tests.length);
+
+               const highestModule = [
+                    { name: "Tasks", count: state.tasks.length },
+                    { name: "Planner", count: state.plans.length },
+                    { name: "Revisions", count: state.revisions.length },
+                    { name: "Tests", count: state.tests.length },
+                    { name: "Notifications", count: state.notifications.length }
+               ].sort((a, b) => b.count - a.count)[0];
+
+               const summaries = [
+                    {
+                         label: "Overall Records",
+                         value: `${state.records.length} total activities available for reporting.`,
+                         icon: "fa-layer-group"
+                    },
+                    {
+                         label: "Task Progress",
+                         value: `${completedTasks} of ${state.tasks.length} tasks completed. Current task completion rate is ${taskRate}%.`,
+                         icon: "fa-list-check"
+                    },
+                    {
+                         label: "Test Publishing",
+                         value: `${publishedTests} of ${state.tests.length} tests are published. Current publish rate is ${testRate}%.`,
+                         icon: "fa-file-pen"
+                    },
+                    {
+                         label: "Most Active Module",
+                         value: `${highestModule?.name || "-"} has the highest record volume with ${highestModule?.count || 0} records.`,
+                         icon: "fa-chart-line"
+                    }
+               ];
+
+               const container = document.getElementById("smartSummaryList");
+               if (!container) return;
+
+               container.innerHTML = summaries.map(item => `
+                    <div class="progress-item">
+                         <div class="progress-top" style="margin-bottom:0">
+                              <div class="progress-label"><i class="fas ${item.icon}"></i>${escapeHtml(item.label)}</div>
+                         </div>
+                         <p style="font-size:12px;color:var(--text2);line-height:1.65;margin-top:8px">${escapeHtml(item.value)}</p>
+                    </div>
+               `).join("");
+          }
+
+          function getStatusClass(status) {
+               const value = String(status || "").toLowerCase();
+
+               if (value.includes("complete") || value.includes("publish") || value.includes("sent") || value.includes("done")) {
+                    return "status-good";
+               }
+
+               if (value.includes("draft") || value.includes("pending") || value.includes("scheduled")) {
+                    return "status-warn";
+               }
+
+               if (value.includes("fail") || value.includes("cancel")) {
+                    return "status-bad";
+               }
+
+               return "status-info";
+          }
+
+          function renderActivityTable() {
+               const records = getFilteredRecords();
+               const tbody = document.getElementById("reportTableBody");
+               if (!tbody) return;
+
+               setText("filteredCountBadge", `${records.length} shown`);
+
+               if (!records.length) {
+                    tbody.innerHTML = `
+                         <tr>
+                              <td colspan="7">
+                                   <div class="empty-state">
+                                        <i class="fas fa-magnifying-glass"></i>
+                                        <p>No report records found for selected filters.</p>
+                                   </div>
+                              </td>
+                         </tr>
+                    `;
+                    return;
+               }
+
+               tbody.innerHTML = records.map(record => `
+                    <tr>
+                         <td><strong>${escapeHtml(record.module)}</strong></td>
+                         <td>${escapeHtml(record.title)}</td>
+                         <td>${escapeHtml(record.student)}</td>
+                         <td>${escapeHtml(record.subject)}</td>
+                         <td><span class="status-badge ${getStatusClass(record.status)}">${escapeHtml(record.status)}</span></td>
+                         <td>${formatDate(record.date)}</td>
+                         <td>${escapeHtml(record.remarks)}</td>
+                    </tr>
+               `).join("");
+          }
+
+          function clearFilters() {
+               document.getElementById("searchInput").value = "";
+               document.getElementById("moduleFilter").value = "ALL";
+               document.getElementById("startDate").value = "";
+               document.getElementById("endDate").value = "";
+
+               renderReports();
+               showToast("Report filters cleared.", "info");
+          }
+
+          function exportCSV() {
+               const records = getFilteredRecords();
+
+               if (!records.length) {
+                    showToast("No report data available to export.", "error");
+                    return;
+               }
+
+               const rows = [
+                    ["Module", "Title", "Student/Target", "Subject", "Status", "Date", "Remarks"],
+                    ...records.map(record => [
+                         record.module,
+                         record.title,
+                         record.student,
+                         record.subject,
+                         record.status,
+                         formatDate(record.date),
+                         record.remarks
+                    ])
+               ];
+
+               const csv = rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+               const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+               const url = URL.createObjectURL(blob);
+
+               const link = document.createElement("a");
+               link.href = url;
+               link.download = `edumind-admin-report-${new Date().toISOString().slice(0, 10)}.csv`;
+               link.click();
+
+               URL.revokeObjectURL(url);
+               showToast("CSV report exported successfully.", "success");
+          }
+
+          function toggleSidebar() {
+               const sidebar = document.getElementById("sidebar");
+               const main = document.getElementById("main");
+               const icon = document.getElementById("toggleIcon");
+
+               sidebarCollapsed = !sidebarCollapsed;
+               sidebar?.classList.toggle("collapsed", sidebarCollapsed);
+               main?.classList.toggle("expanded", sidebarCollapsed);
+
+               if (icon) icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+
+               localStorage.setItem("adminSidebarCollapsed", sidebarCollapsed ? "true" : "false");
+          }
+
+          function restoreSidebar() {
+               if (localStorage.getItem("adminSidebarCollapsed") !== "true") return;
+
+               sidebarCollapsed = true;
+               document.getElementById("sidebar")?.classList.add("collapsed");
+               document.getElementById("main")?.classList.add("expanded");
+
+               const icon = document.getElementById("toggleIcon");
+               if (icon) icon.className = "fas fa-chevron-right";
+          }
+
+          function openMobileSidebar() {
+               document.getElementById("sidebar")?.classList.add("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.add("show");
+          }
+
+          function closeMobileSidebar() {
+               document.getElementById("sidebar")?.classList.remove("mobile-open");
+               document.getElementById("mobileOverlay")?.classList.remove("show");
+          }
+
+          function applySavedTheme() {
+               const theme = localStorage.getItem("edumind-admin-theme") || localStorage.getItem("adminTheme") || "dark";
+               document.documentElement.setAttribute("data-theme", theme);
+
+               if (theme === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(theme);
+          }
+
+          function updateThemeIcon(theme) {
+               const btn = document.getElementById("themeBtn");
+               if (!btn) return;
+
+               btn.innerHTML = theme === "light" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+          }
+
+          function toggleTheme() {
+               const current = document.documentElement.getAttribute("data-theme") || "dark";
+               const next = current === "dark" ? "light" : "dark";
+
+               document.documentElement.setAttribute("data-theme", next);
+               localStorage.setItem("edumind-admin-theme", next);
+               localStorage.setItem("adminTheme", next);
+
+               if (next === "light") {
+                    document.body.setAttribute("data-theme", "light");
+               } else {
+                    document.body.removeAttribute("data-theme");
+               }
+
+               updateThemeIcon(next);
+          }
+
+          function handleLogout() {
+               if (!confirm("Logout from admin panel?")) return;
+
+               [
+                    "adminToken",
+                    "adminRole",
+                    "adminName",
+                    "adminEmail",
+                    "token",
+                    "userRole",
+                    "edumind_is_logged_in",
+                    "edumind_logged_in_user"
+               ].forEach(key => localStorage.removeItem(key));
+
+               window.location.href = "/pages/admin/admin-login.html";
+          }
+
+          document.addEventListener("DOMContentLoaded", () => {
+               softGuard();
+               setupIdentity();
+               applySavedTheme();
+               restoreSidebar();
+               updateClock();
+               setInterval(updateClock, 1000);
+               hideLoader();
+               loadAll(false);
+          });
+     </script>
+</body>
+
+</html>

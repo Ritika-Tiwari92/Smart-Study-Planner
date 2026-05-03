@@ -778,7 +778,7 @@
      </div>
      <script>
           const token = localStorage.getItem('adminToken'); const role = localStorage.getItem('adminRole'); const name = localStorage.getItem('adminName') || 'Admin'; const adminEmail = localStorage.getItem('adminEmail') || 'admin';
-          if (!token || role !== 'ADMIN') window.location.href = '/pages/admin/admin-login.html';
+          if (!token || role !== 'ADMIN') window.location.href = '/pages/login.html';
           document.getElementById('adminName').textContent = name; document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
 
           // Generate security logs from localStorage data
@@ -845,7 +845,7 @@
           function closeMobile() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.remove('show'); }
           function toggleTheme() { const isLight = document.body.getAttribute('data-theme') === 'light'; if (isLight) { document.body.removeAttribute('data-theme'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-moon"></i>'; localStorage.setItem('adminTheme', 'dark'); } else { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; localStorage.setItem('adminTheme', 'light'); } }
           (function () { if (localStorage.getItem('adminTheme') === 'light') { document.body.setAttribute('data-theme', 'light'); document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>'; } })();
-          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/admin-login.html'; } }
+          function handleLogout() { if (confirm('Logout?')) { localStorage.clear(); window.location.href = '/pages/admin/login.html'; } }
           renderLogs();
      </script>
 </body>

@@ -1,17 +1,4 @@
-/**
- * EduMind AI — Login JS
- * login.js
- *
- * Cleaned + Fixed:
- *  - Student/Admin tab selection respected
- *  - Student login uses /api/auth/login
- *  - Admin login uses /api/admin/auth/login
- *  - Admin token keys stored for admin pages
- *  - Admin no longer redirects back to admin-login.html
- *  - Password eye button fixed
- *  - Duplicate inline eye listener conflict handled
- *  - JWT-compatible localStorage session handling
- */
+
 
 document.addEventListener("DOMContentLoaded", function () {
 

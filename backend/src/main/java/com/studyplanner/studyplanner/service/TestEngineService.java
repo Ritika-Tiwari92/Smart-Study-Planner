@@ -18,10 +18,12 @@ import com.studyplanner.studyplanner.model.TestAnswer;
 import com.studyplanner.studyplanner.model.TestAttempt;
 import com.studyplanner.studyplanner.model.TestQuestion;
 import com.studyplanner.studyplanner.model.TestQuestionOption;
+import com.studyplanner.studyplanner.model.User;
 import com.studyplanner.studyplanner.repository.TestAnswerRepository;
 import com.studyplanner.studyplanner.repository.TestAttemptRepository;
 import com.studyplanner.studyplanner.repository.TestQuestionRepository;
 import com.studyplanner.studyplanner.repository.TestRepository;
+import com.studyplanner.studyplanner.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,15 +41,18 @@ public class TestEngineService {
      private final TestQuestionRepository testQuestionRepository;
      private final TestAttemptRepository testAttemptRepository;
      private final TestAnswerRepository testAnswerRepository;
+     private final UserRepository userRepository;
 
      public TestEngineService(TestRepository testRepository,
                TestQuestionRepository testQuestionRepository,
                TestAttemptRepository testAttemptRepository,
-               TestAnswerRepository testAnswerRepository) {
+               TestAnswerRepository testAnswerRepository,
+               UserRepository userRepository) {
           this.testRepository = testRepository;
           this.testQuestionRepository = testQuestionRepository;
           this.testAttemptRepository = testAttemptRepository;
           this.testAnswerRepository = testAnswerRepository;
+          this.userRepository = userRepository;
      }
 
      public TestQuestion createQuestion(Long userId, Long testId, TestQuestionCreateRequestDto request) {
@@ -144,31 +149,28 @@ public class TestEngineService {
                     .orElseThrow(() -> new ResourceNotFoundException(
                               "Question not found with id: " + questionId + " for testId: " + testId));
 
-          // First remove saved answers linked with this question.
-          // Otherwise DB foreign key can block question deletion.
           testAnswerRepository.deleteByQuestion_Id(question.getId());
 
-          // Then remove options linked with this question.
           if (question.getOptions() != null) {
                question.getOptions().clear();
           }
 
-          // Finally delete question.
           testQuestionRepository.delete(question);
      }
 
      @Transactional
      public StartTestResponseDto startTest(Long userId, Long testId) {
-          Test test = getOwnedTest(userId, testId);
+          Test test = getStartableTest(userId, testId);
+          User currentUser = getUserById(userId);
 
-          List<TestQuestion> questions = testQuestionRepository.findByTestIdOrderByQuestionOrderAsc(testId);
+          List<TestQuestion> questions = testQuestionRepository.findByTestIdOrderByQuestionOrderAsc(test.getId());
           if (questions.isEmpty()) {
                throw new IllegalArgumentException("Cannot start test because no questions were found for this test.");
           }
 
           TestAttempt attempt = new TestAttempt();
           attempt.setTest(test);
-          attempt.setUser(test.getUser());
+          attempt.setUser(currentUser);
           attempt.setStatus("STARTED");
           attempt.setTotalQuestions(questions.size());
           attempt.setAnsweredQuestions(0);
@@ -237,6 +239,7 @@ public class TestEngineService {
                answer.setSubmittedAnswer(submittedAnswer);
                answer.setIsCorrect(scoreResult.isCorrect());
                answer.setMarksAwarded(scoreResult.getMarksAwarded());
+
                answersToSave.add(answer);
 
                earnedMarks += scoreResult.getMarksAwarded();
@@ -268,12 +271,6 @@ public class TestEngineService {
           attempt.setTestTip(testTip);
 
           testAttemptRepository.save(attempt);
-
-          test.setScore(percentage);
-          test.setFocusArea(focusArea);
-          test.setTestTip(testTip);
-          test.setTestType("Completed");
-          testRepository.save(test);
 
           SubmitTestResponseDto response = new SubmitTestResponseDto();
           response.setAttemptId(attempt.getId());
@@ -453,6 +450,7 @@ public class TestEngineService {
 
           int theoryMarks = calculateTheoryMarks(question.getCorrectAnswer(), submittedAnswer, marks);
           boolean correct = theoryMarks >= marks;
+
           return new ScoreResult(theoryMarks, correct);
      }
 
@@ -505,12 +503,15 @@ public class TestEngineService {
           String[] parts = normalized.split("\\s+");
           for (String part : parts) {
                String word = part.trim();
+
                if (word.length() <= 2) {
                     continue;
                }
+
                if (STOP_WORDS.contains(word)) {
                     continue;
                }
+
                keywords.add(word);
           }
 
@@ -520,6 +521,7 @@ public class TestEngineService {
      private void incrementWeakTopic(Map<String, Integer> weakTopicCounts, String topic) {
           String normalizedTopic = normalizeNullableText(topic);
           String key = normalizedTopic == null ? "General concepts" : normalizedTopic;
+
           weakTopicCounts.put(key, weakTopicCounts.getOrDefault(key, 0) + 1);
      }
 
@@ -566,6 +568,7 @@ public class TestEngineService {
                dto.setQuestionOrder(question.getQuestionOrder());
 
                List<StartTestQuestionOptionDto> optionDtos = new ArrayList<>();
+
                if (question.getOptions() != null) {
                     for (TestQuestionOption option : question.getOptions()) {
                          StartTestQuestionOptionDto optionDto = new StartTestQuestionOptionDto();
@@ -587,6 +590,30 @@ public class TestEngineService {
           return testRepository.findByIdAndUserId(testId, userId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                               "Test not found with id: " + testId + " for userId: " + userId));
+     }
+
+     private Test getStartableTest(Long userId, Long testId) {
+          Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Test not found with id: " + testId));
+
+          boolean ownedByUser = test.getUser() != null
+                    && test.getUser().getId() != null
+                    && test.getUser().getId().equals(userId);
+
+          boolean published = Boolean.TRUE.equals(test.getPublished())
+                    || "PUBLISHED".equalsIgnoreCase(test.getAdminStatus());
+
+          if (!ownedByUser && !published) {
+               throw new ResourceNotFoundException(
+                         "Test not found with id: " + testId + " for userId: " + userId);
+          }
+
+          return test;
+     }
+
+     private User getUserById(Long userId) {
+          return userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
      }
 
      private TestAttempt getOwnedAttempt(Long userId, Long attemptId) {
@@ -645,6 +672,7 @@ public class TestEngineService {
           if (marks == null || marks < 1) {
                return 1;
           }
+
           return marks;
      }
 
@@ -663,6 +691,7 @@ public class TestEngineService {
           }
 
           String trimmed = value.trim();
+
           return trimmed.isEmpty() ? null : trimmed;
      }
 
@@ -670,6 +699,7 @@ public class TestEngineService {
           if (a == null || b == null) {
                return false;
           }
+
           return a.trim().equalsIgnoreCase(b.trim());
      }
 
