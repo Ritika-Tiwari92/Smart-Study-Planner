@@ -17,105 +17,18 @@
      <link rel="stylesheet" href="../assets/css/layout.css">
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/assistant.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
-
-     <!-- ORBIT ANIMATION FIX -->
-     <style>
-          .ai-bg-animation {
-               opacity: 1 !important;
-               visibility: visible !important;
-               position: fixed !important;
-               inset: 0 !important;
-               z-index: 0 !important;
-               pointer-events: none !important;
-          }
-
-          /* Body background */
-          body::before {
-               content: '';
-               position: fixed;
-               inset: 0;
-               background: #f0eeff;
-               z-index: -1;
-          }
-
-          body.dark-mode::before {
-               background: #0d0b1a;
-          }
-
-          /* Sab layouts transparent — orbit dikhti rahe */
-          .dashboard-layout,
-          .dashboard-main,
-          .assistant-page-main,
-          .assistant-body,
-          .assistant-chat-panel {
-               background: transparent !important;
-          }
-
-          /* Topbar aur side panel: frosted glass */
-          .assistant-topbar {
-               background: rgba(248, 247, 255, 0.85) !important;
-               backdrop-filter: blur(14px) !important;
-          }
-
-          .assistant-side-panel {
-               background: rgba(255, 255, 255, 0.82) !important;
-               backdrop-filter: blur(14px) !important;
-          }
-
-          body.dark-mode .assistant-topbar {
-               background: rgba(17, 13, 30, 0.85) !important;
-          }
-
-          body.dark-mode .assistant-side-panel {
-               background: rgba(17, 13, 30, 0.82) !important;
-          }
-     </style>
+     <link rel="stylesheet" href="../assets/css/assistant.css">
+     <link rel="stylesheet" href="../assets/css/assistant-animation-fix.css">
 </head>
 
-<body>
-
-     <body data-page-role="student"></body>
-
-     <!-- AI Background Animation -->
-     <div class="ai-bg-animation" id="aiBgAnimation">
-          <div class="ai-grid"></div>
-          <div class="ai-core"></div>
-          <div class="ai-orbit ai-orbit-1">
-               <div class="ai-orbit-dot"></div>
-          </div>
-          <div class="ai-orbit ai-orbit-2">
-               <div class="ai-orbit-dot"></div>
-          </div>
-          <div class="ai-orbit ai-orbit-3">
-               <div class="ai-orbit-dot"></div>
-               <div class="ai-orbit-dot ai-orbit-dot-2"></div>
-          </div>
-          <div class="ai-orbit ai-orbit-4">
-               <div class="ai-orbit-dot"></div>
-          </div>
-          <div class="ai-node ai-node-1"></div>
-          <div class="ai-node ai-node-2"></div>
-          <div class="ai-node ai-node-3"></div>
-          <div class="ai-node ai-node-4"></div>
-          <div class="ai-node ai-node-5"></div>
-          <div class="ai-node ai-node-6"></div>
-          <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-               <line class="ai-line" x1="15" y1="20" x2="50" y2="50" />
-               <line class="ai-line" x1="85" y1="30" x2="50" y2="50" />
-               <line class="ai-line" x1="20" y1="80" x2="50" y2="50" />
-               <line class="ai-line" x1="80" y1="75" x2="50" y2="50" />
-          </svg>
-     </div>
+<body data-page-role="student" class="assistant-page">
 
      <div class="dashboard-layout" id="dashboardLayout">
 
-          <!-- Sidebar Overlay (mobile) -->
           <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-          <!-- ══ SIDEBAR ══ -->
           <aside class="sidebar" id="mainSidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo">
@@ -168,15 +81,48 @@
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
                          <i class="fa-solid fa-right-from-bracket"></i>
                          <span>Logout</span>
                     </a>
                </div>
           </aside>
 
-          <!-- ══ ASSISTANT MAIN ══ -->
           <main class="dashboard-main assistant-page-main">
+
+               <!-- AI Background Animation -->
+               <div class="ai-bg-animation" id="aiBgAnimation">
+                    <div class="ai-grid"></div>
+                    <div class="ai-core"></div>
+
+                    <div class="ai-orbit ai-orbit-1">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-2">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-3">
+                         <div class="ai-orbit-dot"></div>
+                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
+                    </div>
+
+                    <div class="ai-node ai-node-1"></div>
+                    <div class="ai-node ai-node-2"></div>
+                    <div class="ai-node ai-node-3"></div>
+                    <div class="ai-node ai-node-4"></div>
+                    <div class="ai-node ai-node-5"></div>
+                    <div class="ai-node ai-node-6"></div>
+
+                    <!-- Smaller center cross lines -->
+                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
+                    </svg>
+               </div>
 
                <!-- Top Bar -->
                <header class="assistant-topbar">
@@ -190,16 +136,19 @@
                               <i class="fa-solid fa-plus"></i>
                               <span>New Chat</span>
                          </button>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
                               <i class="fa-solid fa-moon"></i>
                          </button>
+
                          <div class="profile-mini" id="profileMenuToggle">
                               <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
                               <div>
-                                   <h4 id="assistantProfileName">Student</h4>
+                                   <h4 id="assistantProfileName">Shivika Jii</h4>
                                    <p id="assistantProfileRole">Student</p>
                               </div>
                          </div>
+
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <a href="settings.html" class="profile-menu-item">
                                    <i class="fa-solid fa-user-gear"></i>
@@ -217,57 +166,74 @@
                     </div>
                </header>
 
-               <!-- ══ TWO-COLUMN LAYOUT ══ -->
                <div class="assistant-body">
 
-                    <!-- LEFT: Chat Panel -->
+                    <!-- LEFT -->
                     <div class="assistant-chat-panel">
-
-                         <!-- Intro Hero (shown when no chat) -->
                          <div class="assistant-hero" id="assistantHero">
-                              <div class="assistant-hero-avatar">
-                                   <i class="fa-solid fa-robot"></i>
-                              </div>
-                              <h2 id="assistantIntroTitle">Hello — I'm Astra, your AI Study Buddy</h2>
-                              <p>I can help you with study plans, topic explanations, revision help, coding doubts, and
-                                   smart suggestions.</p>
 
-                              <!-- Quick Action Chips -->
+                              <div class="assistant-hero-avatar-wrap">
+                                   <span class="avatar-orbit orbit-a"></span>
+                                   <span class="avatar-orbit orbit-b"></span>
+                                   <span class="avatar-orbit orbit-c"></span>
+
+                                   <div class="assistant-hero-avatar">
+                                        <i class="fa-solid fa-robot"></i>
+                                   </div>
+                              </div>
+
+                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
+
+                              <p>
+                                   I can help you with study plans, topic explanations, revision help,
+                                   coding doubts, and smart suggestions.
+                              </p>
+
                               <div class="assistant-quick-actions">
                                    <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
-                                        <i class="fa-solid fa-calendar-check"></i> Make a study plan
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        Make a study plan
                                    </button>
+
                                    <button class="assistant-chip" type="button"
                                         data-prompt="Explain a topic in simple words">
-                                        <i class="fa-solid fa-lightbulb"></i> Explain a topic
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        Explain a topic
                                    </button>
+
                                    <button class="assistant-chip" type="button"
                                         data-prompt="Generate revision questions for me">
-                                        <i class="fa-solid fa-rotate"></i> Generate revision questions
+                                        <i class="fa-solid fa-rotate"></i>
+                                        Generate revision questions
                                    </button>
+
                                    <button class="assistant-chip" type="button"
                                         data-prompt="Help me with a coding problem">
-                                        <i class="fa-solid fa-code"></i> Help with coding
+                                        <i class="fa-solid fa-code"></i>
+                                        Help with coding
                                    </button>
+
                                    <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
-                                        <i class="fa-solid fa-file-lines"></i> Summarize notes
+                                        <i class="fa-solid fa-file-lines"></i>
+                                        Summarize notes
                                    </button>
                               </div>
                          </div>
 
-                         <!-- Chat Messages -->
                          <div class="chat-messages" id="chatMessages"></div>
 
-                         <!-- Input -->
                          <div class="chat-input-wrapper">
                               <div class="chat-input-box" id="chatInputBox">
                                    <i class="fa-solid fa-robot chat-icon"></i>
+
                                    <input type="text" id="assistantMessageInput"
-                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off" />
+                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
+
                                    <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
                                         <i class="fa-solid fa-paper-plane"></i>
                                    </button>
                               </div>
+
                               <p class="input-hint">
                                    <i class="fa-solid fa-circle-info"></i>
                                    Astra AI can make mistakes. Always verify important information.
@@ -275,42 +241,45 @@
                          </div>
                     </div>
 
-                    <!-- RIGHT: Sidebar Panel -->
+                    <!-- RIGHT -->
                     <div class="assistant-side-panel" id="assistantSidePanel">
 
-                         <!-- New Chat Button -->
                          <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
                               <i class="fa-solid fa-plus"></i>
                               <span>New Chat</span>
                          </button>
 
-                         <!-- Suggested Help -->
                          <div class="side-section">
                               <div class="side-section-title">
                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                                    <span>Suggested Help</span>
                               </div>
+
                               <div class="assistant-help-list">
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Create a one-day exam revision plan for me">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Create a one-day exam revision plan</span>
                                    </div>
+
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Explain DBMS normalization in easy words">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Explain DBMS normalization in easy words</span>
                                    </div>
+
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Generate Java interview questions for me">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Generate Java interview questions</span>
                                    </div>
+
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Make short notes for Operating System">
                                         <i class="fa-solid fa-lightbulb"></i>
                                         <span>Make short notes for Operating System</span>
                                    </div>
+
                                    <div class="assistant-help-item" role="button" tabindex="0"
                                         data-prompt="Give me aptitude practice questions">
                                         <i class="fa-solid fa-lightbulb"></i>
@@ -319,12 +288,12 @@
                               </div>
                          </div>
 
-                         <!-- Recent Chats -->
                          <div class="side-section side-history-section">
                               <div class="side-section-title">
                                    <i class="fa-solid fa-clock-rotate-left"></i>
                                    <span>Recent Chats</span>
                               </div>
+
                               <div class="history-list" id="historyList">
                                    <div class="history-empty" id="historyEmpty">
                                         <i class="fa-solid fa-comment-slash"></i>
@@ -332,61 +301,802 @@
                                    </div>
                               </div>
                          </div>
-
                     </div>
                </div>
-
           </main>
      </div>
-     <script>
-          (function () {
-               "use strict";
-               const LOGIN_PAGE = "login.html";
-               const STUDENT_HOME = "dashboard.html";
-               const ADMIN_HOME = "admin-dashboard.html";
-               const token = localStorage.getItem("token");
-               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
-               const userRole = localStorage.getItem("userRole") || "STUDENT";
-               function goTo(page) {
-                    // Already on that page? Skip redirect to avoid loop
-                    if (window.location.href.includes(page)) return;
-                    window.location.href = page;
-               }
-               if (!token || !isLoggedIn) {
-                    goTo(LOGIN_PAGE);
-                    return; // script execution rok do
-               }
-               document.addEventListener("DOMContentLoaded", function () {
 
-                    const body = document.body;
-                    const pageRole = body ? body.getAttribute("data-page-role") : null;
-
-                    // data-page-role set nahi hai toh guard kuch nahi karega
-                    if (!pageRole) return;
-
-                    if (pageRole === "admin" && userRole !== "ADMIN") {
-                         // Student admin page pe aaya → student home pe bhejo
-                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
-                         goTo(STUDENT_HOME);
-                         return;
-                    }
-
-                    if (pageRole === "student" && userRole === "ADMIN") {
-                         // Admin student page pe aaya → admin home pe bhejo
-                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
-                         goTo(ADMIN_HOME);
-                         return;
-                    }
-
-                    // Role sahi hai → page load hone do
-                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
-               });
-
-          })();
-     </script>
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/api.js"></script>
      <script src="../assets/js/theme.js"></script>
+
+     <script>
+          (function () {
+               "use strict";
+
+               const THEME_KEY = "edumind_theme";
+
+               function applyAssistantTheme(theme) {
+                    const selectedTheme = theme === "dark" ? "dark" : "light";
+                    const isDark = selectedTheme === "dark";
+
+                    document.documentElement.setAttribute("data-theme", selectedTheme);
+                    document.documentElement.style.colorScheme = selectedTheme;
+
+                    document.body.classList.toggle("preview-dark", isDark);
+                    document.body.classList.toggle("dark-mode", isDark);
+                    document.body.classList.toggle("light-mode", !isDark);
+
+                    const btn = document.getElementById("themeToggleBtn");
+                    const icon = btn ? btn.querySelector("i") : null;
+
+                    if (icon) {
+                         icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+                    }
+
+                    if (btn) {
+                         btn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+                         btn.setAttribute("aria-label", btn.title);
+                    }
+               }
+
+               const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+               applyAssistantTheme(savedTheme);
+
+               const themeBtn = document.getElementById("themeToggleBtn");
+               if (themeBtn) {
+                    themeBtn.addEventListener("click", function (event) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+
+                         const isDark =
+                              document.body.classList.contains("preview-dark") ||
+                              document.body.classList.contains("dark-mode");
+
+                         const nextTheme = isDark ? "light" : "dark";
+                         localStorage.setItem(THEME_KEY, nextTheme);
+                         applyAssistantTheme(nextTheme);
+                    }, true);
+               }
+          })();
+     </script>
+
+     <script src="../assets/js/sidebar.js"></script>
+     <script src="../assets/js/assistant.js"></script>
+</body>
+
+</html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Assistant | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/sidebar.css">
+     <link rel="stylesheet" href="../assets/css/dark-mode.css">
+     <link rel="stylesheet" href="../assets/css/assistant.css">
+     <link rel="stylesheet" href="../assets/css/assistant-animation-fix.css">
+</head>
+
+<body data-page-role="student" class="assistant-page">
+
+     <div class="dashboard-layout" id="dashboardLayout">
+
+          <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+          <aside class="sidebar" id="mainSidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+                    <a href="pomodoro.html" class="nav-item">
+                         <i class="fa-solid fa-stopwatch"></i>
+                         <span>Study Timer</span>
+                    </a>
+                    <a href="assistant.html" class="nav-item active">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main assistant-page-main">
+
+               <!-- AI Background Animation -->
+               <div class="ai-bg-animation" id="aiBgAnimation">
+                    <div class="ai-grid"></div>
+                    <div class="ai-core"></div>
+
+                    <div class="ai-orbit ai-orbit-1">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-2">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-3">
+                         <div class="ai-orbit-dot"></div>
+                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
+                    </div>
+
+                    <div class="ai-node ai-node-1"></div>
+                    <div class="ai-node ai-node-2"></div>
+                    <div class="ai-node ai-node-3"></div>
+                    <div class="ai-node ai-node-4"></div>
+                    <div class="ai-node ai-node-5"></div>
+                    <div class="ai-node ai-node-6"></div>
+
+                    <!-- Smaller center cross lines -->
+                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
+                    </svg>
+               </div>
+
+               <!-- Top Bar -->
+               <header class="assistant-topbar">
+                    <div class="assistant-topbar-left">
+                         <h1>AI Study Assistant</h1>
+                         <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
+                    </div>
+
+                    <div class="assistant-topbar-right">
+                         <button class="new-chat-btn" id="newChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+
+                         <div class="profile-mini" id="profileMenuToggle">
+                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4 id="assistantProfileName">Shivika Jii</h4>
+                                   <p id="assistantProfileRole">Student</p>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <a href="settings.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
+                              </a>
+                              <a href="analytics.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-chart-line"></i>
+                                   <span>View Analytics</span>
+                              </a>
+                              <a href="login.html" class="profile-menu-item logout">
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
+                              </a>
+                         </div>
+                    </div>
+               </header>
+
+               <div class="assistant-body">
+
+                    <!-- LEFT -->
+                    <div class="assistant-chat-panel">
+                         <div class="assistant-hero" id="assistantHero">
+
+                              <div class="assistant-hero-avatar-wrap">
+                                   <span class="avatar-orbit orbit-a"></span>
+                                   <span class="avatar-orbit orbit-b"></span>
+                                   <span class="avatar-orbit orbit-c"></span>
+
+                                   <div class="assistant-hero-avatar">
+                                        <i class="fa-solid fa-robot"></i>
+                                   </div>
+                              </div>
+
+                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
+
+                              <p>
+                                   I can help you with study plans, topic explanations, revision help,
+                                   coding doubts, and smart suggestions.
+                              </p>
+
+                              <div class="assistant-quick-actions">
+                                   <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        Make a study plan
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Explain a topic in simple words">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        Explain a topic
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Generate revision questions for me">
+                                        <i class="fa-solid fa-rotate"></i>
+                                        Generate revision questions
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Help me with a coding problem">
+                                        <i class="fa-solid fa-code"></i>
+                                        Help with coding
+                                   </button>
+
+                                   <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                        Summarize notes
+                                   </button>
+                              </div>
+                         </div>
+
+                         <div class="chat-messages" id="chatMessages"></div>
+
+                         <div class="chat-input-wrapper">
+                              <div class="chat-input-box" id="chatInputBox">
+                                   <i class="fa-solid fa-robot chat-icon"></i>
+
+                                   <input type="text" id="assistantMessageInput"
+                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
+
+                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                   </button>
+                              </div>
+
+                              <p class="input-hint">
+                                   <i class="fa-solid fa-circle-info"></i>
+                                   Astra AI can make mistakes. Always verify important information.
+                              </p>
+                         </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div class="assistant-side-panel" id="assistantSidePanel">
+
+                         <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+
+                         <div class="side-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                   <span>Suggested Help</span>
+                              </div>
+
+                              <div class="assistant-help-list">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Create a one-day exam revision plan for me">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Create a one-day exam revision plan</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Explain DBMS normalization in easy words">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Explain DBMS normalization in easy words</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Generate Java interview questions for me">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Generate Java interview questions</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Make short notes for Operating System">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Make short notes for Operating System</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Give me aptitude practice questions">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Give me aptitude practice questions</span>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="side-section side-history-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-clock-rotate-left"></i>
+                                   <span>Recent Chats</span>
+                              </div>
+
+                              <div class="history-list" id="historyList">
+                                   <div class="history-empty" id="historyEmpty">
+                                        <i class="fa-solid fa-comment-slash"></i>
+                                        <p>No chat history yet</p>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </main>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/api.js"></script>
+     <script src="../assets/js/theme.js"></script>
+
+     <script>
+          (function () {
+               "use strict";
+
+               const THEME_KEY = "edumind_theme";
+
+               function applyAssistantTheme(theme) {
+                    const selectedTheme = theme === "dark" ? "dark" : "light";
+                    const isDark = selectedTheme === "dark";
+
+                    document.documentElement.setAttribute("data-theme", selectedTheme);
+                    document.documentElement.style.colorScheme = selectedTheme;
+
+                    document.body.classList.toggle("preview-dark", isDark);
+                    document.body.classList.toggle("dark-mode", isDark);
+                    document.body.classList.toggle("light-mode", !isDark);
+
+                    const btn = document.getElementById("themeToggleBtn");
+                    const icon = btn ? btn.querySelector("i") : null;
+
+                    if (icon) {
+                         icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+                    }
+
+                    if (btn) {
+                         btn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+                         btn.setAttribute("aria-label", btn.title);
+                    }
+               }
+
+               const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+               applyAssistantTheme(savedTheme);
+
+               const themeBtn = document.getElementById("themeToggleBtn");
+               if (themeBtn) {
+                    themeBtn.addEventListener("click", function (event) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+
+                         const isDark =
+                              document.body.classList.contains("preview-dark") ||
+                              document.body.classList.contains("dark-mode");
+
+                         const nextTheme = isDark ? "light" : "dark";
+                         localStorage.setItem(THEME_KEY, nextTheme);
+                         applyAssistantTheme(nextTheme);
+                    }, true);
+               }
+          })();
+     </script>
+
+     <script src="../assets/js/sidebar.js"></script>
+     <script src="../assets/js/assistant.js"></script>
+</body>
+
+</html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Assistant | EduMind AI</title>
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+     <link rel="stylesheet" href="../assets/css/variables.css">
+     <link rel="stylesheet" href="../assets/css/base.css">
+     <link rel="stylesheet" href="../assets/css/layout.css">
+     <link rel="stylesheet" href="../assets/css/components.css">
+     <link rel="stylesheet" href="../assets/css/dashboard.css">
+     <link rel="stylesheet" href="../assets/css/sidebar.css">
+     <link rel="stylesheet" href="../assets/css/dark-mode.css">
+     <link rel="stylesheet" href="../assets/css/assistant.css">
+     <link rel="stylesheet" href="../assets/css/assistant-animation-fix.css">
+</head>
+
+<body data-page-role="student" class="assistant-page">
+
+     <div class="dashboard-layout" id="dashboardLayout">
+
+          <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+          <aside class="sidebar" id="mainSidebar">
+               <div class="sidebar-top">
+                    <h2 class="sidebar-logo">
+                         <i class="fa-solid fa-graduation-cap"></i>
+                         <span>EduMind AI</span>
+                    </h2>
+               </div>
+
+               <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+                    <a href="pomodoro.html" class="nav-item">
+                         <i class="fa-solid fa-stopwatch"></i>
+                         <span>Study Timer</span>
+                    </a>
+                    <a href="assistant.html" class="nav-item active">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
+               </nav>
+
+               <div class="sidebar-bottom">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
+                    </a>
+               </div>
+          </aside>
+
+          <main class="dashboard-main assistant-page-main">
+
+               <!-- AI Background Animation -->
+               <div class="ai-bg-animation" id="aiBgAnimation">
+                    <div class="ai-grid"></div>
+                    <div class="ai-core"></div>
+
+                    <div class="ai-orbit ai-orbit-1">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-2">
+                         <div class="ai-orbit-dot"></div>
+                    </div>
+
+                    <div class="ai-orbit ai-orbit-3">
+                         <div class="ai-orbit-dot"></div>
+                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
+                    </div>
+
+                    <div class="ai-node ai-node-1"></div>
+                    <div class="ai-node ai-node-2"></div>
+                    <div class="ai-node ai-node-3"></div>
+                    <div class="ai-node ai-node-4"></div>
+                    <div class="ai-node ai-node-5"></div>
+                    <div class="ai-node ai-node-6"></div>
+
+                    <!-- Smaller center cross lines -->
+                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
+                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
+                    </svg>
+               </div>
+
+               <!-- Top Bar -->
+               <header class="assistant-topbar">
+                    <div class="assistant-topbar-left">
+                         <h1>AI Study Assistant</h1>
+                         <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
+                    </div>
+
+                    <div class="assistant-topbar-right">
+                         <button class="new-chat-btn" id="newChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+
+                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
+                              <i class="fa-solid fa-moon"></i>
+                         </button>
+
+                         <div class="profile-mini" id="profileMenuToggle">
+                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
+                              <div>
+                                   <h4 id="assistantProfileName">Shivika Jii</h4>
+                                   <p id="assistantProfileRole">Student</p>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
+                              <a href="settings.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
+                              </a>
+                              <a href="analytics.html" class="profile-menu-item">
+                                   <i class="fa-solid fa-chart-line"></i>
+                                   <span>View Analytics</span>
+                              </a>
+                              <a href="login.html" class="profile-menu-item logout">
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
+                              </a>
+                         </div>
+                    </div>
+               </header>
+
+               <div class="assistant-body">
+
+                    <!-- LEFT -->
+                    <div class="assistant-chat-panel">
+                         <div class="assistant-hero" id="assistantHero">
+
+                              <div class="assistant-hero-avatar-wrap">
+                                   <span class="avatar-orbit orbit-a"></span>
+                                   <span class="avatar-orbit orbit-b"></span>
+                                   <span class="avatar-orbit orbit-c"></span>
+
+                                   <div class="assistant-hero-avatar">
+                                        <i class="fa-solid fa-robot"></i>
+                                   </div>
+                              </div>
+
+                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
+
+                              <p>
+                                   I can help you with study plans, topic explanations, revision help,
+                                   coding doubts, and smart suggestions.
+                              </p>
+
+                              <div class="assistant-quick-actions">
+                                   <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        Make a study plan
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Explain a topic in simple words">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        Explain a topic
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Generate revision questions for me">
+                                        <i class="fa-solid fa-rotate"></i>
+                                        Generate revision questions
+                                   </button>
+
+                                   <button class="assistant-chip" type="button"
+                                        data-prompt="Help me with a coding problem">
+                                        <i class="fa-solid fa-code"></i>
+                                        Help with coding
+                                   </button>
+
+                                   <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                        Summarize notes
+                                   </button>
+                              </div>
+                         </div>
+
+                         <div class="chat-messages" id="chatMessages"></div>
+
+                         <div class="chat-input-wrapper">
+                              <div class="chat-input-box" id="chatInputBox">
+                                   <i class="fa-solid fa-robot chat-icon"></i>
+
+                                   <input type="text" id="assistantMessageInput"
+                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
+
+                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                   </button>
+                              </div>
+
+                              <p class="input-hint">
+                                   <i class="fa-solid fa-circle-info"></i>
+                                   Astra AI can make mistakes. Always verify important information.
+                              </p>
+                         </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div class="assistant-side-panel" id="assistantSidePanel">
+
+                         <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i>
+                              <span>New Chat</span>
+                         </button>
+
+                         <div class="side-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                   <span>Suggested Help</span>
+                              </div>
+
+                              <div class="assistant-help-list">
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Create a one-day exam revision plan for me">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Create a one-day exam revision plan</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Explain DBMS normalization in easy words">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Explain DBMS normalization in easy words</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Generate Java interview questions for me">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Generate Java interview questions</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Make short notes for Operating System">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Make short notes for Operating System</span>
+                                   </div>
+
+                                   <div class="assistant-help-item" role="button" tabindex="0"
+                                        data-prompt="Give me aptitude practice questions">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                        <span>Give me aptitude practice questions</span>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="side-section side-history-section">
+                              <div class="side-section-title">
+                                   <i class="fa-solid fa-clock-rotate-left"></i>
+                                   <span>Recent Chats</span>
+                              </div>
+
+                              <div class="history-list" id="historyList">
+                                   <div class="history-empty" id="historyEmpty">
+                                        <i class="fa-solid fa-comment-slash"></i>
+                                        <p>No chat history yet</p>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </main>
+     </div>
+
+     <script src="../assets/js/auth-guard.js"></script>
+     <script src="../assets/js/api.js"></script>
+     <script src="../assets/js/theme.js"></script>
+
+     <script>
+          (function () {
+               "use strict";
+
+               const THEME_KEY = "edumind_theme";
+
+               function applyAssistantTheme(theme) {
+                    const selectedTheme = theme === "dark" ? "dark" : "light";
+                    const isDark = selectedTheme === "dark";
+
+                    document.documentElement.setAttribute("data-theme", selectedTheme);
+                    document.documentElement.style.colorScheme = selectedTheme;
+
+                    document.body.classList.toggle("preview-dark", isDark);
+                    document.body.classList.toggle("dark-mode", isDark);
+                    document.body.classList.toggle("light-mode", !isDark);
+
+                    const btn = document.getElementById("themeToggleBtn");
+                    const icon = btn ? btn.querySelector("i") : null;
+
+                    if (icon) {
+                         icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+                    }
+
+                    if (btn) {
+                         btn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+                         btn.setAttribute("aria-label", btn.title);
+                    }
+               }
+
+               const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+               applyAssistantTheme(savedTheme);
+
+               const themeBtn = document.getElementById("themeToggleBtn");
+               if (themeBtn) {
+                    themeBtn.addEventListener("click", function (event) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+
+                         const isDark =
+                              document.body.classList.contains("preview-dark") ||
+                              document.body.classList.contains("dark-mode");
+
+                         const nextTheme = isDark ? "light" : "dark";
+                         localStorage.setItem(THEME_KEY, nextTheme);
+                         applyAssistantTheme(nextTheme);
+                    }, true);
+               }
+          })();
+     </script>
+
      <script src="../assets/js/sidebar.js"></script>
      <script src="../assets/js/assistant.js"></script>
 </body>

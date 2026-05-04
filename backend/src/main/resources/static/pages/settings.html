@@ -20,18 +20,212 @@
      <link rel="stylesheet" href="../assets/css/settings.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
+
+
+     <style>
+          /* Settings sidebar brand/logo fix */
+          body[data-page-role="student"] .sidebar-top {
+               gap: 18px;
+          }
+
+          body[data-page-role="student"] .sidebar-logo,
+          body[data-page-role="student"] .student-sidebar-logo {
+               display: flex !important;
+               align-items: center !important;
+               gap: 12px !important;
+               color: #eef7ff !important;
+               margin: 0 !important;
+          }
+
+          body[data-page-role="student"] .sidebar-logo>i.fa-graduation-cap {
+               display: none !important;
+          }
+
+          body[data-page-role="student"] .settings-logo-mark,
+          body[data-page-role="student"] .student-logo-mark {
+               width: 42px;
+               height: 42px;
+               min-width: 42px;
+               border-radius: 15px;
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(6, 182, 212, 0.18));
+               border: 1px solid rgba(96, 165, 250, 0.34);
+               box-shadow:
+                    0 0 0 4px rgba(59, 130, 246, 0.08),
+                    0 12px 28px rgba(37, 99, 235, 0.22),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          }
+
+          body[data-page-role="student"] .settings-neural-logo-svg,
+          body[data-page-role="student"] .student-neural-logo-svg {
+               width: 30px;
+               height: 30px;
+               display: block;
+               filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.48));
+          }
+
+          body[data-page-role="student"] .settings-logo-hex,
+          body[data-page-role="student"] .student-neural-logo-svg .em-logo-hex {
+               transform-origin: center;
+               animation: settingsLogoRotate 12s linear infinite;
+          }
+
+          body[data-page-role="student"] .settings-logo-node,
+          body[data-page-role="student"] .student-neural-logo-svg .em-node {
+               transform-origin: center;
+               animation: settingsLogoPulse 2.6s ease-in-out infinite;
+          }
+
+          body[data-page-role="student"] .settings-logo-text,
+          body[data-page-role="student"] .student-logo-text {
+               display: flex;
+               flex-direction: column;
+               gap: 1px;
+               min-width: 0;
+          }
+
+          body[data-page-role="student"] .settings-logo-text strong,
+          body[data-page-role="student"] .student-logo-text strong {
+               color: #f8fbff !important;
+               font-size: 21px;
+               font-weight: 800;
+               line-height: 1.05;
+               letter-spacing: -0.04em;
+          }
+
+          body[data-page-role="student"] .settings-logo-text small,
+          body[data-page-role="student"] .student-logo-text small {
+               color: rgba(147, 197, 253, 0.86) !important;
+               font-size: 11px;
+               font-weight: 800;
+               letter-spacing: 0.12em;
+               text-transform: uppercase;
+          }
+
+          body[data-page-role="student"] #hamburgerBtn,
+          body[data-page-role="student"] .hamburger-btn {
+               width: 48px !important;
+               height: 48px !important;
+               min-width: 48px !important;
+               border-radius: 16px !important;
+               display: inline-flex !important;
+               align-items: center !important;
+               justify-content: center !important;
+               flex-direction: column !important;
+               gap: 5px !important;
+               background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(6, 182, 212, 0.1)) !important;
+               border: 1px solid rgba(96, 165, 250, 0.28) !important;
+               box-shadow:
+                    0 14px 28px rgba(37, 99, 235, 0.18),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+               color: #93c5fd !important;
+          }
+
+          body[data-page-role="student"] #hamburgerBtn:hover,
+          body[data-page-role="student"] .hamburger-btn:hover {
+               transform: translateY(-2px);
+               border-color: rgba(96, 165, 250, 0.48) !important;
+               box-shadow:
+                    0 18px 36px rgba(37, 99, 235, 0.26),
+                    0 0 22px rgba(59, 130, 246, 0.18) !important;
+          }
+
+          body[data-page-role="student"] #hamburgerBtn .bar,
+          body[data-page-role="student"] .hamburger-btn .bar {
+               width: 22px !important;
+               height: 2px !important;
+               border-radius: 999px !important;
+               background: #bfdbfe !important;
+               display: block !important;
+               transition: 0.25s ease !important;
+          }
+
+          @keyframes settingsLogoRotate {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes settingsLogoPulse {
+
+               0%,
+               100% {
+                    opacity: 0.9;
+                    transform: scale(1);
+               }
+
+               50% {
+                    opacity: 1;
+                    transform: scale(1.12);
+               }
+          }
+     </style>
+
 </head>
 
-<body>
-
-     <body data-page-role="student"></body>
+<body data-page-role="student">
      <div class="dashboard-layout">
           <aside class="sidebar">
                <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
+                    <h2 class="sidebar-logo settings-sidebar-logo">
+                         <span class="settings-logo-mark" aria-hidden="true">
+                              <svg class="settings-neural-logo-svg" viewBox="0 0 44 44" fill="none"
+                                   xmlns="http://www.w3.org/2000/svg">
+                                   <polygon class="settings-logo-hex" points="22,2 38,11 38,33 22,42 6,33 6,11"
+                                        stroke="url(#settingsLogoGrad)" stroke-width="1.8" fill="none" opacity="0.95" />
+                                   <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#settingsLogoBg)"
+                                        opacity="0.2" />
+                                   <line x1="22" y1="15" x2="14" y2="24" stroke="url(#settingsLogoLine)"
+                                        stroke-width="1.15" opacity="0.9" />
+                                   <line x1="22" y1="15" x2="30" y2="24" stroke="url(#settingsLogoLine)"
+                                        stroke-width="1.15" opacity="0.9" />
+                                   <line x1="14" y1="24" x2="22" y2="30" stroke="url(#settingsLogoLine)"
+                                        stroke-width="1.15" opacity="0.9" />
+                                   <line x1="30" y1="24" x2="22" y2="30" stroke="url(#settingsLogoLine)"
+                                        stroke-width="1.15" opacity="0.9" />
+                                   <circle class="settings-logo-node" cx="22" cy="15" r="2.8" fill="#60a5fa" />
+                                   <circle class="settings-logo-node" cx="14" cy="24" r="2.25" fill="#38bdf8" />
+                                   <circle class="settings-logo-node" cx="30" cy="24" r="2.25" fill="#2563eb" />
+                                   <circle class="settings-logo-node" cx="22" cy="30" r="2.05" fill="#22d3ee" />
+                                   <circle cx="22" cy="22" r="1.25" fill="#ffffff" opacity="0.95" />
+                                   <defs>
+                                        <linearGradient id="settingsLogoGrad" x1="6" y1="2" x2="38" y2="42"
+                                             gradientUnits="userSpaceOnUse">
+                                             <stop offset="0%" stop-color="#93c5fd" />
+                                             <stop offset="45%" stop-color="#38bdf8" />
+                                             <stop offset="100%" stop-color="#2563eb" />
+                                        </linearGradient>
+                                        <linearGradient id="settingsLogoBg" x1="6" y1="2" x2="38" y2="42"
+                                             gradientUnits="userSpaceOnUse">
+                                             <stop offset="0%" stop-color="#60a5fa" />
+                                             <stop offset="100%" stop-color="#22d3ee" />
+                                        </linearGradient>
+                                        <linearGradient id="settingsLogoLine" x1="0" y1="0" x2="44" y2="44"
+                                             gradientUnits="userSpaceOnUse">
+                                             <stop offset="0%" stop-color="#93c5fd" />
+                                             <stop offset="100%" stop-color="#38bdf8" />
+                                        </linearGradient>
+                                   </defs>
+                              </svg>
+                         </span>
+                         <span class="settings-logo-text">
+                              <strong>EduMind AI</strong>
+                              <small>Student Panel</small>
+                         </span>
                     </h2>
+
+                    <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Toggle sidebar"
+                         aria-expanded="true">
+                         <span class="bar"></span>
+                         <span class="bar"></span>
+                         <span class="bar"></span>
+                    </button>
                </div>
                <nav class="sidebar-nav">
                     <a href="dashboard.html" class="nav-item"><i

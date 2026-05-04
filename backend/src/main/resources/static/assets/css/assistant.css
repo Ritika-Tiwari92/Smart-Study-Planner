@@ -1667,3 +1667,1581 @@ body.dark-mode .ai-bg-animation {
     opacity: 0.9;
   }
 }
+/* =====================================================
+   EduMind AI Assistant — Final Orbit + Theme Restore
+   Paste at the VERY END of assistant.css
+   Fixes:
+   - preview-dark + dark-mode both supported
+   - orbit/constellation visible again
+   - dark mode side cards not white
+   - animation behind content but above page background
+===================================================== */
+
+/* ---------- Animation Layer Restore ---------- */
+
+.ai-bg-animation {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+.dashboard-layout {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.assistant-page-main {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+
+.assistant-body,
+.assistant-chat-panel {
+  position: relative !important;
+  background: transparent !important;
+}
+
+.assistant-topbar,
+.assistant-side-panel,
+.assistant-hero,
+.chat-input-wrapper,
+.chat-messages {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Make orbit center align better with assistant hero area */
+.ai-core,
+.ai-orbit {
+  top: 44% !important;
+  left: 45% !important;
+}
+
+/* Force all animation elements visible */
+.ai-grid,
+.ai-core,
+.ai-orbit,
+.ai-orbit-dot,
+.ai-node,
+.ai-lines-svg,
+.ai-line {
+  visibility: visible !important;
+  display: block !important;
+  animation-play-state: running !important;
+}
+
+/* ---------- Dark Mode / preview-dark Background ---------- */
+
+body.preview-dark .assistant-page-main,
+body.dark-mode .assistant-page-main {
+  background:
+    radial-gradient(
+      circle at 42% 28%,
+      rgba(124, 92, 255, 0.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 66% 20%,
+      rgba(34, 211, 238, 0.1),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 16% 86%,
+      rgba(20, 184, 166, 0.08),
+      transparent 30%
+    ),
+    #07111f !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-page-main {
+  background:
+    radial-gradient(
+      circle at 42% 28%,
+      rgba(124, 92, 255, 0.1),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 66% 20%,
+      rgba(20, 184, 166, 0.08),
+      transparent 32%
+    ),
+    #f6fbfc !important;
+}
+
+/* ---------- Star / Constellation Visibility ---------- */
+
+body.preview-dark .ai-bg-animation,
+body.dark-mode .ai-bg-animation {
+  opacity: 1 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-bg-animation {
+  opacity: 0.92 !important;
+}
+
+body.preview-dark .ai-bg-animation::before,
+body.dark-mode .ai-bg-animation::before {
+  opacity: 1 !important;
+  background-image:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(255, 255, 255, 0.75) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 22% 78%,
+      rgba(45, 212, 191, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 68% 16%,
+      rgba(255, 255, 255, 0.65) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 82% 64%,
+      rgba(34, 211, 238, 0.78) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 91% 34%,
+      rgba(196, 181, 253, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 38% 52%,
+      rgba(255, 255, 255, 0.55) 0 1px,
+      transparent 2px
+    ) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-bg-animation::before {
+  opacity: 0.55 !important;
+}
+
+/* Grid */
+body.preview-dark .ai-grid,
+body.dark-mode .ai-grid {
+  opacity: 0.24 !important;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.055) 1px, transparent 1px) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.13 !important;
+  background-image:
+    linear-gradient(rgba(20, 184, 166, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.06) 1px, transparent 1px) !important;
+}
+
+/* Core */
+body.preview-dark .ai-core,
+body.dark-mode .ai-core {
+  opacity: 1 !important;
+  background: radial-gradient(
+    circle,
+    rgba(124, 92, 255, 0.42) 0%,
+    rgba(34, 211, 238, 0.2) 48%,
+    transparent 76%
+  ) !important;
+  box-shadow:
+    0 0 60px rgba(124, 92, 255, 0.34),
+    0 0 120px rgba(34, 211, 238, 0.22),
+    0 0 180px rgba(20, 184, 166, 0.1) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-core {
+  opacity: 0.82 !important;
+  background: radial-gradient(
+    circle,
+    rgba(124, 92, 255, 0.22) 0%,
+    rgba(20, 184, 166, 0.12) 48%,
+    transparent 76%
+  ) !important;
+  box-shadow:
+    0 0 42px rgba(124, 92, 255, 0.16),
+    0 0 80px rgba(20, 184, 166, 0.12) !important;
+}
+
+/* Orbit Rings */
+body.preview-dark .ai-orbit-1,
+body.dark-mode .ai-orbit-1 {
+  border-color: rgba(34, 211, 238, 0.28) !important;
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.1) !important;
+}
+
+body.preview-dark .ai-orbit-2,
+body.dark-mode .ai-orbit-2 {
+  border-color: rgba(124, 92, 255, 0.24) !important;
+}
+
+body.preview-dark .ai-orbit-3,
+body.dark-mode .ai-orbit-3 {
+  border-color: rgba(45, 212, 191, 0.16) !important;
+}
+
+body.preview-dark .ai-orbit-4,
+body.dark-mode .ai-orbit-4 {
+  border-color: rgba(34, 211, 238, 0.1) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-orbit-1 {
+  border-color: rgba(124, 92, 255, 0.2) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-orbit-2 {
+  border-color: rgba(20, 184, 166, 0.18) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-orbit-3,
+body:not(.preview-dark):not(.dark-mode) .ai-orbit-4 {
+  border-color: rgba(34, 211, 238, 0.12) !important;
+}
+
+/* Orbit Dots */
+body.preview-dark .ai-orbit-dot,
+body.dark-mode .ai-orbit-dot {
+  opacity: 1 !important;
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.9),
+    0 0 28px rgba(124, 92, 255, 0.45) !important;
+}
+
+body.preview-dark .ai-orbit-1 .ai-orbit-dot,
+body.dark-mode .ai-orbit-1 .ai-orbit-dot {
+  background: #22d3ee !important;
+}
+
+body.preview-dark .ai-orbit-2 .ai-orbit-dot,
+body.dark-mode .ai-orbit-2 .ai-orbit-dot {
+  background: #8b7cff !important;
+}
+
+body.preview-dark .ai-orbit-3 .ai-orbit-dot,
+body.dark-mode .ai-orbit-3 .ai-orbit-dot {
+  background: #2dd4bf !important;
+}
+
+body.preview-dark .ai-orbit-4 .ai-orbit-dot,
+body.dark-mode .ai-orbit-4 .ai-orbit-dot {
+  background: #7dd3fc !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-orbit-dot {
+  opacity: 0.76 !important;
+  box-shadow:
+    0 0 10px rgba(124, 92, 255, 0.42),
+    0 0 18px rgba(20, 184, 166, 0.25) !important;
+}
+
+/* Floating nodes + connection lines */
+body.preview-dark .ai-node,
+body.dark-mode .ai-node {
+  opacity: 0.95 !important;
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.55) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-node {
+  opacity: 0.5 !important;
+}
+
+body.preview-dark .ai-lines-svg,
+body.dark-mode .ai-lines-svg {
+  opacity: 0.18 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-lines-svg {
+  opacity: 0.1 !important;
+}
+
+body.preview-dark .ai-line,
+body.dark-mode .ai-line {
+  stroke: rgba(34, 211, 238, 0.58) !important;
+  opacity: 0.75 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-line {
+  stroke: rgba(20, 184, 166, 0.42) !important;
+  opacity: 0.35 !important;
+}
+
+/* ---------- Hero Robot Premium Glow ---------- */
+
+.assistant-hero {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.assistant-hero::before {
+  content: "";
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(34, 211, 238, 0.15), transparent 55%),
+    radial-gradient(circle, rgba(124, 92, 255, 0.12), transparent 72%);
+  filter: blur(8px);
+  opacity: 0.95;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-hero::before {
+  opacity: 0.62;
+}
+
+.assistant-hero-avatar {
+  z-index: 6 !important;
+}
+
+/* ---------- Assistant Dark/Light UI Consistency ---------- */
+
+body.preview-dark .assistant-topbar,
+body.dark-mode .assistant-topbar {
+  background: rgba(8, 17, 30, 0.92) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.14) !important;
+  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.24) !important;
+}
+
+body.preview-dark .assistant-topbar-left h1,
+body.dark-mode .assistant-topbar-left h1 {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .assistant-topbar-left p,
+body.dark-mode .assistant-topbar-left p {
+  color: #9aa8bd !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-topbar {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: rgba(20, 184, 166, 0.14) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-topbar-left h1 {
+  color: #0f172a !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-topbar-left p {
+  color: #64748b !important;
+}
+
+/* Right panel */
+body.preview-dark .assistant-side-panel,
+body.dark-mode .assistant-side-panel {
+  background: rgba(8, 17, 30, 0.86) !important;
+  border-left-color: rgba(148, 163, 184, 0.14) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-side-panel {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-left-color: rgba(20, 184, 166, 0.14) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+body.preview-dark .side-section-title,
+body.dark-mode .side-section-title {
+  color: #94a3b8 !important;
+  border-bottom-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .side-section-title {
+  color: #475569 !important;
+  border-bottom-color: rgba(20, 184, 166, 0.16) !important;
+}
+
+/* Suggested help + recent chats */
+body.preview-dark .assistant-help-item,
+body.dark-mode .assistant-help-item,
+body.preview-dark .history-item,
+body.dark-mode .history-item {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  color: #e5edf7 !important;
+}
+
+body.preview-dark .assistant-help-item span,
+body.dark-mode .assistant-help-item span,
+body.preview-dark .history-item-title,
+body.dark-mode .history-item-title {
+  color: #e5edf7 !important;
+}
+
+body.preview-dark .assistant-help-item:hover,
+body.dark-mode .assistant-help-item:hover,
+body.preview-dark .history-item:hover,
+body.dark-mode .history-item:hover {
+  background: rgba(20, 184, 166, 0.12) !important;
+  border-color: rgba(45, 212, 191, 0.24) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-help-item,
+body:not(.preview-dark):not(.dark-mode) .history-item {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(20, 184, 166, 0.14) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-help-item span,
+body:not(.preview-dark):not(.dark-mode) .history-item-title {
+  color: #334155 !important;
+}
+
+/* Input box */
+body.preview-dark .chat-input-box,
+body.dark-mode .chat-input-box {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.26) !important;
+}
+
+body.preview-dark .chat-input-box input,
+body.dark-mode .chat-input-box input {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .chat-input-box input::placeholder,
+body.dark-mode .chat-input-box input::placeholder {
+  color: #64748b !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .chat-input-box {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(20, 184, 166, 0.16) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .chat-input-box input {
+  color: #0f172a !important;
+}
+
+/* Hero text */
+body.preview-dark .assistant-hero h2,
+body.dark-mode .assistant-hero h2 {
+  color: #f8fafc !important;
+  text-shadow: 0 0 22px rgba(34, 211, 238, 0.18) !important;
+}
+
+body.preview-dark .assistant-hero p,
+body.dark-mode .assistant-hero p {
+  color: #cbd5e1 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-hero h2 {
+  color: #0f172a !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-hero p {
+  color: #475569 !important;
+}
+
+/* Chips */
+body.preview-dark .assistant-chip,
+body.dark-mode .assistant-chip {
+  background: rgba(15, 23, 42, 0.82) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+body.preview-dark .assistant-chip:hover,
+body.dark-mode .assistant-chip:hover {
+  background: rgba(124, 92, 255, 0.18) !important;
+  border-color: rgba(139, 124, 255, 0.36) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .assistant-chip {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(124, 92, 255, 0.22) !important;
+}
+
+/* Responsive orbit */
+@media (max-width: 900px) {
+  .ai-core,
+  .ai-orbit {
+    left: 50% !important;
+    top: 46% !important;
+  }
+
+  .ai-orbit-4 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ai-orbit-3,
+  .ai-orbit-4 {
+    display: none !important;
+  }
+
+  .assistant-hero::before {
+    width: 320px;
+    height: 320px;
+  }
+}
+/* =====================================================
+   EduMind AI Assistant — Final Premium Orbit Animation
+   Paste at the VERY END of assistant.css
+   Fixes assistant-only:
+   - light/dark toggle mismatch
+   - missing orbit / constellation visibility
+   - premium cosmic animation in both themes
+===================================================== */
+
+body.assistant-page {
+  background: #f6fbfc !important;
+  overflow: hidden;
+}
+
+body.assistant-page.preview-dark,
+body.assistant-page.dark-mode {
+  background: #070b18 !important;
+}
+
+/* Keep assistant page as a clean animation stage */
+body.assistant-page .dashboard-layout {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+body.assistant-page .dashboard-main,
+body.assistant-page .assistant-page-main,
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel {
+  background: transparent !important;
+}
+
+body.assistant-page .assistant-page-main {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+
+/* Main animation layer */
+body.assistant-page .ai-bg-animation {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* Content above animation */
+body.assistant-page .sidebar,
+body.assistant-page .assistant-topbar,
+body.assistant-page .assistant-side-panel,
+body.assistant-page .assistant-hero,
+body.assistant-page .chat-input-wrapper,
+body.assistant-page .chat-messages {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Cosmic page background */
+body.assistant-page.preview-dark .assistant-page-main,
+body.assistant-page.dark-mode .assistant-page-main {
+  background:
+    radial-gradient(
+      circle at 48% 44%,
+      rgba(124, 92, 255, 0.18),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 70% 32%,
+      rgba(34, 211, 238, 0.1),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 20% 80%,
+      rgba(20, 184, 166, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #080b18 0%, #101025 48%, #07111f 100%) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-page-main {
+  background:
+    radial-gradient(
+      circle at 48% 44%,
+      rgba(124, 92, 255, 0.13),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 70% 32%,
+      rgba(20, 184, 166, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #f9fbff 0%, #f1eeff 48%, #eefafa 100%) !important;
+}
+
+/* Center orbit position */
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit {
+  top: 52% !important;
+  left: 50% !important;
+}
+
+/* Bigger premium rings */
+body.assistant-page .ai-core {
+  width: 96px !important;
+  height: 96px !important;
+}
+
+body.assistant-page .ai-orbit-1 {
+  width: 230px !important;
+  height: 230px !important;
+  margin-left: -115px !important;
+  margin-top: -115px !important;
+}
+
+body.assistant-page .ai-orbit-2 {
+  width: 410px !important;
+  height: 410px !important;
+  margin-left: -205px !important;
+  margin-top: -205px !important;
+}
+
+body.assistant-page .ai-orbit-3 {
+  width: 620px !important;
+  height: 620px !important;
+  margin-left: -310px !important;
+  margin-top: -310px !important;
+}
+
+body.assistant-page .ai-orbit-4 {
+  width: 820px !important;
+  height: 820px !important;
+  margin-left: -410px !important;
+  margin-top: -410px !important;
+}
+
+/* Force animation elements visible */
+body.assistant-page .ai-grid,
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit,
+body.assistant-page .ai-orbit-dot,
+body.assistant-page .ai-node,
+body.assistant-page .ai-lines-svg,
+body.assistant-page .ai-line {
+  visibility: visible !important;
+  display: block !important;
+  animation-play-state: running !important;
+}
+
+/* Stars */
+body.assistant-page .ai-bg-animation::before {
+  opacity: 1 !important;
+  background-image:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(255, 255, 255, 0.75) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 22% 78%,
+      rgba(45, 212, 191, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 68% 16%,
+      rgba(255, 255, 255, 0.65) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 82% 64%,
+      rgba(34, 211, 238, 0.78) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 91% 34%,
+      rgba(196, 181, 253, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 38% 52%,
+      rgba(255, 255, 255, 0.55) 0 1px,
+      transparent 2px
+    ) !important;
+  animation: starTwinkle 5.5s ease-in-out infinite !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode)
+  .ai-bg-animation::before {
+  opacity: 0.42 !important;
+}
+
+/* Grid */
+body.assistant-page.preview-dark .ai-grid,
+body.assistant-page.dark-mode .ai-grid {
+  opacity: 0.24 !important;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.13 !important;
+  background-image:
+    linear-gradient(rgba(124, 92, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.05) 1px, transparent 1px) !important;
+}
+
+/* Core */
+body.assistant-page.preview-dark .ai-core,
+body.assistant-page.dark-mode .ai-core {
+  opacity: 1 !important;
+  background: radial-gradient(
+    circle,
+    rgba(8, 10, 20, 0.92) 0%,
+    rgba(124, 92, 255, 0.34) 38%,
+    rgba(34, 211, 238, 0.16) 60%,
+    transparent 78%
+  ) !important;
+  box-shadow:
+    0 0 52px rgba(124, 92, 255, 0.38),
+    0 0 110px rgba(34, 211, 238, 0.2),
+    0 0 190px rgba(20, 184, 166, 0.1) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-core {
+  opacity: 0.8 !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.74) 0%,
+    rgba(124, 92, 255, 0.2) 42%,
+    rgba(20, 184, 166, 0.12) 62%,
+    transparent 80%
+  ) !important;
+  box-shadow:
+    0 0 46px rgba(124, 92, 255, 0.16),
+    0 0 90px rgba(20, 184, 166, 0.12) !important;
+}
+
+/* Rings */
+body.assistant-page.preview-dark .ai-orbit,
+body.assistant-page.dark-mode .ai-orbit {
+  opacity: 1 !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-1,
+body.assistant-page.dark-mode .ai-orbit-1 {
+  border-color: rgba(34, 211, 238, 0.28) !important;
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.1) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-2,
+body.assistant-page.dark-mode .ai-orbit-2 {
+  border-color: rgba(124, 92, 255, 0.24) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-3,
+body.assistant-page.dark-mode .ai-orbit-3 {
+  border-color: rgba(45, 212, 191, 0.16) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-4,
+body.assistant-page.dark-mode .ai-orbit-4 {
+  border-color: rgba(34, 211, 238, 0.1) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-1 {
+  border-color: rgba(124, 92, 255, 0.18) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-2 {
+  border-color: rgba(20, 184, 166, 0.14) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-3,
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-4 {
+  border-color: rgba(34, 211, 238, 0.1) !important;
+}
+
+/* Orbit dots */
+body.assistant-page.preview-dark .ai-orbit-dot,
+body.assistant-page.dark-mode .ai-orbit-dot {
+  opacity: 1 !important;
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.9),
+    0 0 28px rgba(124, 92, 255, 0.45) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-1 .ai-orbit-dot,
+body.assistant-page.dark-mode .ai-orbit-1 .ai-orbit-dot {
+  background: #22d3ee !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-2 .ai-orbit-dot,
+body.assistant-page.dark-mode .ai-orbit-2 .ai-orbit-dot {
+  background: #8b7cff !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-3 .ai-orbit-dot,
+body.assistant-page.dark-mode .ai-orbit-3 .ai-orbit-dot {
+  background: #2dd4bf !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-4 .ai-orbit-dot,
+body.assistant-page.dark-mode .ai-orbit-4 .ai-orbit-dot {
+  background: #7dd3fc !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-dot {
+  opacity: 0.7 !important;
+  box-shadow:
+    0 0 10px rgba(124, 92, 255, 0.38),
+    0 0 18px rgba(20, 184, 166, 0.22) !important;
+}
+
+/* Floating nodes + connection lines */
+body.assistant-page.preview-dark .ai-node,
+body.assistant-page.dark-mode .ai-node {
+  opacity: 0.95 !important;
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.55) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-node {
+  opacity: 0.48 !important;
+}
+
+body.assistant-page.preview-dark .ai-lines-svg,
+body.assistant-page.dark-mode .ai-lines-svg {
+  opacity: 0.18 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-lines-svg {
+  opacity: 0.09 !important;
+}
+
+body.assistant-page.preview-dark .ai-line,
+body.assistant-page.dark-mode .ai-line {
+  stroke: rgba(34, 211, 238, 0.58) !important;
+  opacity: 0.75 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-line {
+  stroke: rgba(20, 184, 166, 0.42) !important;
+  opacity: 0.34 !important;
+}
+
+/* Topbar */
+body.assistant-page.preview-dark .assistant-topbar,
+body.assistant-page.dark-mode .assistant-topbar {
+  background: rgba(8, 10, 22, 0.88) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.14) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-topbar {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-bottom-color: rgba(124, 92, 255, 0.12) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+/* Right panel */
+body.assistant-page.preview-dark .assistant-side-panel,
+body.assistant-page.dark-mode .assistant-side-panel {
+  background: rgba(10, 10, 22, 0.76) !important;
+  border-left-color: rgba(148, 163, 184, 0.14) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-side-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-left-color: rgba(124, 92, 255, 0.12) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+/* Side cards */
+body.assistant-page.preview-dark .assistant-help-item,
+body.assistant-page.dark-mode .assistant-help-item,
+body.assistant-page.preview-dark .history-item,
+body.assistant-page.dark-mode .history-item {
+  background: rgba(20, 18, 35, 0.86) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  color: #e5edf7 !important;
+}
+
+body.assistant-page.preview-dark .assistant-help-item span,
+body.assistant-page.dark-mode .assistant-help-item span,
+body.assistant-page.preview-dark .history-item-title,
+body.assistant-page.dark-mode .history-item-title {
+  color: #e5edf7 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-help-item,
+body.assistant-page:not(.preview-dark):not(.dark-mode) .history-item {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-color: rgba(124, 92, 255, 0.12) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode)
+  .assistant-help-item
+  span,
+body.assistant-page:not(.preview-dark):not(.dark-mode) .history-item-title {
+  color: #334155 !important;
+}
+
+/* Hero text */
+body.assistant-page.preview-dark .assistant-hero h2,
+body.assistant-page.dark-mode .assistant-hero h2 {
+  color: #f8fafc !important;
+  text-shadow: 0 0 22px rgba(34, 211, 238, 0.18) !important;
+}
+
+body.assistant-page.preview-dark .assistant-hero p,
+body.assistant-page.dark-mode .assistant-hero p {
+  color: #cbd5e1 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-hero h2 {
+  color: #111827 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-hero p {
+  color: #475569 !important;
+}
+
+/* Chips */
+body.assistant-page.preview-dark .assistant-chip,
+body.assistant-page.dark-mode .assistant-chip {
+  background: rgba(24, 22, 44, 0.72) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(196, 181, 253, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-chip {
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: #5b4ff5 !important;
+  border-color: rgba(124, 92, 255, 0.18) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Chat input */
+body.assistant-page.preview-dark .chat-input-box,
+body.assistant-page.dark-mode .chat-input-box {
+  background: rgba(10, 10, 22, 0.74) !important;
+  border-color: rgba(196, 181, 253, 0.18) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+body.assistant-page.preview-dark .chat-input-box input,
+body.assistant-page.dark-mode .chat-input-box input {
+  color: #f8fafc !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .chat-input-box {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-color: rgba(124, 92, 255, 0.14) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .chat-input-box input {
+  color: #0f172a !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  body.assistant-page .ai-orbit-4 {
+    display: none !important;
+  }
+
+  body.assistant-page .ai-core,
+  body.assistant-page .ai-orbit {
+    left: 50% !important;
+    top: 50% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  body.assistant-page .ai-orbit-3,
+  body.assistant-page .ai-orbit-4 {
+    display: none !important;
+  }
+}
+/* =====================================================
+   FINAL ASSISTANT FIX — Visible orbit animation + input fix
+   Paste at the VERY END of assistant.css
+===================================================== */
+
+/* Page background ko body pe rakho, main content transparent rahe */
+body.assistant-page,
+body:has(.assistant-page-main) {
+  min-height: 100vh !important;
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(124, 92, 255, 0.14),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 34%,
+      rgba(34, 211, 238, 0.1),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #070b18 0%, #101025 50%, #06131d 100%) !important;
+  overflow: hidden !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode),
+body:has(.assistant-page-main):not(.preview-dark):not(.dark-mode) {
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(124, 92, 255, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 72% 34%,
+      rgba(20, 184, 166, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #f9fbff 0%, #f1eeff 50%, #eefafa 100%) !important;
+}
+
+/* Main sections transparent so animation can be seen */
+body.assistant-page .dashboard-layout,
+body.assistant-page .dashboard-main,
+body.assistant-page .assistant-page-main,
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel,
+body:has(.assistant-page-main) .dashboard-layout,
+body:has(.assistant-page-main) .dashboard-main,
+body:has(.assistant-page-main) .assistant-page-main,
+body:has(.assistant-page-main) .assistant-body,
+body:has(.assistant-page-main) .assistant-chat-panel {
+  background: transparent !important;
+}
+
+/* Animation layer visible behind content */
+body.assistant-page .ai-bg-animation,
+body:has(.assistant-page-main) .ai-bg-animation {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* Layout above animation */
+body.assistant-page .dashboard-layout,
+body:has(.assistant-page-main) .dashboard-layout {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Content above animation */
+body.assistant-page .sidebar,
+body.assistant-page .assistant-topbar,
+body.assistant-page .assistant-side-panel,
+body.assistant-page .assistant-hero,
+body.assistant-page .chat-input-wrapper,
+body.assistant-page .chat-messages,
+body:has(.assistant-page-main) .sidebar,
+body:has(.assistant-page-main) .assistant-topbar,
+body:has(.assistant-page-main) .assistant-side-panel,
+body:has(.assistant-page-main) .assistant-hero,
+body:has(.assistant-page-main) .chat-input-wrapper,
+body:has(.assistant-page-main) .chat-messages {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Make orbit large and centered like reference */
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit,
+body:has(.assistant-page-main) .ai-core,
+body:has(.assistant-page-main) .ai-orbit {
+  top: 53% !important;
+  left: 50% !important;
+}
+
+body.assistant-page .ai-core,
+body:has(.assistant-page-main) .ai-core {
+  width: 110px !important;
+  height: 110px !important;
+}
+
+body.assistant-page .ai-orbit-1,
+body:has(.assistant-page-main) .ai-orbit-1 {
+  width: 250px !important;
+  height: 250px !important;
+  margin-left: -125px !important;
+  margin-top: -125px !important;
+  border-color: rgba(34, 211, 238, 0.26) !important;
+}
+
+body.assistant-page .ai-orbit-2,
+body:has(.assistant-page-main) .ai-orbit-2 {
+  width: 430px !important;
+  height: 430px !important;
+  margin-left: -215px !important;
+  margin-top: -215px !important;
+  border-color: rgba(124, 92, 255, 0.24) !important;
+}
+
+body.assistant-page .ai-orbit-3,
+body:has(.assistant-page-main) .ai-orbit-3 {
+  width: 640px !important;
+  height: 640px !important;
+  margin-left: -320px !important;
+  margin-top: -320px !important;
+  border-color: rgba(45, 212, 191, 0.15) !important;
+}
+
+body.assistant-page .ai-orbit-4,
+body:has(.assistant-page-main) .ai-orbit-4 {
+  width: 860px !important;
+  height: 860px !important;
+  margin-left: -430px !important;
+  margin-top: -430px !important;
+  border-color: rgba(34, 211, 238, 0.1) !important;
+}
+
+/* Force orbit elements visible */
+body.assistant-page .ai-grid,
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit,
+body.assistant-page .ai-orbit-dot,
+body.assistant-page .ai-node,
+body.assistant-page .ai-lines-svg,
+body.assistant-page .ai-line,
+body:has(.assistant-page-main) .ai-grid,
+body:has(.assistant-page-main) .ai-core,
+body:has(.assistant-page-main) .ai-orbit,
+body:has(.assistant-page-main) .ai-orbit-dot,
+body:has(.assistant-page-main) .ai-node,
+body:has(.assistant-page-main) .ai-lines-svg,
+body:has(.assistant-page-main) .ai-line {
+  display: block !important;
+  visibility: visible !important;
+  animation-play-state: running !important;
+}
+
+/* Dark mode orbit visibility */
+body.preview-dark .ai-core,
+body.dark-mode .ai-core {
+  opacity: 1 !important;
+  background: radial-gradient(
+    circle,
+    rgba(8, 10, 20, 0.95) 0%,
+    rgba(124, 92, 255, 0.4) 38%,
+    rgba(34, 211, 238, 0.2) 62%,
+    transparent 80%
+  ) !important;
+  box-shadow:
+    0 0 58px rgba(124, 92, 255, 0.42),
+    0 0 120px rgba(34, 211, 238, 0.24),
+    0 0 200px rgba(20, 184, 166, 0.12) !important;
+}
+
+body.preview-dark .ai-grid,
+body.dark-mode .ai-grid {
+  opacity: 0.24 !important;
+}
+
+body.preview-dark .ai-lines-svg,
+body.dark-mode .ai-lines-svg {
+  opacity: 0.2 !important;
+}
+
+body.preview-dark .ai-line,
+body.dark-mode .ai-line {
+  stroke: rgba(34, 211, 238, 0.58) !important;
+  opacity: 0.75 !important;
+}
+
+body.preview-dark .ai-node,
+body.dark-mode .ai-node {
+  opacity: 0.95 !important;
+}
+
+body.preview-dark .ai-orbit-dot,
+body.dark-mode .ai-orbit-dot {
+  opacity: 1 !important;
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.9),
+    0 0 28px rgba(124, 92, 255, 0.45) !important;
+}
+
+/* Light mode soft orbit */
+body:not(.preview-dark):not(.dark-mode) .ai-core {
+  opacity: 0.85 !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(124, 92, 255, 0.22) 42%,
+    rgba(20, 184, 166, 0.12) 65%,
+    transparent 82%
+  ) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.12 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-lines-svg {
+  opacity: 0.1 !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .ai-line {
+  stroke: rgba(20, 184, 166, 0.42) !important;
+  opacity: 0.35 !important;
+}
+
+/* =====================================================
+   CHAT INPUT BLACK RECTANGLE FIX
+===================================================== */
+
+body.assistant-page .chat-input-wrapper,
+body:has(.assistant-page-main) .chat-input-wrapper {
+  width: 100% !important;
+  position: relative !important;
+  z-index: 8 !important;
+}
+
+body.assistant-page .chat-input-box,
+body:has(.assistant-page-main) .chat-input-box {
+  min-height: 58px !important;
+  padding: 8px 12px 8px 16px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+}
+
+body.preview-dark .chat-input-box,
+body.dark-mode .chat-input-box {
+  background: rgba(10, 14, 28, 0.78) !important;
+  border: 1px solid rgba(196, 181, 253, 0.18) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .chat-input-box {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(124, 92, 255, 0.16) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+/* This removes the black input block */
+body.assistant-page .chat-input-box input,
+body:has(.assistant-page-main) .chat-input-box input,
+body.assistant-page #assistantMessageInput,
+body:has(.assistant-page-main) #assistantMessageInput {
+  flex: 1 !important;
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+
+  padding: 0 8px !important;
+  margin: 0 !important;
+
+  color: #f8fafc !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  line-height: 42px !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .chat-input-box input,
+body:not(.preview-dark):not(.dark-mode) #assistantMessageInput {
+  color: #0f172a !important;
+}
+
+body.preview-dark .chat-input-box input::placeholder,
+body.dark-mode .chat-input-box input::placeholder {
+  color: rgba(203, 213, 225, 0.52) !important;
+}
+
+body:not(.preview-dark):not(.dark-mode) .chat-input-box input::placeholder {
+  color: rgba(100, 116, 139, 0.7) !important;
+}
+
+body.assistant-page .chat-icon,
+body:has(.assistant-page-main) .chat-icon {
+  width: 22px !important;
+  min-width: 22px !important;
+  color: #a78bfa !important;
+}
+
+body.assistant-page .send-chat-btn,
+body:has(.assistant-page-main) .send-chat-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 14px !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+/* =====================================================
+   STRUCTURAL FIX — AI animation inside assistant main
+   Paste at the VERY END of assistant.css
+===================================================== */
+
+body.assistant-page .assistant-page-main,
+body:has(.assistant-page-main) .assistant-page-main {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background:
+    radial-gradient(
+      circle at 50% 38%,
+      rgba(124, 92, 255, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 38%,
+      rgba(34, 211, 238, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #070b18 0%, #101025 50%, #06131d 100%) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .assistant-page-main,
+body:has(.assistant-page-main):not(.preview-dark):not(.dark-mode)
+  .assistant-page-main {
+  background:
+    radial-gradient(
+      circle at 50% 38%,
+      rgba(124, 92, 255, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 72% 38%,
+      rgba(20, 184, 166, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #f9fbff 0%, #f1eeff 50%, #eefafa 100%) !important;
+}
+
+/* Animation layer now inside assistant main */
+body.assistant-page .assistant-page-main > .ai-bg-animation,
+body:has(.assistant-page-main) .assistant-page-main > .ai-bg-animation {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* Content must stay above animation */
+body.assistant-page .assistant-topbar,
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel,
+body.assistant-page .assistant-side-panel,
+body.assistant-page .assistant-hero,
+body.assistant-page .chat-input-wrapper,
+body:has(.assistant-page-main) .assistant-topbar,
+body:has(.assistant-page-main) .assistant-body,
+body:has(.assistant-page-main) .assistant-chat-panel,
+body:has(.assistant-page-main) .assistant-side-panel,
+body:has(.assistant-page-main) .assistant-hero,
+body:has(.assistant-page-main) .chat-input-wrapper {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+/* Transparent center panels */
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel,
+body:has(.assistant-page-main) .assistant-body,
+body:has(.assistant-page-main) .assistant-chat-panel {
+  background: transparent !important;
+}
+
+/* Orbit center */
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-core,
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-orbit,
+body:has(.assistant-page-main) .assistant-page-main > .ai-bg-animation .ai-core,
+body:has(.assistant-page-main)
+  .assistant-page-main
+  > .ai-bg-animation
+  .ai-orbit {
+  top: 54% !important;
+  left: 48% !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Make orbit bigger */
+body.assistant-page .ai-core,
+body:has(.assistant-page-main) .ai-core {
+  width: 130px !important;
+  height: 130px !important;
+}
+
+body.assistant-page .ai-orbit-1,
+body:has(.assistant-page-main) .ai-orbit-1 {
+  width: 270px !important;
+  height: 270px !important;
+  margin-left: -135px !important;
+  margin-top: -135px !important;
+}
+
+body.assistant-page .ai-orbit-2,
+body:has(.assistant-page-main) .ai-orbit-2 {
+  width: 470px !important;
+  height: 470px !important;
+  margin-left: -235px !important;
+  margin-top: -235px !important;
+}
+
+body.assistant-page .ai-orbit-3,
+body:has(.assistant-page-main) .ai-orbit-3 {
+  width: 700px !important;
+  height: 700px !important;
+  margin-left: -350px !important;
+  margin-top: -350px !important;
+}
+
+body.assistant-page .ai-orbit-4,
+body:has(.assistant-page-main) .ai-orbit-4 {
+  width: 920px !important;
+  height: 920px !important;
+  margin-left: -460px !important;
+  margin-top: -460px !important;
+}
+
+/* Force all animation items visible */
+body.assistant-page .ai-grid,
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit,
+body.assistant-page .ai-orbit-dot,
+body.assistant-page .ai-node,
+body.assistant-page .ai-lines-svg,
+body.assistant-page .ai-line,
+body:has(.assistant-page-main) .ai-grid,
+body:has(.assistant-page-main) .ai-core,
+body:has(.assistant-page-main) .ai-orbit,
+body:has(.assistant-page-main) .ai-orbit-dot,
+body:has(.assistant-page-main) .ai-node,
+body:has(.assistant-page-main) .ai-lines-svg,
+body:has(.assistant-page-main) .ai-line {
+  display: block !important;
+  visibility: visible !important;
+  animation-play-state: running !important;
+}
+
+/* Dark mode colors */
+body.assistant-page.preview-dark .ai-core,
+body.assistant-page.dark-mode .ai-core,
+body:has(.assistant-page-main).preview-dark .ai-core,
+body:has(.assistant-page-main).dark-mode .ai-core {
+  opacity: 1 !important;
+  background: radial-gradient(
+    circle,
+    rgba(8, 10, 20, 0.95) 0%,
+    rgba(124, 92, 255, 0.45) 38%,
+    rgba(34, 211, 238, 0.24) 62%,
+    transparent 80%
+  ) !important;
+  box-shadow:
+    0 0 80px rgba(124, 92, 255, 0.48),
+    0 0 150px rgba(34, 211, 238, 0.3),
+    0 0 240px rgba(20, 184, 166, 0.16) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-1,
+body.assistant-page.dark-mode .ai-orbit-1,
+body:has(.assistant-page-main).preview-dark .ai-orbit-1,
+body:has(.assistant-page-main).dark-mode .ai-orbit-1 {
+  border-color: rgba(34, 211, 238, 0.34) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-2,
+body.assistant-page.dark-mode .ai-orbit-2,
+body:has(.assistant-page-main).preview-dark .ai-orbit-2,
+body:has(.assistant-page-main).dark-mode .ai-orbit-2 {
+  border-color: rgba(124, 92, 255, 0.32) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-3,
+body.assistant-page.dark-mode .ai-orbit-3,
+body:has(.assistant-page-main).preview-dark .ai-orbit-3,
+body:has(.assistant-page-main).dark-mode .ai-orbit-3 {
+  border-color: rgba(45, 212, 191, 0.22) !important;
+}
+
+body.assistant-page.preview-dark .ai-orbit-4,
+body.assistant-page.dark-mode .ai-orbit-4,
+body:has(.assistant-page-main).preview-dark .ai-orbit-4,
+body:has(.assistant-page-main).dark-mode .ai-orbit-4 {
+  border-color: rgba(34, 211, 238, 0.14) !important;
+}
+
+body.assistant-page.preview-dark .ai-lines-svg,
+body.assistant-page.dark-mode .ai-lines-svg,
+body:has(.assistant-page-main).preview-dark .ai-lines-svg,
+body:has(.assistant-page-main).dark-mode .ai-lines-svg {
+  opacity: 0.28 !important;
+}
+
+body.assistant-page.preview-dark .ai-line,
+body.assistant-page.dark-mode .ai-line,
+body:has(.assistant-page-main).preview-dark .ai-line,
+body:has(.assistant-page-main).dark-mode .ai-line {
+  stroke: rgba(34, 211, 238, 0.7) !important;
+  opacity: 0.9 !important;
+}
+
+body.assistant-page.preview-dark .ai-grid,
+body.assistant-page.dark-mode .ai-grid,
+body:has(.assistant-page-main).preview-dark .ai-grid,
+body:has(.assistant-page-main).dark-mode .ai-grid {
+  opacity: 0.25 !important;
+}
+
+/* Light mode colors */
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-core,
+body:has(.assistant-page-main):not(.preview-dark):not(.dark-mode) .ai-core {
+  opacity: 0.88 !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(124, 92, 255, 0.26) 42%,
+    rgba(20, 184, 166, 0.15) 65%,
+    transparent 82%
+  ) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-lines-svg,
+body:has(.assistant-page-main):not(.preview-dark):not(.dark-mode)
+  .ai-lines-svg {
+  opacity: 0.13 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-grid,
+body:has(.assistant-page-main):not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.14 !important;
+}

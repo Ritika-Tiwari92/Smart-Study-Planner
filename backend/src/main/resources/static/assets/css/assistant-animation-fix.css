@@ -1,0 +1,1012 @@
+/* =========================================================
+   EduMind AI — Assistant Final Theme Matched Version
+   Big center circles + animated Astra logo
+========================================================= */
+
+/* =========================
+   PAGE FOUNDATION
+========================= */
+body.assistant-page {
+  min-height: 100vh;
+  overflow: hidden !important;
+  background:
+    radial-gradient(
+      circle at 20% 18%,
+      rgba(2, 132, 199, 0.05),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 82% 80%,
+      rgba(109, 40, 217, 0.05),
+      transparent 26%
+    ),
+    linear-gradient(135deg, #eef7f8 0%, #edf5f8 45%, #f5f8ff 100%) !important;
+}
+
+body.assistant-page.preview-dark,
+body.assistant-page.dark-mode {
+  background:
+    radial-gradient(
+      circle at 20% 18%,
+      rgba(0, 229, 255, 0.06),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 82% 80%,
+      rgba(124, 58, 237, 0.06),
+      transparent 26%
+    ),
+    linear-gradient(135deg, #071a1f 0%, #081c24 58%, #06141a 100%) !important;
+}
+
+body.assistant-page .dashboard-layout {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+body.assistant-page .dashboard-main,
+body.assistant-page .assistant-page-main,
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel {
+  background: transparent !important;
+}
+
+body.assistant-page .assistant-page-main {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+
+/* =========================
+   ANIMATION LAYER
+========================= */
+body.assistant-page .assistant-page-main > .ai-bg-animation {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+body.assistant-page .assistant-topbar,
+body.assistant-page .assistant-body,
+body.assistant-page .assistant-chat-panel,
+body.assistant-page .assistant-side-panel,
+body.assistant-page .assistant-hero,
+body.assistant-page .chat-input-wrapper,
+body.assistant-page .chat-messages {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* =========================
+   ORBIT CENTER / SIZE
+========================= */
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-core,
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-orbit {
+  top: 54% !important;
+  left: 50% !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+body.assistant-page .ai-core {
+  width: 92px !important;
+  height: 92px !important;
+  border-radius: 50% !important;
+}
+
+body.assistant-page .ai-core::before,
+body.assistant-page .ai-core::after {
+  display: none !important;
+  content: none !important;
+}
+
+body.assistant-page .ai-orbit-1 {
+  width: 230px !important;
+  height: 230px !important;
+  margin-left: -115px !important;
+  margin-top: -115px !important;
+}
+
+body.assistant-page .ai-orbit-2 {
+  width: 395px !important;
+  height: 395px !important;
+  margin-left: -197.5px !important;
+  margin-top: -197.5px !important;
+}
+
+body.assistant-page .ai-orbit-3 {
+  width: 575px !important;
+  height: 575px !important;
+  margin-left: -287.5px !important;
+  margin-top: -287.5px !important;
+}
+
+body.assistant-page .ai-orbit-4 {
+  display: none !important;
+}
+
+body.assistant-page .ai-grid,
+body.assistant-page .ai-core,
+body.assistant-page .ai-orbit,
+body.assistant-page .ai-orbit-dot,
+body.assistant-page .ai-node,
+body.assistant-page .ai-lines-svg,
+body.assistant-page .ai-line {
+  display: block !important;
+  visibility: visible !important;
+  animation-play-state: running !important;
+}
+
+/* =========================
+   STARS + SHOOTING STARS
+========================= */
+body.assistant-page .ai-bg-animation::before,
+body.assistant-page .ai-bg-animation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+body.assistant-page .ai-bg-animation::before {
+  opacity: 0.82 !important;
+  background-image:
+    radial-gradient(
+      circle at 11% 20%,
+      rgba(0, 229, 255, 0.6) 0 1.2px,
+      transparent 2.4px
+    ),
+    radial-gradient(
+      circle at 16% 70%,
+      rgba(255, 255, 255, 0.68) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 24% 26%,
+      rgba(124, 58, 237, 0.5) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 37% 78%,
+      rgba(0, 229, 255, 0.44) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 46% 18%,
+      rgba(255, 255, 255, 0.75) 0 1.2px,
+      transparent 2.4px
+    ),
+    radial-gradient(
+      circle at 57% 71%,
+      rgba(124, 58, 237, 0.45) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 66% 25%,
+      rgba(0, 229, 255, 0.55) 0 1.2px,
+      transparent 2.4px
+    ),
+    radial-gradient(
+      circle at 78% 34%,
+      rgba(255, 255, 255, 0.68) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 82% 73%,
+      rgba(0, 229, 255, 0.45) 0 1.1px,
+      transparent 2.2px
+    ),
+    radial-gradient(
+      circle at 92% 28%,
+      rgba(124, 58, 237, 0.45) 0 1.1px,
+      transparent 2.2px
+    ) !important;
+  animation: assistantTwinkleStars 6s ease-in-out infinite !important;
+}
+
+body.assistant-page.preview-dark .ai-bg-animation::before,
+body.assistant-page.dark-mode .ai-bg-animation::before {
+  opacity: 0.95 !important;
+}
+
+body.assistant-page .assistant-page-main::before {
+  content: "";
+  position: absolute;
+  top: 22%;
+  left: 18%;
+  width: 125px;
+  height: 2px;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.92) 35%,
+    rgba(0, 229, 255, 0.78) 72%,
+    rgba(0, 229, 255, 0) 100%
+  );
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.35),
+    0 0 14px rgba(0, 229, 255, 0.24);
+  transform: rotate(26deg);
+  animation: assistantShootingStar1 8s linear infinite;
+}
+
+body.assistant-page .assistant-page-main::after {
+  content: "";
+  position: absolute;
+  top: 28%;
+  right: 18%;
+  width: 110px;
+  height: 2px;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.92) 35%,
+    rgba(124, 58, 237, 0.76) 72%,
+    rgba(124, 58, 237, 0) 100%
+  );
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.28),
+    0 0 14px rgba(124, 58, 237, 0.18);
+  transform: rotate(154deg);
+  animation: assistantShootingStar2 10s linear infinite;
+}
+
+/* =========================
+   GRID / LINES / NODES
+========================= */
+body.assistant-page .ai-grid {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0.1 !important;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px) !important;
+  background-size: 60px 60px !important;
+  animation: gridFade 6s ease-in-out infinite !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-grid {
+  opacity: 0.08 !important;
+  background-image:
+    linear-gradient(rgba(2, 132, 199, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(109, 40, 217, 0.035) 1px, transparent 1px) !important;
+}
+
+body.assistant-page .ai-lines-svg {
+  position: absolute !important;
+  width: 46% !important;
+  height: 46% !important;
+  left: 27% !important;
+  top: 27% !important;
+  opacity: 0.1 !important;
+}
+
+body.assistant-page .ai-line {
+  stroke: rgba(0, 229, 255, 0.24) !important;
+  opacity: 0.38 !important;
+  stroke-width: 1 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-line {
+  stroke: rgba(2, 132, 199, 0.18) !important;
+}
+
+body.assistant-page .ai-node {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  opacity: 0.88 !important;
+  background: #00e5ff !important;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.28) !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-node {
+  background: #0284c7 !important;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.18) !important;
+}
+
+/* =========================
+   CORE / RINGS / DOTS
+========================= */
+body.assistant-page .ai-core {
+  opacity: 1 !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(2, 132, 199, 0.14) 34%,
+    rgba(109, 40, 217, 0.12) 60%,
+    transparent 84%
+  ) !important;
+  box-shadow:
+    0 0 28px rgba(2, 132, 199, 0.14),
+    0 0 60px rgba(109, 40, 217, 0.1) !important;
+}
+
+body.assistant-page.preview-dark .ai-core,
+body.assistant-page.dark-mode .ai-core {
+  background: radial-gradient(
+    circle,
+    rgba(4, 14, 19, 0.98) 0%,
+    rgba(0, 229, 255, 0.13) 34%,
+    rgba(124, 58, 237, 0.16) 62%,
+    transparent 84%
+  ) !important;
+  box-shadow:
+    0 0 30px rgba(0, 229, 255, 0.12),
+    0 0 62px rgba(124, 58, 237, 0.12),
+    0 0 100px rgba(0, 229, 255, 0.05) !important;
+}
+
+body.assistant-page .ai-orbit {
+  opacity: 1 !important;
+}
+
+body.assistant-page .ai-orbit-1 {
+  border-color: rgba(0, 229, 255, 0.18) !important;
+}
+
+body.assistant-page .ai-orbit-2 {
+  border-color: rgba(124, 58, 237, 0.18) !important;
+}
+
+body.assistant-page .ai-orbit-3 {
+  border-color: rgba(0, 229, 255, 0.1) !important;
+}
+
+body.assistant-page .ai-orbit-dot {
+  width: 7px !important;
+  height: 7px !important;
+  opacity: 1 !important;
+  background: #00e5ff !important;
+  box-shadow:
+    0 0 9px rgba(0, 229, 255, 0.52),
+    0 0 16px rgba(124, 58, 237, 0.18) !important;
+}
+
+body.assistant-page .ai-orbit-2 .ai-orbit-dot {
+  background: #8b5cf6 !important;
+}
+
+body.assistant-page .ai-orbit-3 .ai-orbit-dot {
+  background: #38bdf8 !important;
+}
+
+body.assistant-page:not(.preview-dark):not(.dark-mode) .ai-orbit-dot {
+  background: #0284c7 !important;
+  box-shadow:
+    0 0 8px rgba(2, 132, 199, 0.28),
+    0 0 14px rgba(109, 40, 217, 0.1) !important;
+}
+
+/* =========================
+   ASTRA HERO CENTER + LOGO ANIMATION
+========================= */
+body.assistant-page .assistant-hero {
+  text-align: center !important;
+  padding-top: 34px !important;
+}
+
+body.assistant-page .assistant-hero-avatar-wrap {
+  position: relative !important;
+  width: 138px !important;
+  height: 138px !important;
+  margin: 0 auto 18px auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.assistant-page .assistant-hero-avatar-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 34px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 229, 255, 0.12),
+    rgba(124, 58, 237, 0.1),
+    transparent 72%
+  );
+  filter: blur(10px);
+  animation: avatarPulseGlow 3.5s ease-in-out infinite;
+}
+
+body.assistant-page .avatar-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 32px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+body.assistant-page .avatar-orbit.orbit-a {
+  width: 108px;
+  height: 108px;
+  border: 1px solid rgba(0, 229, 255, 0.16);
+  animation: heroOrbitSpin 10s linear infinite;
+}
+
+body.assistant-page .avatar-orbit.orbit-b {
+  width: 122px;
+  height: 122px;
+  border: 1px solid rgba(124, 58, 237, 0.16);
+  animation: heroOrbitSpinReverse 12s linear infinite;
+}
+
+body.assistant-page .avatar-orbit.orbit-c {
+  width: 136px;
+  height: 136px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: heroOrbitPulse 4s ease-in-out infinite;
+}
+
+body.assistant-page .assistant-hero-avatar {
+  margin: 0 auto !important;
+  width: 94px !important;
+  height: 94px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 28px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  position: relative !important;
+  z-index: 7 !important;
+  box-shadow:
+    0 14px 40px rgba(2, 132, 199, 0.12),
+    0 4px 14px rgba(109, 40, 217, 0.1) !important;
+  animation: heroFloat 4.2s ease-in-out infinite;
+}
+
+body.assistant-page .assistant-hero-avatar i {
+  font-size: 34px !important;
+  color: #6d5df6 !important;
+}
+
+body.assistant-page.preview-dark .assistant-hero-avatar,
+body.assistant-page.dark-mode .assistant-hero-avatar {
+  background: rgba(244, 246, 255, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  box-shadow:
+    0 16px 42px rgba(0, 229, 255, 0.08),
+    0 4px 14px rgba(124, 58, 237, 0.12) !important;
+}
+
+body.assistant-page.preview-dark .avatar-orbit.orbit-a,
+body.assistant-page.dark-mode .avatar-orbit.orbit-a {
+  border-color: rgba(0, 229, 255, 0.22);
+}
+
+body.assistant-page.preview-dark .avatar-orbit.orbit-b,
+body.assistant-page.dark-mode .avatar-orbit.orbit-b {
+  border-color: rgba(124, 58, 237, 0.22);
+}
+
+body.assistant-page.preview-dark .avatar-orbit.orbit-c,
+body.assistant-page.dark-mode .avatar-orbit.orbit-c {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.assistant-page .assistant-hero h2 {
+  color: #0f172a !important;
+}
+
+body.assistant-page .assistant-hero p {
+  color: #4b5563 !important;
+}
+
+body.assistant-page.preview-dark .assistant-hero h2,
+body.assistant-page.dark-mode .assistant-hero h2 {
+  color: #f8fafc !important;
+}
+
+body.assistant-page.preview-dark .assistant-hero p,
+body.assistant-page.dark-mode .assistant-hero p {
+  color: #94a3b8 !important;
+}
+
+/* =========================
+   ADMIN-ACCENT MATCHED UI
+========================= */
+body.assistant-page .assistant-topbar {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(245, 250, 252, 0.8)
+  ) !important;
+  border-bottom: 1px solid rgba(2, 132, 199, 0.1) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+body.assistant-page.preview-dark .assistant-topbar,
+body.assistant-page.dark-mode .assistant-topbar {
+  background: linear-gradient(
+    135deg,
+    rgba(7, 26, 31, 0.92),
+    rgba(7, 32, 41, 0.88)
+  ) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body.assistant-page .assistant-side-panel {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-left: 1px solid rgba(2, 132, 199, 0.1) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+body.assistant-page.preview-dark .assistant-side-panel,
+body.assistant-page.dark-mode .assistant-side-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 28, 36, 0.88),
+    rgba(7, 23, 31, 0.88)
+  ) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body.assistant-page .assistant-help-item,
+body.assistant-page .history-item,
+body.assistant-page .assistant-chip,
+body.assistant-page .chat-input-box {
+  background: rgba(255, 255, 255, 0.76) !important;
+  border: 1px solid rgba(2, 132, 199, 0.1) !important;
+  backdrop-filter: blur(14px) !important;
+  box-shadow: none !important;
+}
+
+body.assistant-page.preview-dark .assistant-help-item,
+body.assistant-page.dark-mode .assistant-help-item,
+body.assistant-page.preview-dark .history-item,
+body.assistant-page.dark-mode .history-item,
+body.assistant-page.preview-dark .assistant-chip,
+body.assistant-page.dark-mode .assistant-chip,
+body.assistant-page.preview-dark .chat-input-box,
+body.assistant-page.dark-mode .chat-input-box {
+  background: rgba(9, 31, 40, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body.assistant-page .assistant-topbar h1,
+body.assistant-page .assistant-topbar p {
+  color: #0f172a !important;
+}
+
+body.assistant-page.preview-dark .assistant-topbar h1,
+body.assistant-page.dark-mode .assistant-topbar h1 {
+  color: #f8fafc !important;
+}
+
+body.assistant-page.preview-dark .assistant-topbar p,
+body.assistant-page.dark-mode .assistant-topbar p {
+  color: #94a3b8 !important;
+}
+
+/* buttons */
+body.assistant-page .new-chat-btn,
+body.assistant-page .side-new-chat-btn,
+body.assistant-page .send-chat-btn {
+  background: linear-gradient(135deg, #00c8e0 0%, #6d28d9 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 10px 24px rgba(0, 229, 255, 0.16) !important;
+}
+
+body.assistant-page .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.74) !important;
+  border: 1px solid rgba(2, 132, 199, 0.12) !important;
+  color: #0284c7 !important;
+}
+
+body.assistant-page.preview-dark .theme-toggle-btn,
+body.assistant-page.dark-mode .theme-toggle-btn {
+  background: rgba(9, 31, 40, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #00e5ff !important;
+}
+
+body.assistant-page .profile-mini {
+  background: rgba(255, 255, 255, 0.74) !important;
+  border: 1px solid rgba(2, 132, 199, 0.1) !important;
+}
+
+body.assistant-page.preview-dark .profile-mini,
+body.assistant-page.dark-mode .profile-mini {
+  background: rgba(9, 31, 40, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* =========================
+   INPUT
+========================= */
+body.assistant-page .chat-input-wrapper {
+  width: 100% !important;
+  position: relative !important;
+  z-index: 6 !important;
+}
+
+body.assistant-page .chat-input-box {
+  min-height: 58px !important;
+  padding: 8px 12px 8px 16px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+}
+
+body.assistant-page .chat-input-box input,
+body.assistant-page #assistantMessageInput {
+  flex: 1 !important;
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  line-height: 42px !important;
+}
+
+body.assistant-page.preview-dark .chat-input-box input,
+body.assistant-page.dark-mode .chat-input-box input,
+body.assistant-page.preview-dark #assistantMessageInput,
+body.assistant-page.dark-mode #assistantMessageInput {
+  color: #f8fafc !important;
+}
+
+body.assistant-page .chat-input-box input::placeholder {
+  color: rgba(71, 85, 105, 0.7) !important;
+}
+
+body.assistant-page.preview-dark .chat-input-box input::placeholder,
+body.assistant-page.dark-mode .chat-input-box input::placeholder {
+  color: rgba(148, 163, 184, 0.56) !important;
+}
+
+body.assistant-page .send-chat-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 14px !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+/* =========================
+   KEYFRAMES
+========================= */
+@keyframes assistantTwinkleStars {
+  0%,
+  100% {
+    opacity: 0.78;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.14);
+  }
+}
+
+@keyframes assistantShootingStar1 {
+  0% {
+    transform: translate(-18px, 0) rotate(26deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  22% {
+    transform: translate(520px, 220px) rotate(26deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(520px, 220px) rotate(26deg);
+    opacity: 0;
+  }
+}
+
+@keyframes assistantShootingStar2 {
+  0% {
+    transform: translate(0, 0) rotate(154deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  32% {
+    transform: translate(-460px, 220px) rotate(154deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-460px, 220px) rotate(154deg);
+    opacity: 0;
+  }
+}
+
+@keyframes gridFade {
+  0%,
+  100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.14;
+  }
+}
+
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes heroOrbitSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes heroOrbitSpinReverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+@keyframes heroOrbitPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+    opacity: 0.95;
+  }
+}
+
+@keyframes avatarPulseGlow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  body.assistant-page .assistant-page-main > .ai-bg-animation .ai-core,
+  body.assistant-page .assistant-page-main > .ai-bg-animation .ai-orbit {
+    left: 50% !important;
+    top: 54% !important;
+  }
+
+  body.assistant-page .ai-orbit-3 {
+    width: 450px !important;
+    height: 450px !important;
+    margin-left: -225px !important;
+    margin-top: -225px !important;
+  }
+
+  body.assistant-page .ai-lines-svg {
+    width: 56% !important;
+    height: 56% !important;
+    left: 22% !important;
+    top: 22% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  body.assistant-page .ai-orbit-3 {
+    display: none !important;
+  }
+
+  body.assistant-page .assistant-page-main::after {
+    display: none !important;
+  }
+
+  body.assistant-page .assistant-page-main::before {
+    width: 84px;
+  }
+
+  body.assistant-page .assistant-hero-avatar-wrap {
+    width: 122px !important;
+    height: 122px !important;
+  }
+
+  body.assistant-page .avatar-orbit.orbit-a {
+    width: 96px;
+    height: 96px;
+  }
+
+  body.assistant-page .avatar-orbit.orbit-b {
+    width: 108px;
+    height: 108px;
+  }
+
+  body.assistant-page .avatar-orbit.orbit-c {
+    width: 122px;
+    height: 122px;
+  }
+
+  body.assistant-page .assistant-hero-avatar {
+    width: 86px !important;
+    height: 86px !important;
+  }
+}
+/* =========================================================
+   FINAL POSITION FIX
+   Move all big background rings/core near Astra logo circle
+   Paste at the VERY END of assistant-animation-fix.css
+========================================================= */
+
+/* Big orbit animation ko Astra logo ke niche center karo */
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-core,
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-orbit {
+  top: 36% !important;
+  left: 45.5% !important;
+}
+
+/* Cross lines bhi same center par align */
+body.assistant-page .ai-lines-svg {
+  width: 44% !important;
+  height: 44% !important;
+  left: 23.5% !important;
+  top: 14% !important;
+}
+
+/* Rings ka size same rakho, bas position refined */
+body.assistant-page .ai-orbit-1 {
+  width: 230px !important;
+  height: 230px !important;
+  margin-left: -115px !important;
+  margin-top: -115px !important;
+}
+
+body.assistant-page .ai-orbit-2 {
+  width: 395px !important;
+  height: 395px !important;
+  margin-left: -197.5px !important;
+  margin-top: -197.5px !important;
+}
+
+body.assistant-page .ai-orbit-3 {
+  width: 575px !important;
+  height: 575px !important;
+  margin-left: -287.5px !important;
+  margin-top: -287.5px !important;
+}
+
+/* Avatar logo animation ko top layer par rakho */
+body.assistant-page .assistant-hero-avatar-wrap,
+body.assistant-page .assistant-hero-avatar {
+  position: relative !important;
+  z-index: 8 !important;
+}
+
+/* Text/chips also above rings */
+body.assistant-page .assistant-hero h2,
+body.assistant-page .assistant-hero p,
+body.assistant-page .assistant-quick-actions {
+  position: relative !important;
+  z-index: 7 !important;
+}
+/* =========================================================
+   FINAL MICRO FIX
+   - rings thoda niche
+   - logo animation cyan darker / more visible
+========================================================= */
+
+/* 1) Big background rings ko thoda sa niche lao */
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-core,
+body.assistant-page .assistant-page-main > .ai-bg-animation .ai-orbit {
+  top: 46% !important;
+  left: 40.5% !important;
+}
+
+/* cross lines bhi same center ke according */
+body.assistant-page .ai-lines-svg {
+  width: 44% !important;
+  height: 44% !important;
+  left: 19.5% !important;
+  top: 26% !important;
+}
+
+/* 2) Astra logo ke around animation ko darker cyan do */
+body.assistant-page .assistant-hero-avatar-wrap::before {
+  background: radial-gradient(
+    circle,
+    rgba(0, 184, 199, 0.22),
+    rgba(0, 138, 156, 0.16),
+    rgba(124, 58, 237, 0.1),
+    transparent 74%
+  ) !important;
+  filter: blur(10px) !important;
+  opacity: 1 !important;
+}
+
+/* outer animated rings around logo */
+body.assistant-page .avatar-orbit.orbit-a {
+  border: 1px solid rgba(0, 184, 199, 0.38) !important;
+  box-shadow:
+    0 0 10px rgba(0, 184, 199, 0.18),
+    0 0 22px rgba(0, 184, 199, 0.08) !important;
+}
+
+body.assistant-page .avatar-orbit.orbit-b {
+  border: 1px solid rgba(0, 138, 156, 0.3) !important;
+  box-shadow: 0 0 8px rgba(0, 138, 156, 0.14) !important;
+}
+
+body.assistant-page .avatar-orbit.orbit-c {
+  border: 1px solid rgba(0, 184, 199, 0.18) !important;
+  box-shadow: 0 0 8px rgba(0, 184, 199, 0.08) !important;
+}
+
+/* dark mode me aur clearly visible */
+body.assistant-page.preview-dark .avatar-orbit.orbit-a,
+body.assistant-page.dark-mode .avatar-orbit.orbit-a {
+  border-color: rgba(0, 196, 210, 0.48) !important;
+  box-shadow:
+    0 0 12px rgba(0, 196, 210, 0.24),
+    0 0 28px rgba(0, 196, 210, 0.12) !important;
+}
+
+body.assistant-page.preview-dark .avatar-orbit.orbit-b,
+body.assistant-page.dark-mode .avatar-orbit.orbit-b {
+  border-color: rgba(0, 150, 170, 0.34) !important;
+  box-shadow: 0 0 10px rgba(0, 150, 170, 0.16) !important;
+}
+
+body.assistant-page.preview-dark .avatar-orbit.orbit-c,
+body.assistant-page.dark-mode .avatar-orbit.orbit-c {
+  border-color: rgba(0, 196, 210, 0.22) !important;
+}
+
+/* logo box ko bhi thoda cyan glow do taaki animation noticeable lage */
+body.assistant-page .assistant-hero-avatar {
+  box-shadow:
+    0 14px 34px rgba(0, 184, 199, 0.16),
+    0 4px 14px rgba(109, 40, 217, 0.1) !important;
+}
+
+body.assistant-page.preview-dark .assistant-hero-avatar,
+body.assistant-page.dark-mode .assistant-hero-avatar {
+  box-shadow:
+    0 16px 42px rgba(0, 196, 210, 0.18),
+    0 4px 16px rgba(124, 58, 237, 0.12) !important;
+}
