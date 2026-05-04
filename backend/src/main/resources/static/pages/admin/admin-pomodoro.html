@@ -1411,7 +1411,7 @@
                const token = getToken();
                const role = getRole();
                const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
-               if (!token || (!isLoggedIn && role !== "ADMIN")) { window.location.href = "/pages/admin/admin-login.html"; return; }
+               if (!token || (!isLoggedIn && role !== "ADMIN")) { window.location.href = "/pages/login.html"; return; }
                if (role && role !== "ADMIN") { window.location.href = "/pages/dashboard.html"; }
           }
 
@@ -1478,7 +1478,7 @@
 
                if (response.status === 401 || response.status === 403) {
                     showToast("Session expired. Please login again.", "error");
-                    setTimeout(() => { localStorage.removeItem("adminToken"); localStorage.removeItem("adminRole"); localStorage.removeItem("edumind_is_logged_in"); window.location.href = "/pages/admin/admin-login.html" }, 900);
+                    setTimeout(() => { localStorage.removeItem("adminToken"); localStorage.removeItem("adminRole"); localStorage.removeItem("edumind_is_logged_in"); window.location.href = "/pages/login.html" }, 900);
                     throw new Error(data?.message || "Unauthorized");
                }
                if (!response.ok) { throw new Error(data?.message || `Request failed with status ${response.status}`) }
@@ -1796,7 +1796,7 @@
           function handleLogout() {
                if (!confirm("Logout from admin panel?")) return;
                ["adminToken", "adminRole", "adminName", "adminEmail", "token", "userRole", "edumind_is_logged_in", "edumind_logged_in_user"].forEach(key => localStorage.removeItem(key));
-               window.location.href = "/pages/admin/admin-login.html";
+               window.location.href = "/pages/login.html";
           }
 
           document.addEventListener("DOMContentLoaded", () => {

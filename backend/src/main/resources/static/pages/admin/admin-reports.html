@@ -1595,7 +1595,7 @@
                const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
 
                if (!token || (!isLoggedIn && role !== "ADMIN")) {
-                    window.location.href = "/pages/admin/admin-login.html";
+                    window.location.href = "/pages/login.html";
                     return;
                }
 
@@ -1690,7 +1690,7 @@
                     showToast("Session expired. Please login again.", "error");
                     setTimeout(() => {
                          localStorage.clear();
-                         window.location.href = "/pages/admin/admin-login.html";
+                         window.location.href = "/pages/login.html";
                     }, 900);
                     throw new Error("Unauthorized");
                }
@@ -2344,7 +2344,7 @@
                     "edumind_logged_in_user"
                ].forEach(key => localStorage.removeItem(key));
 
-               window.location.href = "/pages/admin/admin-login.html";
+               window.location.href = "/pages/login.html";
           }
 
           document.addEventListener("DOMContentLoaded", () => {
