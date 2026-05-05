@@ -23,9 +23,7 @@
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 
-<body>
-
-     <body data-page-role="student"></body>
+<body data-page-role="student">
      <div class="dashboard-layout">
           <aside class="sidebar">
                <div class="sidebar-top">
@@ -70,6 +68,7 @@
                          <i class="fa-solid fa-chart-line"></i>
                          <span>Analytics</span>
                     </a>
+
                     <a href="pomodoro.html" class="nav-item">
                          <i class="fa-solid fa-stopwatch"></i>
                          <span>Study Timer</span>
@@ -87,7 +86,7 @@
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
                          <i class="fa-solid fa-right-from-bracket"></i>
                          <span>Logout</span>
                     </a>
@@ -99,7 +98,7 @@
                     <div class="header-left">
                          <div>
                               <h1>My Tasks</h1>
-                              <p>Organize, track, and complete your study tasks on time.</p>
+                              <p>Organize, prioritize, and convert your study tasks into focused plans.</p>
                          </div>
                     </div>
 
@@ -108,14 +107,16 @@
                               <i class="fa-solid fa-plus"></i>
                               <span>Add Task</span>
                          </button>
+
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
+
                          <div class="profile-mini" id="profileMenuToggle">
                               <img src="../assets/avatar/default-user.png" alt="User">
                               <div>
-                                   <h4>Ritika</h4>
-                                   <p>Student</p>
+                                   <h4>Student</h4>
+                                   <p>STUDENT</p>
                               </div>
                          </div>
 
@@ -124,11 +125,13 @@
                                    <i class="fa-solid fa-user-gear"></i>
                                    <span>Profile Settings</span>
                               </a>
+
                               <a href="analytics.html" class="profile-menu-item">
                                    <i class="fa-solid fa-chart-line"></i>
                                    <span>View Analytics</span>
                               </a>
-                              <a href="login.html" class="profile-menu-item logout">
+
+                              <a href="login.html" class="profile-menu-item logout" id="profileLogoutBtn">
                                    <i class="fa-solid fa-right-from-bracket"></i>
                                    <span>Logout</span>
                               </a>
@@ -139,30 +142,90 @@
                <section class="tasks-content">
                     <div class="tasks-summary-grid">
                          <div class="task-summary-card">
-                              <h3 id="totalTasksCount">20</h3>
+                              <div class="task-summary-icon">
+                                   <i class="fa-solid fa-list-check"></i>
+                              </div>
+                              <h3 id="totalTasksCount">00</h3>
                               <p>Total Tasks</p>
                          </div>
 
                          <div class="task-summary-card">
-                              <h3 id="pendingTasksCount">08</h3>
+                              <div class="task-summary-icon">
+                                   <i class="fa-regular fa-clock"></i>
+                              </div>
+                              <h3 id="pendingTasksCount">00</h3>
                               <p>Pending</p>
                          </div>
 
                          <div class="task-summary-card">
-                              <h3 id="completedTasksCount">10</h3>
+                              <div class="task-summary-icon">
+                                   <i class="fa-solid fa-circle-check"></i>
+                              </div>
+                              <h3 id="completedTasksCount">00</h3>
                               <p>Completed</p>
                          </div>
 
                          <div class="task-summary-card">
-                              <h3 id="overdueTasksCount">02</h3>
+                              <div class="task-summary-icon">
+                                   <i class="fa-solid fa-triangle-exclamation"></i>
+                              </div>
+                              <h3 id="overdueTasksCount">00</h3>
                               <p>Overdue</p>
+                         </div>
+                    </div>
+
+                    <div class="tasks-smart-grid">
+                         <div class="task-smart-card">
+                              <div class="task-smart-card-top">
+                                   <div>
+                                        <span class="smart-kicker">Smart Focus</span>
+                                        <h3 id="smartFocusTitle">Loading focus priority...</h3>
+                                   </div>
+                                   <div class="smart-icon">
+                                        <i class="fa-solid fa-brain"></i>
+                                   </div>
+                              </div>
+                              <p id="smartFocusDescription">
+                                   Your most important task suggestions will appear here.
+                              </p>
+                              <div class="smart-focus-list" id="smartFocusList"></div>
+                         </div>
+
+                         <div class="task-smart-card">
+                              <div class="task-smart-card-top">
+                                   <div>
+                                        <span class="smart-kicker">Subject Load</span>
+                                        <h3>Pending task distribution</h3>
+                                   </div>
+                                   <div class="smart-icon">
+                                        <i class="fa-solid fa-chart-pie"></i>
+                                   </div>
+                              </div>
+                              <div class="subject-load-list" id="subjectLoadList">
+                                   <p class="smart-muted-text">Subject-wise task load will appear after tasks load.</p>
+                              </div>
+                         </div>
+
+                         <div class="task-smart-card">
+                              <div class="task-smart-card-top">
+                                   <div>
+                                        <span class="smart-kicker">Pomodoro Suggestion</span>
+                                        <h3>Focus session estimate</h3>
+                                   </div>
+                                   <div class="smart-icon">
+                                        <i class="fa-solid fa-stopwatch"></i>
+                                   </div>
+                              </div>
+                              <div class="productivity-tip-list" id="productivityTipList">
+                                   <p class="smart-muted-text">Recommended focus sessions will appear here.</p>
+                              </div>
                          </div>
                     </div>
 
                     <div class="tasks-toolbar">
                          <div class="tasks-search">
                               <i class="fa-solid fa-magnifying-glass"></i>
-                              <input type="text" id="taskSearchInput" placeholder="Search tasks...">
+                              <input type="text" id="taskSearchInput" placeholder="Search tasks by title or subject...">
                          </div>
 
                          <div class="tasks-filter">
@@ -172,108 +235,14 @@
                                    <option>Pending</option>
                                    <option>Completed</option>
                                    <option>High Priority</option>
+                                   <option>Due Today</option>
+                                   <option>Upcoming</option>
                                    <option>Overdue</option>
                               </select>
                          </div>
                     </div>
 
-                    <div class="tasks-list" id="tasksList">
-                         <div class="task-card">
-                              <div class="task-card-top">
-                                   <div class="task-main-info">
-                                        <h3>Complete Java Assignment</h3>
-                                        <p>Subject: Java Programming</p>
-                                   </div>
-
-                                   <div class="task-actions">
-                                        <button class="task-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="task-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <div class="task-card-meta">
-                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Today</span>
-                                   <span class="task-priority high">High Priority</span>
-                                   <span class="task-status pending">Pending</span>
-                              </div>
-                         </div>
-
-                         <div class="task-card">
-                              <div class="task-card-top">
-                                   <div class="task-main-info">
-                                        <h3>Revise DBMS Notes</h3>
-                                        <p>Subject: DBMS</p>
-                                   </div>
-
-                                   <div class="task-actions">
-                                        <button class="task-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="task-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <div class="task-card-meta">
-                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Tomorrow</span>
-                                   <span class="task-priority medium">Medium Priority</span>
-                                   <span class="task-status progress">In Progress</span>
-                              </div>
-                         </div>
-
-                         <div class="task-card">
-                              <div class="task-card-top">
-                                   <div class="task-main-info">
-                                        <h3>Practice Aptitude Questions</h3>
-                                        <p>Subject: Placement Preparation</p>
-                                   </div>
-
-                                   <div class="task-actions">
-                                        <button class="task-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="task-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <div class="task-card-meta">
-                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: 18 Apr</span>
-                                   <span class="task-priority low">Low Priority</span>
-                                   <span class="task-status done">Completed</span>
-                              </div>
-                         </div>
-
-                         <div class="task-card">
-                              <div class="task-card-top">
-                                   <div class="task-main-info">
-                                        <h3>Prepare CN Short Notes</h3>
-                                        <p>Subject: Computer Networks</p>
-                                   </div>
-
-                                   <div class="task-actions">
-                                        <button class="task-action-btn" title="Edit">
-                                             <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="task-action-btn delete" title="Delete">
-                                             <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                   </div>
-                              </div>
-
-                              <div class="task-card-meta">
-                                   <span class="task-date"><i class="fa-regular fa-calendar"></i> Due: Yesterday</span>
-                                   <span class="task-priority high">High Priority</span>
-                                   <span class="task-status overdue">Overdue</span>
-                              </div>
-                         </div>
-                    </div>
+                    <div class="tasks-list" id="tasksList"></div>
 
                     <div class="tasks-empty-state hidden" id="tasksEmptyState">
                          <i class="fa-regular fa-folder-open"></i>
@@ -287,7 +256,7 @@
                          <div class="task-modal-header">
                               <div>
                                    <h2 id="taskModalTitle">Add New Task</h2>
-                                   <p>Create a new study task with subject, deadline, and priority.</p>
+                                   <p>Create a study task with subject, due date, priority, and status.</p>
                               </div>
 
                               <button class="task-modal-close" type="button" id="closeTaskModalBtn">
@@ -299,17 +268,14 @@
                               <div class="task-form-grid">
                                    <div class="task-form-group full-width">
                                         <label for="taskTitle">Task Title</label>
-                                        <input type="text" id="taskTitle" placeholder="Enter task title">
+                                        <input type="text" id="taskTitle"
+                                             placeholder="Example: Revise OS deadlock concepts">
                                    </div>
 
                                    <div class="task-form-group">
                                         <label for="taskSubject">Subject</label>
                                         <select id="taskSubject">
-                                             <option>Select subject</option>
-                                             <option>Java Programming</option>
-                                             <option>DBMS</option>
-                                             <option>Computer Networks</option>
-                                             <option>Operating System</option>
+                                             <option value="">Select subject</option>
                                         </select>
                                    </div>
 
@@ -339,7 +305,7 @@
                                    <div class="task-form-group full-width">
                                         <label for="taskDescription">Description</label>
                                         <textarea id="taskDescription" rows="4"
-                                             placeholder="Write task details..."></textarea>
+                                             placeholder="Write what you need to study, practice, revise, or submit..."></textarea>
                                    </div>
                               </div>
 
@@ -352,52 +318,45 @@
                </div>
           </main>
      </div>
+
      <script>
           (function () {
                "use strict";
+
                const LOGIN_PAGE = "login.html";
                const STUDENT_HOME = "dashboard.html";
                const ADMIN_HOME = "admin-dashboard.html";
+
                const token = localStorage.getItem("token");
                const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
                const userRole = localStorage.getItem("userRole") || "STUDENT";
+
                function goTo(page) {
-                    // Already on that page? Skip redirect to avoid loop
                     if (window.location.href.includes(page)) return;
                     window.location.href = page;
                }
+
                if (!token || !isLoggedIn) {
                     goTo(LOGIN_PAGE);
-                    return; // script execution rok do
                }
+
                document.addEventListener("DOMContentLoaded", function () {
+                    const pageRole = document.body ? document.body.getAttribute("data-page-role") : null;
 
-                    const body = document.body;
-                    const pageRole = body ? body.getAttribute("data-page-role") : null;
-
-                    // data-page-role set nahi hai toh guard kuch nahi karega
                     if (!pageRole) return;
 
                     if (pageRole === "admin" && userRole !== "ADMIN") {
-                         // Student admin page pe aaya → student home pe bhejo
-                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
                          goTo(STUDENT_HOME);
                          return;
                     }
 
                     if (pageRole === "student" && userRole === "ADMIN") {
-                         // Admin student page pe aaya → admin home pe bhejo
-                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
                          goTo(ADMIN_HOME);
-                         return;
                     }
-
-                    // Role sahi hai → page load hone do
-                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
                });
-
           })();
      </script>
+
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/sidebar.js"></script>

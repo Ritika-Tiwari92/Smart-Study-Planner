@@ -1,0 +1,699 @@
+/* =========================================================
+   EduMind AI — dashboard-premium-enhanced.css
+   
+   ONLY adds:
+   1. Banner animations (on existing .welcome-banner)
+   2. Premium Chart.js canvas chart (replaces activity-tracker bars)
+   3. Toast notification system
+   4. Chart tooltips via Chart.js
+   
+   Does NOT change: icons, layout, sidebar, header, stats cards,
+   any existing class structure, colors, fonts, or anything else.
+   ========================================================= */
+
+/* =========================
+   1. BANNER ANIMATIONS
+   (works on existing .welcome-banner from dashboard.css)
+========================= */
+
+/* Animated gradient shimmer on the banner top edge */
+.welcome-banner::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(167, 139, 250, 0.8) 60%,
+    transparent 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: bannerShimmerLine 3s linear infinite !important;
+  pointer-events: none !important;
+  border-radius: 22px 22px 0 0 !important;
+  z-index: 2 !important;
+}
+
+@keyframes bannerShimmerLine {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Floating glow orb — top right */
+.welcome-banner::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -70px !important;
+  right: -50px !important;
+  width: 220px !important;
+  height: 220px !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 65%
+  ) !important;
+  border-radius: 50% !important;
+  pointer-events: none !important;
+  animation: bannerOrbFloat 6s ease-in-out infinite !important;
+  z-index: 0 !important;
+}
+
+@keyframes bannerOrbFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(-15px, 12px) scale(1.08);
+    opacity: 1;
+  }
+  66% {
+    transform: translate(10px, -8px) scale(0.96);
+    opacity: 0.85;
+  }
+}
+
+/* Hero image float animation (existing .welcome-image img) */
+.welcome-banner .welcome-image img {
+  animation: bannerHeroFloat 4.5s ease-in-out infinite !important;
+}
+
+@keyframes bannerHeroFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-12px) rotate(1.5deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+}
+
+/* Date pill pop-in on load */
+.welcome-date-pill {
+  animation: pillPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+
+@keyframes pillPopIn {
+  from {
+    transform: scale(0.75) translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Banner h2 slide up */
+.welcome-text h2 {
+  animation: textSlideUp 0.6s 0.2s ease both !important;
+}
+
+/* Banner subtitle fade */
+#welcomeBannerSubtitle {
+  animation: textSlideUp 0.6s 0.35s ease both !important;
+}
+
+@keyframes textSlideUp {
+  from {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Chips stagger in */
+#welcomeInsightPrimary {
+  animation: chipStagger 0.5s 0.45s ease both !important;
+}
+#welcomeInsightSecondary {
+  animation: chipStagger 0.5s 0.6s ease both !important;
+}
+#welcomeInsightTertiary {
+  animation: chipStagger 0.5s 0.75s ease both !important;
+}
+
+@keyframes chipStagger {
+  from {
+    transform: translateY(14px) scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Chip hover lift */
+.welcome-banner-chip {
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease !important;
+}
+
+.welcome-banner-chip:hover {
+  transform: translateY(-3px) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Stats card stagger entry */
+.stats-grid .stat-card:nth-child(1) {
+  animation: statCardIn 0.5s 0.15s ease both;
+}
+.stats-grid .stat-card:nth-child(2) {
+  animation: statCardIn 0.5s 0.25s ease both;
+}
+.stats-grid .stat-card:nth-child(3) {
+  animation: statCardIn 0.5s 0.35s ease both;
+}
+.stats-grid .stat-card:nth-child(4) {
+  animation: statCardIn 0.5s 0.45s ease both;
+}
+
+@keyframes statCardIn {
+  from {
+    transform: translateY(22px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Stat icon hover spin */
+.stat-card:hover .stat-icon-wrap {
+  transform: scale(1.1) rotate(-6deg) !important;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.stat-icon-wrap {
+  transition: transform 0.28s ease !important;
+}
+
+/* Progress bar fill shimmer */
+.progress-fill {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.progress-fill::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -60px !important;
+  width: 40px !important;
+  height: 100% !important;
+  background: rgba(255, 255, 255, 0.35) !important;
+  filter: blur(6px) !important;
+  animation: progressShimmer 2.4s ease-in-out infinite !important;
+  border-radius: inherit !important;
+}
+
+@keyframes progressShimmer {
+  0% {
+    left: -60px;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    left: 110%;
+    opacity: 0;
+  }
+}
+
+/* Daily target bar pulse glow */
+.ds-target-fill {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.ds-target-fill::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -80px !important;
+  width: 50px !important;
+  height: 100% !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  filter: blur(8px) !important;
+  animation: progressShimmer 2.8s 0.5s ease-in-out infinite !important;
+}
+
+/* Calendar day hover scale */
+.ds-cal-box {
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease !important;
+}
+
+.ds-cal-box:hover {
+  transform: scale(1.4) !important;
+  z-index: 2 !important;
+  position: relative !important;
+  filter: brightness(1.15) !important;
+}
+
+/* Badge item hover lift */
+.ds-badge-item.unlocked:hover {
+  transform: translateY(-3px) !important;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease !important;
+}
+
+/* =========================
+   2. PREMIUM CHART CANVAS WRAPPER
+   (replaces #weeklyOverviewChartBars bar cards with canvas chart)
+========================= */
+
+/* Canvas chart wrapper — injected by JS */
+#premiumChartWrap {
+  position: relative;
+  width: 100%;
+  margin-top: 18px;
+}
+
+#premiumChartCanvas {
+  width: 100% !important;
+  height: 260px !important;
+  display: block;
+}
+
+/* Chart type tab pills */
+.premium-chart-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.premium-chart-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #e0deff;
+  background: #f8f7ff;
+  color: #6c63ff;
+  transition: all 0.22s ease;
+  font-family: inherit;
+}
+
+.premium-chart-tab:hover,
+.premium-chart-tab.active {
+  background: #6c63ff;
+  color: #ffffff;
+  border-color: #6c63ff;
+  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+body.preview-dark .premium-chart-tab,
+body.dark-mode .premium-chart-tab {
+  background: rgba(108, 99, 255, 0.1);
+  border-color: rgba(139, 124, 255, 0.22);
+  color: #c4b5fd;
+}
+
+body.preview-dark .premium-chart-tab:hover,
+body.preview-dark .premium-chart-tab.active,
+body.dark-mode .premium-chart-tab:hover,
+body.dark-mode .premium-chart-tab.active {
+  background: #7c6cff;
+  color: #ffffff;
+  border-color: #7c6cff;
+  box-shadow: 0 8px 20px rgba(124, 108, 255, 0.28);
+}
+
+/* Summary pills row (above chart) */
+.premium-summary-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.premium-summary-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 9px 16px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 78px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.premium-summary-pill:hover {
+  transform: translateY(-2px);
+}
+
+.premium-summary-pill strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 3px;
+  font-family: var(--font-main, inherit);
+}
+
+/* pill color variants */
+.premium-summary-pill:nth-child(1) {
+  background: #f3f0ff;
+  color: #5b4ef5;
+  border: 1px solid #ddd6fe;
+}
+.premium-summary-pill:nth-child(1) strong {
+  color: #4c3ff0;
+}
+
+.premium-summary-pill:nth-child(2) {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+.premium-summary-pill:nth-child(2) strong {
+  color: #065f46;
+}
+
+.premium-summary-pill:nth-child(3) {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+.premium-summary-pill:nth-child(3) strong {
+  color: #1e40af;
+}
+
+.premium-summary-pill:nth-child(4) {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+.premium-summary-pill:nth-child(4) strong {
+  color: #9a3412;
+}
+
+/* Dark mode pills */
+body.preview-dark .premium-summary-pill:nth-child(1),
+body.dark-mode .premium-summary-pill:nth-child(1) {
+  background: rgba(108, 99, 255, 0.14);
+  color: #d7ccff;
+  border-color: rgba(139, 124, 255, 0.22);
+}
+body.preview-dark .premium-summary-pill:nth-child(1) strong,
+body.dark-mode .premium-summary-pill:nth-child(1) strong {
+  color: #f3efff;
+}
+
+body.preview-dark .premium-summary-pill:nth-child(2),
+body.dark-mode .premium-summary-pill:nth-child(2) {
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+body.preview-dark .premium-summary-pill:nth-child(2) strong,
+body.dark-mode .premium-summary-pill:nth-child(2) strong {
+  color: #d1fae5;
+}
+
+body.preview-dark .premium-summary-pill:nth-child(3),
+body.dark-mode .premium-summary-pill:nth-child(3) {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+body.preview-dark .premium-summary-pill:nth-child(3) strong,
+body.dark-mode .premium-summary-pill:nth-child(3) strong {
+  color: #dbeafe;
+}
+
+body.preview-dark .premium-summary-pill:nth-child(4),
+body.dark-mode .premium-summary-pill:nth-child(4) {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+body.preview-dark .premium-summary-pill:nth-child(4) strong,
+body.dark-mode .premium-summary-pill:nth-child(4) strong {
+  color: #fef3c7;
+}
+
+/* Insight line under chart */
+#chartInsightLine {
+  margin-top: 16px;
+  padding: 13px 16px;
+  background: linear-gradient(180deg, #f8f7ff 0%, #f4f7ff 100%);
+  border: 1px solid #e4e1ff;
+  border-radius: 14px;
+  font-size: 12.5px;
+  color: #5b6472;
+  line-height: 1.65;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+body.preview-dark #chartInsightLine,
+body.dark-mode #chartInsightLine {
+  background: linear-gradient(
+    180deg,
+    rgba(108, 99, 255, 0.1) 0%,
+    rgba(59, 130, 246, 0.06) 100%
+  );
+  border-color: rgba(108, 99, 255, 0.2);
+  color: #94a3b8;
+}
+
+/* =========================
+   3. TOAST SYSTEM
+========================= */
+
+#emToastContainer {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.em-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.13);
+  min-width: 290px;
+  max-width: 370px;
+  pointer-events: all;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: emToastIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-family: var(--font-main, inherit);
+}
+
+.em-toast::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 999px 0 0 999px;
+}
+
+.em-toast.success::before {
+  background: #10b981;
+}
+.em-toast.info::before {
+  background: #6c63ff;
+}
+.em-toast.warn::before {
+  background: #f59e0b;
+}
+.em-toast.error::before {
+  background: #ef4444;
+}
+
+@keyframes emToastIn {
+  from {
+    transform: translateX(110%) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes emToastOut {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    max-height: 120px;
+    margin-bottom: 0;
+  }
+  to {
+    transform: translateX(110%) scale(0.9);
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: -10px;
+  }
+}
+
+.em-toast.hiding {
+  animation: emToastOut 0.3s ease forwards;
+}
+
+.em-toast-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.em-toast.success .em-toast-icon {
+  background: #ecfdf5;
+  color: #059669;
+}
+.em-toast.info .em-toast-icon {
+  background: #f5f3ff;
+  color: #6c63ff;
+}
+.em-toast.warn .em-toast-icon {
+  background: #fffbeb;
+  color: #d97706;
+}
+.em-toast.error .em-toast-icon {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.em-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.em-toast-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.em-toast-msg {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.em-toast-close {
+  color: #9ca3af;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.18s ease;
+  padding: 2px;
+  line-height: 1;
+}
+
+.em-toast-close:hover {
+  color: #374151;
+}
+
+/* Dark mode toast */
+body.preview-dark .em-toast,
+body.dark-mode .em-toast {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+}
+
+body.preview-dark .em-toast-title,
+body.dark-mode .em-toast-title {
+  color: #f1f5f9;
+}
+
+body.preview-dark .em-toast-msg,
+body.dark-mode .em-toast-msg {
+  color: #94a3b8;
+}
+
+body.preview-dark .em-toast-close,
+body.dark-mode .em-toast-close {
+  color: #64748b;
+}
+
+body.preview-dark .em-toast-close:hover,
+body.dark-mode .em-toast-close:hover {
+  color: #e2e8f0;
+}
+
+body.preview-dark .em-toast.success .em-toast-icon,
+body.dark-mode .em-toast.success .em-toast-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+body.preview-dark .em-toast.info .em-toast-icon,
+body.dark-mode .em-toast.info .em-toast-icon {
+  background: rgba(108, 99, 255, 0.15);
+  color: #a78bfa;
+}
+body.preview-dark .em-toast.warn .em-toast-icon,
+body.dark-mode .em-toast.warn .em-toast-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+body.preview-dark .em-toast.error .em-toast-icon,
+body.dark-mode .em-toast.error .em-toast-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  #emToastContainer {
+    bottom: 16px;
+    right: 12px;
+    left: 12px;
+  }
+  .em-toast {
+    min-width: unset;
+    max-width: 100%;
+  }
+}
