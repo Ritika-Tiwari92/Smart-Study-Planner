@@ -8,9 +8,8 @@
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
-
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -23,9 +22,8 @@
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
 </head>
 
-<body>
+<body data-page-role="student">
 
-     <body data-page-role="student"></body>
      <div class="dashboard-layout">
           <aside class="sidebar">
                <div class="sidebar-top">
@@ -34,54 +32,27 @@
                          <span>EduMind AI</span>
                     </h2>
                </div>
-
                <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
-                    </a>
-                    <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
-                    </a>
-                    <a href="subjects.html" class="nav-item active">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
-                    </a>
-                    <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
-                    </a>
-                    <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
-                    </a>
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
-                    </a>
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-                    <a href="pomodoro.html" class="nav-item">
-                         <i class="fa-solid fa-stopwatch"></i>
-                         <span>Study Timer</span>
-                    </a>
-                    <a href="assistant.html" class="nav-item">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
-                    </a>
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
+                    <a href="dashboard.html" class="nav-item"><i
+                              class="fa-solid fa-house"></i><span>Dashboard</span></a>
+                    <a href="planner.html" class="nav-item"><i
+                              class="fa-solid fa-calendar-days"></i><span>Planner</span></a>
+                    <a href="subjects.html" class="nav-item active"><i
+                              class="fa-solid fa-book"></i><span>Subjects</span></a>
+                    <a href="tasks.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
+                    <a href="revision.html" class="nav-item"><i class="fa-solid fa-rotate"></i><span>Revision</span></a>
+                    <a href="tests.html" class="nav-item"><i class="fa-solid fa-file-lines"></i><span>Tests</span></a>
+                    <a href="analytics.html" class="nav-item"><i
+                              class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                    <a href="pomodoro.html" class="nav-item"><i class="fa-solid fa-stopwatch"></i><span>Study
+                              Timer</span></a>
+                    <a href="assistant.html" class="nav-item"><i
+                              class="fa-solid fa-robot"></i><span>Assistant</span></a>
+                    <a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
                </nav>
-
                <div class="sidebar-bottom">
                     <a href="login.html" class="logout-btn" id="logoutBtn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
+                         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
                     </a>
                </div>
           </aside>
@@ -91,14 +62,12 @@
                     <div class="header-left">
                          <div>
                               <h1>My Subjects</h1>
-                              <p>Manage your study subjects and upload syllabi.</p>
+                              <p>Manage subjects, upload syllabi &amp; let AI build your study plan.</p>
                          </div>
                     </div>
-
                     <div class="header-actions">
                          <button class="add-subject-btn" id="openSubjectModalBtn">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>Add Subject</span>
+                              <i class="fa-solid fa-plus"></i><span>Add Subject</span>
                          </button>
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
@@ -111,49 +80,58 @@
                               </div>
                          </div>
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout" id="profileLogoutBtn">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
+                              <a href="settings.html" class="profile-menu-item"><i
+                                        class="fa-solid fa-user-gear"></i><span>Profile Settings</span></a>
+                              <a href="analytics.html" class="profile-menu-item"><i
+                                        class="fa-solid fa-chart-line"></i><span>View Analytics</span></a>
+                              <a href="login.html" class="profile-menu-item logout" id="profileLogoutBtn"><i
+                                        class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
                          </div>
                     </div>
                </header>
 
                <section class="subjects-content">
+
+                    <!-- ── Summary Cards ── -->
                     <div class="subjects-summary-grid">
-                         <div class="summary-card">
-                              <h3 id="totalSubjectsCount">00</h3>
-                              <p>Total Subjects</p>
+                         <div class="summary-card summary-card--total">
+                              <div class="summary-icon"><i class="fa-solid fa-layer-group"></i></div>
+                              <div class="summary-info">
+                                   <h3 id="totalSubjectsCount">00</h3>
+                                   <p>Total Subjects</p>
+                              </div>
                          </div>
-                         <div class="summary-card">
-                              <h3 id="completedSubjectsCount">00</h3>
-                              <p>Completed</p>
+                         <div class="summary-card summary-card--done">
+                              <div class="summary-icon"><i class="fa-solid fa-circle-check"></i></div>
+                              <div class="summary-info">
+                                   <h3 id="completedSubjectsCount">00</h3>
+                                   <p>Completed</p>
+                              </div>
                          </div>
-                         <div class="summary-card">
-                              <h3 id="inProgressSubjectsCount">00</h3>
-                              <p>In Progress</p>
+                         <div class="summary-card summary-card--progress">
+                              <div class="summary-icon"><i class="fa-solid fa-spinner"></i></div>
+                              <div class="summary-info">
+                                   <h3 id="inProgressSubjectsCount">00</h3>
+                                   <p>In Progress</p>
+                              </div>
                          </div>
-                         <div class="summary-card">
-                              <h3 id="averageProgressCount">0%</h3>
-                              <p>Average Progress</p>
+                         <div class="summary-card summary-card--avg">
+                              <div class="summary-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                              <div class="summary-info">
+                                   <h3 id="averageProgressCount">0%</h3>
+                                   <p>Avg Progress</p>
+                              </div>
                          </div>
                     </div>
 
+                    <!-- ── Toolbar ── -->
                     <div class="subjects-toolbar">
                          <div class="subjects-search">
                               <i class="fa-solid fa-magnifying-glass"></i>
                               <input type="text" id="subjectSearchInput" placeholder="Search subjects...">
                          </div>
                          <div class="subjects-filter">
-                              <i class="fa-solid fa-filter"></i>
+                              <i class="fa-solid fa-sliders"></i>
                               <select id="subjectFilterSelect">
                                    <option>All Subjects</option>
                                    <option>Completed</option>
@@ -163,22 +141,95 @@
                          </div>
                     </div>
 
+                    <!-- ── Subject Cards Grid ── -->
                     <div class="subjects-grid" id="subjectsGrid"></div>
 
                     <div class="subjects-empty-state hidden" id="subjectsEmptyState">
+                         <div class="empty-state-glow"></div>
                          <i class="fa-regular fa-folder-open"></i>
                          <h3>No subjects found</h3>
-                         <p>Try changing your search or filter, or add a new subject.</p>
+                         <p>Add a new subject or change your filter.</p>
                     </div>
+
                </section>
 
-               <!-- ===================== SUBJECT MODAL ===================== -->
+               <!-- ══════════════════════════════════════
+           AI SYLLABUS ANALYSIS PANEL
+           Shows after syllabus is processed
+      ══════════════════════════════════════ -->
+               <div class="ai-syllabus-panel hidden" id="aiSyllabusPanel">
+                    <div class="ai-panel-header">
+                         <div class="ai-panel-title">
+                              <div class="ai-badge-glow"><i class="fa-solid fa-brain"></i></div>
+                              <div>
+                                   <h2 id="aiPanelSubjectName">Subject Analysis</h2>
+                                   <p>AI-generated study plan from your syllabus</p>
+                              </div>
+                         </div>
+                         <div class="ai-panel-actions">
+                              <button class="ai-action-btn ai-plan-btn" id="aiCreatePlanBtn">
+                                   <i class="fa-solid fa-calendar-plus"></i>
+                                   <span>Push to Planner</span>
+                              </button>
+                              <button class="ai-action-btn ai-close-btn" id="aiPanelCloseBtn">
+                                   <i class="fa-solid fa-xmark"></i>
+                              </button>
+                         </div>
+                    </div>
+
+                    <!-- AI Summary Strip -->
+                    <div class="ai-summary-strip" id="aiSummaryStrip">
+                         <div class="ai-summary-chip">
+                              <i class="fa-solid fa-book-open"></i>
+                              <div><span class="chip-label">Topics</span><strong id="aiTopicCount">0</strong></div>
+                         </div>
+                         <div class="ai-summary-chip">
+                              <i class="fa-solid fa-clock"></i>
+                              <div><span class="chip-label">Total Hours</span><strong id="aiTotalHours">0h</strong>
+                              </div>
+                         </div>
+                         <div class="ai-summary-chip">
+                              <i class="fa-solid fa-calendar-week"></i>
+                              <div><span class="chip-label">Weeks Needed</span><strong id="aiWeeksNeeded">0</strong>
+                              </div>
+                         </div>
+                         <div class="ai-summary-chip">
+                              <i class="fa-solid fa-fire"></i>
+                              <div><span class="chip-label">Difficulty</span><strong id="aiOverallDifficulty">-</strong>
+                              </div>
+                         </div>
+                    </div>
+
+                    <!-- Topics Timeline -->
+                    <div class="ai-topics-container">
+                         <div class="ai-topics-header">
+                              <h3><i class="fa-solid fa-list-check"></i> Study Topics &amp; Timeline</h3>
+                              <div class="ai-filter-tabs">
+                                   <button class="ai-tab active" data-filter="all">All</button>
+                                   <button class="ai-tab" data-filter="easy">Easy</button>
+                                   <button class="ai-tab" data-filter="medium">Medium</button>
+                                   <button class="ai-tab" data-filter="hard">Hard</button>
+                              </div>
+                         </div>
+                         <div class="ai-topics-grid" id="aiTopicsGrid"></div>
+                    </div>
+
+                    <!-- Weekly Plan Preview -->
+                    <div class="ai-weekly-preview" id="aiWeeklyPreview">
+                         <h3><i class="fa-solid fa-calendar-days"></i> Recommended Weekly Plan</h3>
+                         <div class="ai-weeks-list" id="aiWeeksList"></div>
+                    </div>
+               </div>
+
+               <!-- ══════════════════════════════════════
+           SUBJECT MODAL
+      ══════════════════════════════════════ -->
                <div class="subject-modal-overlay hidden" id="subjectModalOverlay">
                     <div class="subject-modal">
                          <div class="subject-modal-header">
                               <div>
                                    <h2 id="subjectModalTitle">Add New Subject</h2>
-                                   <p>Fill in subject details and optionally upload a syllabus.</p>
+                                   <p>Fill in details and optionally upload a syllabus for AI analysis.</p>
                               </div>
                               <button class="subject-modal-close" type="button" id="closeSubjectModalBtn">
                                    <i class="fa-solid fa-xmark"></i>
@@ -188,7 +239,6 @@
                          <form class="subject-modal-form" id="subjectModalForm">
                               <div class="subject-form-grid">
 
-                                   <!-- Subject Name -->
                                    <div class="subject-form-group full-width">
                                         <label for="subjectName">Subject Name <span class="required">*</span></label>
                                         <input type="text" id="subjectName" placeholder="e.g. Computer Networks">
@@ -196,13 +246,11 @@
                                              required.</span>
                                    </div>
 
-                                   <!-- Subject Code -->
                                    <div class="subject-form-group">
                                         <label for="subjectCode">Subject Code</label>
                                         <input type="text" id="subjectCode" placeholder="e.g. BCA-601">
                                    </div>
 
-                                   <!-- Total Chapters -->
                                    <div class="subject-form-group">
                                         <label for="subjectChapters">Total Chapters <span
                                                   class="required">*</span></label>
@@ -211,13 +259,11 @@
                                              chapters.</span>
                                    </div>
 
-                                   <!-- Progress -->
                                    <div class="subject-form-group">
                                         <label for="subjectProgress">Progress (%)</label>
                                         <input type="number" id="subjectProgress" placeholder="0" min="0" max="100">
                                    </div>
 
-                                   <!-- Icon -->
                                    <div class="subject-form-group">
                                         <label for="subjectIcon">Subject Icon</label>
                                         <select id="subjectIcon">
@@ -232,17 +278,19 @@
                                         </select>
                                    </div>
 
-                                   <!-- Description -->
                                    <div class="subject-form-group full-width">
                                         <label for="subjectDescription">Description</label>
                                         <textarea id="subjectDescription" rows="3"
                                              placeholder="Brief description of the subject..."></textarea>
                                    </div>
 
-                                   <!-- ===== SYLLABUS UPLOAD SECTION ===== -->
+                                   <!-- ── SYLLABUS UPLOAD ── -->
                                    <div class="subject-form-group full-width">
                                         <div class="syllabus-upload-header">
-                                             <label>Syllabus Upload <span class="optional-tag">(Optional)</span></label>
+                                             <label>
+                                                  Syllabus Upload
+                                                  <span class="optional-tag">(Optional — AI will analyse it)</span>
+                                             </label>
                                              <label class="syllabus-toggle-switch">
                                                   <input type="checkbox" id="syllabusUploadToggle">
                                                   <span class="toggle-slider"></span>
@@ -250,26 +298,27 @@
                                              </label>
                                         </div>
 
-                                        <!-- Upload area — shown only when toggle is ON -->
                                         <div class="syllabus-upload-area hidden" id="syllabusUploadArea">
                                              <div class="syllabus-dropzone" id="syllabusDropzone">
-                                                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                                                  <p>Drag & drop your syllabus here</p>
-                                                  <span>or</span>
-                                                  <label class="syllabus-browse-btn" for="syllabusFileInput">
-                                                       Browse File
-                                                  </label>
+                                                  <div class="dropzone-icon-wrap">
+                                                       <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                  </div>
+                                                  <p class="dropzone-main-text">Drag &amp; drop your syllabus here</p>
+                                                  <span class="dropzone-or">or</span>
+                                                  <label class="syllabus-browse-btn" for="syllabusFileInput">Browse
+                                                       File</label>
                                                   <input type="file" id="syllabusFileInput" accept=".pdf,.docx,.txt"
                                                        hidden>
                                                   <p class="syllabus-format-hint">
-                                                       Supported: PDF, DOCX, TXT &nbsp;|&nbsp; Max: 10MB
+                                                       <i class="fa-solid fa-shield-halved"></i>
+                                                       PDF, DOCX, TXT &nbsp;·&nbsp; Max 10 MB
                                                   </p>
                                              </div>
 
-                                             <!-- File selected preview -->
                                              <div class="syllabus-file-preview hidden" id="syllabusFilePreview">
                                                   <div class="syllabus-file-info">
-                                                       <i class="fa-solid fa-file-lines"></i>
+                                                       <div class="file-icon-wrap"><i
+                                                                 class="fa-solid fa-file-lines"></i></div>
                                                        <div>
                                                             <p id="syllabusFileName">filename.pdf</p>
                                                             <span id="syllabusFileSize">0 KB</span>
@@ -281,16 +330,30 @@
                                                   </button>
                                              </div>
 
-                                             <!-- Upload error message -->
                                              <span class="field-error hidden" id="syllabusFileError">
                                                   Invalid file. Use PDF, DOCX, or TXT under 10MB.
                                              </span>
 
-                                             <!-- Parsed chapters preview (shown after subject saved + syllabus uploaded) -->
+                                             <!-- AI Analysis Status -->
+                                             <div class="ai-analysis-status hidden" id="aiAnalysisStatus">
+                                                  <div class="ai-status-icon">
+                                                       <i class="fa-solid fa-brain fa-spin"></i>
+                                                  </div>
+                                                  <div class="ai-status-text">
+                                                       <strong id="aiStatusTitle">Analysing syllabus...</strong>
+                                                       <span id="aiStatusDesc">Groq AI is extracting topics and building
+                                                            your study plan</span>
+                                                  </div>
+                                                  <div class="ai-status-progress">
+                                                       <div class="ai-status-bar" id="aiStatusBar"></div>
+                                                  </div>
+                                             </div>
+
+                                             <!-- Chapters preview (after parse) -->
                                              <div class="syllabus-chapters-preview hidden" id="syllabusChaptersPreview">
                                                   <div class="chapters-preview-header">
                                                        <i class="fa-solid fa-list-ol"></i>
-                                                       <span>Parsed Chapters</span>
+                                                       <span>Parsed Topics</span>
                                                        <span class="chapters-count-badge"
                                                             id="chaptersCountBadge">0</span>
                                                   </div>
@@ -298,69 +361,35 @@
                                              </div>
                                         </div>
                                    </div>
-                                   <!-- ===== END SYLLABUS SECTION ===== -->
-
                               </div>
 
                               <div class="subject-modal-actions">
                                    <button type="button" class="subject-cancel-btn"
                                         id="cancelSubjectModalBtn">Cancel</button>
                                    <button type="submit" class="subject-save-btn" id="subjectSaveBtn">
-                                        <i class="fa-solid fa-floppy-disk"></i>
-                                        Save Subject
+                                        <i class="fa-solid fa-floppy-disk"></i> Save Subject
                                    </button>
                               </div>
                          </form>
                     </div>
                </div>
-               <!-- ===================== END MODAL ===================== -->
 
           </main>
      </div>
+
+     <!-- ── Auth Guard ── -->
      <script>
           (function () {
                "use strict";
-               const LOGIN_PAGE = "login.html";
-               const STUDENT_HOME = "dashboard.html";
-               const ADMIN_HOME = "admin-dashboard.html";
                const token = localStorage.getItem("token");
                const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
                const userRole = localStorage.getItem("userRole") || "STUDENT";
-               function goTo(page) {
-                    // Already on that page? Skip redirect to avoid loop
-                    if (window.location.href.includes(page)) return;
-                    window.location.href = page;
-               }
-               if (!token || !isLoggedIn) {
-                    goTo(LOGIN_PAGE);
-                    return; // script execution rok do
-               }
+               if (!token || !isLoggedIn) { window.location.href = "login.html"; return; }
                document.addEventListener("DOMContentLoaded", function () {
-
-                    const body = document.body;
-                    const pageRole = body ? body.getAttribute("data-page-role") : null;
-
-                    // data-page-role set nahi hai toh guard kuch nahi karega
+                    const pageRole = document.body.getAttribute("data-page-role");
                     if (!pageRole) return;
-
-                    if (pageRole === "admin" && userRole !== "ADMIN") {
-                         // Student admin page pe aaya → student home pe bhejo
-                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
-                         goTo(STUDENT_HOME);
-                         return;
-                    }
-
-                    if (pageRole === "student" && userRole === "ADMIN") {
-                         // Admin student page pe aaya → admin home pe bhejo
-                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
-                         goTo(ADMIN_HOME);
-                         return;
-                    }
-
-                    // Role sahi hai → page load hone do
-                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
+                    if (pageRole === "student" && userRole === "ADMIN") { window.location.href = "admin-dashboard.html"; }
                });
-
           })();
      </script>
 

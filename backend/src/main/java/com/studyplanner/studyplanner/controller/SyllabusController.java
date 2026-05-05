@@ -1,5 +1,6 @@
 package com.studyplanner.studyplanner.controller;
 
+import com.studyplanner.studyplanner.security.JwtUtil;
 import com.studyplanner.studyplanner.service.SyllabusService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +15,66 @@ import java.util.Map;
 public class SyllabusController {
 
      private final SyllabusService syllabusService;
+     private final JwtUtil jwtUtil;
 
-     public SyllabusController(SyllabusService syllabusService) {
+     public SyllabusController(SyllabusService syllabusService, JwtUtil jwtUtil) {
           this.syllabusService = syllabusService;
+          this.jwtUtil = jwtUtil;
      }
 
-     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-     public ResponseEntity<?> uploadSyllabus(
-               @RequestParam("file") MultipartFile file,
-               @RequestParam(value = "userId", required = false) Long userId) {
+     private Long extractUserId(String authHeader) {
+          if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+               throw new RuntimeException("Missing or invalid Authorization header");
+          }
 
-          Map<String, Object> result = syllabusService.processSyllabusFile(file, userId);
-          return ResponseEntity.ok(result);
+          return jwtUtil.extractUserId(authHeader.substring(7).trim());
+     }
+
+     @PostMapping(value = { "/analyze/{subjectId}",
+               "/upload/{subjectId}" }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+     public ResponseEntity<?> analyzeSyllabus(
+               @RequestHeader("Authorization") String authHeader,
+               @PathVariable Long subjectId,
+               @RequestParam("file") MultipartFile file) {
+
+          try {
+               Long userId = extractUserId(authHeader);
+               Map<String, Object> result = syllabusService.analyzeAndSaveSyllabus(file, subjectId, userId);
+               return ResponseEntity.ok(result);
+          } catch (RuntimeException ex) {
+               return ResponseEntity.badRequest().body(Map.of(
+                         "message", ex.getMessage()));
+          }
+     }
+
+     @GetMapping("/subject/{subjectId}")
+     public ResponseEntity<?> getSyllabusAnalysis(
+               @RequestHeader("Authorization") String authHeader,
+               @PathVariable Long subjectId) {
+
+          try {
+               Long userId = extractUserId(authHeader);
+               Map<String, Object> result = syllabusService.getAnalysisBySubject(subjectId, userId);
+               return ResponseEntity.ok(result);
+          } catch (RuntimeException ex) {
+               return ResponseEntity.badRequest().body(Map.of(
+                         "message", ex.getMessage()));
+          }
+     }
+
+     @PostMapping("/subject/{subjectId}/create-weekly-plan")
+     public ResponseEntity<?> createWeeklyPlan(
+               @RequestHeader("Authorization") String authHeader,
+               @PathVariable Long subjectId) {
+
+          try {
+               Long userId = extractUserId(authHeader);
+               Map<String, Object> result = syllabusService.createWeeklyPlanFromAnalysis(subjectId, userId);
+               return ResponseEntity.ok(result);
+          } catch (RuntimeException ex) {
+               return ResponseEntity.badRequest().body(Map.of(
+                         "message", ex.getMessage()));
+          }
      }
 
      @GetMapping("/health")

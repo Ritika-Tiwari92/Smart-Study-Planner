@@ -3,8 +3,8 @@ package com.studyplanner.studyplanner.model;
 import jakarta.persistence.*;
 
 /**
- * Represents one topic inside a chapter.
- * e.g. "TCP/IP Stack", "Subnetting", "OSI Layer functions"
+ * Represents one topic inside a chapter or AI-generated weekly plan.
+ * Example: "TCP/IP Stack", "Subnetting", "OSI Layer functions"
  */
 @Entity
 @Table(name = "syllabus_topics")
@@ -17,14 +17,18 @@ public class SyllabusTopic {
      @Column(nullable = false)
      private String topicTitle;
 
-     // Position inside chapter
+     @Column(length = 1000)
+     private String topicDescription;
+
      private Integer topicNumber;
 
-     // easy / medium / hard
      private String difficulty;
 
-     // Estimated hours for this topic
      private Double estimatedHours;
+
+     private Integer recommendedWeek;
+
+     private Boolean plannerCreated = false;
 
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "chapter_id", nullable = false)
@@ -49,6 +53,14 @@ public class SyllabusTopic {
           this.topicTitle = topicTitle;
      }
 
+     public String getTopicDescription() {
+          return topicDescription;
+     }
+
+     public void setTopicDescription(String topicDescription) {
+          this.topicDescription = topicDescription;
+     }
+
      public Integer getTopicNumber() {
           return topicNumber;
      }
@@ -71,6 +83,22 @@ public class SyllabusTopic {
 
      public void setEstimatedHours(Double estimatedHours) {
           this.estimatedHours = estimatedHours;
+     }
+
+     public Integer getRecommendedWeek() {
+          return recommendedWeek;
+     }
+
+     public void setRecommendedWeek(Integer recommendedWeek) {
+          this.recommendedWeek = recommendedWeek;
+     }
+
+     public Boolean getPlannerCreated() {
+          return plannerCreated;
+     }
+
+     public void setPlannerCreated(Boolean plannerCreated) {
+          this.plannerCreated = plannerCreated;
      }
 
      public SyllabusChapter getChapter() {

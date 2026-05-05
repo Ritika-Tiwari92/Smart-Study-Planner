@@ -1,9 +1,7 @@
 package com.studyplanner.studyplanner.model;
 
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,7 +25,6 @@ public class Subject {
 
      @NotBlank(message = "Subject name is required")
      @JsonProperty("name")
-     @JsonAlias("subjectName")
      @Column(name = "subject_name")
      private String subjectName;
 
@@ -57,6 +54,13 @@ public class Subject {
      @JoinColumn(name = "user_id")
      private User user;
 
+     /*
+      * Important:
+      * Do not serialize the full syllabusFile inside /api/subjects.
+      * It contains nested chapters/topics and can create huge or circular JSON.
+      * Frontend only needs hasSyllabus boolean here.
+      */
+     @JsonIgnore
      @OneToOne(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
      private SyllabusFile syllabusFile;
 
@@ -73,6 +77,11 @@ public class Subject {
           this.iconClass = iconClass;
           this.description = description;
           this.difficultyLevel = difficultyLevel;
+     }
+
+     @JsonProperty("hasSyllabus")
+     public boolean isHasSyllabus() {
+          return this.syllabusFile != null;
      }
 
      public Long getId() {
@@ -162,5 +171,4 @@ public class Subject {
      public void setSyllabusFile(SyllabusFile syllabusFile) {
           this.syllabusFile = syllabusFile;
      }
-
 }

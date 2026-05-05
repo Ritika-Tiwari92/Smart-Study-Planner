@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Stores metadata about uploaded syllabus file.
  * One subject can have one syllabus file.
- * Actual file stored on disk — only path saved here.
+ * Actual file is stored on disk; metadata and AI analysis are saved in DB.
  */
 @Entity
 @Table(name = "syllabus_files")
@@ -18,40 +18,48 @@ public class SyllabusFile {
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Long id;
 
-     // Original filename shown to user
      @Column(nullable = false)
      private String originalFileName;
 
-     // Stored filename on disk (UUID-based, safe)
      @Column(nullable = false)
      private String storedFileName;
 
-     // Full path on disk
      @Column(nullable = false)
      private String filePath;
 
-     // pdf / docx / txt
      @Column(nullable = false)
      private String fileType;
 
-     // File size in bytes
      private Long fileSize;
 
      @Column(nullable = false, updatable = false)
      private LocalDateTime uploadedAt;
 
-     // One subject → one syllabus file
+     private Double totalHours;
+
+     private Integer weeksNeeded;
+
+     private String overallDifficulty;
+
+     @Column(length = 1500)
+     private String studyTips;
+
+     private LocalDateTime aiGeneratedAt;
+
+     private Boolean plannerCreated = false;
+
      @OneToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "subject_id", nullable = false)
      private Subject subject;
 
-     // Parsed chapters from this syllabus
      @OneToMany(mappedBy = "syllabusFile", cascade = CascadeType.ALL, orphanRemoval = true)
      private List<SyllabusChapter> chapters = new ArrayList<>();
 
      @PrePersist
      public void prePersist() {
-          this.uploadedAt = LocalDateTime.now();
+          if (this.uploadedAt == null) {
+               this.uploadedAt = LocalDateTime.now();
+          }
      }
 
      public SyllabusFile() {
@@ -111,6 +119,54 @@ public class SyllabusFile {
 
      public void setUploadedAt(LocalDateTime uploadedAt) {
           this.uploadedAt = uploadedAt;
+     }
+
+     public Double getTotalHours() {
+          return totalHours;
+     }
+
+     public void setTotalHours(Double totalHours) {
+          this.totalHours = totalHours;
+     }
+
+     public Integer getWeeksNeeded() {
+          return weeksNeeded;
+     }
+
+     public void setWeeksNeeded(Integer weeksNeeded) {
+          this.weeksNeeded = weeksNeeded;
+     }
+
+     public String getOverallDifficulty() {
+          return overallDifficulty;
+     }
+
+     public void setOverallDifficulty(String overallDifficulty) {
+          this.overallDifficulty = overallDifficulty;
+     }
+
+     public String getStudyTips() {
+          return studyTips;
+     }
+
+     public void setStudyTips(String studyTips) {
+          this.studyTips = studyTips;
+     }
+
+     public LocalDateTime getAiGeneratedAt() {
+          return aiGeneratedAt;
+     }
+
+     public void setAiGeneratedAt(LocalDateTime aiGeneratedAt) {
+          this.aiGeneratedAt = aiGeneratedAt;
+     }
+
+     public Boolean getPlannerCreated() {
+          return plannerCreated;
+     }
+
+     public void setPlannerCreated(Boolean plannerCreated) {
+          this.plannerCreated = plannerCreated;
      }
 
      public Subject getSubject() {

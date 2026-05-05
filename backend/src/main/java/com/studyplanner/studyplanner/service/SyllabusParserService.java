@@ -3,8 +3,8 @@ package com.studyplanner.studyplanner.service;
 import com.studyplanner.studyplanner.model.SyllabusChapter;
 import com.studyplanner.studyplanner.model.SyllabusFile;
 import com.studyplanner.studyplanner.model.SyllabusTopic;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -19,72 +19,43 @@ import java.util.regex.Pattern;
 
 /**
  * Rule-based syllabus parser.
- *
- * Algorithm (for viva explanation):
- * 1. Read file as plain text (PDF via PDFBox, DOCX via Apache POI, TXT
- * directly)
- * 2. Split text into lines
- * 3. Identify chapter headings using patterns:
- * - "Chapter 1", "CHAPTER 1", "Unit 1", "UNIT 1"
- * - Numbered lines: "1.", "1)", "1 -"
- * - ALL CAPS lines (likely headings)
- * 4. Lines under a chapter heading = topics
- * 5. Estimate difficulty from keywords:
- * - hard keywords: algorithm, complex, advanced, implement, design, analysis
- * - easy keywords: introduction, overview, basics, what is, definition
- * - else: medium
- * 6. Estimate hours: hard=3h, medium=2h, easy=1h per chapter
- * 7. Estimate lectures: hard=3, medium=2, easy=1
+ * Used for safe text extraction from PDF, DOCX, and TXT.
  */
 @Service
 public class SyllabusParserService {
 
-     // Pattern to detect chapter/unit headings
      private static final Pattern CHAPTER_PATTERN = Pattern.compile(
                "^(chapter|unit|module|section|part)\\s*[\\d]+[:\\s-]*(.*)$",
                Pattern.CASE_INSENSITIVE);
 
-     // Pattern for numbered lines: "1.", "1)", "1 -", "1:"
      private static final Pattern NUMBERED_PATTERN = Pattern.compile(
                "^(\\d{1,2})[.):\\-]\\s+(.+)$");
 
-     // Keywords that suggest hard difficulty
      private static final List<String> HARD_KEYWORDS = List.of(
                "algorithm", "complexity", "advanced", "implement", "design",
                "analysis", "optimization", "theorem", "proof", "synchronization",
                "deadlock", "normalization", "cryptography", "compilation");
 
-     // Keywords that suggest easy difficulty
      private static final List<String> EASY_KEYWORDS = List.of(
                "introduction", "overview", "basics", "what is", "definition",
                "history", "concept", "types of", "classification", "features");
 
-     /**
-      * Main entry point — parse file and attach chapters/topics to syllabusFile
-      * entity.
-      */
      public void parseSyllabusAndAttach(SyllabusFile syllabusFile, File file, String fileType) {
           try {
                String rawText = extractTextFromFile(file, fileType);
                List<SyllabusChapter> chapters = parseTextIntoChapters(rawText, syllabusFile);
                syllabusFile.setChapters(chapters);
           } catch (Exception e) {
-               // If parsing fails, still save the file — just without chapters
                System.err.println("Syllabus parsing failed: " + e.getMessage());
           }
      }
 
-     // -----------------------------------------------------------------------
-     // TEXT EXTRACTION
-     // -----------------------------------------------------------------------
-
-     private String extractTextFromFile(File file, String fileType) throws Exception {
+     public String extractTextFromFile(File file, String fileType) throws Exception {
           return switch (fileType.toLowerCase()) {
                case "pdf" -> extractFromPdf(file);
                case "docx" -> extractFromDocx(file);
                case "txt" -> extractFromTxt(file);
-               default -> throw new IllegalArgumentException(
-                         "Unsupported file type: " + fileType);
+               default -> throw new IllegalArgumentException("Unsupported file type: " + fileType);
           };
      }
 
@@ -100,12 +71,15 @@ public class SyllabusParserService {
                     XWPFDocument doc = new XWPFDocument(fis)) {
 
                StringBuilder sb = new StringBuilder();
+
                for (XWPFParagraph para : doc.getParagraphs()) {
                     String text = para.getText().trim();
+
                     if (!text.isEmpty()) {
                          sb.append(text).append("\n");
                     }
                }
+
                return sb.toString();
           }
      }
@@ -114,12 +88,7 @@ public class SyllabusParserService {
           return new String(java.nio.file.Files.readAllBytes(file.toPath()));
      }
 
-     // -----------------------------------------------------------------------
-     // PARSING LOGIC
-     // -----------------------------------------------------------------------
-
-     private List<SyllabusChapter> parseTextIntoChapters(String text,
-               SyllabusFile syllabusFile) {
+     private List<SyllabusChapter> parseTextIntoChapters(String text, SyllabusFile syllabusFile) {
           List<SyllabusChapter> chapters = new ArrayList<>();
           String[] lines = text.split("\\r?\\n");
 
@@ -129,21 +98,21 @@ public class SyllabusParserService {
 
           for (String rawLine : lines) {
                String line = rawLine.trim();
-               if (line.isEmpty())
-                    continue;
 
-               // --- Check if this line is a chapter heading ---
+               if (line.isEmpty()) {
+                    continue;
+               }
+
                String detectedTitle = detectChapterHeading(line);
 
                if (detectedTitle != null) {
-                    // Save previous chapter if exists
                     if (currentChapter != null) {
                          chapters.add(currentChapter);
                     }
 
-                    // Start new chapter
                     chapterCount++;
                     topicCount = 0;
+
                     currentChapter = new SyllabusChapter();
                     currentChapter.setChapterNumber(chapterCount);
                     currentChapter.setChapterTitle(detectedTitle);
@@ -156,26 +125,28 @@ public class SyllabusParserService {
                     currentChapter.setTopics(new ArrayList<>());
 
                } else if (currentChapter != null && isTopicLine(line)) {
-                    // This line is a topic under current chapter
                     topicCount++;
+
                     SyllabusTopic topic = new SyllabusTopic();
                     topic.setTopicNumber(topicCount);
                     topic.setTopicTitle(cleanTopicLine(line));
+                    topic.setTopicDescription("");
                     topic.setChapter(currentChapter);
 
                     String topicDiff = estimateDifficulty(line);
                     topic.setDifficulty(topicDiff);
                     topic.setEstimatedHours(hoursForDifficulty(topicDiff));
+                    topic.setRecommendedWeek(Math.max(1, chapterCount));
+                    topic.setPlannerCreated(false);
+
                     currentChapter.getTopics().add(topic);
                }
           }
 
-          // Don't forget the last chapter
           if (currentChapter != null) {
                chapters.add(currentChapter);
           }
 
-          // If parser found nothing, create one fallback chapter
           if (chapters.isEmpty()) {
                chapters.add(createFallbackChapter(syllabusFile));
           }
@@ -183,25 +154,20 @@ public class SyllabusParserService {
           return chapters;
      }
 
-     /**
-      * Detects if a line is a chapter heading.
-      * Returns cleaned title or null if not a heading.
-      */
      private String detectChapterHeading(String line) {
-          // Match "Chapter 1: OSI Model", "Unit 2 - Networking" etc.
           Matcher chapterMatcher = CHAPTER_PATTERN.matcher(line);
+
           if (chapterMatcher.matches()) {
                String title = chapterMatcher.group(2).trim();
-               return title.isEmpty() ? line : line;
+               return title.isEmpty() ? line : title;
           }
 
-          // Match "1. Introduction", "2) Networking Basics"
           Matcher numberedMatcher = NUMBERED_PATTERN.matcher(line);
+
           if (numberedMatcher.matches()) {
                return numberedMatcher.group(2).trim();
           }
 
-          // ALL CAPS line with reasonable length = likely a heading
           if (line.equals(line.toUpperCase())
                     && line.length() > 4
                     && line.length() < 80
@@ -213,38 +179,36 @@ public class SyllabusParserService {
      }
 
      private boolean isTopicLine(String line) {
-          // Skip very short or very long lines
-          if (line.length() < 3 || line.length() > 200)
+          if (line.length() < 3 || line.length() > 200) {
                return false;
-          // Skip lines that look like page numbers
-          if (line.matches("^\\d+$"))
+          }
+
+          if (line.matches("^\\d+$")) {
                return false;
-          // Skip lines that are just punctuation
-          if (line.matches("^[^a-zA-Z]+$"))
-               return false;
-          return true;
+          }
+
+          return !line.matches("^[^a-zA-Z]+$");
      }
 
      private String cleanTopicLine(String line) {
-          // Remove leading bullets, dashes, numbers
           return line.replaceAll("^[•\\-*>\\d.)]+\\s*", "").trim();
      }
-
-     // -----------------------------------------------------------------------
-     // DIFFICULTY ESTIMATION
-     // -----------------------------------------------------------------------
 
      private String estimateDifficulty(String text) {
           String lower = text.toLowerCase();
 
           for (String keyword : HARD_KEYWORDS) {
-               if (lower.contains(keyword))
+               if (lower.contains(keyword)) {
                     return "hard";
+               }
           }
+
           for (String keyword : EASY_KEYWORDS) {
-               if (lower.contains(keyword))
+               if (lower.contains(keyword)) {
                     return "easy";
+               }
           }
+
           return "medium";
      }
 
@@ -252,7 +216,7 @@ public class SyllabusParserService {
           return switch (difficulty) {
                case "hard" -> 3.0;
                case "easy" -> 1.0;
-               default -> 2.0; // medium
+               default -> 2.0;
           };
      }
 
@@ -263,10 +227,6 @@ public class SyllabusParserService {
                default -> 2;
           };
      }
-
-     // -----------------------------------------------------------------------
-     // HELPERS
-     // -----------------------------------------------------------------------
 
      private SyllabusChapter createFallbackChapter(SyllabusFile syllabusFile) {
           SyllabusChapter fallback = new SyllabusChapter();
@@ -283,6 +243,7 @@ public class SyllabusParserService {
      private String toTitleCase(String input) {
           String[] words = input.toLowerCase().split("\\s+");
           StringBuilder sb = new StringBuilder();
+
           for (String word : words) {
                if (!word.isEmpty()) {
                     sb.append(Character.toUpperCase(word.charAt(0)))
@@ -290,6 +251,7 @@ public class SyllabusParserService {
                               .append(" ");
                }
           }
+
           return sb.toString().trim();
      }
 }
