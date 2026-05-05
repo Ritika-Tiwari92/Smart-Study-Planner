@@ -18,14 +18,14 @@
      <link rel="stylesheet" href="../assets/css/layout.css">
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/revision.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
+     <link rel="stylesheet" href="../assets/css/revision.css">
+
 </head>
 
-<body>
 
-     <body data-page-role="student"></body>
+<body data-page-role="student">
      <div class="dashboard-layout">
           <aside class="sidebar">
                <div class="sidebar-top">
@@ -138,23 +138,59 @@
                <section class="revision-content">
                     <div class="revision-summary-grid">
                          <div class="revision-summary-card">
-                              <h3 id="totalRevisionCount">12</h3>
+                              <h3 id="totalRevisionCount">0</h3>
                               <p>Total Revision Topics</p>
                          </div>
 
                          <div class="revision-summary-card">
-                              <h3 id="revisionDueTodayCount">05</h3>
+                              <h3 id="revisionDueTodayCount">0</h3>
                               <p>Due Today</p>
                          </div>
 
                          <div class="revision-summary-card">
-                              <h3 id="revisionCompletedTodayCount">03</h3>
+                              <h3 id="revisionCompletedTodayCount">0</h3>
                               <p>Completed Today</p>
                          </div>
 
                          <div class="revision-summary-card">
-                              <h3 id="revisionProgressCount">68%</h3>
+                              <h3 id="revisionProgressCount">0%</h3>
                               <p>Revision Progress</p>
+                         </div>
+                    </div>
+
+                    <div class="revision-smart-grid">
+                         <div class="revision-smart-card">
+                              <div class="revision-smart-card-top">
+                                   <div>
+                                        <span class="revision-smart-kicker">Smart Revision Focus</span>
+                                        <h3 id="revisionSmartFocusTitle">Loading revision focus...</h3>
+                                   </div>
+                                   <div class="revision-smart-icon">
+                                        <i class="fa-solid fa-brain"></i>
+                                   </div>
+                              </div>
+
+                              <p id="revisionSmartFocusDescription">
+                                   Your most important revision topics will appear here.
+                              </p>
+
+                              <div class="revision-smart-list" id="revisionSmartFocusList"></div>
+                         </div>
+
+                         <div class="revision-smart-card">
+                              <div class="revision-smart-card-top">
+                                   <div>
+                                        <span class="revision-smart-kicker">Spaced Revision</span>
+                                        <h3>Next review suggestions</h3>
+                                   </div>
+                                   <div class="revision-smart-icon">
+                                        <i class="fa-solid fa-repeat"></i>
+                                   </div>
+                              </div>
+
+                              <div class="revision-spaced-list" id="revisionSpacedList">
+                                   <p class="revision-muted-text">Spaced revision suggestions will appear here.</p>
+                              </div>
                          </div>
                     </div>
 
