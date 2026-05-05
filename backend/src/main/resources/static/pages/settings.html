@@ -4,12 +4,14 @@
 <head>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
      <title>Settings | EduMind AI</title>
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
+
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
      <link rel="stylesheet" href="../assets/css/variables.css">
@@ -17,161 +19,16 @@
      <link rel="stylesheet" href="../assets/css/layout.css">
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/settings.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
-
-
-     <style>
-          /* Settings sidebar brand/logo fix */
-          body[data-page-role="student"] .sidebar-top {
-               gap: 18px;
-          }
-
-          body[data-page-role="student"] .sidebar-logo,
-          body[data-page-role="student"] .student-sidebar-logo {
-               display: flex !important;
-               align-items: center !important;
-               gap: 12px !important;
-               color: #eef7ff !important;
-               margin: 0 !important;
-          }
-
-          body[data-page-role="student"] .sidebar-logo>i.fa-graduation-cap {
-               display: none !important;
-          }
-
-          body[data-page-role="student"] .settings-logo-mark,
-          body[data-page-role="student"] .student-logo-mark {
-               width: 42px;
-               height: 42px;
-               min-width: 42px;
-               border-radius: 15px;
-               display: inline-flex;
-               align-items: center;
-               justify-content: center;
-               background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(6, 182, 212, 0.18));
-               border: 1px solid rgba(96, 165, 250, 0.34);
-               box-shadow:
-                    0 0 0 4px rgba(59, 130, 246, 0.08),
-                    0 12px 28px rgba(37, 99, 235, 0.22),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-          }
-
-          body[data-page-role="student"] .settings-neural-logo-svg,
-          body[data-page-role="student"] .student-neural-logo-svg {
-               width: 30px;
-               height: 30px;
-               display: block;
-               filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.48));
-          }
-
-          body[data-page-role="student"] .settings-logo-hex,
-          body[data-page-role="student"] .student-neural-logo-svg .em-logo-hex {
-               transform-origin: center;
-               animation: settingsLogoRotate 12s linear infinite;
-          }
-
-          body[data-page-role="student"] .settings-logo-node,
-          body[data-page-role="student"] .student-neural-logo-svg .em-node {
-               transform-origin: center;
-               animation: settingsLogoPulse 2.6s ease-in-out infinite;
-          }
-
-          body[data-page-role="student"] .settings-logo-text,
-          body[data-page-role="student"] .student-logo-text {
-               display: flex;
-               flex-direction: column;
-               gap: 1px;
-               min-width: 0;
-          }
-
-          body[data-page-role="student"] .settings-logo-text strong,
-          body[data-page-role="student"] .student-logo-text strong {
-               color: #f8fbff !important;
-               font-size: 21px;
-               font-weight: 800;
-               line-height: 1.05;
-               letter-spacing: -0.04em;
-          }
-
-          body[data-page-role="student"] .settings-logo-text small,
-          body[data-page-role="student"] .student-logo-text small {
-               color: rgba(147, 197, 253, 0.86) !important;
-               font-size: 11px;
-               font-weight: 800;
-               letter-spacing: 0.12em;
-               text-transform: uppercase;
-          }
-
-          body[data-page-role="student"] #hamburgerBtn,
-          body[data-page-role="student"] .hamburger-btn {
-               width: 48px !important;
-               height: 48px !important;
-               min-width: 48px !important;
-               border-radius: 16px !important;
-               display: inline-flex !important;
-               align-items: center !important;
-               justify-content: center !important;
-               flex-direction: column !important;
-               gap: 5px !important;
-               background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(6, 182, 212, 0.1)) !important;
-               border: 1px solid rgba(96, 165, 250, 0.28) !important;
-               box-shadow:
-                    0 14px 28px rgba(37, 99, 235, 0.18),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-               color: #93c5fd !important;
-          }
-
-          body[data-page-role="student"] #hamburgerBtn:hover,
-          body[data-page-role="student"] .hamburger-btn:hover {
-               transform: translateY(-2px);
-               border-color: rgba(96, 165, 250, 0.48) !important;
-               box-shadow:
-                    0 18px 36px rgba(37, 99, 235, 0.26),
-                    0 0 22px rgba(59, 130, 246, 0.18) !important;
-          }
-
-          body[data-page-role="student"] #hamburgerBtn .bar,
-          body[data-page-role="student"] .hamburger-btn .bar {
-               width: 22px !important;
-               height: 2px !important;
-               border-radius: 999px !important;
-               background: #bfdbfe !important;
-               display: block !important;
-               transition: 0.25s ease !important;
-          }
-
-          @keyframes settingsLogoRotate {
-               from {
-                    transform: rotate(0deg);
-               }
-
-               to {
-                    transform: rotate(360deg);
-               }
-          }
-
-          @keyframes settingsLogoPulse {
-
-               0%,
-               100% {
-                    opacity: 0.9;
-                    transform: scale(1);
-               }
-
-               50% {
-                    opacity: 1;
-                    transform: scale(1.12);
-               }
-          }
-     </style>
-
+     <link rel="stylesheet" href="../assets/css/settings.css">
 </head>
 
-<body data-page-role="student">
+<body data-page-role="student" class="settings-page">
+
      <div class="dashboard-layout">
-          <aside class="sidebar">
+
+          <aside class="sidebar" id="mainSidebar">
                <div class="sidebar-top">
                     <h2 class="sidebar-logo settings-sidebar-logo">
                          <span class="settings-logo-mark" aria-hidden="true">
@@ -179,8 +36,10 @@
                                    xmlns="http://www.w3.org/2000/svg">
                                    <polygon class="settings-logo-hex" points="22,2 38,11 38,33 22,42 6,33 6,11"
                                         stroke="url(#settingsLogoGrad)" stroke-width="1.8" fill="none" opacity="0.95" />
+
                                    <polygon points="22,8 34,15 34,29 22,36 10,29 10,15" fill="url(#settingsLogoBg)"
                                         opacity="0.2" />
+
                                    <line x1="22" y1="15" x2="14" y2="24" stroke="url(#settingsLogoLine)"
                                         stroke-width="1.15" opacity="0.9" />
                                    <line x1="22" y1="15" x2="30" y2="24" stroke="url(#settingsLogoLine)"
@@ -189,168 +48,266 @@
                                         stroke-width="1.15" opacity="0.9" />
                                    <line x1="30" y1="24" x2="22" y2="30" stroke="url(#settingsLogoLine)"
                                         stroke-width="1.15" opacity="0.9" />
-                                   <circle class="settings-logo-node" cx="22" cy="15" r="2.8" fill="#60a5fa" />
-                                   <circle class="settings-logo-node" cx="14" cy="24" r="2.25" fill="#38bdf8" />
-                                   <circle class="settings-logo-node" cx="30" cy="24" r="2.25" fill="#2563eb" />
-                                   <circle class="settings-logo-node" cx="22" cy="30" r="2.05" fill="#22d3ee" />
+
+                                   <circle class="settings-logo-node" cx="22" cy="15" r="2.8" fill="#2dd4bf" />
+                                   <circle class="settings-logo-node" cx="14" cy="24" r="2.25" fill="#22d3ee" />
+                                   <circle class="settings-logo-node" cx="30" cy="24" r="2.25" fill="#14b8a6" />
+                                   <circle class="settings-logo-node" cx="22" cy="30" r="2.05" fill="#67e8f9" />
                                    <circle cx="22" cy="22" r="1.25" fill="#ffffff" opacity="0.95" />
+
                                    <defs>
                                         <linearGradient id="settingsLogoGrad" x1="6" y1="2" x2="38" y2="42"
                                              gradientUnits="userSpaceOnUse">
-                                             <stop offset="0%" stop-color="#93c5fd" />
-                                             <stop offset="45%" stop-color="#38bdf8" />
-                                             <stop offset="100%" stop-color="#2563eb" />
+                                             <stop offset="0%" stop-color="#67e8f9" />
+                                             <stop offset="45%" stop-color="#2dd4bf" />
+                                             <stop offset="100%" stop-color="#14b8a6" />
                                         </linearGradient>
+
                                         <linearGradient id="settingsLogoBg" x1="6" y1="2" x2="38" y2="42"
                                              gradientUnits="userSpaceOnUse">
-                                             <stop offset="0%" stop-color="#60a5fa" />
-                                             <stop offset="100%" stop-color="#22d3ee" />
+                                             <stop offset="0%" stop-color="#22d3ee" />
+                                             <stop offset="100%" stop-color="#2dd4bf" />
                                         </linearGradient>
+
                                         <linearGradient id="settingsLogoLine" x1="0" y1="0" x2="44" y2="44"
                                              gradientUnits="userSpaceOnUse">
-                                             <stop offset="0%" stop-color="#93c5fd" />
-                                             <stop offset="100%" stop-color="#38bdf8" />
+                                             <stop offset="0%" stop-color="#67e8f9" />
+                                             <stop offset="100%" stop-color="#2dd4bf" />
                                         </linearGradient>
                                    </defs>
                               </svg>
                          </span>
+
                          <span class="settings-logo-text">
                               <strong>EduMind AI</strong>
                               <small>Student Panel</small>
                          </span>
                     </h2>
-
-                    <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Toggle sidebar"
-                         aria-expanded="true">
-                         <span class="bar"></span>
-                         <span class="bar"></span>
-                         <span class="bar"></span>
-                    </button>
                </div>
+
                <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item"><i
-                              class="fa-solid fa-house"></i><span>Dashboard</span></a>
-                    <a href="planner.html" class="nav-item"><i
-                              class="fa-solid fa-calendar-days"></i><span>Planner</span></a>
-                    <a href="subjects.html" class="nav-item"><i class="fa-solid fa-book"></i><span>Subjects</span></a>
-                    <a href="tasks.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
-                    <a href="revision.html" class="nav-item"><i class="fa-solid fa-rotate"></i><span>Revision</span></a>
-                    <a href="tests.html" class="nav-item"><i class="fa-solid fa-file-lines"></i><span>Tests</span></a>
-                    <a href="analytics.html" class="nav-item"><i
-                              class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                    <a href="dashboard.html" class="nav-item">
+                         <i class="fa-solid fa-house"></i>
+                         <span>Dashboard</span>
+                    </a>
+
+                    <a href="planner.html" class="nav-item">
+                         <i class="fa-solid fa-calendar-days"></i>
+                         <span>Planner</span>
+                    </a>
+
+                    <a href="subjects.html" class="nav-item">
+                         <i class="fa-solid fa-book"></i>
+                         <span>Subjects</span>
+                    </a>
+
+                    <a href="tasks.html" class="nav-item">
+                         <i class="fa-solid fa-list-check"></i>
+                         <span>Tasks</span>
+                    </a>
+
+                    <a href="revision.html" class="nav-item">
+                         <i class="fa-solid fa-rotate"></i>
+                         <span>Revision</span>
+                    </a>
+
+                    <a href="tests.html" class="nav-item">
+                         <i class="fa-solid fa-file-lines"></i>
+                         <span>Tests</span>
+                    </a>
+
+                    <a href="analytics.html" class="nav-item">
+                         <i class="fa-solid fa-chart-line"></i>
+                         <span>Analytics</span>
+                    </a>
+
                     <a href="pomodoro.html" class="nav-item">
                          <i class="fa-solid fa-stopwatch"></i>
                          <span>Study Timer</span>
                     </a>
-                    <a href="assistant.html" class="nav-item"><i
-                              class="fa-solid fa-robot"></i><span>Assistant</span></a>
-                    <a href="settings.html" class="nav-item active"><i
-                              class="fa-solid fa-gear"></i><span>Settings</span></a>
+
+                    <a href="assistant.html" class="nav-item">
+                         <i class="fa-solid fa-robot"></i>
+                         <span>Assistant</span>
+                    </a>
+
+                    <a href="settings.html" class="nav-item active">
+                         <i class="fa-solid fa-gear"></i>
+                         <span>Settings</span>
+                    </a>
                </nav>
+
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn">
-                         <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                    <a href="login.html" class="logout-btn" id="logoutBtn">
+                         <i class="fa-solid fa-right-from-bracket"></i>
+                         <span>Logout</span>
                     </a>
                </div>
           </aside>
 
-          <main class="dashboard-main">
-               <header class="dashboard-header">
+          <main class="dashboard-main settings-main">
+
+               <header class="dashboard-header settings-header">
                     <div class="header-left">
+                         <div class="settings-header-icon">
+                              <i class="fa-solid fa-sliders"></i>
+                         </div>
+
                          <div>
                               <h1>Settings</h1>
-                              <p>Manage your profile, preferences, notifications, and account options.</p>
+                              <p>Manage your profile, preferences, notifications, and account security.</p>
                          </div>
                     </div>
+
                     <div class="header-actions">
-                         <button class="save-settings-btn" id="saveSettingsBtn">
+                         <p class="settings-save-status" id="settingsSaveStatus">All changes saved.</p>
+
+                         <button class="save-settings-btn" id="saveSettingsBtn" type="button">
                               <i class="fa-solid fa-floppy-disk"></i>
                               <span>Save Changes</span>
                          </button>
-                         <p class="settings-save-status" id="settingsSaveStatus"></p>
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+
+                         <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle Theme">
                               <i class="fa-solid fa-moon"></i>
                          </button>
-                         <div class="profile-mini" id="profileMenuToggle">
+
+                         <div class="profile-mini" id="profileMenuToggle" role="button" tabindex="0"
+                              aria-label="Open profile menu">
                               <img src="../assets/avatar/default-user.png" alt="User" id="headerProfileImage">
                               <div>
-                                   <h4>Ritika</h4>
-                                   <p>Student</p>
+                                   <h4>Student</h4>
+                                   <p>STUDENT</p>
                               </div>
                          </div>
+
                          <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
                               <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i><span>Profile Settings</span>
+                                   <i class="fa-solid fa-user-gear"></i>
+                                   <span>Profile Settings</span>
                               </a>
+
                               <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i><span>View Analytics</span>
+                                   <i class="fa-solid fa-chart-line"></i>
+                                   <span>View Analytics</span>
                               </a>
+
                               <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                                   <i class="fa-solid fa-right-from-bracket"></i>
+                                   <span>Logout</span>
                               </a>
                          </div>
                     </div>
                </header>
 
+               <section class="settings-overview" aria-label="Settings overview">
+                    <article class="settings-overview-card profile-completion-card">
+                         <div class="overview-icon">
+                              <i class="fa-solid fa-user-check"></i>
+                         </div>
+
+                         <div>
+                              <span>Profile Completion</span>
+                              <strong id="profileCompletionValue">0%</strong>
+                         </div>
+
+                         <div class="profile-completion-track" aria-hidden="true">
+                              <span id="profileCompletionBar"></span>
+                         </div>
+                    </article>
+
+                    <article class="settings-overview-card">
+                         <div class="overview-icon success">
+                              <i class="fa-solid fa-bell"></i>
+                         </div>
+
+                         <div>
+                              <span>Active Alerts</span>
+                              <strong id="activeAlertsCount">0</strong>
+                         </div>
+                    </article>
+
+                    <article class="settings-overview-card">
+                         <div class="overview-icon warning">
+                              <i class="fa-solid fa-shield-halved"></i>
+                         </div>
+
+                         <div>
+                              <span>Account Security</span>
+                              <strong id="securityStatusText">Basic</strong>
+                         </div>
+                    </article>
+               </section>
+
                <section class="settings-content">
                     <div class="settings-main-grid">
 
-                         <!-- LEFT COLUMN -->
                          <div class="settings-left-column">
 
-                              <!-- Profile Card -->
-                              <div class="settings-card profile-settings-card animate-card">
+                              <article class="settings-card profile-settings-card animate-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-user-circle"></i> Profile Settings</h3>
-                                        <p>Update your basic profile details.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-user-circle"></i>
+                                             Profile Settings
+                                        </h3>
+                                        <p>Keep your profile information accurate for personalized study insights.</p>
                                    </div>
+
                                    <div class="profile-settings-layout">
                                         <div class="settings-avatar-box">
                                              <div class="avatar-ring-wrapper">
                                                   <img src="../assets/avatar/default-user.png" alt="Profile"
                                                        id="settingsProfileImage">
-                                                  <div class="avatar-upload-overlay" id="avatarOverlay">
+
+                                                  <button class="avatar-upload-overlay" id="avatarOverlay" type="button"
+                                                       aria-label="Change profile photo">
                                                        <i class="fa-solid fa-camera"></i>
-                                                  </div>
+                                                  </button>
                                              </div>
+
                                              <input type="file" id="profilePhotoInput" accept="image/*"
-                                                  style="display:none">
+                                                  class="visually-hidden">
+
                                              <button class="change-photo-btn" id="changePhotoBtn" type="button">
-                                                  <i class="fa-solid fa-camera"></i> Change Photo
+                                                  <i class="fa-solid fa-camera"></i>
+                                                  <span>Change Photo</span>
                                              </button>
+
+                                             <p class="photo-help-text">JPG or PNG, maximum 2 MB.</p>
                                         </div>
+
                                         <div class="settings-form-grid">
                                              <div class="settings-form-group">
                                                   <label for="settingsFullName">Full Name</label>
-                                                  <input type="text" id="settingsFullName" value="Ritika Tiwari"
-                                                       placeholder="Full name">
+                                                  <input type="text" id="settingsFullName" placeholder="Full name">
                                              </div>
+
                                              <div class="settings-form-group">
                                                   <label for="settingsEmail">Email</label>
-                                                  <input type="email" id="settingsEmail" value="ritika@example.com"
-                                                       placeholder="Email">
+                                                  <input type="email" id="settingsEmail" placeholder="Email address">
                                              </div>
+
                                              <div class="settings-form-group">
                                                   <label for="settingsCourse">Course</label>
-                                                  <input type="text" id="settingsCourse" value="BCA Final Year"
-                                                       placeholder="Course">
+                                                  <input type="text" id="settingsCourse" placeholder="Course">
                                              </div>
+
                                              <div class="settings-form-group">
                                                   <label for="settingsCollege">College</label>
-                                                  <input type="text" id="settingsCollege"
-                                                       value="ITM College of Science and Management"
-                                                       placeholder="College">
+                                                  <input type="text" id="settingsCollege" placeholder="College">
                                              </div>
                                         </div>
                                    </div>
-                              </div>
+                              </article>
 
-                              <!-- Study Preferences -->
-                              <div class="settings-card preferences-card animate-card" style="animation-delay:0.1s">
+                              <article class="settings-card preferences-card animate-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-brain"></i> Study Preferences</h3>
-                                        <p>Customize your learning environment and habits.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-brain"></i>
+                                             Study Preferences
+                                        </h3>
+                                        <p>Customize your learning environment and daily study habits.</p>
                                    </div>
+
                                    <div class="settings-form-grid">
                                         <div class="settings-form-group">
                                              <label for="settingsStudyTime">Preferred Study Time</label>
@@ -361,6 +318,7 @@
                                                   <option value="Night">Night</option>
                                              </select>
                                         </div>
+
                                         <div class="settings-form-group">
                                              <label for="settingsStudyGoal">Daily Study Goal</label>
                                              <select id="settingsStudyGoal">
@@ -370,128 +328,169 @@
                                                   <option value="8 Hours">8 Hours</option>
                                              </select>
                                         </div>
+
                                         <div class="settings-form-group full-width">
                                              <label for="settingsSubjectFocus">Preferred Subjects Focus</label>
-                                             <input type="text" id="settingsSubjectFocus" value="Java, DBMS, Aptitude"
+                                             <input type="text" id="settingsSubjectFocus"
                                                   placeholder="e.g. Java, DBMS, Aptitude">
                                         </div>
                                    </div>
-                              </div>
+                              </article>
+
                          </div>
 
-                         <!-- RIGHT COLUMN -->
                          <div class="settings-right-column">
 
-                              <!-- Notifications -->
-                              <div class="settings-card notification-card animate-card" style="animation-delay:0.15s">
+                              <article class="settings-card notification-card animate-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
-                                        <p>Choose what reminders and alerts you want.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-bell"></i>
+                                             Notifications
+                                        </h3>
+                                        <p>Choose the reminders and alerts you want to receive.</p>
                                    </div>
+
                                    <div class="settings-toggle-list">
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Task Reminders</h4>
                                                   <p>Get reminders for pending study tasks.</p>
                                              </div>
-                                             <label class="switch"><input type="checkbox" checked><span
-                                                       class="slider"></span></label>
+
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
                                         </div>
+
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Revision Alerts</h4>
                                                   <p>Receive reminders for revision topics.</p>
                                              </div>
-                                             <label class="switch"><input type="checkbox" checked><span
-                                                       class="slider"></span></label>
+
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
                                         </div>
+
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Test Notifications</h4>
                                                   <p>Get alerts for upcoming tests and mock exams.</p>
                                              </div>
-                                             <label class="switch"><input type="checkbox" checked><span
-                                                       class="slider"></span></label>
+
+                                             <label class="switch">
+                                                  <input type="checkbox" checked>
+                                                  <span class="slider"></span>
+                                             </label>
                                         </div>
+
                                         <div class="settings-toggle-item">
                                              <div>
                                                   <h4>Assistant Suggestions</h4>
-                                                  <p>Show smart recommendations from AI assistant.</p>
+                                                  <p>Show smart recommendations from the AI assistant.</p>
                                              </div>
-                                             <label class="switch"><input type="checkbox"><span
-                                                       class="slider"></span></label>
+
+                                             <label class="switch">
+                                                  <input type="checkbox">
+                                                  <span class="slider"></span>
+                                             </label>
                                         </div>
                                    </div>
-                              </div>
+                              </article>
 
-                              <!-- Security -->
-                              <div class="settings-card security-card animate-card" style="animation-delay:0.2s">
+                              <article class="settings-card security-card animate-card">
                                    <div class="section-title">
-                                        <h3><i class="fa-solid fa-shield-halved"></i> Security & Account</h3>
-                                        <p>Manage account security settings.</p>
+                                        <h3>
+                                             <i class="fa-solid fa-shield-halved"></i>
+                                             Security & Account
+                                        </h3>
+                                        <p>Manage your account security settings.</p>
                                    </div>
 
-                                   <!-- 2FA Status Banner -->
-                                   <div class="twofa-status-banner" id="twofaStatusBanner">
-                                        <div class="twofa-status-left">
-                                             <span class="twofa-dot" id="twofaDot"></span>
+                                   <div class="security-status-banner" id="twofaStatusBanner">
+                                        <div class="security-status-left">
+                                             <span class="security-dot" id="twofaDot"></span>
+
                                              <div>
-                                                  <p class="twofa-status-label" id="twofaStatusLabel">2FA Disabled</p>
-                                                  <p class="twofa-status-sub">Two-Factor Authentication</p>
+                                                  <h4 id="twofaStatusLabel">2FA Disabled</h4>
+                                                  <p>Two-Factor Authentication</p>
                                              </div>
                                         </div>
-                                        <span class="twofa-badge" id="twofaBadge">OFF</span>
+
+                                        <span class="security-badge" id="twofaBadge">OFF</span>
                                    </div>
 
                                    <div class="security-action-list">
                                         <button class="security-action-btn" id="changePasswordBtn" type="button">
-                                             <i class="fa-solid fa-key"></i>
-                                             <span>Change Password</span>
-                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
+                                             <span>
+                                                  <i class="fa-solid fa-key"></i>
+                                                  Change Password
+                                             </span>
+                                             <i class="fa-solid fa-chevron-right"></i>
                                         </button>
-                                        <button class="security-action-btn twofa-btn" id="twoFactorBtn" type="button">
-                                             <i class="fa-solid fa-shield-halved"></i>
-                                             <span>Enable Two-Factor Auth</span>
-                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
-                                        </button>
-                                        <button class="security-action-btn danger" id="deleteAccountBtn" type="button">
-                                             <i class="fa-solid fa-trash"></i>
-                                             <span>Delete Account</span>
-                                             <i class="fa-solid fa-chevron-right sec-arrow"></i>
-                                        </button>
-                                   </div>
 
-                                   <!-- Change Password Inline Form -->
-                                   <div id="changePasswordForm" class="password-form-panel" style="display:none">
-                                        <div class="password-form-inner">
-                                             <div class="settings-form-group full-width">
-                                                  <label for="currentPassword">Current Password</label>
-                                                  <input type="password" id="currentPassword"
-                                                       placeholder="Enter current password">
+                                        <div class="password-form-panel" id="changePasswordForm" hidden>
+                                             <div class="settings-form-grid">
+                                                  <div class="settings-form-group full-width">
+                                                       <label for="currentPassword">Current Password</label>
+                                                       <input type="password" id="currentPassword"
+                                                            placeholder="Enter current password">
+                                                  </div>
+
+                                                  <div class="settings-form-group">
+                                                       <label for="newPassword">New Password</label>
+                                                       <input type="password" id="newPassword"
+                                                            placeholder="Enter new password">
+
+                                                       <div class="password-strength">
+                                                            <div class="password-strength-track">
+                                                                 <span id="passwordStrengthBar"></span>
+                                                            </div>
+                                                            <p id="passwordStrengthText">
+                                                                 Use 8+ characters with uppercase, lowercase, number,
+                                                                 and special character.
+                                                            </p>
+                                                       </div>
+                                                  </div>
+
+                                                  <div class="settings-form-group">
+                                                       <label for="confirmNewPassword">Confirm Password</label>
+                                                       <input type="password" id="confirmNewPassword"
+                                                            placeholder="Confirm new password">
+                                                  </div>
                                              </div>
-                                             <div class="settings-form-group">
-                                                  <label for="newPassword">New Password</label>
-                                                  <input type="password" id="newPassword"
-                                                       placeholder="Min 6 characters">
-                                             </div>
-                                             <div class="settings-form-group">
-                                                  <label for="confirmNewPassword">Confirm New Password</label>
-                                                  <input type="password" id="confirmNewPassword"
-                                                       placeholder="Repeat new password">
+
+                                             <div class="password-form-actions">
+                                                  <button class="secondary-btn" id="cancelPasswordBtn"
+                                                       type="button">Cancel</button>
+
+                                                  <button class="primary-btn" id="updatePasswordBtn" type="button">
+                                                       <i class="fa-solid fa-shield"></i>
+                                                       <span>Update Password</span>
+                                                  </button>
                                              </div>
                                         </div>
-                                        <div class="password-form-actions">
-                                             <button class="save-settings-btn" id="updatePasswordBtn" type="button">
-                                                  <i class="fa-solid fa-lock"></i>
-                                                  <span>Update Password</span>
-                                             </button>
-                                             <button class="security-action-btn" id="cancelPasswordBtn" type="button">
-                                                  <i class="fa-solid fa-xmark"></i>
-                                                  <span>Cancel</span>
-                                             </button>
-                                        </div>
+
+                                        <button class="security-action-btn" id="twoFactorBtn" type="button">
+                                             <span>
+                                                  <i class="fa-solid fa-shield-halved"></i>
+                                                  Enable Two-Factor Auth
+                                             </span>
+                                             <i class="fa-solid fa-chevron-right"></i>
+                                        </button>
+
+                                        <button class="security-action-btn danger" id="deleteAccountBtn" type="button">
+                                             <span>
+                                                  <i class="fa-solid fa-trash"></i>
+                                                  Delete Account
+                                             </span>
+                                             <i class="fa-solid fa-chevron-right"></i>
+                                        </button>
                                    </div>
-                              </div>
+                              </article>
 
                          </div>
                     </div>
@@ -499,118 +498,59 @@
           </main>
      </div>
 
-     <!-- ══════════════════════════════════════════
-          2FA MODAL — Email OTP Flow
-          ══════════════════════════════════════════ -->
-     <div class="modal-overlay" id="twofaModalOverlay">
-          <div class="modal-box twofa-modal">
-               <button class="modal-close-btn" id="twofaModalClose">
+     <div class="twofa-modal-overlay" id="twofaModalOverlay">
+          <div class="twofa-modal" role="dialog" aria-modal="true" aria-labelledby="twofaModalTitle">
+               <button class="modal-close-btn" id="twofaModalClose" type="button" aria-label="Close modal">
                     <i class="fa-solid fa-xmark"></i>
                </button>
 
-               <div class="modal-header">
-                    <div class="modal-icon-wrap">
-                         <i class="fa-solid fa-envelope-open-text"></i>
-                    </div>
-                    <h2>Enable Two-Factor Auth</h2>
-                    <p>We'll send a 6-digit OTP to your registered email address.</p>
+               <div class="twofa-modal-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
                </div>
 
-               <!-- Step 1: Send OTP -->
-               <div class="otp-send-section">
-                    <div class="otp-email-display">
-                         <i class="fa-solid fa-envelope"></i>
-                         <span>OTP will be sent to: <strong id="maskedEmailDisplay">your email</strong></span>
-                    </div>
-                    <button class="send-otp-btn" id="sendOtpBtn" type="button">
-                         <i class="fa-solid fa-paper-plane"></i>
-                         <span>Send OTP</span>
-                    </button>
+               <h3 id="twofaModalTitle">Enable Two-Factor Authentication</h3>
+
+               <p>
+                    We will send a verification code to
+                    <strong id="maskedEmailDisplay">your registered email</strong>.
+               </p>
+
+               <button class="send-otp-btn" id="sendOtpBtn" type="button">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Send OTP</span>
+               </button>
+
+               <div class="otp-input-row">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+                    <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
                </div>
 
-               <div class="otp-divider-line">
-                    <span>Enter OTP below after receiving email</span>
-               </div>
-
-               <!-- Step 2: Enter OTP -->
-               <p class="otp-instruction">Enter the 6-digit code from your email</p>
-               <div class="otp-input-row" id="otpInputRow">
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp0">
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp1">
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp2">
-                    <span class="otp-sep">—</span>
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp3">
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp4">
-                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" id="otp5">
-               </div>
                <p class="otp-error-msg" id="otpErrorMsg"></p>
 
-               <div class="modal-actions">
-                    <button class="modal-cancel-btn" id="twofaModalCancel">Cancel</button>
-                    <button class="save-settings-btn" id="verify2FABtn">
-                         <i class="fa-solid fa-check-circle"></i>
+               <div class="modal-action-row">
+                    <button class="secondary-btn" id="twofaModalCancel" type="button">Cancel</button>
+
+                    <button class="primary-btn" id="verify2FABtn" type="button">
+                         <i class="fa-solid fa-circle-check"></i>
                          <span>Verify & Enable</span>
                     </button>
                </div>
           </div>
      </div>
 
-     <!-- TOAST -->
      <div class="toast-notification" id="toastNotification">
           <i class="toast-icon fa-solid fa-circle-check" id="toastIcon"></i>
-          <span id="toastMsg">Saved!</span>
+          <span id="toastMsg">Saved</span>
      </div>
-     <script>
-          (function () {
-               "use strict";
-               const LOGIN_PAGE = "login.html";
-               const STUDENT_HOME = "dashboard.html";
-               const ADMIN_HOME = "admin-dashboard.html";
-               const token = localStorage.getItem("token");
-               const isLoggedIn = localStorage.getItem("edumind_is_logged_in") === "true";
-               const userRole = localStorage.getItem("userRole") || "STUDENT";
-               function goTo(page) {
-                    // Already on that page? Skip redirect to avoid loop
-                    if (window.location.href.includes(page)) return;
-                    window.location.href = page;
-               }
-               if (!token || !isLoggedIn) {
-                    goTo(LOGIN_PAGE);
-                    return; // script execution rok do
-               }
-               document.addEventListener("DOMContentLoaded", function () {
-
-                    const body = document.body;
-                    const pageRole = body ? body.getAttribute("data-page-role") : null;
-
-                    // data-page-role set nahi hai toh guard kuch nahi karega
-                    if (!pageRole) return;
-
-                    if (pageRole === "admin" && userRole !== "ADMIN") {
-                         // Student admin page pe aaya → student home pe bhejo
-                         console.warn("[AuthGuard] Student tried to access admin page. Redirecting...");
-                         goTo(STUDENT_HOME);
-                         return;
-                    }
-
-                    if (pageRole === "student" && userRole === "ADMIN") {
-                         // Admin student page pe aaya → admin home pe bhejo
-                         console.warn("[AuthGuard] Admin tried to access student page. Redirecting...");
-                         goTo(ADMIN_HOME);
-                         return;
-                    }
-
-                    // Role sahi hai → page load hone do
-                    console.log("[AuthGuard] Access granted. Role:", userRole, "| Page:", pageRole);
-               });
-
-          })();
-     </script>
 
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
-     <script src="../assets/js/settings.js"></script>
      <script src="../assets/js/sidebar.js"></script>
+     <script src="../assets/js/settings.js"></script>
 </body>
 
 </html>
