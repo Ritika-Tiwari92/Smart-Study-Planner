@@ -7,15 +7,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * DashboardController — Phase 2
+ * DashboardController
  *
  * APIs:
- * GET /api/dashboard/summary → stats cards (subjects, tasks, progress)
- * GET /api/dashboard/weekly-overview → weekly chart (tasks, plans, revisions,
- * tests)
+ * GET /api/dashboard/summary
+ * GET /api/dashboard/weekly-overview
  *
- * NOTE: /api/dashboard/study-summary is handled by DashboardStudyController
- * (already exists with ActivityService, BadgeService, StudySessionService)
+ * NOTE:
+ * GET /api/dashboard/study-summary is already handled by
+ * DashboardStudyController.
+ * Do not add study-summary here, otherwise ambiguous mapping error will come.
  */
 @RestController
 @RequestMapping("/api/dashboard")
@@ -30,15 +31,21 @@ public class DashboardController {
 
      /**
       * GET /api/dashboard/summary
-      * Stats cards: total subjects, pending tasks, completed tasks, study progress
       */
      @GetMapping("/summary")
      public ResponseEntity<?> getDashboardSummary(
                @AuthenticationPrincipal UserDetails userDetails) {
+
           try {
+               if (userDetails == null) {
+                    return ResponseEntity.status(401).body("Unauthorized. Please login again.");
+               }
+
                return ResponseEntity.ok(
                          dashboardService.getDashboardSummary(userDetails.getUsername()));
+
           } catch (Exception e) {
+               e.printStackTrace();
                return ResponseEntity.internalServerError()
                          .body("Failed to load dashboard summary.");
           }
@@ -46,15 +53,21 @@ public class DashboardController {
 
      /**
       * GET /api/dashboard/weekly-overview
-      * Weekly chart: tasks, plans, revisions, tests per day (last 7 days)
       */
      @GetMapping("/weekly-overview")
      public ResponseEntity<?> getWeeklyOverview(
                @AuthenticationPrincipal UserDetails userDetails) {
+
           try {
+               if (userDetails == null) {
+                    return ResponseEntity.status(401).body("Unauthorized. Please login again.");
+               }
+
                return ResponseEntity.ok(
                          dashboardService.getWeeklyOverview(userDetails.getUsername()));
+
           } catch (Exception e) {
+               e.printStackTrace();
                return ResponseEntity.internalServerError()
                          .body("Failed to load weekly overview.");
           }
