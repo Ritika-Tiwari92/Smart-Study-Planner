@@ -53,6 +53,10 @@ public class PomodoroSessionService {
                session.setStartTime(LocalDateTime.now());
           }
 
+          session.setLinkedTaskId(getLong(body, "linkedTaskId"));
+          session.setLinkedRevisionId(getLong(body, "linkedRevisionId"));
+          session.setLinkedPlanId(getLong(body, "linkedPlanId"));
+          session.setCycleNumber(defaultPositiveInt(getInteger(body, "cycleNumber"), 1));
           session.setNotes(getString(body, "notes"));
 
           return pomodoroSessionRepository.save(session);
@@ -86,7 +90,21 @@ public class PomodoroSessionService {
 
           session.setEndTime(endTime);
           session.setCompletedAt(endTime);
-          session.setFocusMinutes(focusMinutes);
+
+          String sessionType = session.getSessionType() == null
+                    ? ""
+                    : session.getSessionType().trim().toUpperCase();
+
+          boolean isBreakSession = sessionType.equals("SHORT_BREAK")
+                    || sessionType.equals("LONG_BREAK")
+                    || sessionType.equals("BREAK");
+
+          if (isBreakSession) {
+               session.setFocusMinutes(0);
+          } else {
+               session.setFocusMinutes(focusMinutes);
+          }
+
           session.setStatus("COMPLETED");
 
           String notes = getString(body, "notes");

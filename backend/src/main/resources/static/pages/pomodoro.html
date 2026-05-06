@@ -19,12 +19,13 @@
      <link rel="stylesheet" href="../assets/css/layout.css">
      <link rel="stylesheet" href="../assets/css/components.css">
      <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/pomodoro.css">
      <link rel="stylesheet" href="../assets/css/sidebar.css">
      <link rel="stylesheet" href="../assets/css/dark-mode.css">
+     <link rel="stylesheet" href="../assets/css/pomodoro.css">
+
 </head>
 
-<body>
+<body data-page-role="student">
      <div class="dashboard-layout">
 
           <aside class="sidebar">
@@ -117,10 +118,33 @@
                                              Please select a subject.
                                         </span>
                                    </div>
+
                                    <div class="pom-select-group">
                                         <label>Topic / Video <span class="pom-optional">(optional)</span></label>
                                         <select id="pomVideoSelect">
                                              <option value="">-- Select Topic --</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="pom-select-group">
+                                        <label>Linked Task <span class="pom-optional">(optional)</span></label>
+                                        <select id="pomTaskSelect">
+                                             <option value="">-- Select Task --</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="pom-select-group">
+                                        <label>Linked Revision <span class="pom-optional">(optional)</span></label>
+                                        <select id="pomRevisionSelect">
+                                             <option value="">-- Select Revision --</option>
+                                        </select>
+                                   </div>
+
+                                   <div class="pom-select-group">
+                                        <label>Linked Planner Session <span
+                                                  class="pom-optional">(optional)</span></label>
+                                        <select id="pomPlanSelect">
+                                             <option value="">-- Select Planner Session --</option>
                                         </select>
                                    </div>
                               </div>
@@ -180,6 +204,29 @@
                               <div class="pom-session-info hidden" id="pomSessionInfo">
                                    <i class="fa-solid fa-circle-dot pom-pulse"></i>
                                    <span id="pomSessionInfoText">Session active</span>
+                              </div>
+
+                              <div class="pom-ai-coach-card">
+                                   <div class="pom-ai-coach-top">
+                                        <div>
+                                             <span class="pom-ai-kicker">
+                                                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                                  AI Productivity Coach
+                                             </span>
+                                             <h4>Get a smart focus plan before starting</h4>
+                                             <p>
+                                                  AI will use your selected subject, task, revision, planner session,
+                                                  video, and focus history.
+                                             </p>
+                                        </div>
+
+                                        <button type="button" class="pom-ai-suggest-btn" id="pomAiSuggestBtn">
+                                             <i class="fa-solid fa-brain"></i>
+                                             Suggest Plan
+                                        </button>
+                                   </div>
+
+                                   <div class="pom-ai-result hidden" id="pomAiResult"></div>
                               </div>
                          </div>
 
@@ -306,6 +353,44 @@
                          </div>
                     </div>
 
+                    <!-- REAL FOCUS HISTORY -->
+                    <div class="pom-focus-history-card">
+                         <div class="pom-history-header">
+                              <div>
+                                   <span class="pom-ai-kicker">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                        Real Focus History
+                                   </span>
+                                   <h3>Recent study sessions</h3>
+                                   <p>Track your completed, interrupted, and linked Pomodoro sessions.</p>
+                              </div>
+
+                              <div class="pom-history-mini-stats">
+                                   <div>
+                                        <strong id="pomHistoryTotalMinutes">0</strong>
+                                        <span>Total min</span>
+                                   </div>
+
+                                   <div>
+                                        <strong id="pomHistoryCompleted">0</strong>
+                                        <span>Completed</span>
+                                   </div>
+
+                                   <div>
+                                        <strong id="pomHistoryStreak">0</strong>
+                                        <span>Day streak</span>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="pom-history-list" id="pomHistoryList">
+                              <div class="pom-history-empty">
+                                   <i class="fa-regular fa-clock"></i>
+                                   <p>No focus history yet. Start a session to build your streak.</p>
+                              </div>
+                         </div>
+                    </div>
+
                     <!-- ── ANALYTICS ROW ── -->
                     <div class="pom-analytics-row">
 
@@ -394,59 +479,87 @@
 
      <!-- ADD VIDEO MODAL -->
      <div class="pom-modal-overlay hidden" id="addVideoModalOverlay">
-          <div class="pom-modal">
+          <div class="pom-modal pom-add-content-modal" role="dialog" aria-modal="true">
                <div class="pom-modal-header">
                     <div>
                          <h2>Add Study Content</h2>
                          <p>Add a video or topic to your study library.</p>
                     </div>
-                    <button class="pom-modal-close" id="closeAddVideoModal">
+
+                    <button type="button" class="pom-modal-close" id="closeAddVideoModal" title="Close">
                          <i class="fa-solid fa-xmark"></i>
                     </button>
                </div>
+
                <div class="pom-modal-body">
                     <div class="pom-form-group">
                          <label>Subject <span class="req">*</span></label>
                          <select id="addVideoSubject">
                               <option value="">-- Select Subject --</option>
                          </select>
-                         <span class="pom-field-error hidden" id="addVideoSubjectError">Subject is required.</span>
+                         <span class="pom-field-error hidden" id="addVideoSubjectError">
+                              Subject is required.
+                         </span>
                     </div>
+
                     <div class="pom-form-group">
                          <label>Title <span class="req">*</span></label>
                          <input type="text" id="addVideoTitle" placeholder="e.g. Introduction to OOP">
-                         <span class="pom-field-error hidden" id="addVideoTitleError">Title is required.</span>
-                    </div>
-                    <div class="pom-form-group">
-                         <label>YouTube / Video URL <span class="pom-optional">(optional)</span></label>
-                         <div class="pom-url-input-wrap">
-                              <i class="fa-brands fa-youtube pom-url-icon"></i>
-                              <input type="url" id="addVideoUrl" placeholder="https://youtube.com/watch?v=...">
-                         </div>
-                         <span class="pom-url-hint">
-                              <i class="fa-solid fa-circle-info"></i>
-                              Paste YouTube link — video will play inside the timer page
+                         <span class="pom-field-error hidden" id="addVideoTitleError">
+                              Title is required.
                          </span>
                     </div>
+
+                    <div class="pom-form-group">
+                         <label>YouTube / Video URL <span class="pom-optional">(optional)</span></label>
+
+                         <div class="pom-url-input-wrap">
+                              <i class="fa-brands fa-youtube pom-url-icon"></i>
+                              <input type="url" id="addVideoUrl" placeholder="https://youtube.com/watch?v=">
+                         </div>
+
+                         <div class="pom-youtube-actions">
+                              <button type="button" class="pom-btn-secondary pom-youtube-analyze-btn"
+                                   id="analyzeYoutubeBtn">
+                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                   <span>Analyze & Auto Set Duration</span>
+                              </button>
+                         </div>
+
+                         <div class="pom-youtube-analysis hidden" id="youtubeAnalyzeResult"></div>
+
+                         <span class="pom-url-hint">
+                              <i class="fa-solid fa-circle-info"></i>
+                              Paste YouTube link — AI will detect video duration and suggest focus sessions.
+                         </span>
+                    </div>
+
                     <div class="pom-form-row">
                          <div class="pom-form-group">
                               <label>Tag <span class="pom-optional">(optional)</span></label>
                               <input type="text" id="addVideoTag" placeholder="e.g. Basics, OOP">
                          </div>
+
                          <div class="pom-form-group">
                               <label>Duration (minutes)</label>
                               <input type="number" id="addVideoDuration" placeholder="25" min="1">
                          </div>
                     </div>
                </div>
+
                <div class="pom-modal-footer">
-                    <button class="pom-btn-secondary" id="cancelAddVideoModal">Cancel</button>
-                    <button class="pom-btn-primary" id="saveVideoBtn">
-                         <i class="fa-solid fa-floppy-disk"></i> Save
+                    <button type="button" class="pom-btn-secondary" id="cancelAddVideoModal">
+                         Cancel
+                    </button>
+
+                    <button type="button" class="pom-btn-primary" id="saveVideoBtn">
+                         <i class="fa-solid fa-floppy-disk"></i>
+                         <span>Save</span>
                     </button>
                </div>
           </div>
      </div>
+
 
      <!-- SESSION COMPLETE MODAL -->
      <div class="pom-modal-overlay hidden" id="sessionCompleteModal">
