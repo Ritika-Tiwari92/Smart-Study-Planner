@@ -1817,3 +1817,361 @@ body.preview-dark .attempt-theory-wrap textarea:focus {
 .tests-empty-state.hidden {
   display: none !important;
 }
+/* =========================================================
+   EduMind AI Tests Page — Final Cyan/Neon Student UI Polish
+   Purple accents replaced with cyan/teal theme
+   ========================================================= */
+
+:root {
+  --test-cyan: #06b6d4;
+  --test-cyan-bright: #22d3ee;
+  --test-teal: #14b8a6;
+  --test-navy: #073344;
+  --test-soft: rgba(6, 182, 212, 0.1);
+  --test-border: rgba(6, 182, 212, 0.18);
+  --test-glow: rgba(6, 182, 212, 0.22);
+}
+
+/* Page cards */
+.tests-summary-card,
+.upcoming-tests-card,
+.recent-results-card,
+.syllabus-focus-card,
+.test-tips-card {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--test-border) !important;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 211, 238, 0.08),
+      transparent 30%
+    ),
+    rgba(255, 255, 255, 0.96) !important;
+  box-shadow:
+    0 18px 44px rgba(8, 17, 31, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+}
+
+.tests-summary-card::before,
+.upcoming-tests-card::before,
+.recent-results-card::before,
+.syllabus-focus-card::before,
+.test-tips-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--test-cyan-bright),
+    var(--test-teal),
+    transparent
+  );
+}
+
+.tests-summary-card:hover,
+.upcoming-tests-card:hover,
+.recent-results-card:hover,
+.syllabus-focus-card:hover,
+.test-tips-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(6, 182, 212, 0.34) !important;
+  box-shadow:
+    0 24px 55px rgba(8, 17, 31, 0.09),
+    0 0 28px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Summary cards */
+.tests-summary-card h3 {
+  color: #0891b2 !important;
+}
+
+.tests-summary-card p,
+.section-title p {
+  color: #64748b !important;
+}
+
+/* Toolbar */
+.tests-search,
+.tests-filter {
+  border-color: var(--test-border) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 14px 32px rgba(8, 17, 31, 0.045) !important;
+}
+
+.tests-search:focus-within,
+.tests-filter:focus-within {
+  border-color: rgba(6, 182, 212, 0.42) !important;
+  box-shadow:
+    0 0 0 4px rgba(6, 182, 212, 0.1),
+    0 16px 34px rgba(8, 17, 31, 0.06) !important;
+}
+
+.tests-search i,
+.tests-filter i {
+  color: var(--test-cyan) !important;
+}
+
+.tests-search input,
+.tests-filter select {
+  color: #0f172a !important;
+}
+
+/* Test list cards */
+.test-item {
+  border-color: rgba(6, 182, 212, 0.14) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(248, 250, 252, 0.96),
+    rgba(255, 255, 255, 0.98)
+  ) !important;
+  box-shadow: 0 12px 26px rgba(8, 17, 31, 0.035);
+}
+
+.test-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(6, 182, 212, 0.34) !important;
+  box-shadow:
+    0 18px 40px rgba(8, 17, 31, 0.08),
+    0 0 24px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Date box */
+.test-date-box {
+  background: linear-gradient(135deg, #06b6d4, #14b8a6) !important;
+  box-shadow:
+    0 16px 30px rgba(6, 182, 212, 0.24),
+    0 0 22px rgba(6, 182, 212, 0.12) !important;
+}
+
+.test-info h4 {
+  color: #0f172a !important;
+}
+
+.test-info p {
+  color: #475569 !important;
+}
+
+/* Badges */
+.test-badge.upcoming {
+  background: rgba(6, 182, 212, 0.12) !important;
+  color: #0891b2 !important;
+}
+
+.test-badge.week {
+  background: rgba(245, 158, 11, 0.13) !important;
+  color: #b45309 !important;
+}
+
+.test-badge.mock {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #2563eb !important;
+}
+
+.test-badge.completed {
+  background: rgba(16, 185, 129, 0.13) !important;
+  color: #047857 !important;
+}
+
+/* Action buttons */
+.test-action-btn {
+  border-color: rgba(6, 182, 212, 0.16) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+.test-action-btn.start {
+  color: #0891b2 !important;
+}
+
+.test-action-btn.start:hover {
+  border-color: rgba(6, 182, 212, 0.36) !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #06b6d4, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(6, 182, 212, 0.24) !important;
+}
+
+.test-action-btn.review {
+  color: #059669 !important;
+}
+
+.test-action-btn.review:hover {
+  border-color: rgba(16, 185, 129, 0.32) !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #10b981, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(16, 185, 129, 0.22) !important;
+}
+
+/* Recent results */
+.result-item,
+.focus-area-item,
+.test-tip-item {
+  border-color: rgba(6, 182, 212, 0.13) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(248, 250, 252, 0.96),
+    rgba(255, 255, 255, 0.98)
+  ) !important;
+}
+
+.result-item:hover,
+.focus-area-item:hover,
+.test-tip-item:hover {
+  transform: translateX(4px);
+  border-color: rgba(6, 182, 212, 0.3) !important;
+  box-shadow:
+    0 14px 28px rgba(8, 17, 31, 0.065),
+    0 0 20px rgba(6, 182, 212, 0.08) !important;
+}
+
+.result-score {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+  border: 1px solid rgba(6, 182, 212, 0.18);
+}
+
+.focus-area-item i {
+  color: #f59e0b !important;
+}
+
+.test-tip-item i {
+  color: #10b981 !important;
+}
+
+/* Instructions / attempt / result modal buttons */
+.test-save-btn,
+.instructionsStartBtn,
+.attempt-submit-btn,
+.test-result-actions .test-cancel-btn {
+  background: linear-gradient(135deg, #06b6d4, #14b8a6) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(6, 182, 212, 0.24) !important;
+}
+
+.test-save-btn:hover,
+.attempt-submit-btn:hover {
+  box-shadow:
+    0 18px 36px rgba(6, 182, 212, 0.3),
+    0 0 24px rgba(6, 182, 212, 0.12) !important;
+}
+
+/* Attempt modal accents */
+.attempt-progress-fill {
+  background: linear-gradient(90deg, #06b6d4, #14b8a6) !important;
+}
+
+.attempt-question-type,
+.attempt-question-meta span:first-child,
+.attempt-option-label,
+.review-question-index {
+  color: #0891b2 !important;
+}
+
+.attempt-option-item:hover {
+  border-color: rgba(6, 182, 212, 0.28) !important;
+  background: rgba(6, 182, 212, 0.06) !important;
+}
+
+.attempt-option-item.selected {
+  border-color: rgba(6, 182, 212, 0.45) !important;
+  background: rgba(6, 182, 212, 0.1) !important;
+  box-shadow: 0 10px 22px rgba(6, 182, 212, 0.1) !important;
+}
+
+.attempt-option-item.selected .attempt-option-radio {
+  border-color: #06b6d4 !important;
+}
+
+.attempt-option-item.selected .attempt-option-radio::after {
+  background: #06b6d4 !important;
+}
+
+.attempt-palette-btn.current {
+  background: rgba(6, 182, 212, 0.12) !important;
+  border-color: rgba(6, 182, 212, 0.38) !important;
+  color: #0891b2 !important;
+}
+
+.attempt-legend-dot.current {
+  background: #06b6d4 !important;
+}
+
+/* Review modal */
+.review-summary-chip strong,
+.review-meta-card strong {
+  color: #0891b2 !important;
+}
+
+/* Empty state */
+.tests-empty-state i {
+  color: #67e8f9 !important;
+}
+
+.tests-empty-state h3 {
+  color: #0f172a !important;
+}
+
+/* Dark mode */
+body.preview-dark .tests-summary-card,
+body.preview-dark .upcoming-tests-card,
+body.preview-dark .recent-results-card,
+body.preview-dark .syllabus-focus-card,
+body.preview-dark .test-tips-card,
+body.preview-dark .tests-search,
+body.preview-dark .tests-filter,
+body.preview-dark .test-item,
+body.preview-dark .result-item,
+body.preview-dark .focus-area-item,
+body.preview-dark .test-tip-item,
+body.preview-dark .test-modal,
+body.preview-dark .test-instructions-modal,
+body.preview-dark .test-attempt-modal,
+body.preview-dark .test-result-modal,
+body.preview-dark .review-result-modal {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 211, 238, 0.05),
+      transparent 32%
+    ),
+    rgba(15, 23, 42, 0.92) !important;
+  border-color: rgba(34, 211, 238, 0.14) !important;
+}
+
+body.preview-dark .tests-summary-card h3,
+body.preview-dark .section-title h3,
+body.preview-dark .test-info h4,
+body.preview-dark .result-info h4,
+body.preview-dark .tests-empty-state h3 {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .tests-summary-card p,
+body.preview-dark .section-title p,
+body.preview-dark .test-info p,
+body.preview-dark .result-info p,
+body.preview-dark .focus-area-item span,
+body.preview-dark .test-tip-item span,
+body.preview-dark .tests-empty-state p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .tests-search input,
+body.preview-dark .tests-filter select {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .test-action-btn {
+  background: rgba(8, 17, 31, 0.76) !important;
+  border-color: rgba(34, 211, 238, 0.14) !important;
+}
+
+body.preview-dark .result-score {
+  color: #67e8f9 !important;
+  background: rgba(34, 211, 238, 0.1) !important;
+}
+
+body.preview-dark .attempt-option-item.selected {
+  background: rgba(34, 211, 238, 0.1) !important;
+}

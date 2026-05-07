@@ -1404,3 +1404,324 @@ body.preview-dark .question-progress-chip {
     justify-content: center;
   }
 }
+/* =========================================================
+   EduMind AI Test Engine — Cyan/Neon Final Polish
+   English-only exam interface polish
+   ========================================================= */
+
+:root {
+  --engine-primary: #06b6d4;
+  --engine-primary-dark: #0891b2;
+  --engine-primary-soft: rgba(6, 182, 212, 0.1);
+  --engine-teal: #14b8a6;
+  --engine-cyan-bright: #22d3ee;
+  --engine-border: rgba(6, 182, 212, 0.18);
+  --engine-border-strong: rgba(6, 182, 212, 0.28);
+  --engine-shadow: 0 18px 42px rgba(8, 17, 31, 0.08);
+}
+
+/* Header */
+.test-engine-header {
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(34, 211, 238, 0.2),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #071824 0%, #0a2233 36%, #0b3b49 100%) !important;
+  border: 1px solid rgba(34, 211, 238, 0.2) !important;
+  box-shadow:
+    0 24px 55px rgba(3, 10, 18, 0.25),
+    0 0 34px rgba(6, 182, 212, 0.1) !important;
+}
+
+.test-engine-logo-box {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(103, 232, 249, 0.2) !important;
+  color: #67e8f9 !important;
+}
+
+.test-engine-header-timer {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(103, 232, 249, 0.2) !important;
+}
+
+.test-engine-header-timer i {
+  color: #67e8f9 !important;
+}
+
+/* Main cards */
+.test-engine-info-strip,
+.test-engine-question-panel,
+.sidebar-card,
+.question-card {
+  border-color: var(--engine-border) !important;
+  box-shadow:
+    0 18px 42px rgba(8, 17, 31, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.test-engine-info-strip,
+.test-engine-question-panel,
+.sidebar-card {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 211, 238, 0.07),
+      transparent 30%
+    ),
+    #ffffff !important;
+}
+
+/* Candidate avatar */
+.candidate-avatar-box,
+.candidate-side-avatar {
+  background: rgba(6, 182, 212, 0.1) !important;
+  border-color: rgba(6, 182, 212, 0.22) !important;
+  color: #0891b2 !important;
+}
+
+/* Section banner */
+.question-panel-banner {
+  background: linear-gradient(
+    135deg,
+    rgba(236, 254, 255, 0.95),
+    rgba(255, 255, 255, 0.98)
+  ) !important;
+  border-color: rgba(6, 182, 212, 0.2) !important;
+}
+
+.question-panel-label,
+.candidate-side-info span,
+.engine-option-label {
+  color: #0891b2 !important;
+}
+
+.question-progress-chip {
+  border-color: rgba(6, 182, 212, 0.2) !important;
+  color: #0891b2 !important;
+  background: rgba(6, 182, 212, 0.08) !important;
+}
+
+/* Question card top line */
+.question-card::before {
+  background: linear-gradient(90deg, #06b6d4, #14b8a6) !important;
+}
+
+/* Options */
+.engine-option-item {
+  border-color: rgba(6, 182, 212, 0.14) !important;
+}
+
+.engine-option-item:hover {
+  border-color: rgba(6, 182, 212, 0.34) !important;
+  background: rgba(6, 182, 212, 0.06) !important;
+}
+
+.engine-option-item.selected {
+  border-color: rgba(6, 182, 212, 0.45) !important;
+  background: rgba(6, 182, 212, 0.1) !important;
+  box-shadow: 0 10px 24px rgba(6, 182, 212, 0.1) !important;
+}
+
+.engine-option-item.selected .engine-option-radio {
+  border-color: #06b6d4 !important;
+}
+
+.engine-option-item.selected .engine-option-radio::after {
+  background: #06b6d4 !important;
+}
+
+/* Buttons */
+.engine-btn.green,
+.engine-btn.blue,
+.engine-btn.submit,
+.submit-summary-btn.final {
+  background: linear-gradient(135deg, #06b6d4, #14b8a6) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(6, 182, 212, 0.22) !important;
+}
+
+.engine-btn.green:hover,
+.engine-btn.blue:hover,
+.engine-btn.submit:hover,
+.submit-summary-btn.final:hover {
+  box-shadow:
+    0 18px 36px rgba(6, 182, 212, 0.28),
+    0 0 24px rgba(6, 182, 212, 0.12) !important;
+}
+
+.engine-btn.amber {
+  background: linear-gradient(135deg, #f59e0b, #f97316) !important;
+  color: #ffffff !important;
+}
+
+.engine-btn.light,
+.engine-btn.muted,
+.submit-summary-btn.light {
+  background: #f8fafc !important;
+  border: 1px solid rgba(6, 182, 212, 0.16) !important;
+  color: #334155 !important;
+}
+
+/* Sidebar candidate card top */
+.candidate-side-card::before {
+  background: linear-gradient(90deg, #06b6d4, #14b8a6) !important;
+}
+
+.candidate-meta-box {
+  background: rgba(6, 182, 212, 0.07) !important;
+  border-color: rgba(6, 182, 212, 0.16) !important;
+}
+
+.candidate-meta-box strong {
+  color: #0891b2 !important;
+}
+
+/* Palette */
+.engine-palette-btn.current {
+  box-shadow:
+    inset 0 0 0 2px #06b6d4,
+    0 0 16px rgba(6, 182, 212, 0.15) !important;
+}
+
+.palette-collapse-btn {
+  border-color: rgba(6, 182, 212, 0.16) !important;
+  color: #0891b2 !important;
+}
+
+/* Focus topic */
+.question-focus-topic {
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: #b45309 !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+/* Summary modal */
+.submit-summary-modal {
+  border-color: rgba(6, 182, 212, 0.18) !important;
+}
+
+.submit-summary-info-card,
+.submit-summary-stat,
+.submit-summary-note {
+  border-color: rgba(6, 182, 212, 0.16) !important;
+}
+
+.submit-summary-stat.total strong {
+  color: #0891b2 !important;
+}
+
+/* Dark mode */
+body.preview-dark.test-engine-body,
+body.preview-dark {
+  --engine-bg: #07111f;
+  --engine-surface: #111c2e;
+  --engine-surface-soft: #0b1627;
+  --engine-border: rgba(34, 211, 238, 0.14);
+  --engine-border-strong: rgba(34, 211, 238, 0.2);
+  --engine-text: #f8fafc;
+  --engine-text-soft: #cbd5e1;
+}
+
+body.preview-dark .test-engine-info-strip,
+body.preview-dark .test-engine-question-panel,
+body.preview-dark .sidebar-card,
+body.preview-dark .question-card,
+body.preview-dark .submit-summary-modal {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 211, 238, 0.05),
+      transparent 32%
+    ),
+    rgba(15, 23, 42, 0.94) !important;
+  border-color: rgba(34, 211, 238, 0.14) !important;
+}
+
+body.preview-dark .question-panel-banner,
+body.preview-dark .candidate-meta-box,
+body.preview-dark .exam-status-chip,
+body.preview-dark .engine-btn.light,
+body.preview-dark .engine-btn.muted,
+body.preview-dark .submit-summary-btn.light {
+  background: rgba(8, 17, 31, 0.78) !important;
+  border-color: rgba(34, 211, 238, 0.14) !important;
+  color: #f8fafc !important;
+}
+
+body.preview-dark .question-panel-banner-left strong,
+body.preview-dark .question-panel-top-left h2,
+body.preview-dark .question-text-wrap p,
+body.preview-dark .engine-option-text,
+body.preview-dark .candidate-info-row strong,
+body.preview-dark .candidate-side-info strong,
+body.preview-dark .sidebar-card h3,
+body.preview-dark .sidebar-card h4 {
+  color: #f8fafc !important;
+}
+
+body.preview-dark .candidate-info-row span,
+body.preview-dark .candidate-side-info small,
+body.preview-dark .note-card li,
+body.preview-dark .question-panel-top-left p {
+  color: #94a3b8 !important;
+}
+
+body.preview-dark .engine-option-item {
+  background: rgba(8, 17, 31, 0.78) !important;
+  border-color: rgba(34, 211, 238, 0.12) !important;
+}
+
+body.preview-dark .engine-option-item:hover,
+body.preview-dark .engine-option-item.selected {
+  background: rgba(6, 182, 212, 0.1) !important;
+}
+
+body.preview-dark .submit-summary-note {
+  background: rgba(6, 182, 212, 0.08) !important;
+  color: #a5f3fc !important;
+}
+
+/* Responsive polish */
+@media (max-width: 980px) {
+  .test-engine-main {
+    grid-template-columns: 1fr !important;
+  }
+
+  .test-engine-sidebar {
+    position: static !important;
+  }
+
+  .test-engine-info-strip {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .test-engine-page {
+    padding: 10px !important;
+  }
+
+  .test-engine-header,
+  .test-engine-info-strip,
+  .test-engine-question-panel,
+  .sidebar-card {
+    border-radius: 16px !important;
+  }
+
+  .candidate-info-list,
+  .candidate-side-meta,
+  .submit-summary-exam-info,
+  .submit-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .question-action-row {
+    flex-direction: column !important;
+  }
+
+  .engine-btn {
+    width: 100% !important;
+  }
+}

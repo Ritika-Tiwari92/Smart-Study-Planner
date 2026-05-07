@@ -11,9 +11,13 @@ const resultScoreMain = document.getElementById("resultScoreMain");
 const resultPercentageMain = document.getElementById("resultPercentageMain");
 
 const resultTotalQuestions = document.getElementById("resultTotalQuestions");
-const resultAnsweredQuestions = document.getElementById("resultAnsweredQuestions");
+const resultAnsweredQuestions = document.getElementById(
+  "resultAnsweredQuestions",
+);
 const resultCorrectAnswers = document.getElementById("resultCorrectAnswers");
-const resultIncorrectAnswers = document.getElementById("resultIncorrectAnswers");
+const resultIncorrectAnswers = document.getElementById(
+  "resultIncorrectAnswers",
+);
 const resultAccuracy = document.getElementById("resultAccuracy");
 
 const resultFocusArea = document.getElementById("resultFocusArea");
@@ -25,238 +29,247 @@ const errorBackToTestsBtn = document.getElementById("errorBackToTestsBtn");
 const reviewAnswersBtn = document.getElementById("reviewAnswersBtn");
 const resultAnswersSection = document.getElementById("resultAnswersSection");
 
-const API_BASE_URL = window.location.port === "8080" ? "" : "http://localhost:8080";
+const API_BASE_URL =
+  window.location.port === "8080" ? "" : "http://localhost:8080";
 const TESTS_API_URL = `${API_BASE_URL}/api/tests`;
 
 let loadedResultDetails = null;
 
 function parseStoredJson(value) {
-    try {
-        return JSON.parse(value);
-    } catch (error) {
-        return null;
-    }
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return null;
+  }
 }
 
 function decodeJwtPayload(token) {
-    try {
-        if (!token || !token.includes(".")) return null;
+  try {
+    if (!token || !token.includes(".")) return null;
 
-        const payload = token.split(".")[1];
-        const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
-        const decoded = atob(normalizedPayload);
+    const payload = token.split(".")[1];
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = atob(normalizedPayload);
 
-        return JSON.parse(decoded);
-    } catch (error) {
-        return null;
-    }
+    return JSON.parse(decoded);
+  } catch (error) {
+    return null;
+  }
 }
 
 function getStoredUserObject() {
-    const possibleKeys = [
-        "edumind_logged_in_user",
-        "edumind_registered_user",
-        "loggedInUser",
-        "currentUser",
-        "user",
-        "authUser",
-        "studyPlannerUser"
-    ];
+  const possibleKeys = [
+    "edumind_logged_in_user",
+    "edumind_registered_user",
+    "loggedInUser",
+    "currentUser",
+    "user",
+    "authUser",
+    "studyPlannerUser",
+  ];
 
-    for (const key of possibleKeys) {
-        const rawValue =
-            localStorage.getItem(key) ||
-            sessionStorage.getItem(key);
+  for (const key of possibleKeys) {
+    const rawValue = localStorage.getItem(key) || sessionStorage.getItem(key);
 
-        if (!rawValue) continue;
+    if (!rawValue) continue;
 
-        const parsed = parseStoredJson(rawValue);
+    const parsed = parseStoredJson(rawValue);
 
-        if (parsed && typeof parsed === "object") {
-            return parsed;
-        }
+    if (parsed && typeof parsed === "object") {
+      return parsed;
     }
+  }
 
-    return null;
+  return null;
 }
 
 function extractUserIdFromObject(obj) {
-    if (!obj || typeof obj !== "object") return null;
+  if (!obj || typeof obj !== "object") return null;
 
-    if (obj.id != null && obj.id !== "") return Number(obj.id);
-    if (obj.userId != null && obj.userId !== "") return Number(obj.userId);
-    if (obj.studentId != null && obj.studentId !== "") return Number(obj.studentId);
+  if (obj.id != null && obj.id !== "") return Number(obj.id);
+  if (obj.userId != null && obj.userId !== "") return Number(obj.userId);
+  if (obj.studentId != null && obj.studentId !== "")
+    return Number(obj.studentId);
 
-    if (obj.user && obj.user.id != null && obj.user.id !== "") {
-        return Number(obj.user.id);
-    }
+  if (obj.user && obj.user.id != null && obj.user.id !== "") {
+    return Number(obj.user.id);
+  }
 
-    if (obj.data && obj.data.id != null && obj.data.id !== "") {
-        return Number(obj.data.id);
-    }
+  if (obj.data && obj.data.id != null && obj.data.id !== "") {
+    return Number(obj.data.id);
+  }
 
-    return null;
+  return null;
 }
 
 function getStoredToken() {
-    return (
-        localStorage.getItem("token") ||
-        localStorage.getItem("jwtToken") ||
-        localStorage.getItem("accessToken") ||
-        sessionStorage.getItem("token") ||
-        sessionStorage.getItem("jwtToken") ||
-        sessionStorage.getItem("accessToken") ||
-        ""
-    ).trim();
+  return (
+    localStorage.getItem("token") ||
+    localStorage.getItem("jwtToken") ||
+    localStorage.getItem("accessToken") ||
+    sessionStorage.getItem("token") ||
+    sessionStorage.getItem("jwtToken") ||
+    sessionStorage.getItem("accessToken") ||
+    ""
+  ).trim();
 }
 
 function requireAuthToken() {
-    const token = getStoredToken();
+  const token = getStoredToken();
 
-    if (!token) {
-        throw new Error("Missing login token. Please login again.");
-    }
+  if (!token) {
+    throw new Error("Missing login token. Please login again.");
+  }
 
-    return token;
+  return token;
 }
 
 function getCurrentUserId() {
-    const storedUser = getStoredUserObject();
-    const extractedUserId = extractUserIdFromObject(storedUser);
+  const storedUser = getStoredUserObject();
+  const extractedUserId = extractUserIdFromObject(storedUser);
 
-    if (extractedUserId != null && !Number.isNaN(extractedUserId)) {
-        return Number(extractedUserId);
-    }
+  if (extractedUserId != null && !Number.isNaN(extractedUserId)) {
+    return Number(extractedUserId);
+  }
 
-    const localUserId =
-        localStorage.getItem("userId") ||
-        localStorage.getItem("studentId") ||
-        sessionStorage.getItem("userId") ||
-        sessionStorage.getItem("studentId");
+  const localUserId =
+    localStorage.getItem("userId") ||
+    localStorage.getItem("studentId") ||
+    sessionStorage.getItem("userId") ||
+    sessionStorage.getItem("studentId");
 
-    if (localUserId != null && localUserId !== "" && !Number.isNaN(Number(localUserId))) {
-        return Number(localUserId);
-    }
+  if (
+    localUserId != null &&
+    localUserId !== "" &&
+    !Number.isNaN(Number(localUserId))
+  ) {
+    return Number(localUserId);
+  }
 
-    const payload = decodeJwtPayload(getStoredToken());
+  const payload = decodeJwtPayload(getStoredToken());
 
-    const jwtUserId =
-        payload?.userId ||
-        payload?.id ||
-        payload?.studentId ||
-        payload?.uid;
+  const jwtUserId =
+    payload?.userId || payload?.id || payload?.studentId || payload?.uid;
 
-    if (jwtUserId != null && jwtUserId !== "" && !Number.isNaN(Number(jwtUserId))) {
-        return Number(jwtUserId);
-    }
+  if (
+    jwtUserId != null &&
+    jwtUserId !== "" &&
+    !Number.isNaN(Number(jwtUserId))
+  ) {
+    return Number(jwtUserId);
+  }
 
-    if (payload?.sub != null && !Number.isNaN(Number(payload.sub))) {
-        return Number(payload.sub);
-    }
+  if (payload?.sub != null && !Number.isNaN(Number(payload.sub))) {
+    return Number(payload.sub);
+  }
 
-    throw new Error("Logged-in user id not found. Please login again.");
+  throw new Error("Logged-in user id not found. Please login again.");
 }
 
 function getAuthHeaders(extraHeaders = {}) {
-    const token = requireAuthToken();
+  const token = requireAuthToken();
 
-    return {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        ...extraHeaders
-    };
+  return {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+    ...extraHeaders,
+  };
 }
 
 function getQueryParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
+  return new URLSearchParams(window.location.search).get(name);
 }
 
 function buildAttemptDetailsApiUrl(attemptId) {
-    const userId = getCurrentUserId();
-
-    return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}?userId=${encodeURIComponent(userId)}`;
+  return `${TESTS_API_URL}/attempts/${encodeURIComponent(attemptId)}`;
 }
-
 function extractApiErrorMessage(responseText, responseStatus) {
-    if (!responseText) {
-        return `HTTP ${responseStatus}`;
+  if (!responseText) {
+    return `HTTP ${responseStatus}`;
+  }
+
+  try {
+    const parsed = JSON.parse(responseText);
+
+    if (parsed && typeof parsed === "object") {
+      return (
+        parsed.message ||
+        parsed.error ||
+        parsed.field ||
+        `HTTP ${responseStatus}`
+      );
     }
+  } catch (error) {
+    // raw text fallback
+  }
 
-    try {
-        const parsed = JSON.parse(responseText);
-
-        if (parsed && typeof parsed === "object") {
-            return parsed.message || parsed.error || parsed.field || `HTTP ${responseStatus}`;
-        }
-    } catch (error) {
-        // raw text fallback
-    }
-
-    return responseText;
+  return responseText;
 }
 
 async function fetchJson(url, options = {}) {
-    const finalOptions = {
-        ...options,
-        headers: {
-            ...getAuthHeaders(options.headers || {})
-        }
-    };
+  const finalOptions = {
+    ...options,
+    headers: {
+      ...getAuthHeaders(options.headers || {}),
+    },
+  };
 
-    const response = await fetch(url, finalOptions);
+  const response = await fetch(url, finalOptions);
 
-    let responseText = "";
+  let responseText = "";
 
-    try {
-        responseText = await response.text();
-    } catch (error) {
-        responseText = "";
-    }
+  try {
+    responseText = await response.text();
+  } catch (error) {
+    responseText = "";
+  }
 
-    if (response.status === 401 || response.status === 403) {
-        throw new Error("Unauthorized. Your session may have expired. Please login again.");
-    }
+  if (response.status === 401 || response.status === 403) {
+    throw new Error(
+      "Unauthorized. Your session may have expired. Please login again.",
+    );
+  }
 
-    if (!response.ok) {
-        throw new Error(extractApiErrorMessage(responseText, response.status));
-    }
+  if (!response.ok) {
+    throw new Error(extractApiErrorMessage(responseText, response.status));
+  }
 
-    if (!responseText) {
-        return null;
-    }
+  if (!responseText) {
+    return null;
+  }
 
-    try {
-        return JSON.parse(responseText);
-    } catch (error) {
-        return null;
-    }
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    return null;
+  }
 }
 
 function showResultToast(message, type = "info") {
-    const oldToast = document.querySelector(".result-toast");
-    if (oldToast) oldToast.remove();
+  const oldToast = document.querySelector(".result-toast");
+  if (oldToast) oldToast.remove();
 
-    const toast = document.createElement("div");
-    toast.className = `result-toast ${type}`;
+  const toast = document.createElement("div");
+  toast.className = `result-toast ${type}`;
 
-    const iconClass =
-        type === "success"
-            ? "fa-circle-check"
-            : type === "error"
-                ? "fa-triangle-exclamation"
-                : "fa-circle-info";
+  const iconClass =
+    type === "success"
+      ? "fa-circle-check"
+      : type === "error"
+        ? "fa-triangle-exclamation"
+        : "fa-circle-info";
 
-    toast.innerHTML = `
+  toast.innerHTML = `
         <i class="fa-solid ${iconClass}"></i>
         <span>${escapeHtml(message)}</span>
     `;
 
-    document.body.appendChild(toast);
+  document.body.appendChild(toast);
 
-    if (!document.getElementById("resultToastStyle")) {
-        const style = document.createElement("style");
-        style.id = "resultToastStyle";
-        style.textContent = `
+  if (!document.getElementById("resultToastStyle")) {
+    const style = document.createElement("style");
+    style.id = "resultToastStyle";
+    style.textContent = `
             .result-toast {
                 position: fixed;
                 top: 22px;
@@ -305,137 +318,141 @@ function showResultToast(message, type = "info") {
             }
         `;
 
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 
-    setTimeout(() => {
-        toast.remove();
-    }, 3500);
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
 }
 
 function redirectToLoginSoon(message) {
-    showResultToast(message || "Please login again.", "error");
+  showResultToast(message || "Please login again.", "error");
 
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 1200);
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 1200);
 }
 
 function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function parseDateValue(dateValue) {
-    if (!dateValue) return null;
+  if (!dateValue) return null;
 
-    if (dateValue instanceof Date) {
-        return Number.isNaN(dateValue.getTime()) ? null : dateValue;
-    }
+  if (dateValue instanceof Date) {
+    return Number.isNaN(dateValue.getTime()) ? null : dateValue;
+  }
 
-    const parsed = new Date(dateValue);
+  const parsed = new Date(dateValue);
 
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function formatDateTime(dateValue) {
-    const date = parseDateValue(dateValue);
-    if (!date) return "--";
+  const date = parseDateValue(dateValue);
+  if (!date) return "--";
 
-    return date.toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+  return date.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function normalizeText(value, fallback = "") {
-    const text = String(value ?? "").trim();
+  const text = String(value ?? "").trim();
 
-    return text || fallback;
+  return text || fallback;
 }
 
 function normalizeNumber(value, fallback = 0) {
-    const number = Number(value);
+  const number = Number(value);
 
-    return Number.isFinite(number) ? number : fallback;
+  return Number.isFinite(number) ? number : fallback;
 }
 
 function getStatusClass(answer) {
-    const submitted = normalizeText(answer?.submittedAnswer);
+  const submitted = normalizeText(answer?.submittedAnswer);
 
-    if (!submitted) return "unanswered";
-    if (answer?.isCorrect === true) return "correct";
-    return "wrong";
+  if (!submitted) return "unanswered";
+  if (answer?.isCorrect === true) return "correct";
+  return "wrong";
 }
 
 function getStatusLabel(answer) {
-    const submitted = normalizeText(answer?.submittedAnswer);
+  const submitted = normalizeText(answer?.submittedAnswer);
 
-    if (!submitted) return "Not Answered";
-    if (answer?.isCorrect === true) return "Correct";
-    return "Incorrect";
+  if (!submitted) return "Not Answered";
+  if (answer?.isCorrect === true) return "Correct";
+  return "Incorrect";
 }
 
 function getPerformanceLevel(percentage) {
-    const safePercentage = normalizeNumber(percentage);
+  const safePercentage = normalizeNumber(percentage);
 
-    if (safePercentage >= 85) {
-        return {
-            label: "Excellent",
-            message: "Excellent performance. Keep revising consistently and maintain this momentum.",
-            className: "excellent"
-        };
-    }
-
-    if (safePercentage >= 70) {
-        return {
-            label: "Very Good",
-            message: "Strong performance. Review minor mistakes and practice mixed questions.",
-            className: "good"
-        };
-    }
-
-    if (safePercentage >= 50) {
-        return {
-            label: "Good Attempt",
-            message: "Good attempt. Focus on weak areas and reattempt after revision.",
-            className: "average"
-        };
-    }
-
+  if (safePercentage >= 85) {
     return {
-        label: "Needs Improvement",
-        message: "Revise core concepts first, then solve short practice sets before reattempting.",
-        className: "weak"
+      label: "Excellent",
+      message:
+        "Excellent performance. Keep revising consistently and maintain this momentum.",
+      className: "excellent",
     };
+  }
+
+  if (safePercentage >= 70) {
+    return {
+      label: "Very Good",
+      message:
+        "Strong performance. Review minor mistakes and practice mixed questions.",
+      className: "good",
+    };
+  }
+
+  if (safePercentage >= 50) {
+    return {
+      label: "Good Attempt",
+      message:
+        "Good attempt. Focus on weak areas and reattempt after revision.",
+      className: "average",
+    };
+  }
+
+  return {
+    label: "Needs Improvement",
+    message:
+      "Revise core concepts first, then solve short practice sets before reattempting.",
+    className: "weak",
+  };
 }
 
 function ensurePerformanceSummaryCard() {
-    let card = document.getElementById("resultPerformanceSummaryCard");
+  let card = document.getElementById("resultPerformanceSummaryCard");
 
-    if (card) return card;
+  if (card) return card;
 
-    const heroCard = document.querySelector(".result-hero-card");
+  const heroCard = document.querySelector(".result-hero-card");
 
-    if (!heroCard) return null;
+  if (!heroCard) return null;
 
-    card = document.createElement("section");
-    card.id = "resultPerformanceSummaryCard";
-    card.className = "result-performance-summary-card";
+  card = document.createElement("section");
+  card.id = "resultPerformanceSummaryCard";
+  card.className = "result-performance-summary-card";
 
-    heroCard.insertAdjacentElement("afterend", card);
+  heroCard.insertAdjacentElement("afterend", card);
 
-    if (!document.getElementById("resultPerformanceStyle")) {
-        const style = document.createElement("style");
-        style.id = "resultPerformanceStyle";
-        style.textContent = `
+  if (!document.getElementById("resultPerformanceStyle")) {
+    const style = document.createElement("style");
+    style.id = "resultPerformanceStyle";
+    style.textContent = `
             .result-performance-summary-card {
                 background: var(--result-surface);
                 border: 1px solid var(--result-border);
@@ -531,21 +548,21 @@ function ensurePerformanceSummaryCard() {
             }
         `;
 
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 
-    return card;
+  return card;
 }
 
 function renderPerformanceSummary(details) {
-    const card = ensurePerformanceSummaryCard();
+  const card = ensurePerformanceSummaryCard();
 
-    if (!card) return;
+  if (!card) return;
 
-    const percentage = Math.round(normalizeNumber(details?.percentage));
-    const performance = getPerformanceLevel(percentage);
+  const percentage = Math.round(normalizeNumber(details?.percentage));
+  const performance = getPerformanceLevel(percentage);
 
-    card.innerHTML = `
+  card.innerHTML = `
         <div class="result-performance-grade ${performance.className}">
             <span>Performance Level</span>
             <strong>${escapeHtml(performance.label)}</strong>
@@ -564,53 +581,63 @@ function renderPerformanceSummary(details) {
 }
 
 function showLoading() {
-    resultLoadingState?.classList.remove("hidden");
-    resultErrorState?.classList.add("hidden");
-    resultPageContent?.classList.add("hidden");
+  resultLoadingState?.classList.remove("hidden");
+  resultErrorState?.classList.add("hidden");
+  resultPageContent?.classList.add("hidden");
 }
 
 function showError(message) {
-    resultLoadingState?.classList.add("hidden");
-    resultPageContent?.classList.add("hidden");
-    resultErrorState?.classList.remove("hidden");
+  resultLoadingState?.classList.add("hidden");
+  resultPageContent?.classList.add("hidden");
+  resultErrorState?.classList.remove("hidden");
 
-    if (resultErrorText) {
-        resultErrorText.textContent = message || "We could not load this result.";
-    }
+  if (resultErrorText) {
+    resultErrorText.textContent = message || "We could not load this result.";
+  }
 }
 
 function showContent() {
-    resultLoadingState?.classList.add("hidden");
-    resultErrorState?.classList.add("hidden");
-    resultPageContent?.classList.remove("hidden");
+  resultLoadingState?.classList.add("hidden");
+  resultErrorState?.classList.add("hidden");
+  resultPageContent?.classList.remove("hidden");
 }
 
 function renderAnswers(answers) {
-    if (!resultAnswersList) return;
+  if (!resultAnswersList) return;
 
-    if (!Array.isArray(answers) || answers.length === 0) {
-        resultAnswersList.innerHTML = `
+  if (!Array.isArray(answers) || answers.length === 0) {
+    resultAnswersList.innerHTML = `
             <div class="result-answer-empty">
                 <i class="fa-regular fa-file-lines"></i>
                 <p>No question review is available for this attempt.</p>
             </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    resultAnswersList.innerHTML = answers.map((answer, index) => {
-        const statusClass = getStatusClass(answer);
-        const statusLabel = getStatusLabel(answer);
-        const questionType = normalizeText(answer.questionType, "Question");
-        const focusTopic = normalizeText(answer.focusTopic, "General Concepts");
-        const questionText = normalizeText(answer.questionText, "Question text not available.");
-        const submittedAnswer = normalizeText(answer.submittedAnswer, "Not Answered");
-        const correctAnswer = normalizeText(answer.correctAnswer, "Not available");
-        const awardedMarks = normalizeNumber(answer.marksAwarded);
-        const totalMarks = normalizeNumber(answer.totalMarks);
-        const questionOrder = normalizeNumber(answer.questionOrder, index + 1);
+  resultAnswersList.innerHTML = answers
+    .map((answer, index) => {
+      const statusClass = getStatusClass(answer);
+      const statusLabel = getStatusLabel(answer);
+      const questionType = normalizeText(answer.questionType, "Question");
+      const focusTopic = normalizeText(answer.focusTopic, "General Concepts");
+      const questionText = normalizeText(
+        answer.questionText,
+        "Question text not available.",
+      );
+      const submittedAnswer = normalizeText(
+        answer.submittedAnswer,
+        "Not Answered",
+      );
+      const correctAnswer = normalizeText(
+        answer.correctAnswer,
+        "Not available",
+      );
+      const awardedMarks = normalizeNumber(answer.marksAwarded);
+      const totalMarks = normalizeNumber(answer.totalMarks);
+      const questionOrder = normalizeNumber(answer.questionOrder, index + 1);
 
-        return `
+      return `
             <div class="result-answer-card ${statusClass}">
                 <div class="result-answer-top">
                     <div class="result-answer-top-left">
@@ -645,140 +672,160 @@ function renderAnswers(answers) {
                 </div>
             </div>
         `;
-    }).join("");
+    })
+    .join("");
 }
 
 function renderResultPage(details) {
-    loadedResultDetails = details || {};
+  loadedResultDetails = details || {};
 
-    const answers = Array.isArray(details?.answers) ? details.answers : [];
-    const calculatedTotalMarks = answers.reduce((sum, item) => sum + normalizeNumber(item?.totalMarks), 0);
-    const totalMarks = calculatedTotalMarks > 0 ? calculatedTotalMarks : normalizeNumber(details?.totalMarks);
-    const totalQuestions = normalizeNumber(details?.totalQuestions);
-    const answeredQuestions = normalizeNumber(details?.answeredQuestions);
-    const correctAnswers = normalizeNumber(details?.correctAnswers);
-    const incorrectAnswers = Math.max(0, answeredQuestions - correctAnswers);
-    const accuracy = answeredQuestions > 0
-        ? Math.round((correctAnswers / answeredQuestions) * 100)
-        : 0;
+  const answers = Array.isArray(details?.answers) ? details.answers : [];
+  const calculatedTotalMarks = answers.reduce(
+    (sum, item) => sum + normalizeNumber(item?.totalMarks),
+    0,
+  );
+  const totalMarks =
+    calculatedTotalMarks > 0
+      ? calculatedTotalMarks
+      : normalizeNumber(details?.totalMarks);
+  const totalQuestions = normalizeNumber(details?.totalQuestions);
+  const answeredQuestions = normalizeNumber(details?.answeredQuestions);
+  const correctAnswers = normalizeNumber(details?.correctAnswers);
+  const incorrectAnswers = Math.max(0, answeredQuestions - correctAnswers);
+  const accuracy =
+    answeredQuestions > 0
+      ? Math.round((correctAnswers / answeredQuestions) * 100)
+      : 0;
 
-    if (resultTitle) {
-        resultTitle.textContent = normalizeText(details?.title, "Test Result");
-    }
+  if (resultTitle) {
+    resultTitle.textContent = normalizeText(details?.title, "Test Result");
+  }
 
-    if (resultSubject) {
-        resultSubject.textContent = normalizeText(details?.subject, "Subject not available");
-    }
+  if (resultSubject) {
+    resultSubject.textContent = normalizeText(
+      details?.subject,
+      "Subject not available",
+    );
+  }
 
-    if (resultStatusBadge) {
-        resultStatusBadge.textContent = normalizeText(details?.status, "SUBMITTED").toUpperCase();
-    }
+  if (resultStatusBadge) {
+    resultStatusBadge.textContent = normalizeText(
+      details?.status,
+      "SUBMITTED",
+    ).toUpperCase();
+  }
 
-    if (resultSubmittedAt) {
-        resultSubmittedAt.textContent = details?.submittedAt
-            ? `Submitted on ${formatDateTime(details.submittedAt)}`
-            : "Submitted on --";
-    }
+  if (resultSubmittedAt) {
+    resultSubmittedAt.textContent = details?.submittedAt
+      ? `Submitted on ${formatDateTime(details.submittedAt)}`
+      : "Submitted on --";
+  }
 
-    if (resultScoreMain) {
-        resultScoreMain.textContent = totalMarks > 0
-            ? `${normalizeNumber(details?.score)}/${totalMarks}`
-            : `${normalizeNumber(details?.score)}`;
-    }
+  if (resultScoreMain) {
+    resultScoreMain.textContent =
+      totalMarks > 0
+        ? `${normalizeNumber(details?.score)}/${totalMarks}`
+        : `${normalizeNumber(details?.score)}`;
+  }
 
-    if (resultPercentageMain) {
-        resultPercentageMain.textContent = `${Math.round(normalizeNumber(details?.percentage))}%`;
-    }
+  if (resultPercentageMain) {
+    resultPercentageMain.textContent = `${Math.round(normalizeNumber(details?.percentage))}%`;
+  }
 
-    if (resultTotalQuestions) {
-        resultTotalQuestions.textContent = String(totalQuestions);
-    }
+  if (resultTotalQuestions) {
+    resultTotalQuestions.textContent = String(totalQuestions);
+  }
 
-    if (resultAnsweredQuestions) {
-        resultAnsweredQuestions.textContent = String(answeredQuestions);
-    }
+  if (resultAnsweredQuestions) {
+    resultAnsweredQuestions.textContent = String(answeredQuestions);
+  }
 
-    if (resultCorrectAnswers) {
-        resultCorrectAnswers.textContent = String(correctAnswers);
-    }
+  if (resultCorrectAnswers) {
+    resultCorrectAnswers.textContent = String(correctAnswers);
+  }
 
-    if (resultIncorrectAnswers) {
-        resultIncorrectAnswers.textContent = String(incorrectAnswers);
-    }
+  if (resultIncorrectAnswers) {
+    resultIncorrectAnswers.textContent = String(incorrectAnswers);
+  }
 
-    if (resultAccuracy) {
-        resultAccuracy.textContent = `${accuracy}%`;
-    }
+  if (resultAccuracy) {
+    resultAccuracy.textContent = `${accuracy}%`;
+  }
 
-    if (resultFocusArea) {
-        resultFocusArea.textContent = normalizeText(details?.focusArea, "No focus area available.");
-    }
+  if (resultFocusArea) {
+    resultFocusArea.textContent = normalizeText(
+      details?.focusArea,
+      "No focus area available.",
+    );
+  }
 
-    if (resultTestTip) {
-        resultTestTip.textContent = normalizeText(details?.testTip, "No test tip available.");
-    }
+  if (resultTestTip) {
+    resultTestTip.textContent = normalizeText(
+      details?.testTip,
+      "No test tip available.",
+    );
+  }
 
-    renderPerformanceSummary(details);
-    renderAnswers(answers);
-    showContent();
+  renderPerformanceSummary(details);
+  renderAnswers(answers);
+  showContent();
 }
 
 async function loadResultPage() {
-    try {
-        showLoading();
+  try {
+    showLoading();
 
-        requireAuthToken();
-        getCurrentUserId();
+    requireAuthToken();
+    getCurrentUserId();
 
-        const attemptId =
-            getQueryParam("attemptId") ||
-            sessionStorage.getItem("edumind_latest_attempt_id");
+    const attemptId =
+      getQueryParam("attemptId") ||
+      sessionStorage.getItem("edumind_latest_attempt_id");
 
-        if (!attemptId) {
-            throw new Error("Attempt id not found.");
-        }
-
-        const details = await fetchJson(buildAttemptDetailsApiUrl(attemptId), {
-            method: "GET"
-        });
-
-        renderResultPage(details || {});
-        showResultToast("Result loaded successfully.", "success");
-
-    } catch (error) {
-        console.error("Result page load failed:", error);
-
-        const message = String(error.message || "");
-
-        if (
-            message.toLowerCase().includes("token") ||
-            message.toLowerCase().includes("unauthorized") ||
-            message.toLowerCase().includes("user id")
-        ) {
-            showError("Your session has expired. Redirecting to login...");
-            redirectToLoginSoon(message);
-            return;
-        }
-
-        showError(message || "We could not load this result.");
+    if (!attemptId) {
+      throw new Error("Attempt id not found.");
     }
+
+    const details = await fetchJson(buildAttemptDetailsApiUrl(attemptId), {
+      method: "GET",
+    });
+
+    renderResultPage(details || {});
+    showResultToast("Result loaded successfully.", "success");
+  } catch (error) {
+    console.error("Result page load failed:", error);
+
+    const message = String(error.message || "");
+
+    if (
+      message.toLowerCase().includes("token") ||
+      message.toLowerCase().includes("unauthorized") ||
+      message.toLowerCase().includes("user id")
+    ) {
+      showError("Your session has expired. Redirecting to login...");
+      redirectToLoginSoon(message);
+      return;
+    }
+
+    showError(message || "We could not load this result.");
+  }
 }
 
 function bindActions() {
-    backToTestsBtn?.addEventListener("click", () => {
-        window.location.href = "tests.html";
-    });
+  backToTestsBtn?.addEventListener("click", () => {
+    window.location.href = "tests.html";
+  });
 
-    errorBackToTestsBtn?.addEventListener("click", () => {
-        window.location.href = "tests.html";
-    });
+  errorBackToTestsBtn?.addEventListener("click", () => {
+    window.location.href = "tests.html";
+  });
 
-    reviewAnswersBtn?.addEventListener("click", () => {
-        resultAnswersSection?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+  reviewAnswersBtn?.addEventListener("click", () => {
+    resultAnswersSection?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
     });
+  });
 }
 
 bindActions();
