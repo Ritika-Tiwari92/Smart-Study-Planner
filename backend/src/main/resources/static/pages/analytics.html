@@ -204,6 +204,145 @@
                               </div>
                          </div>
                     </div>
+                    <!-- PREMIUM AI + REALTIME POMODORO ANALYTICS -->
+                    <div class="analytics-ai-realtime-grid">
+
+                         <div class="analytics-ai-coach-card" id="analyticsAiPanel">
+                              <div class="analytics-ai-bg-orb analytics-ai-orb-one"></div>
+                              <div class="analytics-ai-bg-orb analytics-ai-orb-two"></div>
+
+                              <div class="analytics-ai-header">
+                                   <div class="analytics-ai-title-wrap">
+                                        <span class="analytics-ai-kicker">
+                                             <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                             AI Productivity Coach
+                                        </span>
+                                        <h3>Realtime study intelligence</h3>
+                                        <p>
+                                             AI insights are generated from your Pomodoro sessions, study activity,
+                                             consistency, and subject performance.
+                                        </p>
+                                   </div>
+
+                                   <div class="analytics-ai-score-ring"
+                                        data-tooltip="Backend productivity score calculated from focus minutes, completed sessions, interruptions, and active study days.">
+                                        <div class="analytics-ai-ring-inner">
+                                             <strong id="analyticsAiScore">0</strong>
+                                             <span>/100</span>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="analytics-ai-metrics-row">
+                                   <div class="analytics-ai-metric">
+                                        <span class="analytics-ai-metric-label">Status</span>
+                                        <strong id="analyticsAiLabel">No data yet</strong>
+                                   </div>
+
+                                   <div class="analytics-ai-metric">
+                                        <span class="analytics-ai-metric-label">Best Focus Subject</span>
+                                        <strong id="analyticsAiSubject">No subject yet</strong>
+                                   </div>
+
+                                   <div class="analytics-ai-metric">
+                                        <span class="analytics-ai-metric-label">Break Balance</span>
+                                        <strong id="analyticsAiBreakRatio">0.00</strong>
+                                   </div>
+                              </div>
+
+                              <div class="analytics-ai-insights" id="analyticsAiInsightsList">
+                                   <div class="analytics-ai-insight-item">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        <span>Loading AI productivity insights...</span>
+                                   </div>
+                              </div>
+
+                              <div class="analytics-ai-footer">
+                                   <span>
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        Uses only your logged-in account data.
+                                   </span>
+                                   <span id="analyticsAiRefreshTime">Realtime sync pending</span>
+                              </div>
+                         </div>
+
+                         <div class="analytics-realtime-card">
+                              <div class="analytics-section-title analytics-realtime-title">
+                                   <div>
+                                        <h3>
+                                             <i class="fa-solid fa-stopwatch section-title-icon"></i>
+                                             Realtime Pomodoro Analytics
+                                        </h3>
+                                        <p>Live backend summary from completed and interrupted focus sessions.</p>
+                                   </div>
+                              </div>
+
+                              <div class="analytics-realtime-stats">
+                                   <div class="analytics-realtime-stat">
+                                        <div class="analytics-realtime-icon focus">
+                                             <i class="fa-solid fa-clock"></i>
+                                        </div>
+                                        <div>
+                                             <span>Total Focus</span>
+                                             <strong id="analyticsRtFocusMinutes">0 min</strong>
+                                        </div>
+                                   </div>
+
+                                   <div class="analytics-realtime-stat">
+                                        <div class="analytics-realtime-icon completed">
+                                             <i class="fa-solid fa-circle-check"></i>
+                                        </div>
+                                        <div>
+                                             <span>Completed Sessions</span>
+                                             <strong id="analyticsRtCompletedSessions">0</strong>
+                                        </div>
+                                   </div>
+
+                                   <div class="analytics-realtime-stat">
+                                        <div class="analytics-realtime-icon interrupted">
+                                             <i class="fa-solid fa-triangle-exclamation"></i>
+                                        </div>
+                                        <div>
+                                             <span>Interrupted Sessions</span>
+                                             <strong id="analyticsRtInterruptedSessions">0</strong>
+                                        </div>
+                                   </div>
+
+                                   <div class="analytics-realtime-stat">
+                                        <div class="analytics-realtime-icon average">
+                                             <i class="fa-solid fa-chart-line"></i>
+                                        </div>
+                                        <div>
+                                             <span>Daily Average</span>
+                                             <strong id="analyticsRtAverageFocus">0 min</strong>
+                                        </div>
+                                   </div>
+
+                                   <div class="analytics-realtime-stat">
+                                        <div class="analytics-realtime-icon active">
+                                             <i class="fa-solid fa-fire"></i>
+                                        </div>
+                                        <div>
+                                             <span>Active Days</span>
+                                             <strong id="analyticsRtActiveDays">0/7</strong>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="analytics-realtime-mini-chart">
+                                   <div class="analytics-realtime-chart-head">
+                                        <span>Daily Focus Minutes</span>
+                                        <strong id="analyticsRtBestDay">Best day: —</strong>
+                                   </div>
+                                   <div class="analytics-focus-spark-bars" id="analyticsFocusSparkBars">
+                                        <div class="analytics-spark-loading">
+                                             <i class="fa-solid fa-spinner fa-spin"></i>
+                                             <span>Loading focus trend...</span>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
 
                     <div class="analytics-toolbar">
                          <div class="analytics-toolbar-left">

@@ -1,564 +1,877 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const dashboardSearchInput = document.getElementById("dashboardSearchInput");
-    const dashboardSearchResults = document.getElementById("dashboardSearchResults");
-    const dashboardSearchBox = document.getElementById("dashboardSearchBox");
+  const dashboardSearchInput = document.getElementById("dashboardSearchInput");
+  const dashboardSearchResults = document.getElementById(
+    "dashboardSearchResults",
+  );
+  const dashboardSearchBox = document.getElementById("dashboardSearchBox");
 
-    const notificationToggleBtn = document.getElementById("notificationToggleBtn");
-    const dashboardNotificationDropdown = document.getElementById("dashboardNotificationDropdown");
+  const notificationToggleBtn = document.getElementById(
+    "notificationToggleBtn",
+  );
+  const dashboardNotificationDropdown = document.getElementById(
+    "dashboardNotificationDropdown",
+  );
 
-    const dashboardGreetingTitle = document.getElementById("dashboardGreetingTitle");
-    const dashboardGreetingSubtitle = document.getElementById("dashboardGreetingSubtitle");
-    const dashboardProfileName = document.getElementById("dashboardProfileName");
-    const dashboardProfileRole = document.getElementById("dashboardProfileRole");
-    const dashboardProfileAvatar = document.getElementById("dashboardProfileAvatar");
+  const dashboardGreetingTitle = document.getElementById(
+    "dashboardGreetingTitle",
+  );
+  const dashboardGreetingSubtitle = document.getElementById(
+    "dashboardGreetingSubtitle",
+  );
+  const dashboardProfileName = document.getElementById("dashboardProfileName");
+  const dashboardProfileRole = document.getElementById("dashboardProfileRole");
+  const dashboardProfileAvatar = document.getElementById(
+    "dashboardProfileAvatar",
+  );
 
-    const welcomeInsightPrimary = document.getElementById("welcomeInsightPrimary");
-    const welcomeInsightSecondary = document.getElementById("welcomeInsightSecondary");
-    const welcomeInsightTertiary = document.getElementById("welcomeInsightTertiary");
-    const welcomeBannerSubtitle = document.getElementById("welcomeBannerSubtitle");
+  const welcomeInsightPrimary = document.getElementById(
+    "welcomeInsightPrimary",
+  );
+  const welcomeInsightSecondary = document.getElementById(
+    "welcomeInsightSecondary",
+  );
+  const welcomeInsightTertiary = document.getElementById(
+    "welcomeInsightTertiary",
+  );
+  const welcomeBannerSubtitle = document.getElementById(
+    "welcomeBannerSubtitle",
+  );
 
-    const totalSubjectsCount  = document.getElementById("totalSubjectsCount");
-    const pendingTasksCount   = document.getElementById("pendingTasksCount");
-    const completedTasksCount = document.getElementById("completedTasksCount");
-    const studyProgressCount  = document.getElementById("studyProgressCount");
+  const totalSubjectsCount = document.getElementById("totalSubjectsCount");
+  const pendingTasksCount = document.getElementById("pendingTasksCount");
+  const completedTasksCount = document.getElementById("completedTasksCount");
+  const studyProgressCount = document.getElementById("studyProgressCount");
 
-    const totalSubjectsHint  = document.getElementById("totalSubjectsHint");
-    const pendingTasksHint   = document.getElementById("pendingTasksHint");
-    const completedTasksHint = document.getElementById("completedTasksHint");
-    const studyProgressHint  = document.getElementById("studyProgressHint");
+  const totalSubjectsHint = document.getElementById("totalSubjectsHint");
+  const pendingTasksHint = document.getElementById("pendingTasksHint");
+  const completedTasksHint = document.getElementById("completedTasksHint");
+  const studyProgressHint = document.getElementById("studyProgressHint");
 
-    const subjectProgressList    = document.getElementById("subjectProgressList");
-    const upcomingScheduleList   = document.getElementById("upcomingScheduleList");
-    const todayTasksList         = document.getElementById("todayTasksList");
-    const weeklyOverviewChartBars = document.getElementById("weeklyOverviewChartBars");
+  const subjectProgressList = document.getElementById("subjectProgressList");
+  const upcomingScheduleList = document.getElementById("upcomingScheduleList");
+  const todayTasksList = document.getElementById("todayTasksList");
+  const weeklyOverviewChartBars = document.getElementById(
+    "weeklyOverviewChartBars",
+  );
 
-    // ─── CHANGE: API_BASE_URL consistent rakha ────────────────────────────────
-    const API_BASE_URL = window.location.port === "8080"
-        ? ""
-        : "http://localhost:8080";
+  // ─── CHANGE: API_BASE_URL consistent rakha ────────────────────────────────
+  const API_BASE_URL =
+    window.location.port === "8080" ? "" : "http://localhost:8080";
 
-    const ENDPOINTS = {
-        // NEW: summary API — stats cards ke liye
-        summary:  `${API_BASE_URL}/api/dashboard/summary`,
-        // Existing — subject progress, upcoming, tasks, chart ke liye
-        subjects:  `${API_BASE_URL}/api/subjects`,
-        tasks:     `${API_BASE_URL}/api/tasks`,
-        plans:     `${API_BASE_URL}/api/plans`,
-        revisions: `${API_BASE_URL}/api/revisions`,
-        tests:     `${API_BASE_URL}/api/tests`
-    };
+  const ENDPOINTS = {
+    // NEW: summary API — stats cards ke liye
+    summary: `${API_BASE_URL}/api/dashboard/summary`,
+    // Existing — subject progress, upcoming, tasks, chart ke liye
+    subjects: `${API_BASE_URL}/api/subjects`,
+    tasks: `${API_BASE_URL}/api/tasks`,
+    plans: `${API_BASE_URL}/api/plans`,
+    revisions: `${API_BASE_URL}/api/revisions`,
+    tests: `${API_BASE_URL}/api/tests`,
 
-    const state = {
-        user: null,
-        summary: null,   // NEW: backend summary data
-        subjects: [],
-        tasks: [],
-        plans: [],
-        revisions: [],
-        tests: [],
-        searchItems: []
-    };
+    // Realtime Pomodoro analytics for productivity score and best focus subject
+    pomodoroAnalytics: `${API_BASE_URL}/api/analytics/pomodoro`,
 
-    // ─── Utilities — UNCHANGED ────────────────────────────────────────────────
+    // Recent Pomodoro focus sessions for dashboard activity feed
+    pomodoroSessions: `${API_BASE_URL}/api/pomodoro/my`,
+  };
 
-    function closeDashboardDropdowns() {
-        dashboardSearchResults?.classList.add("hidden");
-        dashboardNotificationDropdown?.classList.add("hidden");
+  const state = {
+    user: null,
+    summary: null, // NEW: backend summary data
+    subjects: [],
+    tasks: [],
+    plans: [],
+    revisions: [],
+    tests: [],
+    searchItems: [],
+  };
+
+  // ─── Utilities — UNCHANGED ────────────────────────────────────────────────
+
+  function closeDashboardDropdowns() {
+    dashboardSearchResults?.classList.add("hidden");
+    dashboardNotificationDropdown?.classList.add("hidden");
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function getFirstAvailableValue(obj, keys, fallback = "") {
+    if (!obj || typeof obj !== "object") return fallback;
+    for (const key of keys) {
+      const value = obj[key];
+      if (value !== undefined && value !== null && value !== "") return value;
+    }
+    return fallback;
+  }
+
+  function getArrayFromResponse(response) {
+    if (Array.isArray(response)) return response;
+    if (!response || typeof response !== "object") return [];
+    const possibleKeys = [
+      "data",
+      "content",
+      "items",
+      "results",
+      "list",
+      "subjects",
+      "tasks",
+      "plans",
+      "revisions",
+      "tests",
+      "sessions",
+    ];
+    for (const key of possibleKeys) {
+      if (Array.isArray(response[key])) return response[key];
+    }
+    return [];
+  }
+
+  let dashboardRefreshRunning = false;
+
+  function setDashboardSyncStatus(status = "idle") {
+    const syncEl = document.getElementById("dashboardLastUpdated");
+
+    if (!syncEl) {
+      return;
     }
 
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+    const icon = syncEl.querySelector("i");
+    const text = syncEl.querySelector("span");
+
+    if (status === "syncing") {
+      syncEl.classList.add("is-syncing");
+
+      if (icon) {
+        icon.className = "fa-solid fa-rotate";
+      }
+
+      if (text) {
+        text.textContent = "Syncing...";
+      }
+
+      return;
     }
 
-    function getFirstAvailableValue(obj, keys, fallback = "") {
-        if (!obj || typeof obj !== "object") return fallback;
-        for (const key of keys) {
-            const value = obj[key];
-            if (value !== undefined && value !== null && value !== "") return value;
-        }
-        return fallback;
+    syncEl.classList.remove("is-syncing");
+
+    if (icon) {
+      icon.className = "fa-solid fa-circle-check";
     }
 
-    function getArrayFromResponse(response) {
-        if (Array.isArray(response)) return response;
-        if (!response || typeof response !== "object") return [];
-        const possibleKeys = ["data", "content", "items", "results", "list",
-            "subjects", "tasks", "plans", "revisions", "tests"];
-        for (const key of possibleKeys) {
-            if (Array.isArray(response[key])) return response[key];
-        }
-        return [];
+    if (text) {
+      const now = new Date();
+
+      text.textContent = `Updated ${now.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    }
+  }
+
+  async function refreshDashboardSafely() {
+    if (dashboardRefreshRunning) {
+      return;
     }
 
-    function safeNumber(value, fallback = 0) {
-        const num = Number(value);
-        return Number.isFinite(num) ? num : fallback;
+    dashboardRefreshRunning = true;
+    setDashboardSyncStatus("syncing");
+
+    try {
+      await loadDashboardData();
+      await loadStudySummary();
+      setDashboardSyncStatus("idle");
+    } catch (error) {
+      console.warn("Dashboard refresh failed:", error.message);
+      setDashboardSyncStatus("idle");
+    } finally {
+      dashboardRefreshRunning = false;
+    }
+  }
+
+  function setDashboardSyncStatus(status = "idle") {
+    const syncEl = document.getElementById("dashboardLastUpdated");
+
+    if (!syncEl) {
+      return;
     }
 
-    function clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value));
+    const icon = syncEl.querySelector("i");
+    const text = syncEl.querySelector("span");
+
+    if (status === "syncing") {
+      syncEl.classList.add("is-syncing");
+
+      if (icon) {
+        icon.className = "fa-solid fa-rotate";
+      }
+
+      if (text) {
+        text.textContent = "Syncing...";
+      }
+
+      return;
     }
 
-    function normalizeText(value) {
-        return String(value ?? "").trim().toLowerCase();
+    syncEl.classList.remove("is-syncing");
+
+    if (icon) {
+      icon.className = "fa-solid fa-circle-check";
     }
 
-    function parseStoredJson(value) {
-        try { return JSON.parse(value); } catch { return null; }
-    }
+    if (text) {
+      const now = new Date();
 
-    function getStoredUser() {
-        const possibleKeys = ["edumind_logged_in_user", "edumind_registered_user",
-            "loggedInUser", "currentUser", "user", "authUser", "studyPlannerUser"];
-        for (const key of possibleKeys) {
-            const rawValue = localStorage.getItem(key);
-            if (!rawValue) continue;
-            const parsed = parseStoredJson(rawValue);
-            if (parsed && typeof parsed === "object") return parsed;
-        }
-        return null;
+      text.textContent = `Updated ${now.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
     }
+  }
+  
 
-    function getUserDisplayName(user) {
-        return getFirstAvailableValue(user,
-            ["fullName", "name", "displayName", "username"], "Student") || "Student";
+  function safeNumber(value, fallback = 0) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function normalizeText(value) {
+    return String(value ?? "")
+      .trim()
+      .toLowerCase();
+  }
+
+  function parseStoredJson(value) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
     }
+  }
 
-    function getUserFirstName(user) {
-        return getUserDisplayName(user).split(" ")[0] || "Student";
+  function getStoredUser() {
+    const possibleKeys = [
+      "edumind_logged_in_user",
+      "edumind_registered_user",
+      "loggedInUser",
+      "currentUser",
+      "user",
+      "authUser",
+      "studyPlannerUser",
+    ];
+    for (const key of possibleKeys) {
+      const rawValue = localStorage.getItem(key);
+      if (!rawValue) continue;
+      const parsed = parseStoredJson(rawValue);
+      if (parsed && typeof parsed === "object") return parsed;
     }
+    return null;
+  }
 
-    function getUserRole(user) {
-        const role = getFirstAvailableValue(user, ["role", "userRole"], "");
-        if (role) return role;
-        return getFirstAvailableValue(user, ["course"], "Student") || "Student";
+  function getUserDisplayName(user) {
+    return (
+      getFirstAvailableValue(
+        user,
+        ["fullName", "name", "displayName", "username"],
+        "Student",
+      ) || "Student"
+    );
+  }
+
+  function getUserFirstName(user) {
+    return getUserDisplayName(user).split(" ")[0] || "Student";
+  }
+
+  function getUserRole(user) {
+    const role = getFirstAvailableValue(user, ["role", "userRole"], "");
+    if (role) return role;
+    return getFirstAvailableValue(user, ["course"], "Student") || "Student";
+  }
+
+  function getUserAvatar(user) {
+    const userId = user && user.id ? user.id : null;
+    if (userId) {
+      const userSpecificPhoto = localStorage.getItem(
+        `edumind_profile_photo_${userId}`,
+      );
+      if (userSpecificPhoto && userSpecificPhoto.trim() !== "")
+        return userSpecificPhoto;
     }
+    const legacyPhoto = localStorage.getItem("edumind_profile_photo");
+    if (legacyPhoto && legacyPhoto.trim() !== "") return legacyPhoto;
+    return getFirstAvailableValue(
+      user,
+      ["profilePhoto", "profileImage", "avatar", "imageUrl", "photoUrl"],
+      "../assets/avatar/default-user.png",
+    );
+  }
 
-    function getUserAvatar(user) {
-        const userId = user && user.id ? user.id : null;
-        if (userId) {
-            const userSpecificPhoto = localStorage.getItem(`edumind_profile_photo_${userId}`);
-            if (userSpecificPhoto && userSpecificPhoto.trim() !== "") return userSpecificPhoto;
-        }
-        const legacyPhoto = localStorage.getItem("edumind_profile_photo");
-        if (legacyPhoto && legacyPhoto.trim() !== "") return legacyPhoto;
-        return getFirstAvailableValue(user,
-            ["profilePhoto", "profileImage", "avatar", "imageUrl", "photoUrl"],
-            "../assets/avatar/default-user.png");
-    }
-
-    function renderChipText(element, iconClass, text) {
-        if (!element) return;
-        element.innerHTML = `
+  function renderChipText(element, iconClass, text) {
+    if (!element) return;
+    element.innerHTML = `
             <i class="fa-solid ${iconClass}"></i>
             <span>${escapeHtml(text)}</span>
         `;
+  }
+
+  // ─── User Info — UNCHANGED ────────────────────────────────────────────────
+
+  function renderUserInfo() {
+    const user = state.user || getStoredUser();
+    const firstName = getUserFirstName(user);
+    const fullName = getUserDisplayName(user);
+    const role = getUserRole(user);
+    const avatar = getUserAvatar(user);
+
+    if (dashboardGreetingTitle)
+      dashboardGreetingTitle.textContent = `Hello, ${firstName} 👋`;
+    if (dashboardGreetingSubtitle)
+      dashboardGreetingSubtitle.textContent =
+        "Let's make today productive and well planned.";
+    if (dashboardProfileName) dashboardProfileName.textContent = fullName;
+    if (dashboardProfileRole) dashboardProfileRole.textContent = role;
+
+    if (dashboardProfileAvatar) {
+      dashboardProfileAvatar.src =
+        avatar || "../assets/avatar/default-user.png";
+      dashboardProfileAvatar.alt = fullName;
+      dashboardProfileAvatar.onerror = function () {
+        dashboardProfileAvatar.src = "../assets/avatar/default-user.png";
+      };
     }
 
-    // ─── User Info — UNCHANGED ────────────────────────────────────────────────
+    const dropdownAvatar = document.getElementById(
+      "dashboardProfileAvatarDropdown",
+    );
+    const dropdownName = document.getElementById(
+      "dashboardProfileNameDropdown",
+    );
+    const dropdownRole = document.getElementById(
+      "dashboardProfileRoleDropdown",
+    );
 
-    function renderUserInfo() {
-        const user      = state.user || getStoredUser();
-        const firstName = getUserFirstName(user);
-        const fullName  = getUserDisplayName(user);
-        const role      = getUserRole(user);
-        const avatar    = getUserAvatar(user);
+    if (dropdownAvatar) {
+      dropdownAvatar.src = avatar || "../assets/avatar/default-user.png";
+      dropdownAvatar.onerror = function () {
+        dropdownAvatar.src = "../assets/avatar/default-user.png";
+      };
+    }
+    if (dropdownName) dropdownName.textContent = fullName;
+    if (dropdownRole) dropdownRole.textContent = role;
+  }
 
-        if (dashboardGreetingTitle)
-            dashboardGreetingTitle.textContent = `Hello, ${firstName} 👋`;
-        if (dashboardGreetingSubtitle)
-            dashboardGreetingSubtitle.textContent = "Let's make today productive and well planned.";
-        if (dashboardProfileName) dashboardProfileName.textContent = fullName;
-        if (dashboardProfileRole) dashboardProfileRole.textContent = role;
+  // ─── Fetch — UNCHANGED ───────────────────────────────────────────────────
 
-        if (dashboardProfileAvatar) {
-            dashboardProfileAvatar.src = avatar || "../assets/avatar/default-user.png";
-            dashboardProfileAvatar.alt = fullName;
-            dashboardProfileAvatar.onerror = function () {
-                dashboardProfileAvatar.src = "../assets/avatar/default-user.png";
-            };
-        }
+  async function fetchJson(url) {
+    const token = (localStorage.getItem("token") || "").trim();
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const dropdownAvatar = document.getElementById("dashboardProfileAvatarDropdown");
-        const dropdownName   = document.getElementById("dashboardProfileNameDropdown");
-        const dropdownRole   = document.getElementById("dashboardProfileRoleDropdown");
-
-        if (dropdownAvatar) {
-            dropdownAvatar.src = avatar || "../assets/avatar/default-user.png";
-            dropdownAvatar.onerror = function () {
-                dropdownAvatar.src = "../assets/avatar/default-user.png";
-            };
-        }
-        if (dropdownName) dropdownName.textContent = fullName;
-        if (dropdownRole) dropdownRole.textContent = role;
+    let responseText = "";
+    try {
+      responseText = await response.text();
+    } catch {
+      responseText = "";
     }
 
-    // ─── Fetch — UNCHANGED ───────────────────────────────────────────────────
+    if (!response.ok) {
+      throw new Error(
+        responseText || `${url} failed with status ${response.status}`,
+      );
+    }
+    if (!responseText) return null;
 
-    async function fetchJson(url) {
-        const token = (localStorage.getItem("token") || "").trim();
-        const response = await fetch(url, {
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
+    try {
+      return JSON.parse(responseText);
+    } catch {
+      return null;
+    }
+  }
 
-        let responseText = "";
-        try { responseText = await response.text(); } catch { responseText = ""; }
+  async function fetchArray(baseUrl, label) {
+    try {
+      const response = await fetchJson(baseUrl);
+      return getArrayFromResponse(response);
+    } catch (error) {
+      console.error(`Failed to load ${label}:`, error);
+      return [];
+    }
+  }
 
-        if (!response.ok) {
-            throw new Error(responseText || `${url} failed with status ${response.status}`);
-        }
-        if (!responseText) return null;
+  // ─── Date Helpers — UNCHANGED ────────────────────────────────────────────
 
-        try { return JSON.parse(responseText); } catch { return null; }
+  function isValidDate(date) {
+    return date instanceof Date && !Number.isNaN(date.getTime());
+  }
+
+  function parseDateValue(value) {
+    if (!value) return null;
+    if (value instanceof Date) return isValidDate(value) ? value : null;
+    if (typeof value === "number") {
+      const d = new Date(value);
+      return isValidDate(d) ? d : null;
+    }
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+      ? new Date(`${trimmed}T00:00:00`)
+      : new Date(trimmed);
+    return isValidDate(date) ? date : null;
+  }
+
+  function parseItemDate(item) {
+    if (!item || typeof item !== "object") return null;
+    const directDate = getFirstAvailableValue(
+      item,
+      [
+        "date",
+        "dueDate",
+        "planDate",
+        "studyDate",
+        "revisionDate",
+        "testDate",
+        "scheduledDate",
+        "scheduleDate",
+        "examDate",
+        "startDate",
+        "createdAt",
+        "updatedAt",
+      ],
+      null,
+    );
+    const directDateParsed = parseDateValue(directDate);
+    if (directDateParsed) return directDateParsed;
+    const dateTime = getFirstAvailableValue(
+      item,
+      ["dateTime", "startDateTime", "scheduledAt", "start"],
+      null,
+    );
+    return parseDateValue(dateTime);
+  }
+
+  function getTimeText(item) {
+    const startTime = getFirstAvailableValue(
+      item,
+      ["startTime", "fromTime", "time"],
+      "",
+    );
+    const endTime = getFirstAvailableValue(item, ["endTime", "toTime"], "");
+    if (startTime && endTime) return `${startTime} – ${endTime}`;
+    if (startTime) return startTime;
+    return "";
+  }
+
+  function getRelativeDayLabel(date) {
+    if (!isValidDate(date)) return "No date";
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const targetDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    const diffDays = Math.round(
+      (targetDay - startOfToday) / (1000 * 60 * 60 * 24),
+    );
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Tomorrow";
+    if (diffDays === -1) return "Yesterday";
+    return targetDay.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+  }
+
+  function formatChartDayLabel(date) {
+    return date.toLocaleDateString("en-US", { weekday: "short" });
+  }
+
+  function isSameDay(dateA, dateB) {
+    return (
+      isValidDate(dateA) &&
+      isValidDate(dateB) &&
+      dateA.getFullYear() === dateB.getFullYear() &&
+      dateA.getMonth() === dateB.getMonth() &&
+      dateA.getDate() === dateB.getDate()
+    );
+  }
+
+  function isFutureOrToday(date) {
+    if (!isValidDate(date)) return false;
+    const today = new Date();
+    const currentDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const targetDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    return targetDay >= currentDay;
+  }
+
+  function isWithinNextDays(date, days) {
+    if (!isValidDate(date)) return false;
+    const today = new Date();
+    const start = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const end = new Date(start);
+    end.setDate(start.getDate() + days);
+    const target = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    return target >= start && target <= end;
+  }
+
+  function isWithinLastDays(date, days) {
+    if (!isValidDate(date)) return false;
+    const today = new Date();
+    const end = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const start = new Date(end);
+    start.setDate(end.getDate() - days);
+    const target = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    return target >= start && target <= end;
+  }
+
+  // ─── Task Helpers — UNCHANGED ─────────────────────────────────────────────
+
+  function isTaskCompleted(task) {
+    const status = normalizeText(getFirstAvailableValue(task, ["status"], ""));
+    return status === "completed" || status === "done";
+  }
+
+  function isTaskInProgress(task) {
+    const status = normalizeText(getFirstAvailableValue(task, ["status"], ""));
+    return status === "in progress" || status === "progress";
+  }
+
+  function getTaskBadgeInfo(task) {
+    if (isTaskCompleted(task)) return { label: "Done", className: "done" };
+    if (isTaskInProgress(task))
+      return { label: "In Progress", className: "progress" };
+    return { label: "Pending", className: "pending" };
+  }
+
+  function getTaskTitle(task) {
+    return getFirstAvailableValue(
+      task,
+      ["title", "taskTitle", "name"],
+      "Untitled Task",
+    );
+  }
+
+  function getTaskPriority(task) {
+    return getFirstAvailableValue(task, ["priority"], "Normal");
+  }
+
+  function getSubjectId(subject) {
+    return getFirstAvailableValue(subject, ["id", "subjectId"], "");
+  }
+
+  function getSubjectName(subject) {
+    return getFirstAvailableValue(
+      subject,
+      ["name", "subjectName", "title"],
+      "Untitled Subject",
+    );
+  }
+
+  function getTaskSubjectId(task) {
+    const directId = getFirstAvailableValue(task, ["subjectId"], "");
+    if (directId) return directId;
+    if (task.subject && typeof task.subject === "object") {
+      return getFirstAvailableValue(task.subject, ["id", "subjectId"], "");
+    }
+    return "";
+  }
+
+  function getTaskSubjectName(task) {
+    const directName = getFirstAvailableValue(task, ["subjectName"], "");
+    if (directName) return directName;
+    if (task.subject && typeof task.subject === "object")
+      return getSubjectName(task.subject);
+    return "";
+  }
+
+  function tasksForSubject(subject) {
+    const subjectId = String(getSubjectId(subject));
+    const subjectName = normalizeText(getSubjectName(subject));
+    return state.tasks.filter((task) => {
+      const taskSubjectId = String(getTaskSubjectId(task));
+      const taskSubjectName = normalizeText(getTaskSubjectName(task));
+      return (
+        (subjectId && taskSubjectId && subjectId === taskSubjectId) ||
+        (subjectName && taskSubjectName && subjectName === taskSubjectName)
+      );
+    });
+  }
+
+  function computeSubjectProgress(subject) {
+    const explicitProgress = safeNumber(
+      getFirstAvailableValue(
+        subject,
+        ["progress", "completionPercentage", "coverage", "studyProgress"],
+        null,
+      ),
+      NaN,
+    );
+    if (Number.isFinite(explicitProgress)) {
+      return clamp(Math.round(explicitProgress), 0, 100);
+    }
+    const relatedTasks = tasksForSubject(subject);
+    if (!relatedTasks.length) return 0;
+    const completedCount = relatedTasks.filter(isTaskCompleted).length;
+    return clamp(
+      Math.round((completedCount / relatedTasks.length) * 100),
+      0,
+      100,
+    );
+  }
+
+  function getProgressStatusLabel(progress) {
+    if (progress >= 75) return "Excellent momentum";
+    if (progress >= 50) return "Steady progress";
+    if (progress >= 25) return "Building consistency";
+    return "Needs stronger focus";
+  }
+
+  // ─── Welcome Banner Insights — UNCHANGED ─────────────────────────────────
+
+  function renderWelcomeBannerInsights() {
+    const today = new Date();
+
+    const pendingToday = state.tasks.filter((task) => {
+      const date = parseItemDate(task);
+      return date && isSameDay(date, today) && !isTaskCompleted(task);
+    });
+
+    const upcomingRevision = state.revisions.find((item) => {
+      const d = parseItemDate(item);
+      return d && isWithinNextDays(d, 2);
+    });
+
+    const upcomingTest = state.tests.find((item) => {
+      const d = parseItemDate(item);
+      return d && isWithinNextDays(d, 3);
+    });
+
+    const incompleteTasks = state.tasks.filter(
+      (task) => !isTaskCompleted(task),
+    );
+    const strongestSubject = state.subjects.length
+      ? state.subjects
+          .map((subject) => ({
+            name: getSubjectName(subject),
+            progress: computeSubjectProgress(subject),
+          }))
+          .sort((a, b) => b.progress - a.progress)[0]
+      : null;
+
+    const subtitleText =
+      pendingToday.length > 0
+        ? `You have ${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} to handle today.`
+        : incompleteTasks.length > 0
+          ? `You are doing well — focus on your next pending study actions.`
+          : `You are all caught up. Use today to revise and strengthen weak areas.`;
+
+    if (welcomeBannerSubtitle) welcomeBannerSubtitle.textContent = subtitleText;
+
+    if (pendingToday.length > 0) {
+      renderChipText(
+        welcomeInsightPrimary,
+        "fa-list-check",
+        `${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} pending today`,
+      );
+    } else {
+      renderChipText(
+        welcomeInsightPrimary,
+        "fa-circle-check",
+        "No pending tasks due today",
+      );
     }
 
-    async function fetchArray(baseUrl, label) {
-        try {
-            const response = await fetchJson(baseUrl);
-            return getArrayFromResponse(response);
-        } catch (error) {
-            console.error(`Failed to load ${label}:`, error);
-            return [];
-        }
+    if (strongestSubject && strongestSubject.progress > 0) {
+      renderChipText(
+        welcomeInsightSecondary,
+        "fa-trophy",
+        `Strongest subject: ${strongestSubject.name} at ${strongestSubject.progress}%`,
+      );
+    } else {
+      renderChipText(
+        welcomeInsightSecondary,
+        "fa-book-open",
+        "Start building subject progress with your first completed task",
+      );
     }
 
-    // ─── Date Helpers — UNCHANGED ────────────────────────────────────────────
+    if (upcomingTest) {
+      const testName = getFirstAvailableValue(
+        upcomingTest,
+        ["title", "testName", "name", "subjectName"],
+        "Upcoming test",
+      );
+      renderChipText(
+        welcomeInsightTertiary,
+        "fa-file-lines",
+        `${testName} is ${getRelativeDayLabel(parseItemDate(upcomingTest)).toLowerCase()}`,
+      );
+    } else if (upcomingRevision) {
+      const revisionName = getFirstAvailableValue(
+        upcomingRevision,
+        ["title", "topic", "name"],
+        "Revision session",
+      );
+      renderChipText(
+        welcomeInsightTertiary,
+        "fa-rotate",
+        `${revisionName} is coming up ${getRelativeDayLabel(parseItemDate(upcomingRevision)).toLowerCase()}`,
+      );
+    } else {
+      renderChipText(
+        welcomeInsightTertiary,
+        "fa-bolt",
+        "No urgent test or revision alert right now",
+      );
+    }
+  }
 
-    function isValidDate(date) {
-        return date instanceof Date && !Number.isNaN(date.getTime());
+  // ─── Stats — CHANGE: now uses /api/dashboard/summary ─────────────────────
+
+  function renderStats() {
+    const s = state.summary;
+
+    // Agar summary API se data nahi aaya — fallback to local calculation
+    if (!s) {
+      renderStatsFallback();
+      return;
     }
 
-    function parseDateValue(value) {
-        if (!value) return null;
-        if (value instanceof Date) return isValidDate(value) ? value : null;
-        if (typeof value === "number") {
-            const d = new Date(value);
-            return isValidDate(d) ? d : null;
-        }
-        if (typeof value !== "string") return null;
-        const trimmed = value.trim();
-        if (!trimmed) return null;
-        const date = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
-            ? new Date(`${trimmed}T00:00:00`)
-            : new Date(trimmed);
-        return isValidDate(date) ? date : null;
+    const totalSubjects = safeNumber(s.totalSubjects, 0);
+    const pendingTasks = safeNumber(s.pendingTasks, 0);
+    const completedTasks = safeNumber(s.completedTasks, 0);
+    const totalTasks = safeNumber(s.totalTasks, 0);
+    const studyProgress = safeNumber(s.studyProgressPercent, 0);
+    const avgScore = safeNumber(s.avgTestScore, 0);
+    const completedTests = safeNumber(s.completedTests, 0);
+    const todayPlans = safeNumber(s.todayPlans, 0);
+
+    // Stats cards
+    if (totalSubjectsCount)
+      totalSubjectsCount.textContent = String(totalSubjects).padStart(2, "0");
+    if (pendingTasksCount)
+      pendingTasksCount.textContent = String(pendingTasks).padStart(2, "0");
+    if (completedTasksCount)
+      completedTasksCount.textContent = String(completedTasks).padStart(2, "0");
+    if (studyProgressCount)
+      studyProgressCount.textContent = `${studyProgress}%`;
+
+    // Hint texts
+    if (totalSubjectsHint) {
+      totalSubjectsHint.textContent =
+        totalSubjects === 0
+          ? "Start by adding your first study subject."
+          : `${totalSubjects} subject${totalSubjects > 1 ? "s" : ""} ready to track`;
     }
 
-    function parseItemDate(item) {
-        if (!item || typeof item !== "object") return null;
-        const directDate = getFirstAvailableValue(item,
-            ["date", "dueDate", "planDate", "studyDate", "revisionDate", "testDate",
-             "scheduledDate", "scheduleDate", "examDate", "startDate", "createdAt", "updatedAt"],
-            null);
-        const directDateParsed = parseDateValue(directDate);
-        if (directDateParsed) return directDateParsed;
-        const dateTime = getFirstAvailableValue(item,
-            ["dateTime", "startDateTime", "scheduledAt", "start"], null);
-        return parseDateValue(dateTime);
+    if (pendingTasksHint) {
+      pendingTasksHint.textContent =
+        pendingTasks === 0
+          ? "All clear — no pending tasks right now."
+          : `${pendingTasks} task${pendingTasks > 1 ? "s" : ""} need your attention`;
     }
 
-    function getTimeText(item) {
-        const startTime = getFirstAvailableValue(item, ["startTime", "fromTime", "time"], "");
-        const endTime   = getFirstAvailableValue(item, ["endTime", "toTime"], "");
-        if (startTime && endTime) return `${startTime} – ${endTime}`;
-        if (startTime) return startTime;
-        return "";
+    if (completedTasksHint) {
+      completedTasksHint.textContent =
+        completedTasks === 0
+          ? "No completed tasks yet — start with one win."
+          : `${completedTasks} of ${totalTasks} tasks done`;
     }
 
-    function getRelativeDayLabel(date) {
-        if (!isValidDate(date)) return "No date";
-        const today = new Date();
-        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const targetDay    = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const diffDays     = Math.round((targetDay - startOfToday) / (1000 * 60 * 60 * 24));
-        if (diffDays === 0)  return "Today";
-        if (diffDays === 1)  return "Tomorrow";
-        if (diffDays === -1) return "Yesterday";
-        return targetDay.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    if (studyProgressHint) {
+      studyProgressHint.textContent =
+        totalTasks === 0
+          ? "Add tasks to unlock progress tracking."
+          : `${getProgressStatusLabel(studyProgress)} · ${completedTasks}/${totalTasks} tasks done`;
     }
+  }
 
-    function formatChartDayLabel(date) {
-        return date.toLocaleDateString("en-US", { weekday: "short" });
+  // Fallback agar API fail ho — local data se calculate karo
+  function renderStatsFallback() {
+    const tasks = state.tasks;
+    const pendingTasks = tasks.filter((t) => !isTaskCompleted(t));
+    const completedTasks = tasks.filter(isTaskCompleted);
+    const totalTasks = tasks.length;
+    const studyProgress =
+      totalTasks > 0
+        ? Math.round((completedTasks.length / totalTasks) * 100)
+        : 0;
+
+    if (totalSubjectsCount)
+      totalSubjectsCount.textContent = String(state.subjects.length).padStart(
+        2,
+        "0",
+      );
+    if (pendingTasksCount)
+      pendingTasksCount.textContent = String(pendingTasks.length).padStart(
+        2,
+        "0",
+      );
+    if (completedTasksCount)
+      completedTasksCount.textContent = String(completedTasks.length).padStart(
+        2,
+        "0",
+      );
+    if (studyProgressCount)
+      studyProgressCount.textContent = `${studyProgress}%`;
+  }
+
+  // ─── Smart Insights Strip — UNCHANGED ────────────────────────────────────
+
+  function renderSmartInsights() {
+    const insightsContainer = document.getElementById("smartInsightsStrip");
+    if (!insightsContainer) return;
+    const insights = buildInsights();
+    if (!insights.length) {
+      insightsContainer.innerHTML = "";
+      return;
     }
-
-    function isSameDay(dateA, dateB) {
-        return isValidDate(dateA) && isValidDate(dateB) &&
-            dateA.getFullYear() === dateB.getFullYear() &&
-            dateA.getMonth()    === dateB.getMonth() &&
-            dateA.getDate()     === dateB.getDate();
-    }
-
-    function isFutureOrToday(date) {
-        if (!isValidDate(date)) return false;
-        const today      = new Date();
-        const currentDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const targetDay  = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        return targetDay >= currentDay;
-    }
-
-    function isWithinNextDays(date, days) {
-        if (!isValidDate(date)) return false;
-        const today  = new Date();
-        const start  = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const end    = new Date(start);
-        end.setDate(start.getDate() + days);
-        const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        return target >= start && target <= end;
-    }
-
-    function isWithinLastDays(date, days) {
-        if (!isValidDate(date)) return false;
-        const today  = new Date();
-        const end    = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const start  = new Date(end);
-        start.setDate(end.getDate() - days);
-        const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        return target >= start && target <= end;
-    }
-
-    // ─── Task Helpers — UNCHANGED ─────────────────────────────────────────────
-
-    function isTaskCompleted(task) {
-        const status = normalizeText(getFirstAvailableValue(task, ["status"], ""));
-        return status === "completed" || status === "done";
-    }
-
-    function isTaskInProgress(task) {
-        const status = normalizeText(getFirstAvailableValue(task, ["status"], ""));
-        return status === "in progress" || status === "progress";
-    }
-
-    function getTaskBadgeInfo(task) {
-        if (isTaskCompleted(task))  return { label: "Done",        className: "done" };
-        if (isTaskInProgress(task)) return { label: "In Progress", className: "progress" };
-        return { label: "Pending", className: "pending" };
-    }
-
-    function getTaskTitle(task) {
-        return getFirstAvailableValue(task, ["title", "taskTitle", "name"], "Untitled Task");
-    }
-
-    function getTaskPriority(task) {
-        return getFirstAvailableValue(task, ["priority"], "Normal");
-    }
-
-    function getSubjectId(subject) {
-        return getFirstAvailableValue(subject, ["id", "subjectId"], "");
-    }
-
-    function getSubjectName(subject) {
-        return getFirstAvailableValue(subject,
-            ["name", "subjectName", "title"], "Untitled Subject");
-    }
-
-    function getTaskSubjectId(task) {
-        const directId = getFirstAvailableValue(task, ["subjectId"], "");
-        if (directId) return directId;
-        if (task.subject && typeof task.subject === "object") {
-            return getFirstAvailableValue(task.subject, ["id", "subjectId"], "");
-        }
-        return "";
-    }
-
-    function getTaskSubjectName(task) {
-        const directName = getFirstAvailableValue(task, ["subjectName"], "");
-        if (directName) return directName;
-        if (task.subject && typeof task.subject === "object") return getSubjectName(task.subject);
-        return "";
-    }
-
-    function tasksForSubject(subject) {
-        const subjectId   = String(getSubjectId(subject));
-        const subjectName = normalizeText(getSubjectName(subject));
-        return state.tasks.filter((task) => {
-            const taskSubjectId   = String(getTaskSubjectId(task));
-            const taskSubjectName = normalizeText(getTaskSubjectName(task));
-            return (subjectId && taskSubjectId && subjectId === taskSubjectId) ||
-                   (subjectName && taskSubjectName && subjectName === taskSubjectName);
-        });
-    }
-
-    function computeSubjectProgress(subject) {
-        const explicitProgress = safeNumber(
-            getFirstAvailableValue(subject,
-                ["progress", "completionPercentage", "coverage", "studyProgress"], null),
-            NaN);
-        if (Number.isFinite(explicitProgress)) {
-            return clamp(Math.round(explicitProgress), 0, 100);
-        }
-        const relatedTasks = tasksForSubject(subject);
-        if (!relatedTasks.length) return 0;
-        const completedCount = relatedTasks.filter(isTaskCompleted).length;
-        return clamp(Math.round((completedCount / relatedTasks.length) * 100), 0, 100);
-    }
-
-    function getProgressStatusLabel(progress) {
-        if (progress >= 75) return "Excellent momentum";
-        if (progress >= 50) return "Steady progress";
-        if (progress >= 25) return "Building consistency";
-        return "Needs stronger focus";
-    }
-
-    // ─── Welcome Banner Insights — UNCHANGED ─────────────────────────────────
-
-    function renderWelcomeBannerInsights() {
-        const today = new Date();
-
-        const pendingToday = state.tasks.filter((task) => {
-            const date = parseItemDate(task);
-            return date && isSameDay(date, today) && !isTaskCompleted(task);
-        });
-
-        const upcomingRevision = state.revisions.find((item) => {
-            const d = parseItemDate(item);
-            return d && isWithinNextDays(d, 2);
-        });
-
-        const upcomingTest = state.tests.find((item) => {
-            const d = parseItemDate(item);
-            return d && isWithinNextDays(d, 3);
-        });
-
-        const incompleteTasks   = state.tasks.filter((task) => !isTaskCompleted(task));
-        const strongestSubject  = state.subjects.length
-            ? state.subjects
-                .map((subject) => ({
-                    name: getSubjectName(subject),
-                    progress: computeSubjectProgress(subject)
-                }))
-                .sort((a, b) => b.progress - a.progress)[0]
-            : null;
-
-        const subtitleText = pendingToday.length > 0
-            ? `You have ${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} to handle today.`
-            : incompleteTasks.length > 0
-                ? `You are doing well — focus on your next pending study actions.`
-                : `You are all caught up. Use today to revise and strengthen weak areas.`;
-
-        if (welcomeBannerSubtitle) welcomeBannerSubtitle.textContent = subtitleText;
-
-        if (pendingToday.length > 0) {
-            renderChipText(welcomeInsightPrimary, "fa-list-check",
-                `${pendingToday.length} task${pendingToday.length > 1 ? "s" : ""} pending today`);
-        } else {
-            renderChipText(welcomeInsightPrimary, "fa-circle-check", "No pending tasks due today");
-        }
-
-        if (strongestSubject && strongestSubject.progress > 0) {
-            renderChipText(welcomeInsightSecondary, "fa-trophy",
-                `Strongest subject: ${strongestSubject.name} at ${strongestSubject.progress}%`);
-        } else {
-            renderChipText(welcomeInsightSecondary, "fa-book-open",
-                "Start building subject progress with your first completed task");
-        }
-
-        if (upcomingTest) {
-            const testName = getFirstAvailableValue(upcomingTest,
-                ["title", "testName", "name", "subjectName"], "Upcoming test");
-            renderChipText(welcomeInsightTertiary, "fa-file-lines",
-                `${testName} is ${getRelativeDayLabel(parseItemDate(upcomingTest)).toLowerCase()}`);
-        } else if (upcomingRevision) {
-            const revisionName = getFirstAvailableValue(upcomingRevision,
-                ["title", "topic", "name"], "Revision session");
-            renderChipText(welcomeInsightTertiary, "fa-rotate",
-                `${revisionName} is coming up ${getRelativeDayLabel(parseItemDate(upcomingRevision)).toLowerCase()}`);
-        } else {
-            renderChipText(welcomeInsightTertiary, "fa-bolt",
-                "No urgent test or revision alert right now");
-        }
-    }
-
-    // ─── Stats — CHANGE: now uses /api/dashboard/summary ─────────────────────
-
-    function renderStats() {
-        const s = state.summary;
-
-        // Agar summary API se data nahi aaya — fallback to local calculation
-        if (!s) {
-            renderStatsFallback();
-            return;
-        }
-
-        const totalSubjects   = safeNumber(s.totalSubjects,       0);
-        const pendingTasks    = safeNumber(s.pendingTasks,         0);
-        const completedTasks  = safeNumber(s.completedTasks,       0);
-        const totalTasks      = safeNumber(s.totalTasks,           0);
-        const studyProgress   = safeNumber(s.studyProgressPercent, 0);
-        const avgScore        = safeNumber(s.avgTestScore,         0);
-        const completedTests  = safeNumber(s.completedTests,       0);
-        const todayPlans      = safeNumber(s.todayPlans,           0);
-
-        // Stats cards
-        if (totalSubjectsCount)
-            totalSubjectsCount.textContent  = String(totalSubjects).padStart(2, "0");
-        if (pendingTasksCount)
-            pendingTasksCount.textContent   = String(pendingTasks).padStart(2, "0");
-        if (completedTasksCount)
-            completedTasksCount.textContent = String(completedTasks).padStart(2, "0");
-        if (studyProgressCount)
-            studyProgressCount.textContent  = `${studyProgress}%`;
-
-        // Hint texts
-        if (totalSubjectsHint) {
-            totalSubjectsHint.textContent = totalSubjects === 0
-                ? "Start by adding your first study subject."
-                : `${totalSubjects} subject${totalSubjects > 1 ? "s" : ""} ready to track`;
-        }
-
-        if (pendingTasksHint) {
-            pendingTasksHint.textContent = pendingTasks === 0
-                ? "All clear — no pending tasks right now."
-                : `${pendingTasks} task${pendingTasks > 1 ? "s" : ""} need your attention`;
-        }
-
-        if (completedTasksHint) {
-            completedTasksHint.textContent = completedTasks === 0
-                ? "No completed tasks yet — start with one win."
-                : `${completedTasks} of ${totalTasks} tasks done`;
-        }
-
-        if (studyProgressHint) {
-            studyProgressHint.textContent = totalTasks === 0
-                ? "Add tasks to unlock progress tracking."
-                : `${getProgressStatusLabel(studyProgress)} · ${completedTasks}/${totalTasks} tasks done`;
-        }
-    }
-
-    // Fallback agar API fail ho — local data se calculate karo
-    function renderStatsFallback() {
-        const tasks          = state.tasks;
-        const pendingTasks   = tasks.filter((t) => !isTaskCompleted(t));
-        const completedTasks = tasks.filter(isTaskCompleted);
-        const totalTasks     = tasks.length;
-        const studyProgress  = totalTasks > 0
-            ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
-
-        if (totalSubjectsCount)
-            totalSubjectsCount.textContent  = String(state.subjects.length).padStart(2, "0");
-        if (pendingTasksCount)
-            pendingTasksCount.textContent   = String(pendingTasks.length).padStart(2, "0");
-        if (completedTasksCount)
-            completedTasksCount.textContent = String(completedTasks.length).padStart(2, "0");
-        if (studyProgressCount)
-            studyProgressCount.textContent  = `${studyProgress}%`;
-    }
-
-    // ─── Smart Insights Strip — UNCHANGED ────────────────────────────────────
-
-    function renderSmartInsights() {
-        const insightsContainer = document.getElementById("smartInsightsStrip");
-        if (!insightsContainer) return;
-        const insights = buildInsights();
-        if (!insights.length) { insightsContainer.innerHTML = ""; return; }
-        insightsContainer.innerHTML = insights.map((insight) => `
+    insightsContainer.innerHTML = insights
+      .map(
+        (insight) => `
             <div class="insight-chip insight-${insight.type}">
                 <div class="insight-chip-icon">
                     <i class="fa-solid ${insight.icon}"></i>
@@ -568,76 +881,107 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="insight-chip-value">${escapeHtml(insight.value)}</span>
                 </div>
             </div>
-        `).join("");
+        `,
+      )
+      .join("");
+  }
+
+  function buildInsights() {
+    const insights = [];
+    const today = new Date();
+
+    if (state.subjects.length > 0) {
+      const subjectsWithProgress = state.subjects.map((s) => ({
+        name: getSubjectName(s),
+        progress: computeSubjectProgress(s),
+      }));
+      const strongest = subjectsWithProgress.reduce((a, b) =>
+        a.progress >= b.progress ? a : b,
+      );
+      const weakest = subjectsWithProgress.reduce((a, b) =>
+        a.progress <= b.progress ? a : b,
+      );
+      if (strongest.progress > 0) {
+        insights.push({
+          type: "strong",
+          icon: "fa-trophy",
+          label: "Strongest Subject",
+          value: `${strongest.name} — ${strongest.progress}%`,
+        });
+      }
+      if (
+        weakest.name !== strongest.name ||
+        subjectsWithProgress.length === 1
+      ) {
+        insights.push({
+          type: "weak",
+          icon: "fa-triangle-exclamation",
+          label: "Needs Attention",
+          value: `${weakest.name} — ${weakest.progress}%`,
+        });
+      }
     }
 
-    function buildInsights() {
-        const insights = [];
-        const today    = new Date();
+    const todayPending = state.tasks.filter((t) => {
+      const d = parseItemDate(t);
+      return d && isSameDay(d, today) && !isTaskCompleted(t);
+    }).length;
 
-        if (state.subjects.length > 0) {
-            const subjectsWithProgress = state.subjects.map((s) => ({
-                name: getSubjectName(s),
-                progress: computeSubjectProgress(s)
-            }));
-            const strongest = subjectsWithProgress.reduce((a, b) => a.progress >= b.progress ? a : b);
-            const weakest   = subjectsWithProgress.reduce((a, b) => a.progress <= b.progress ? a : b);
-            if (strongest.progress > 0) {
-                insights.push({ type: "strong", icon: "fa-trophy",
-                    label: "Strongest Subject",
-                    value: `${strongest.name} — ${strongest.progress}%` });
-            }
-            if (weakest.name !== strongest.name || subjectsWithProgress.length === 1) {
-                insights.push({ type: "weak", icon: "fa-triangle-exclamation",
-                    label: "Needs Attention",
-                    value: `${weakest.name} — ${weakest.progress}%` });
-            }
-        }
-
-        const todayPending = state.tasks.filter((t) => {
-            const d = parseItemDate(t);
-            return d && isSameDay(d, today) && !isTaskCompleted(t);
-        }).length;
-
-        if (todayPending > 0) {
-            insights.push({ type: "pending", icon: "fa-hourglass-half",
-                label: "Due Today",
-                value: `${todayPending} task${todayPending > 1 ? "s" : ""} pending` });
-        }
-
-        const nearTest = state.tests.find((t) => {
-            const d = parseItemDate(t);
-            return d && isWithinNextDays(d, 3);
-        });
-        if (nearTest) {
-            const testName = getFirstAvailableValue(nearTest,
-                ["title", "testName", "name", "subjectName"], "Test");
-            insights.push({ type: "test", icon: "fa-file-lines",
-                label: "Upcoming Test",
-                value: `${testName} — ${getRelativeDayLabel(parseItemDate(nearTest))}` });
-        }
-
-        const nearRevision = state.revisions.find((r) => {
-            const d = parseItemDate(r);
-            return d && isWithinNextDays(d, 2);
-        });
-        if (nearRevision) {
-            const revName = getFirstAvailableValue(nearRevision,
-                ["title", "topic", "name"], "Revision");
-            insights.push({ type: "revision", icon: "fa-rotate",
-                label: "Revision Due", value: `${revName} coming up` });
-        }
-
-        return insights.slice(0, 4);
+    if (todayPending > 0) {
+      insights.push({
+        type: "pending",
+        icon: "fa-hourglass-half",
+        label: "Due Today",
+        value: `${todayPending} task${todayPending > 1 ? "s" : ""} pending`,
+      });
     }
 
-    // ─── Subject Progress — UNCHANGED ────────────────────────────────────────
+    const nearTest = state.tests.find((t) => {
+      const d = parseItemDate(t);
+      return d && isWithinNextDays(d, 3);
+    });
+    if (nearTest) {
+      const testName = getFirstAvailableValue(
+        nearTest,
+        ["title", "testName", "name", "subjectName"],
+        "Test",
+      );
+      insights.push({
+        type: "test",
+        icon: "fa-file-lines",
+        label: "Upcoming Test",
+        value: `${testName} — ${getRelativeDayLabel(parseItemDate(nearTest))}`,
+      });
+    }
 
-    function renderSubjectProgress() {
-        if (!subjectProgressList) return;
+    const nearRevision = state.revisions.find((r) => {
+      const d = parseItemDate(r);
+      return d && isWithinNextDays(d, 2);
+    });
+    if (nearRevision) {
+      const revName = getFirstAvailableValue(
+        nearRevision,
+        ["title", "topic", "name"],
+        "Revision",
+      );
+      insights.push({
+        type: "revision",
+        icon: "fa-rotate",
+        label: "Revision Due",
+        value: `${revName} coming up`,
+      });
+    }
 
-        if (!state.subjects.length) {
-            subjectProgressList.innerHTML = `
+    return insights.slice(0, 4);
+  }
+
+  // ─── Subject Progress — UNCHANGED ────────────────────────────────────────
+
+  function renderSubjectProgress() {
+    if (!subjectProgressList) return;
+
+    if (!state.subjects.length) {
+      subjectProgressList.innerHTML = `
                 <div class="subject-progress-item">
                     <div class="subject-row">
                         <span>No subjects added yet</span>
@@ -647,27 +991,40 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="progress-fill" style="width: 0%;"></div>
                     </div>
                 </div>`;
-            return;
-        }
+      return;
+    }
 
-        const subjectsWithProgress = state.subjects.map((subject) => ({
-            subject,
-            name: getSubjectName(subject),
-            progress: computeSubjectProgress(subject)
-        }));
+    const subjectsWithProgress = state.subjects.map((subject) => ({
+      subject,
+      name: getSubjectName(subject),
+      progress: computeSubjectProgress(subject),
+    }));
 
-        const sorted      = [...subjectsWithProgress].sort((a, b) => b.progress - a.progress);
-        const topProgress = sorted[0]?.progress ?? 0;
-        const lowProgress = sorted[sorted.length - 1]?.progress ?? 0;
+    const sorted = [...subjectsWithProgress].sort(
+      (a, b) => b.progress - a.progress,
+    );
+    const topProgress = sorted[0]?.progress ?? 0;
+    const lowProgress = sorted[sorted.length - 1]?.progress ?? 0;
 
-        subjectProgressList.innerHTML = subjectsWithProgress.slice(0, 5).map(({ name, progress }) => {
-            const pctClass    = progress >= 70 ? "pct-high" : progress >= 45 ? "pct-mid" : "pct-low";
-            const isStrongest = progress === topProgress && topProgress > 0 && subjectsWithProgress.length > 1;
-            const isWeakest   = progress === lowProgress && subjectsWithProgress.length > 1 && progress < topProgress;
-            let badgeHtml = "";
-            if (isStrongest) badgeHtml = `<span class="subject-highlight-badge badge-strong"><i class="fa-solid fa-trophy"></i> Top</span>`;
-            else if (isWeakest) badgeHtml = `<span class="subject-highlight-badge badge-weak"><i class="fa-solid fa-arrow-trend-up"></i> Focus</span>`;
-            return `
+    subjectProgressList.innerHTML = subjectsWithProgress
+      .slice(0, 5)
+      .map(({ name, progress }) => {
+        const pctClass =
+          progress >= 70 ? "pct-high" : progress >= 45 ? "pct-mid" : "pct-low";
+        const isStrongest =
+          progress === topProgress &&
+          topProgress > 0 &&
+          subjectsWithProgress.length > 1;
+        const isWeakest =
+          progress === lowProgress &&
+          subjectsWithProgress.length > 1 &&
+          progress < topProgress;
+        let badgeHtml = "";
+        if (isStrongest)
+          badgeHtml = `<span class="subject-highlight-badge badge-strong"><i class="fa-solid fa-trophy"></i> Top</span>`;
+        else if (isWeakest)
+          badgeHtml = `<span class="subject-highlight-badge badge-weak"><i class="fa-solid fa-arrow-trend-up"></i> Focus</span>`;
+        return `
                 <div class="subject-progress-item ${isStrongest ? "item-strongest" : ""} ${isWeakest ? "item-weakest" : ""}">
                     <div class="subject-row">
                         <span class="subject-name-text">${escapeHtml(name)}</span>
@@ -680,67 +1037,96 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="progress-fill ${isStrongest ? "fill-strong" : ""} ${isWeakest ? "fill-weak" : ""}" style="width: ${progress}%;"></div>
                     </div>
                 </div>`;
-        }).join("");
-    }
+      })
+      .join("");
+  }
 
-    // ─── Upcoming Schedule — UNCHANGED ───────────────────────────────────────
+  // ─── Upcoming Schedule — UNCHANGED ───────────────────────────────────────
 
-    function getDayBadgeClass(date) {
-        const label = getRelativeDayLabel(date);
-        if (label === "Today")    return "today-badge";
-        if (label === "Tomorrow") return "tomorrow-badge";
-        return "later-badge";
-    }
+  function getDayBadgeClass(date) {
+    const label = getRelativeDayLabel(date);
+    if (label === "Today") return "today-badge";
+    if (label === "Tomorrow") return "tomorrow-badge";
+    return "later-badge";
+  }
 
-    function getItemTypeBadge(type) {
-        const map = {
-            "Planner":  { cls: "type-planner",  icon: "fa-calendar-days" },
-            "Revision": { cls: "type-revision",  icon: "fa-rotate" },
-            "Test":     { cls: "type-test",      icon: "fa-file-lines" },
-            "Task":     { cls: "type-task",      icon: "fa-list-check" }
-        };
-        return map[type] || { cls: "type-planner", icon: "fa-calendar-days" };
-    }
+  function getItemTypeBadge(type) {
+    const map = {
+      Planner: { cls: "type-planner", icon: "fa-calendar-days" },
+      Revision: { cls: "type-revision", icon: "fa-rotate" },
+      Test: { cls: "type-test", icon: "fa-file-lines" },
+      Task: { cls: "type-task", icon: "fa-list-check" },
+    };
+    return map[type] || { cls: "type-planner", icon: "fa-calendar-days" };
+  }
 
-    function buildCombinedUpcomingItems() {
-        const items = [];
-        state.plans.forEach((plan) => {
-            const date = parseItemDate(plan);
-            if (!isFutureOrToday(date)) return;
-            items.push({ type: "Planner",
-                title: getFirstAvailableValue(plan, ["title", "planTitle", "name", "topic"], "Study Plan"),
-                date, item: plan, timestamp: date.getTime() });
-        });
-        state.revisions.forEach((revision) => {
-            const date = parseItemDate(revision);
-            if (!isFutureOrToday(date)) return;
-            items.push({ type: "Revision",
-                title: getFirstAvailableValue(revision, ["title", "topic", "name"], "Revision Session"),
-                date, item: revision, timestamp: date.getTime() });
-        });
-        state.tests.forEach((test) => {
-            const date = parseItemDate(test);
-            if (!isFutureOrToday(date)) return;
-            items.push({ type: "Test",
-                title: getFirstAvailableValue(test, ["title", "testName", "name", "subjectName"], "Upcoming Test"),
-                date, item: test, timestamp: date.getTime() });
-        });
-        state.tasks.forEach((task) => {
-            const date = parseItemDate(task);
-            if (!isFutureOrToday(date) || isTaskCompleted(task)) return;
-            items.push({ type: "Task", title: getTaskTitle(task),
-                date, item: { ...task, subjectName: getTaskSubjectName(task) },
-                timestamp: date.getTime() });
-        });
-        items.sort((a, b) => a.timestamp - b.timestamp);
-        return items.slice(0, 5);
-    }
+  function buildCombinedUpcomingItems() {
+    const items = [];
+    state.plans.forEach((plan) => {
+      const date = parseItemDate(plan);
+      if (!isFutureOrToday(date)) return;
+      items.push({
+        type: "Planner",
+        title: getFirstAvailableValue(
+          plan,
+          ["title", "planTitle", "name", "topic"],
+          "Study Plan",
+        ),
+        date,
+        item: plan,
+        timestamp: date.getTime(),
+      });
+    });
+    state.revisions.forEach((revision) => {
+      const date = parseItemDate(revision);
+      if (!isFutureOrToday(date)) return;
+      items.push({
+        type: "Revision",
+        title: getFirstAvailableValue(
+          revision,
+          ["title", "topic", "name"],
+          "Revision Session",
+        ),
+        date,
+        item: revision,
+        timestamp: date.getTime(),
+      });
+    });
+    state.tests.forEach((test) => {
+      const date = parseItemDate(test);
+      if (!isFutureOrToday(date)) return;
+      items.push({
+        type: "Test",
+        title: getFirstAvailableValue(
+          test,
+          ["title", "testName", "name", "subjectName"],
+          "Upcoming Test",
+        ),
+        date,
+        item: test,
+        timestamp: date.getTime(),
+      });
+    });
+    state.tasks.forEach((task) => {
+      const date = parseItemDate(task);
+      if (!isFutureOrToday(date) || isTaskCompleted(task)) return;
+      items.push({
+        type: "Task",
+        title: getTaskTitle(task),
+        date,
+        item: { ...task, subjectName: getTaskSubjectName(task) },
+        timestamp: date.getTime(),
+      });
+    });
+    items.sort((a, b) => a.timestamp - b.timestamp);
+    return items.slice(0, 5);
+  }
 
-    function renderUpcomingSchedule() {
-        if (!upcomingScheduleList) return;
-        const upcomingItems = buildCombinedUpcomingItems();
-        if (!upcomingItems.length) {
-            upcomingScheduleList.innerHTML = `
+  function renderUpcomingSchedule() {
+    if (!upcomingScheduleList) return;
+    const upcomingItems = buildCombinedUpcomingItems();
+    if (!upcomingItems.length) {
+      upcomingScheduleList.innerHTML = `
                 <div class="upcoming-item upcoming-empty">
                     <div class="upcoming-icon"><i class="fa-solid fa-calendar-check"></i></div>
                     <div class="upcoming-info">
@@ -748,14 +1134,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         <p>Your next plans will appear here.</p>
                     </div>
                 </div>`;
-            return;
-        }
-        upcomingScheduleList.innerHTML = upcomingItems.map(({ type, title, date, item }) => {
-            const dayBadgeClass = getDayBadgeClass(date);
-            const dayLabel      = getRelativeDayLabel(date);
-            const timeText      = getTimeText(item);
-            const typeBadge     = getItemTypeBadge(type);
-            return `
+      return;
+    }
+    upcomingScheduleList.innerHTML = upcomingItems
+      .map(({ type, title, date, item }) => {
+        const dayBadgeClass = getDayBadgeClass(date);
+        const dayLabel = getRelativeDayLabel(date);
+        const timeText = getTimeText(item);
+        const typeBadge = getItemTypeBadge(type);
+        return `
                 <div class="upcoming-item">
                     <div class="upcoming-icon upcoming-icon-${typeBadge.cls}">
                         <i class="fa-solid ${typeBadge.icon}"></i>
@@ -769,25 +1156,28 @@ document.addEventListener("DOMContentLoaded", function () {
                         </p>
                     </div>
                 </div>`;
-        }).join("");
+      })
+      .join("");
+  }
+
+  // ─── Today's Tasks — UNCHANGED ───────────────────────────────────────────
+
+  function renderTodayTasks() {
+    if (!todayTasksList) return;
+    const today = new Date();
+    let todaysTasks = state.tasks.filter((task) => {
+      const taskDate = parseItemDate(task);
+      return taskDate && isSameDay(taskDate, today);
+    });
+    if (!todaysTasks.length) {
+      todaysTasks = state.tasks
+        .filter((task) => !isTaskCompleted(task))
+        .slice(0, 3);
+    } else {
+      todaysTasks = todaysTasks.slice(0, 3);
     }
-
-    // ─── Today's Tasks — UNCHANGED ───────────────────────────────────────────
-
-    function renderTodayTasks() {
-        if (!todayTasksList) return;
-        const today = new Date();
-        let todaysTasks = state.tasks.filter((task) => {
-            const taskDate = parseItemDate(task);
-            return taskDate && isSameDay(taskDate, today);
-        });
-        if (!todaysTasks.length) {
-            todaysTasks = state.tasks.filter((task) => !isTaskCompleted(task)).slice(0, 3);
-        } else {
-            todaysTasks = todaysTasks.slice(0, 3);
-        }
-        if (!todaysTasks.length) {
-            todayTasksList.innerHTML = `
+    if (!todaysTasks.length) {
+      todayTasksList.innerHTML = `
                 <div class="task-item">
                     <div class="task-info">
                         <h4>No tasks for today</h4>
@@ -795,22 +1185,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     <span class="task-badge done">Clear</span>
                 </div>`;
-            return;
-        }
-        todayTasksList.innerHTML = todaysTasks.map((task) => {
-            const badge        = getTaskBadgeInfo(task);
-            const dueDate      = parseItemDate(task);
-            const priority     = getTaskPriority(task);
-            const subjectName  = getTaskSubjectName(task);
-            const priorityLower = normalizeText(priority);
-            const priorityClass = badge.className === "done" ? "priority-done"
-                : priorityLower.includes("high") ? "priority-high"
-                : badge.className === "progress" ? "priority-normal"
+      return;
+    }
+    todayTasksList.innerHTML = todaysTasks
+      .map((task) => {
+        const badge = getTaskBadgeInfo(task);
+        const dueDate = parseItemDate(task);
+        const priority = getTaskPriority(task);
+        const subjectName = getTaskSubjectName(task);
+        const priorityLower = normalizeText(priority);
+        const priorityClass =
+          badge.className === "done"
+            ? "priority-done"
+            : priorityLower.includes("high")
+              ? "priority-high"
+              : badge.className === "progress"
+                ? "priority-normal"
                 : "priority-low";
-            let subtitle = dueDate && isSameDay(dueDate, new Date()) ? "Due today" : getRelativeDayLabel(dueDate);
-            if (priority)    subtitle += ` • ${priority} Priority`;
-            if (subjectName) subtitle += ` • ${subjectName}`;
-            return `
+        let subtitle =
+          dueDate && isSameDay(dueDate, new Date())
+            ? "Due today"
+            : getRelativeDayLabel(dueDate);
+        if (priority) subtitle += ` • ${priority} Priority`;
+        if (subjectName) subtitle += ` • ${subjectName}`;
+        return `
                 <div class="task-item ${priorityClass}">
                     <div class="task-info">
                         <h4>${escapeHtml(getTaskTitle(task))}</h4>
@@ -818,251 +1216,409 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     <span class="task-badge ${badge.className}">${badge.label}</span>
                 </div>`;
-        }).join("");
+      })
+      .join("");
+  }
+
+  // ─── Weekly Chart — UNCHANGED ─────────────────────────────────────────────
+
+  function buildWeeklyActivityCounts() {
+    const today = new Date();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+      );
+      day.setDate(day.getDate() - i);
+      days.push(day);
     }
+    const counts = days.map((day) => ({
+      date: day,
+      label: formatChartDayLabel(day),
+      count: 0,
+      breakdown: { tasks: 0, plans: 0, revisions: 0, tests: 0 },
+    }));
+    state.tasks.forEach((item) => {
+      const d = parseItemDate(item);
+      if (!d) return;
+      const match = counts.find((entry) => isSameDay(entry.date, d));
+      if (match) {
+        match.count++;
+        match.breakdown.tasks++;
+      }
+    });
+    state.plans.forEach((item) => {
+      const d = parseItemDate(item);
+      if (!d) return;
+      const match = counts.find((entry) => isSameDay(entry.date, d));
+      if (match) {
+        match.count++;
+        match.breakdown.plans++;
+      }
+    });
+    state.revisions.forEach((item) => {
+      const d = parseItemDate(item);
+      if (!d) return;
+      const match = counts.find((entry) => isSameDay(entry.date, d));
+      if (match) {
+        match.count++;
+        match.breakdown.revisions++;
+      }
+    });
+    state.tests.forEach((item) => {
+      const d = parseItemDate(item);
+      if (!d) return;
+      const match = counts.find((entry) => isSameDay(entry.date, d));
+      if (match) {
+        match.count++;
+        match.breakdown.tests++;
+      }
+    });
+    return counts;
+  }
 
-    // ─── Weekly Chart — UNCHANGED ─────────────────────────────────────────────
+  function getWeeklyActivityCategories(item) {
+    return [
+      {
+        key: "tasks",
+        label: "Tasks",
+        className: "task",
+        count: item.breakdown.tasks,
+      },
+      {
+        key: "plans",
+        label: "Planner",
+        className: "plan",
+        count: item.breakdown.plans,
+      },
+      {
+        key: "revisions",
+        label: "Revision",
+        className: "revision",
+        count: item.breakdown.revisions,
+      },
+      {
+        key: "tests",
+        label: "Tests",
+        className: "test",
+        count: item.breakdown.tests,
+      },
+    ].filter((entry) => entry.count > 0);
+  }
 
-    function buildWeeklyActivityCounts() {
-        const today = new Date();
-        const days  = [];
-        for (let i = 6; i >= 0; i--) {
-            const day = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            day.setDate(day.getDate() - i);
-            days.push(day);
-        }
-        const counts = days.map((day) => ({
-            date: day, label: formatChartDayLabel(day),
-            count: 0, breakdown: { tasks: 0, plans: 0, revisions: 0, tests: 0 }
-        }));
-        state.tasks.forEach((item) => {
-            const d = parseItemDate(item); if (!d) return;
-            const match = counts.find((entry) => isSameDay(entry.date, d));
-            if (match) { match.count++; match.breakdown.tasks++; }
-        });
-        state.plans.forEach((item) => {
-            const d = parseItemDate(item); if (!d) return;
-            const match = counts.find((entry) => isSameDay(entry.date, d));
-            if (match) { match.count++; match.breakdown.plans++; }
-        });
-        state.revisions.forEach((item) => {
-            const d = parseItemDate(item); if (!d) return;
-            const match = counts.find((entry) => isSameDay(entry.date, d));
-            if (match) { match.count++; match.breakdown.revisions++; }
-        });
-        state.tests.forEach((item) => {
-            const d = parseItemDate(item); if (!d) return;
-            const match = counts.find((entry) => isSameDay(entry.date, d));
-            if (match) { match.count++; match.breakdown.tests++; }
-        });
-        return counts;
+  function getDominantWeeklyActivityType(counts) {
+    const totals = counts.reduce(
+      (acc, item) => {
+        acc.tasks += item.breakdown.tasks;
+        acc.plans += item.breakdown.plans;
+        acc.revisions += item.breakdown.revisions;
+        acc.tests += item.breakdown.tests;
+        return acc;
+      },
+      { tasks: 0, plans: 0, revisions: 0, tests: 0 },
+    );
+    const labelMap = {
+      tasks: "Tasks",
+      plans: "Planner",
+      revisions: "Revision",
+      tests: "Tests",
+    };
+    const topEntry = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+    if (!topEntry || topEntry[1] <= 0) return "No focus yet";
+    return labelMap[topEntry[0]] || "Mixed";
+  }
+
+  function buildWeeklyActivityTooltip(item) {
+    const categories = getWeeklyActivityCategories(item);
+    if (!categories.length) return `${item.label}: No study activity recorded`;
+    const breakdownText = categories
+      .map((e) => `${e.count} ${e.label}`)
+      .join(", ");
+    return `${item.label}: ${item.count} activit${item.count > 1 ? "ies" : "y"} — ${breakdownText}`;
+  }
+
+  function renderChartSummaryPills(counts) {
+    const overviewCard = document.querySelector(".overview-chart-card");
+    const chartHeader = overviewCard?.querySelector(".chart-header");
+    if (!overviewCard || !chartHeader) return;
+    let pillsContainer = document.getElementById("chartSummaryPills");
+    if (!pillsContainer) {
+      pillsContainer = document.createElement("div");
+      pillsContainer.id = "chartSummaryPills";
+      pillsContainer.className = "chart-summary-pills";
+      chartHeader.insertAdjacentElement("afterend", pillsContainer);
     }
-
-    function getWeeklyActivityCategories(item) {
-        return [
-            { key: "tasks",     label: "Tasks",    className: "task",     count: item.breakdown.tasks },
-            { key: "plans",     label: "Planner",  className: "plan",     count: item.breakdown.plans },
-            { key: "revisions", label: "Revision", className: "revision", count: item.breakdown.revisions },
-            { key: "tests",     label: "Tests",    className: "test",     count: item.breakdown.tests }
-        ].filter((entry) => entry.count > 0);
-    }
-
-    function getDominantWeeklyActivityType(counts) {
-        const totals = counts.reduce((acc, item) => {
-            acc.tasks     += item.breakdown.tasks;
-            acc.plans     += item.breakdown.plans;
-            acc.revisions += item.breakdown.revisions;
-            acc.tests     += item.breakdown.tests;
-            return acc;
-        }, { tasks: 0, plans: 0, revisions: 0, tests: 0 });
-        const labelMap = { tasks: "Tasks", plans: "Planner", revisions: "Revision", tests: "Tests" };
-        const topEntry = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-        if (!topEntry || topEntry[1] <= 0) return "No focus yet";
-        return labelMap[topEntry[0]] || "Mixed";
-    }
-
-    function buildWeeklyActivityTooltip(item) {
-        const categories = getWeeklyActivityCategories(item);
-        if (!categories.length) return `${item.label}: No study activity recorded`;
-        const breakdownText = categories.map((e) => `${e.count} ${e.label}`).join(", ");
-        return `${item.label}: ${item.count} activit${item.count > 1 ? "ies" : "y"} — ${breakdownText}`;
-    }
-
-    function renderChartSummaryPills(counts) {
-        const overviewCard  = document.querySelector(".overview-chart-card");
-        const chartHeader   = overviewCard?.querySelector(".chart-header");
-        if (!overviewCard || !chartHeader) return;
-        let pillsContainer = document.getElementById("chartSummaryPills");
-        if (!pillsContainer) {
-            pillsContainer = document.createElement("div");
-            pillsContainer.id        = "chartSummaryPills";
-            pillsContainer.className = "chart-summary-pills";
-            chartHeader.insertAdjacentElement("afterend", pillsContainer);
-        }
-        const totalWeek    = counts.reduce((sum, item) => sum + item.count, 0);
-        const activeDays   = counts.filter((item) => item.count > 0).length;
-        const busiestDay   = counts.reduce((best, cur) => cur.count > best.count ? cur : best, counts[0]);
-        const dominantType = getDominantWeeklyActivityType(counts);
-        pillsContainer.innerHTML = `
+    const totalWeek = counts.reduce((sum, item) => sum + item.count, 0);
+    const activeDays = counts.filter((item) => item.count > 0).length;
+    const busiestDay = counts.reduce(
+      (best, cur) => (cur.count > best.count ? cur : best),
+      counts[0],
+    );
+    const dominantType = getDominantWeeklyActivityType(counts);
+    pillsContainer.innerHTML = `
             <span class="chart-summary-pill"><span>Total</span><strong>${totalWeek}</strong></span>
             <span class="chart-summary-pill"><span>Active Days</span><strong>${activeDays}</strong></span>
             <span class="chart-summary-pill"><span>Best Day</span><strong>${busiestDay && busiestDay.count > 0 ? escapeHtml(busiestDay.label) : "—"}</strong></span>
             <span class="chart-summary-pill"><span>Focus</span><strong>${escapeHtml(dominantType)}</strong></span>
         `;
-    }
+  }
 
-    function renderWeeklyOverviewChart() {
-        if (!weeklyOverviewChartBars) return;
-        const counts = buildWeeklyActivityCounts();
-        const today  = new Date();
-        renderChartSummaryPills(counts);
-        weeklyOverviewChartBars.innerHTML = counts.map((item) => {
-            const isToday    = isSameDay(item.date, today);
-            const isEmpty    = item.count === 0;
-            const categories = getWeeklyActivityCategories(item);
-            const tooltipText = buildWeeklyActivityTooltip(item);
-            const cardClasses = ["activity-day-card",
-                isToday ? "activity-day-card--today" : "",
-                isEmpty ? "activity-day-card--empty" : ""].filter(Boolean).join(" ");
-            const markerHtml = categories.length
-                ? `<div class="activity-marker-list">${categories.map((entry) => `
+  function renderWeeklyOverviewChart() {
+    if (!weeklyOverviewChartBars) return;
+    const counts = buildWeeklyActivityCounts();
+    const today = new Date();
+    renderChartSummaryPills(counts);
+    weeklyOverviewChartBars.innerHTML = counts
+      .map((item) => {
+        const isToday = isSameDay(item.date, today);
+        const isEmpty = item.count === 0;
+        const categories = getWeeklyActivityCategories(item);
+        const tooltipText = buildWeeklyActivityTooltip(item);
+        const cardClasses = [
+          "activity-day-card",
+          isToday ? "activity-day-card--today" : "",
+          isEmpty ? "activity-day-card--empty" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const markerHtml = categories.length
+          ? `<div class="activity-marker-list">${categories
+              .map(
+                (entry) => `
                     <div class="activity-marker-item" title="${escapeHtml(`${entry.label}: ${entry.count}`)}">
                         <div class="activity-marker-left">
                             <span class="activity-marker-dot ${entry.className}"></span>
                             <span class="activity-marker-label">${escapeHtml(entry.label)}</span>
                         </div>
                         <span class="activity-marker-count ${entry.className}">${entry.count}</span>
-                    </div>`).join("")}</div>`
-                : `<div class="activity-empty-text"><i class="fa-regular fa-bell-slash"></i><span>No study activity</span></div>`;
-            return `
+                    </div>`,
+              )
+              .join("")}</div>`
+          : `<div class="activity-empty-text"><i class="fa-regular fa-bell-slash"></i><span>No study activity</span></div>`;
+        return `
                 <div class="${cardClasses}" title="${escapeHtml(tooltipText)}">
                     <div class="activity-day-top"><span class="activity-day-count">${item.count}</span></div>
                     <div class="activity-day-body">${markerHtml}</div>
                     <div class="activity-day-footer"><span class="chart-day-label">${escapeHtml(item.label)}</span></div>
                 </div>`;
-        }).join("");
-        renderChartInsight(counts, today);
+      })
+      .join("");
+    renderChartInsight(counts, today);
+  }
+
+  function renderChartInsight(counts, today) {
+    const insightEl = document.getElementById("chartInsightLine");
+    if (!insightEl) return;
+    const totalWeek = counts.reduce((sum, item) => sum + item.count, 0);
+    const activeDays = counts.filter((item) => item.count > 0).length;
+    const todayData = counts.find((item) => isSameDay(item.date, today));
+    const todayCount = todayData ? todayData.count : 0;
+    const busiestDay = counts.reduce(
+      (best, cur) => (cur.count > best.count ? cur : best),
+      counts[0],
+    );
+    const dominantType = getDominantWeeklyActivityType(counts);
+    if (totalWeek === 0) {
+      insightEl.textContent =
+        "No study activity recorded in the last 7 days. Add one task, planner item, revision, or test to start building consistency.";
+      return;
     }
+    let insightText = `Strong weekly snapshot: ${totalWeek} activit${totalWeek > 1 ? "ies" : "y"} across ${activeDays} active day${activeDays > 1 ? "s" : ""}.`;
+    if (busiestDay && busiestDay.count > 0)
+      insightText += ` ${busiestDay.label} led the week with ${busiestDay.count} activit${busiestDay.count > 1 ? "ies" : "y"}.`;
+    insightText += ` Your main focus was ${dominantType.toLowerCase()}.`;
+    insightText +=
+      todayCount > 0
+        ? ` Today already looks productive with ${todayCount} tracked activit${todayCount > 1 ? "ies" : "y"}.`
+        : ` No activity is tracked for today yet.`;
+    insightEl.textContent = insightText;
+  }
 
-    function renderChartInsight(counts, today) {
-        const insightEl = document.getElementById("chartInsightLine");
-        if (!insightEl) return;
-        const totalWeek    = counts.reduce((sum, item) => sum + item.count, 0);
-        const activeDays   = counts.filter((item) => item.count > 0).length;
-        const todayData    = counts.find((item) => isSameDay(item.date, today));
-        const todayCount   = todayData ? todayData.count : 0;
-        const busiestDay   = counts.reduce((best, cur) => cur.count > best.count ? cur : best, counts[0]);
-        const dominantType = getDominantWeeklyActivityType(counts);
-        if (totalWeek === 0) {
-            insightEl.textContent = "No study activity recorded in the last 7 days. Add one task, planner item, revision, or test to start building consistency.";
-            return;
-        }
-        let insightText = `Strong weekly snapshot: ${totalWeek} activit${totalWeek > 1 ? "ies" : "y"} across ${activeDays} active day${activeDays > 1 ? "s" : ""}.`;
-        if (busiestDay && busiestDay.count > 0)
-            insightText += ` ${busiestDay.label} led the week with ${busiestDay.count} activit${busiestDay.count > 1 ? "ies" : "y"}.`;
-        insightText += ` Your main focus was ${dominantType.toLowerCase()}.`;
-        insightText += todayCount > 0
-            ? ` Today already looks productive with ${todayCount} tracked activit${todayCount > 1 ? "ies" : "y"}.`
-            : ` No activity is tracked for today yet.`;
-        insightEl.textContent = insightText;
+  // ─── Search — UNCHANGED ───────────────────────────────────────────────────
+
+  function buildSearchItems() {
+    const items = [];
+    state.subjects.forEach((s) =>
+      items.push({
+        type: "Subject",
+        title: getSubjectName(s),
+        icon: "fa-book",
+        href: "subjects.html",
+      }),
+    );
+    state.tasks.forEach((t) =>
+      items.push({
+        type: "Task",
+        title: getTaskTitle(t),
+        icon: "fa-list-check",
+        href: "tasks.html",
+      }),
+    );
+    state.plans.forEach((p) =>
+      items.push({
+        type: "Planner",
+        title: getFirstAvailableValue(
+          p,
+          ["title", "planTitle", "name", "topic"],
+          "Study Plan",
+        ),
+        icon: "fa-calendar-days",
+        href: "planner.html",
+      }),
+    );
+    state.revisions.forEach((r) =>
+      items.push({
+        type: "Revision",
+        title: getFirstAvailableValue(
+          r,
+          ["title", "topic", "name"],
+          "Revision",
+        ),
+        icon: "fa-rotate",
+        href: "revision.html",
+      }),
+    );
+    state.tests.forEach((t) =>
+      items.push({
+        type: "Test",
+        title: getFirstAvailableValue(t, ["title", "testName", "name"], "Test"),
+        icon: "fa-file-lines",
+        href: "tests.html",
+      }),
+    );
+    state.searchItems = items;
+  }
+
+  function renderSearchResults(query) {
+    if (!dashboardSearchResults) return;
+    const searchText = normalizeText(query);
+    if (!searchText) {
+      dashboardSearchResults.classList.add("hidden");
+      return;
     }
-
-    // ─── Search — UNCHANGED ───────────────────────────────────────────────────
-
-    function buildSearchItems() {
-        const items = [];
-        state.subjects.forEach((s)  => items.push({ type: "Subject",  title: getSubjectName(s), icon: "fa-book",         href: "subjects.html" }));
-        state.tasks.forEach((t)     => items.push({ type: "Task",     title: getTaskTitle(t),   icon: "fa-list-check",   href: "tasks.html" }));
-        state.plans.forEach((p)     => items.push({ type: "Planner",  title: getFirstAvailableValue(p, ["title", "planTitle", "name", "topic"], "Study Plan"), icon: "fa-calendar-days", href: "planner.html" }));
-        state.revisions.forEach((r) => items.push({ type: "Revision", title: getFirstAvailableValue(r, ["title", "topic", "name"], "Revision"), icon: "fa-rotate", href: "revision.html" }));
-        state.tests.forEach((t)     => items.push({ type: "Test",     title: getFirstAvailableValue(t, ["title", "testName", "name"], "Test"), icon: "fa-file-lines", href: "tests.html" }));
-        state.searchItems = items;
-    }
-
-    function renderSearchResults(query) {
-        if (!dashboardSearchResults) return;
-        const searchText = normalizeText(query);
-        if (!searchText) { dashboardSearchResults.classList.add("hidden"); return; }
-        const filteredItems = state.searchItems
-            .filter((item) => normalizeText(item.title).includes(searchText))
-            .slice(0, 6);
-        if (!filteredItems.length) {
-            dashboardSearchResults.innerHTML = `
+    const filteredItems = state.searchItems
+      .filter((item) => normalizeText(item.title).includes(searchText))
+      .slice(0, 6);
+    if (!filteredItems.length) {
+      dashboardSearchResults.innerHTML = `
                 <div class="search-result-item">
                     <i class="fa-solid fa-circle-info"></i>
                     <div><h4>No results found</h4><p>Try another keyword</p></div>
                 </div>`;
-            dashboardSearchResults.classList.remove("hidden");
-            return;
-        }
-        dashboardSearchResults.innerHTML = filteredItems.map((item) => `
+      dashboardSearchResults.classList.remove("hidden");
+      return;
+    }
+    dashboardSearchResults.innerHTML = filteredItems
+      .map(
+        (item) => `
             <div class="search-result-item" data-href="${item.href}">
                 <i class="fa-solid ${item.icon}"></i>
                 <div><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.type)}</p></div>
-            </div>`).join("");
-        dashboardSearchResults.classList.remove("hidden");
+            </div>`,
+      )
+      .join("");
+    dashboardSearchResults.classList.remove("hidden");
+  }
+
+  // ─── Notifications — UNCHANGED ────────────────────────────────────────────
+
+  function buildNotifications() {
+    const notifications = [];
+    const today = new Date();
+    const todayPendingTasks = state.tasks
+      .filter((task) => {
+        const date = parseItemDate(task);
+        return date && isSameDay(date, today) && !isTaskCompleted(task);
+      })
+      .slice(0, 2);
+    todayPendingTasks.forEach((task) => {
+      notifications.push({
+        type: "task",
+        icon: "fa-list-check",
+        iconClass: "notif-task",
+        title: "Task Due Today",
+        message: `${getTaskTitle(task)} needs to be completed today.`,
+      });
+    });
+    const upcomingRevision = state.revisions.find((r) => {
+      const date = parseItemDate(r);
+      return date && isWithinNextDays(date, 3);
+    });
+    if (upcomingRevision) {
+      const revName = getFirstAvailableValue(
+        upcomingRevision,
+        ["title", "topic", "name"],
+        "Revision session",
+      );
+      notifications.push({
+        type: "revision",
+        icon: "fa-rotate",
+        iconClass: "notif-revision",
+        title: "Revision Coming Up",
+        message: `${revName} is scheduled ${getRelativeDayLabel(parseItemDate(upcomingRevision)).toLowerCase()}.`,
+      });
     }
-
-    // ─── Notifications — UNCHANGED ────────────────────────────────────────────
-
-    function buildNotifications() {
-        const notifications = [];
-        const today = new Date();
-        const todayPendingTasks = state.tasks.filter((task) => {
-            const date = parseItemDate(task);
-            return date && isSameDay(date, today) && !isTaskCompleted(task);
-        }).slice(0, 2);
-        todayPendingTasks.forEach((task) => {
-            notifications.push({ type: "task", icon: "fa-list-check", iconClass: "notif-task",
-                title: "Task Due Today", message: `${getTaskTitle(task)} needs to be completed today.` });
-        });
-        const upcomingRevision = state.revisions.find((r) => {
-            const date = parseItemDate(r); return date && isWithinNextDays(date, 3);
-        });
-        if (upcomingRevision) {
-            const revName = getFirstAvailableValue(upcomingRevision, ["title", "topic", "name"], "Revision session");
-            notifications.push({ type: "revision", icon: "fa-rotate", iconClass: "notif-revision",
-                title: "Revision Coming Up",
-                message: `${revName} is scheduled ${getRelativeDayLabel(parseItemDate(upcomingRevision)).toLowerCase()}.` });
-        }
-        const upcomingTest = state.tests.find((t) => {
-            const date = parseItemDate(t); return date && isWithinNextDays(date, 7);
-        });
-        if (upcomingTest) {
-            const testName = getFirstAvailableValue(upcomingTest, ["title", "testName", "name", "subjectName"], "Test");
-            notifications.push({ type: "test", icon: "fa-file-lines", iconClass: "notif-test",
-                title: "Test Approaching",
-                message: `${testName} is ${getRelativeDayLabel(parseItemDate(upcomingTest)).toLowerCase()}. Prepare well!` });
-        }
-        const upcomingPlan = state.plans.find((p) => {
-            const date = parseItemDate(p); return date && isWithinNextDays(date, 2);
-        });
-        if (upcomingPlan) {
-            const planName = getFirstAvailableValue(upcomingPlan, ["title", "planTitle", "name", "topic"], "Your study plan");
-            notifications.push({ type: "plan", icon: "fa-calendar-days", iconClass: "notif-plan",
-                title: "Study Plan Reminder", message: `${planName} is lined up soon. Stay on track!` });
-        }
-        return notifications.slice(0, 4);
+    const upcomingTest = state.tests.find((t) => {
+      const date = parseItemDate(t);
+      return date && isWithinNextDays(date, 7);
+    });
+    if (upcomingTest) {
+      const testName = getFirstAvailableValue(
+        upcomingTest,
+        ["title", "testName", "name", "subjectName"],
+        "Test",
+      );
+      notifications.push({
+        type: "test",
+        icon: "fa-file-lines",
+        iconClass: "notif-test",
+        title: "Test Approaching",
+        message: `${testName} is ${getRelativeDayLabel(parseItemDate(upcomingTest)).toLowerCase()}. Prepare well!`,
+      });
     }
+    const upcomingPlan = state.plans.find((p) => {
+      const date = parseItemDate(p);
+      return date && isWithinNextDays(date, 2);
+    });
+    if (upcomingPlan) {
+      const planName = getFirstAvailableValue(
+        upcomingPlan,
+        ["title", "planTitle", "name", "topic"],
+        "Your study plan",
+      );
+      notifications.push({
+        type: "plan",
+        icon: "fa-calendar-days",
+        iconClass: "notif-plan",
+        title: "Study Plan Reminder",
+        message: `${planName} is lined up soon. Stay on track!`,
+      });
+    }
+    return notifications.slice(0, 4);
+  }
 
-    function renderNotifications() {
-        if (!dashboardNotificationDropdown) return;
-        const notifications = buildNotifications();
-        const notifBadge    = document.getElementById("notifBadgeDot");
-        if (!notifications.length) {
-            if (notifBadge) notifBadge.classList.add("hidden");
-            dashboardNotificationDropdown.innerHTML = `
+  function renderNotifications() {
+    if (!dashboardNotificationDropdown) return;
+    const notifications = buildNotifications();
+    const notifBadge = document.getElementById("notifBadgeDot");
+    if (!notifications.length) {
+      if (notifBadge) notifBadge.classList.add("hidden");
+      dashboardNotificationDropdown.innerHTML = `
                 <div class="dropdown-header"><span>Notifications</span></div>
                 <div class="notif-empty-state">
                     <i class="fa-solid fa-bell-slash"></i>
                     <p>All caught up! No new alerts.</p>
                 </div>`;
-            return;
-        }
-        if (notifBadge) notifBadge.classList.remove("hidden");
-        dashboardNotificationDropdown.innerHTML = `
+      return;
+    }
+    if (notifBadge) notifBadge.classList.remove("hidden");
+    dashboardNotificationDropdown.innerHTML = `
             <div class="dropdown-header"><span>Notifications</span><span class="notif-count-badge">${notifications.length}</span></div>
-            ${notifications.map((item) => `
+            ${notifications
+              .map(
+                (item) => `
                 <div class="notification-item">
                     <div class="notif-icon-wrap ${item.iconClass}">
                         <i class="fa-solid ${item.icon}"></i>
@@ -1071,209 +1627,848 @@ document.addEventListener("DOMContentLoaded", function () {
                         <h4>${escapeHtml(item.title)}</h4>
                         <p>${escapeHtml(item.message)}</p>
                     </div>
-                </div>`).join("")}`;
+                </div>`,
+              )
+              .join("")}`;
+  }
+
+  // ─── Events — UNCHANGED ───────────────────────────────────────────────────
+
+  function attachSearchEvents() {
+    if (dashboardSearchInput && dashboardSearchResults && dashboardSearchBox) {
+      dashboardSearchInput.addEventListener("input", function () {
+        dashboardNotificationDropdown?.classList.add("hidden");
+        renderSearchResults(dashboardSearchInput.value.trim());
+      });
+      dashboardSearchInput.addEventListener("focus", function () {
+        dashboardNotificationDropdown?.classList.add("hidden");
+        if (dashboardSearchInput.value.trim().length > 0)
+          renderSearchResults(dashboardSearchInput.value.trim());
+      });
+      dashboardSearchResults.addEventListener("click", function (event) {
+        event.stopPropagation();
+        const item = event.target.closest(".search-result-item");
+        if (!item) return;
+        const href = item.getAttribute("data-href");
+        if (href) window.location.href = href;
+      });
     }
+  }
 
-    // ─── Events — UNCHANGED ───────────────────────────────────────────────────
-
-    function attachSearchEvents() {
-        if (dashboardSearchInput && dashboardSearchResults && dashboardSearchBox) {
-            dashboardSearchInput.addEventListener("input", function () {
-                dashboardNotificationDropdown?.classList.add("hidden");
-                renderSearchResults(dashboardSearchInput.value.trim());
-            });
-            dashboardSearchInput.addEventListener("focus", function () {
-                dashboardNotificationDropdown?.classList.add("hidden");
-                if (dashboardSearchInput.value.trim().length > 0)
-                    renderSearchResults(dashboardSearchInput.value.trim());
-            });
-            dashboardSearchResults.addEventListener("click", function (event) {
-                event.stopPropagation();
-                const item = event.target.closest(".search-result-item");
-                if (!item) return;
-                const href = item.getAttribute("data-href");
-                if (href) window.location.href = href;
-            });
-        }
+  function attachNotificationEvents() {
+    if (notificationToggleBtn && dashboardNotificationDropdown) {
+      notificationToggleBtn.addEventListener("mouseenter", function () {
+        closeDashboardDropdowns();
+        document.dispatchEvent(new CustomEvent("dashboard:closeProfileMenu"));
+        dashboardNotificationDropdown.classList.remove("hidden");
+      });
+      notificationToggleBtn.addEventListener("mouseleave", function () {
+        setTimeout(() => {
+          if (
+            !notificationToggleBtn.matches(":hover") &&
+            !dashboardNotificationDropdown.matches(":hover")
+          )
+            dashboardNotificationDropdown.classList.add("hidden");
+        }, 80);
+      });
+      dashboardNotificationDropdown.addEventListener("mouseenter", function () {
+        dashboardNotificationDropdown.classList.remove("hidden");
+      });
+      dashboardNotificationDropdown.addEventListener("mouseleave", function () {
+        dashboardNotificationDropdown.classList.add("hidden");
+      });
     }
+  }
 
-    function attachNotificationEvents() {
-        if (notificationToggleBtn && dashboardNotificationDropdown) {
-            notificationToggleBtn.addEventListener("mouseenter", function () {
-                closeDashboardDropdowns();
-                document.dispatchEvent(new CustomEvent("dashboard:closeProfileMenu"));
-                dashboardNotificationDropdown.classList.remove("hidden");
-            });
-            notificationToggleBtn.addEventListener("mouseleave", function () {
-                setTimeout(() => {
-                    if (!notificationToggleBtn.matches(":hover") && !dashboardNotificationDropdown.matches(":hover"))
-                        dashboardNotificationDropdown.classList.add("hidden");
-                }, 80);
-            });
-            dashboardNotificationDropdown.addEventListener("mouseenter", function () {
-                dashboardNotificationDropdown.classList.remove("hidden");
-            });
-            dashboardNotificationDropdown.addEventListener("mouseleave", function () {
-                dashboardNotificationDropdown.classList.add("hidden");
-            });
-        }
-    }
+  function attachSharedDropdownEvents() {
+    dashboardSearchBox?.addEventListener("click", (e) => e.stopPropagation());
+    dashboardNotificationDropdown?.addEventListener("click", (e) =>
+      e.stopPropagation(),
+    );
+    document.addEventListener("click", closeDashboardDropdowns);
+    document.addEventListener(
+      "dashboard:closeOtherDropdowns",
+      closeDashboardDropdowns,
+    );
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDashboardDropdowns();
+    });
+  }
 
-    function attachSharedDropdownEvents() {
-        dashboardSearchBox?.addEventListener("click", (e) => e.stopPropagation());
-        dashboardNotificationDropdown?.addEventListener("click", (e) => e.stopPropagation());
-        document.addEventListener("click", closeDashboardDropdowns);
-        document.addEventListener("dashboard:closeOtherDropdowns", closeDashboardDropdowns);
-        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDashboardDropdowns(); });
-    }
+  // ─── Load All — CHANGE: summary API added ────────────────────────────────
 
-    // ─── Load All — CHANGE: summary API added ────────────────────────────────
+  async function loadDashboardData() {
+    setDashboardSyncStatus("syncing");
 
-    async function loadDashboardData() {
-        state.user = getStoredUser();
-        renderUserInfo();
+    try {
+      state.user = getStoredUser();
+      renderUserInfo();
 
-        // Sab parallel load karo
-        const [summaryData, subjects, tasks, plans, revisions, tests] = await Promise.all([
-            fetchJson(ENDPOINTS.summary).catch(() => null),   // NEW
-            fetchArray(ENDPOINTS.subjects,  "subjects"),
-            fetchArray(ENDPOINTS.tasks,     "tasks"),
-            fetchArray(ENDPOINTS.plans,     "plans"),
-            fetchArray(ENDPOINTS.revisions, "revisions"),
-            fetchArray(ENDPOINTS.tests,     "tests")
+      // Sab parallel load karo
+      const [summaryData, subjects, tasks, plans, revisions, tests] =
+        await Promise.all([
+          fetchJson(ENDPOINTS.summary).catch(() => null), // NEW
+          fetchArray(ENDPOINTS.subjects, "subjects"),
+          fetchArray(ENDPOINTS.tasks, "tasks"),
+          fetchArray(ENDPOINTS.plans, "plans"),
+          fetchArray(ENDPOINTS.revisions, "revisions"),
+          fetchArray(ENDPOINTS.tests, "tests"),
         ]);
 
-        state.summary  = summaryData;   // NEW
-        state.subjects = subjects;
-        state.tasks    = tasks;
-        state.plans    = plans;
-        state.revisions = revisions;
-        state.tests    = tests;
+      state.summary = summaryData; // NEW
+      state.subjects = subjects;
+      state.tasks = tasks;
+      state.plans = plans;
+      state.revisions = revisions;
+      state.tests = tests;
 
-        renderUserInfo();
-        renderWelcomeBannerInsights();
-        renderStats();           // Ab backend summary se chalega
-        renderSmartInsights();
-        renderSubjectProgress();
-        renderUpcomingSchedule();
-        renderTodayTasks();
-        renderWeeklyOverviewChart();
-        renderNotifications();
-        buildSearchItems();
+      renderUserInfo();
+      renderWelcomeBannerInsights();
+      renderStats(); // Ab backend summary se chalega
+      renderSmartInsights();
+      renderSubjectProgress();
+      renderUpcomingSchedule();
+      renderTodayTasks();
+      renderWeeklyOverviewChart();
+      renderNotifications();
+      buildSearchItems();
 
-        if (dashboardSearchInput?.value?.trim()) {
-            renderSearchResults(dashboardSearchInput.value.trim());
-        }
+      if (dashboardSearchInput?.value?.trim()) {
+        renderSearchResults(dashboardSearchInput.value.trim());
+      }
+    } finally {
+      setDashboardSyncStatus("idle");
+    }
+  }
+
+  attachSearchEvents();
+  attachNotificationEvents();
+  attachSharedDropdownEvents();
+  loadDashboardData();
+  loadStudySummary();
+
+  async function loadDashboardPomodoroAnalytics() {
+    try {
+      const token = (localStorage.getItem("token") || "").trim();
+
+      if (!token) {
+        return null;
+      }
+
+      const response = await fetch(ENDPOINTS.pomodoroAnalytics, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn("Dashboard Pomodoro analytics not loaded:", error.message);
+      return null;
+    }
+  }
+
+  function renderDashboardPomodoroAnalytics(analytics) {
+    if (!analytics || typeof analytics !== "object") {
+      return;
     }
 
-    attachSearchEvents();
-    attachNotificationEvents();
-    attachSharedDropdownEvents();
-    loadDashboardData();
+    const scoreEl = document.getElementById("dsWeeklyProductivityScore");
+    const subjectEl = document.getElementById("dsWeeklyBestSubject");
+    renderDashboardAiCoach(analytics);
 
-    // ─── Study Engine — UNCHANGED ─────────────────────────────────────────────
+    const productivityScore = safeNumber(analytics.productivityScore, 0);
+    const mostFocusedSubject = analytics.mostFocusedSubject || "No subject yet";
 
-    async function loadStudySummary() {
-        try {
-            const token = (localStorage.getItem("token") || "").trim();
-            if (!token) return;
-            const response = await fetch(`${API_BASE_URL}/api/dashboard/study-summary`, {
-                headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
-            });
-            if (!response.ok) return;
-            const data = await response.json();
-            if (!data) return;
-            renderStudyStats(data);
-            renderDailyTarget(data.today);
-            renderCalendar(data.calendar);
-            renderBadges(data.badges);
-            renderWeeklyAnalytics(data.weekly);
-        } catch (e) {
-            console.warn("Study summary not loaded:", e.message);
-        }
+    if (scoreEl) {
+      scoreEl.textContent = `${productivityScore}%`;
     }
 
-    setInterval(loadStudySummary, 60000);
-
-    function renderStudyStats(data) {
-        const today  = data.today  || {};
-        const streak = data.streak || {};
-        const badges = data.badges || {};
-        const dsStreak    = document.getElementById("dsStreakValue");
-        const dsFocus     = document.getElementById("dsFocusValue");
-        const dsVideos    = document.getElementById("dsVideosValue");
-        const dsSessions  = document.getElementById("dsSessionsValue");
-        const dsBadges    = document.getElementById("dsBadgesValue");
-        const dsBadgesSub = document.getElementById("dsBadgesSub");
-        const dsTargetSub = document.getElementById("dsTargetSub");
-        if (dsStreak)    dsStreak.textContent    = streak.currentStreak       || 0;
-        if (dsFocus)     dsFocus.textContent      = today.focusMinutes         || 0;
-        if (dsVideos)    dsVideos.textContent     = today.videosCompleted      || 0;
-        if (dsSessions)  dsSessions.textContent   = today.sessionsCompleted    || 0;
-        if (dsBadges)    dsBadges.textContent     = badges.unlockedBadges      || 0;
-        if (dsBadgesSub) dsBadgesSub.textContent  = `of ${badges.totalBadges  || 7} total`;
-        if (dsTargetSub) dsTargetSub.textContent  = `of ${today.targetVideos  || 3} target`;
+    if (subjectEl) {
+      subjectEl.textContent = mostFocusedSubject;
+      subjectEl.title = mostFocusedSubject;
     }
 
-    function renderDailyTarget(today) {
-        if (!today) return;
-        const fill   = document.getElementById("dsTargetFill");
-        const pct    = document.getElementById("dsTargetPct");
-        const label  = document.getElementById("dsTargetLabel");
-        const status = document.getElementById("dsTargetStatus");
-        const done   = today.videosCompleted || 0;
-        const target = today.targetVideos    || 3;
-        const pctVal = today.progressPercent || 0;
-        if (fill)   fill.style.width  = `${pctVal}%`;
-        if (pct)    pct.textContent   = `${pctVal}%`;
-        if (label)  label.textContent = `${done} of ${target} videos completed today`;
-        if (status) {
-            if (pctVal >= 100) {
-                status.textContent = "🎯 Target Reached!";
-                status.style.background = "#ecfdf5"; status.style.color = "#047857";
-            } else if (pctVal >= 50) {
-                status.textContent = "⚡ Halfway there";
-                status.style.background = "#fffbeb"; status.style.color = "#d97706";
-            } else {
-                status.textContent = "📚 Keep going";
-                status.style.background = "#f5f3ff"; status.style.color = "#6c63ff";
-            }
-        }
+    renderDashboardFocusInsights(analytics);
+    function renderDashboardFocusInsights(analytics) {
+      const list = document.getElementById("dsFocusInsightsList");
+
+      if (!list) {
+        return;
+      }
+
+      const insights = Array.isArray(analytics?.insights)
+        ? analytics.insights
+        : [];
+
+      if (!insights.length) {
+        list.innerHTML = `
+            <div class="ds-focus-insight-empty">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Complete Pomodoro sessions to generate personalized focus insights.</span>
+            </div>
+        `;
+        return;
+      }
+
+      const icons = [
+        "fa-lightbulb",
+        "fa-chart-line",
+        "fa-bullseye",
+        "fa-shield-heart",
+      ];
+
+      list.innerHTML = insights
+        .slice(0, 4)
+        .map((line, index) => {
+          return `
+                <div class="ds-focus-insight-item">
+                    <div class="ds-focus-insight-icon">
+                        <i class="fa-solid ${icons[index] || "fa-circle-info"}"></i>
+                    </div>
+                    <p class="ds-focus-insight-text">${escapeHtml(line)}</p>
+                </div>
+            `;
+        })
+        .join("");
+    }
+  }
+
+  function renderDashboardAiCoach(analytics) {
+    const scoreEl = document.getElementById("dashboardAiScore");
+    const labelEl = document.getElementById("dashboardAiLabel");
+    const subjectEl = document.getElementById("dashboardAiBestSubject");
+    const planEl = document.getElementById("dashboardAiTodayPlan");
+    const actionsEl = document.getElementById("dashboardAiActions");
+    const quickLinksEl = document.getElementById("dashboardAiQuickLinks");
+
+    if (!scoreEl || !labelEl || !subjectEl || !planEl || !actionsEl) {
+      return;
     }
 
-    function renderCalendar(calendarData) {
-        const grid = document.getElementById("dsCalendarGrid");
-        if (!grid || !calendarData) return;
-        const today = new Date().toISOString().split("T")[0];
-        grid.innerHTML = calendarData.map(day => {
-            const level   = getActivityLevel(day.focusMinutes, day.sessionsCompleted);
-            const isToday = day.date === today;
-            const tip     = day.active
-                ? `${day.date}: ${day.focusMinutes}m focus · ${day.videosCompleted} videos · ${day.sessionsCompleted} sessions`
-                : `${day.date}: No activity`;
-            return `<div class="ds-cal-box ds-level-${level} ${isToday ? "today-box" : ""}"
+    const productivityScore = safeNumber(analytics?.productivityScore, 0);
+    const productivityLabel =
+      analytics?.productivityLabel || getAiProductivityLabel(productivityScore);
+    const mostFocusedSubject =
+      analytics?.mostFocusedSubject || "No subject yet";
+    const totalFocusMinutes = safeNumber(analytics?.totalFocusMinutes, 0);
+    const completedSessions = safeNumber(analytics?.totalCompletedSessions, 0);
+    const activeDays = safeNumber(analytics?.activeDaysThisWeek, 0);
+
+    scoreEl.textContent = `${productivityScore}%`;
+    labelEl.textContent = productivityLabel;
+    subjectEl.textContent = mostFocusedSubject;
+    subjectEl.title = mostFocusedSubject;
+
+    const aiContext = buildDashboardAiContext({
+      productivityScore,
+      productivityLabel,
+      mostFocusedSubject,
+      totalFocusMinutes,
+      completedSessions,
+      activeDays,
+    });
+
+    planEl.textContent = buildDashboardAiPlan(aiContext);
+
+    const actions = buildDashboardAiActions(aiContext);
+
+    actionsEl.innerHTML = actions
+      .map((item) => {
+        return `
+                <div class="dashboard-ai-action-item">
+                    <i class="fa-solid ${item.icon}"></i>
+                    <span>${escapeHtml(item.text)}</span>
+                </div>
+            `;
+      })
+      .join("");
+    renderDashboardAiQuickLinks(aiContext, quickLinksEl);
+  }
+
+  function getAiProductivityLabel(score) {
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Strong";
+    if (score >= 35) return "Improving";
+    if (score > 0) return "Low Consistency";
+    return "No data yet";
+  }
+
+  function buildDashboardAiContext(baseData) {
+    const today = new Date();
+
+    const todayPendingTasks = state.tasks.filter((task) => {
+      const date = parseItemDate(task);
+      return date && isSameDay(date, today) && !isTaskCompleted(task);
+    });
+
+    const incompleteTasks = state.tasks.filter(
+      (task) => !isTaskCompleted(task),
+    );
+
+    const subjectsWithProgress = state.subjects.map((subject) => ({
+      name: getSubjectName(subject),
+      progress: computeSubjectProgress(subject),
+    }));
+
+    const weakestSubject = subjectsWithProgress.length
+      ? [...subjectsWithProgress].sort((a, b) => a.progress - b.progress)[0]
+      : null;
+
+    const strongestSubject = subjectsWithProgress.length
+      ? [...subjectsWithProgress].sort((a, b) => b.progress - a.progress)[0]
+      : null;
+
+    const upcomingTest = state.tests.find((test) => {
+      const date = parseItemDate(test);
+      return date && isWithinNextDays(date, 3);
+    });
+
+    const upcomingRevision = state.revisions.find((revision) => {
+      const date = parseItemDate(revision);
+      return date && isWithinNextDays(date, 2);
+    });
+
+    return {
+      ...baseData,
+      todayPendingTasks,
+      incompleteTasks,
+      weakestSubject,
+      strongestSubject,
+      upcomingTest,
+      upcomingRevision,
+    };
+  }
+
+  function buildDashboardAiPlan(data) {
+    if (data.todayPendingTasks.length > 0) {
+      const firstTask = getTaskTitle(data.todayPendingTasks[0]);
+
+      return `Today, start with "${firstTask}" because it is due today. After that, complete one Pomodoro session and review your weakest subject for better balance.`;
+    }
+
+    if (data.upcomingTest) {
+      const testName = getFirstAvailableValue(
+        data.upcomingTest,
+        ["title", "testName", "name", "subjectName"],
+        "your upcoming test",
+      );
+
+      return `Your next priority should be ${testName}. Complete one focused revision block and attempt a short practice test before the deadline.`;
+    }
+
+    if (data.upcomingRevision) {
+      const revisionName = getFirstAvailableValue(
+        data.upcomingRevision,
+        ["title", "topic", "name"],
+        "your upcoming revision",
+      );
+
+      return `Focus on ${revisionName} first. Add one Pomodoro session and mark the revision complete after studying.`;
+    }
+
+    if (data.weakestSubject && data.weakestSubject.progress < 40) {
+      return `${data.weakestSubject.name} needs attention right now. Study this subject for one focused session today and complete one related task.`;
+    }
+
+    if (data.productivityScore >= 70) {
+      return `You are performing strongly this week. Continue with ${data.mostFocusedSubject}, then add one short revision session to keep your progress balanced.`;
+    }
+
+    if (data.totalFocusMinutes <= 0 && data.completedSessions <= 0) {
+      return "Start with one short Pomodoro session today. Once you complete a focus block, your dashboard will generate smarter study guidance.";
+    }
+
+    return "Your dashboard looks stable. Complete one pending task, study for one Pomodoro block, and review your analytics to maintain consistency.";
+  }
+
+  function buildDashboardAiActions(data) {
+    const actions = [];
+
+    if (data.todayPendingTasks.length > 0) {
+      actions.push({
+        icon: "fa-list-check",
+        text: `Clear ${data.todayPendingTasks.length} task${data.todayPendingTasks.length > 1 ? "s" : ""} due today before starting new work.`,
+      });
+    } else {
+      actions.push({
+        icon: "fa-circle-check",
+        text: "No task is due today. Use this time for revision or focused practice.",
+      });
+    }
+
+    if (data.weakestSubject && data.weakestSubject.progress < 50) {
+      actions.push({
+        icon: "fa-bullseye",
+        text: `Give extra focus to ${data.weakestSubject.name}. Its current progress is ${data.weakestSubject.progress}%.`,
+      });
+    } else if (data.strongestSubject) {
+      actions.push({
+        icon: "fa-trophy",
+        text: `${data.strongestSubject.name} is your strongest subject. Maintain it with a short revision session.`,
+      });
+    } else {
+      actions.push({
+        icon: "fa-book-open",
+        text: "Add subjects and tasks to unlock subject-wise AI recommendations.",
+      });
+    }
+
+    if (data.upcomingTest) {
+      const testName = getFirstAvailableValue(
+        data.upcomingTest,
+        ["title", "testName", "name", "subjectName"],
+        "Upcoming test",
+      );
+
+      actions.push({
+        icon: "fa-file-lines",
+        text: `Prepare for ${testName}. Revise important topics and attempt one mock test.`,
+      });
+    } else if (data.upcomingRevision) {
+      const revisionName = getFirstAvailableValue(
+        data.upcomingRevision,
+        ["title", "topic", "name"],
+        "Upcoming revision",
+      );
+
+      actions.push({
+        icon: "fa-rotate",
+        text: `Complete your upcoming revision: ${revisionName}.`,
+      });
+    } else if (data.totalFocusMinutes < 60) {
+      actions.push({
+        icon: "fa-stopwatch",
+        text: "Complete at least one 25-minute Pomodoro session today.",
+      });
+    } else {
+      actions.push({
+        icon: "fa-fire",
+        text: "Your focus time is improving. Add one more study block to maintain momentum.",
+      });
+    }
+
+    if (data.activeDays < 4) {
+      actions.push({
+        icon: "fa-calendar-check",
+        text: "Try to stay active for at least 4 days this week to improve consistency.",
+      });
+    }
+
+    return actions.slice(0, 4);
+  }
+
+  function renderDashboardAiQuickLinks(data, quickLinksEl) {
+    if (!quickLinksEl) {
+      return;
+    }
+
+    const links = [];
+
+    if (data.todayPendingTasks && data.todayPendingTasks.length > 0) {
+      links.push({
+        href: "tasks.html",
+        icon: "fa-list-check",
+        label: "Clear Today’s Tasks",
+        className: "warning",
+      });
+    }
+
+    if (data.weakestSubject && data.weakestSubject.progress < 50) {
+      links.push({
+        href: "subjects.html",
+        icon: "fa-bullseye",
+        label: "Review Weak Subject",
+        className: "warning",
+      });
+    }
+
+    if (data.upcomingTest) {
+      links.push({
+        href: "tests.html",
+        icon: "fa-file-lines",
+        label: "Prepare Test",
+        className: "primary",
+      });
+    } else if (data.upcomingRevision) {
+      links.push({
+        href: "revision.html",
+        icon: "fa-rotate",
+        label: "Complete Revision",
+        className: "primary",
+      });
+    }
+
+    links.push({
+      href: "pomodoro.html",
+      icon: "fa-stopwatch",
+      label: "Start Focus Session",
+      className: "primary",
+    });
+
+    links.push({
+      href: "analytics.html",
+      icon: "fa-chart-line",
+      label: "Open Analytics",
+      className: "success",
+    });
+
+    quickLinksEl.innerHTML = links
+      .slice(0, 5)
+      .map((link) => {
+        return `
+                <a href="${escapeHtml(link.href)}" class="dashboard-ai-link ${escapeHtml(link.className)}">
+                    <i class="fa-solid ${escapeHtml(link.icon)}"></i>
+                    <span>${escapeHtml(link.label)}</span>
+                </a>
+            `;
+      })
+      .join("");
+  }
+
+  // ─── Study Engine — UNCHANGED ─────────────────────────────────────────────
+
+  function dsGetSessionTitle(session) {
+    return getFirstAvailableValue(
+      session,
+      [
+        "topic",
+        "videoTitle",
+        "title",
+        "sessionTitle",
+        "subjectName",
+        "linkedSubjectName",
+      ],
+      "Focus Session",
+    );
+  }
+
+  function dsGetSessionSubject(session) {
+    return getFirstAvailableValue(
+      session,
+      ["linkedSubjectName", "subjectName", "subject", "category"],
+      "General",
+    );
+  }
+
+  function dsGetSessionMinutes(session) {
+    const value = getFirstAvailableValue(
+      session,
+      [
+        "focusMinutes",
+        "actualDurationMinutes",
+        "actualMinutes",
+        "durationMinutes",
+      ],
+      0,
+    );
+
+    const minutes = Number(value);
+    return Number.isFinite(minutes) && minutes > 0 ? minutes : 0;
+  }
+
+  function dsGetSessionDateValue(session) {
+    return getFirstAvailableValue(
+      session,
+      ["sessionDate", "startedAt", "startTime", "createdAt"],
+      "",
+    );
+  }
+
+  function dsFormatSessionDate(value) {
+    if (!value) {
+      return "No date";
+    }
+
+    const raw = String(value);
+    const date = new Date(raw.includes("T") ? raw : `${raw}T00:00:00`);
+
+    if (Number.isNaN(date.getTime())) {
+      return raw.slice(0, 10);
+    }
+
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function dsGetSessionStatus(session) {
+    return String(session?.status || "ACTIVE")
+      .trim()
+      .toUpperCase();
+  }
+
+  function dsGetSessionStatusIcon(status) {
+    if (status === "COMPLETED") {
+      return "fa-solid fa-circle-check";
+    }
+
+    if (
+      status === "INTERRUPTED" ||
+      status === "CANCELLED" ||
+      status === "CANCELED"
+    ) {
+      return "fa-solid fa-triangle-exclamation";
+    }
+
+    return "fa-solid fa-clock";
+  }
+
+  function dsGetSessionStatusClass(status) {
+    if (status === "COMPLETED") {
+      return "completed";
+    }
+
+    if (
+      status === "INTERRUPTED" ||
+      status === "CANCELLED" ||
+      status === "CANCELED"
+    ) {
+      return "interrupted";
+    }
+
+    return "active";
+  }
+
+  function dsIsFocusSession(session) {
+    const type = String(session?.sessionType || session?.type || "")
+      .trim()
+      .toUpperCase();
+
+    if (!type) {
+      return true;
+    }
+
+    return type !== "SHORT_BREAK" && type !== "LONG_BREAK" && type !== "BREAK";
+  }
+
+  function dsSortSessionsNewestFirst(a, b) {
+    const dateA = new Date(
+      String(dsGetSessionDateValue(a) || "").includes("T")
+        ? dsGetSessionDateValue(a)
+        : `${dsGetSessionDateValue(a)}T00:00:00`,
+    );
+
+    const dateB = new Date(
+      String(dsGetSessionDateValue(b) || "").includes("T")
+        ? dsGetSessionDateValue(b)
+        : `${dsGetSessionDateValue(b)}T00:00:00`,
+    );
+
+    return dateB.getTime() - dateA.getTime();
+  }
+
+  function renderRecentFocusActivity(sessions) {
+    const list = document.getElementById("dsRecentFocusList");
+
+    if (!list) {
+      return;
+    }
+
+    const safeSessions = Array.isArray(sessions) ? sessions : [];
+
+    const recentSessions = safeSessions
+      .filter(dsIsFocusSession)
+      .sort(dsSortSessionsNewestFirst)
+      .slice(0, 5);
+
+    if (!recentSessions.length) {
+      list.innerHTML = `
+            <div class="ds-recent-focus-empty">
+                <i class="fa-regular fa-clock"></i>
+                <span>No focus activity yet. Start a Pomodoro session to build your history.</span>
+            </div>
+        `;
+      return;
+    }
+
+    list.innerHTML = recentSessions
+      .map((session) => {
+        const status = dsGetSessionStatus(session);
+        const statusClass = dsGetSessionStatusClass(status);
+        const icon = dsGetSessionStatusIcon(status);
+        const title = dsGetSessionTitle(session);
+        const subject = dsGetSessionSubject(session);
+        const minutes = dsGetSessionMinutes(session);
+        const dateText = dsFormatSessionDate(dsGetSessionDateValue(session));
+
+        return `
+                <div class="ds-recent-focus-item">
+                    <div class="ds-recent-focus-icon ${statusClass}">
+                        <i class="${icon}"></i>
+                    </div>
+
+                    <div class="ds-recent-focus-info">
+                        <h4>${escapeHtml(title)}</h4>
+                        <p>
+                            ${escapeHtml(subject)}
+                            • ${escapeHtml(minutes)} min
+                            • ${escapeHtml(dateText)}
+                        </p>
+                    </div>
+
+                    <span class="ds-recent-focus-badge ${statusClass}">
+                        ${escapeHtml(status)}
+                    </span>
+                </div>
+            `;
+      })
+      .join("");
+  }
+
+  async function loadRecentFocusActivity() {
+    const list = document.getElementById("dsRecentFocusList");
+
+    if (!list || !ENDPOINTS.pomodoroSessions) {
+      return;
+    }
+
+    try {
+      const response = await fetchJson(ENDPOINTS.pomodoroSessions);
+      const sessions = getArrayFromResponse(response);
+
+      renderRecentFocusActivity(sessions);
+    } catch (error) {
+      console.warn("Recent focus activity not loaded:", error.message);
+
+      list.innerHTML = `
+            <div class="ds-recent-focus-empty">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>Could not load recent focus activity right now.</span>
+            </div>
+        `;
+    }
+  }
+
+  async function loadStudySummary() {
+    try {
+      const token = (localStorage.getItem("token") || "").trim();
+      if (!token) return;
+      const response = await fetch(
+        `${API_BASE_URL}/api/dashboard/study-summary`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        },
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data) return;
+      renderStudyStats(data);
+      renderDailyTarget(data.today);
+      renderCalendar(data.calendar);
+      renderBadges(data.badges);
+      renderWeeklyAnalytics(data.weekly);
+
+      const pomodoroAnalytics = await loadDashboardPomodoroAnalytics();
+      renderDashboardPomodoroAnalytics(pomodoroAnalytics);
+
+      await loadRecentFocusActivity();
+    } catch (e) {
+      console.warn("Study summary not loaded:", e.message);
+    }
+  }
+
+  setInterval(refreshDashboardSafely, 60000);
+
+  function renderStudyStats(data) {
+    const today = data.today || {};
+    const streak = data.streak || {};
+    const badges = data.badges || {};
+    const dsStreak = document.getElementById("dsStreakValue");
+    const dsFocus = document.getElementById("dsFocusValue");
+    const dsVideos = document.getElementById("dsVideosValue");
+    const dsSessions = document.getElementById("dsSessionsValue");
+    const dsBadges = document.getElementById("dsBadgesValue");
+    const dsBadgesSub = document.getElementById("dsBadgesSub");
+    const dsTargetSub = document.getElementById("dsTargetSub");
+    if (dsStreak) dsStreak.textContent = streak.currentStreak || 0;
+    if (dsFocus) dsFocus.textContent = today.focusMinutes || 0;
+    if (dsVideos) dsVideos.textContent = today.videosCompleted || 0;
+    if (dsSessions) dsSessions.textContent = today.sessionsCompleted || 0;
+    if (dsBadges) dsBadges.textContent = badges.unlockedBadges || 0;
+    if (dsBadgesSub)
+      dsBadgesSub.textContent = `of ${badges.totalBadges || 7} total`;
+    if (dsTargetSub)
+      dsTargetSub.textContent = `of ${today.targetVideos || 3} target`;
+  }
+
+  function renderDailyTarget(today) {
+    if (!today) return;
+    const fill = document.getElementById("dsTargetFill");
+    const pct = document.getElementById("dsTargetPct");
+    const label = document.getElementById("dsTargetLabel");
+    const status = document.getElementById("dsTargetStatus");
+    const done = today.videosCompleted || 0;
+    const target = today.targetVideos || 3;
+    const pctVal = today.progressPercent || 0;
+    if (fill) fill.style.width = `${pctVal}%`;
+    if (pct) pct.textContent = `${pctVal}%`;
+    if (label)
+      label.textContent = `${done} of ${target} videos completed today`;
+    if (status) {
+      if (pctVal >= 100) {
+        status.textContent = "🎯 Target Reached!";
+        status.style.background = "#ecfdf5";
+        status.style.color = "#047857";
+      } else if (pctVal >= 50) {
+        status.textContent = "⚡ Halfway there";
+        status.style.background = "#fffbeb";
+        status.style.color = "#d97706";
+      } else {
+        status.textContent = "📚 Keep going";
+        status.style.background = "#f5f3ff";
+        status.style.color = "#6c63ff";
+      }
+    }
+  }
+
+  function renderCalendar(calendarData) {
+    const grid = document.getElementById("dsCalendarGrid");
+    if (!grid || !calendarData) return;
+    const today = new Date().toISOString().split("T")[0];
+    grid.innerHTML = calendarData
+      .map((day) => {
+        const level = getActivityLevel(day.focusMinutes, day.sessionsCompleted);
+        const isToday = day.date === today;
+        const tip = day.active
+          ? `${day.date}: ${day.focusMinutes}m focus · ${day.videosCompleted} videos · ${day.sessionsCompleted} sessions`
+          : `${day.date}: No activity`;
+        return `<div class="ds-cal-box ds-level-${level} ${isToday ? "today-box" : ""}"
                 data-tip="${escapeHtml(tip)}" title="${escapeHtml(tip)}"></div>`;
-        }).join("");
-    }
+      })
+      .join("");
+  }
 
-    function getActivityLevel(focusMinutes, sessions) {
-        const score = (focusMinutes || 0) + (sessions || 0) * 5;
-        if (score === 0) return 0;
-        if (score < 10)  return 1;
-        if (score < 30)  return 2;
-        if (score < 60)  return 3;
-        return 4;
-    }
+  function getActivityLevel(focusMinutes, sessions) {
+    const score = (focusMinutes || 0) + (sessions || 0) * 5;
+    if (score === 0) return 0;
+    if (score < 10) return 1;
+    if (score < 30) return 2;
+    if (score < 60) return 3;
+    return 4;
+  }
 
-    function renderBadges(badgesData) {
-        const grid = document.getElementById("dsBadgesGrid");
-        if (!grid || !badgesData) return;
-        const list = badgesData.badges || [];
-        if (!list.length) {
-            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#9ca3af;font-size:13px;padding:16px 0;">No badges yet. Start studying!</div>`;
-            return;
-        }
-        grid.innerHTML = list.map(badge => `
+  function renderBadges(badgesData) {
+    const grid = document.getElementById("dsBadgesGrid");
+    if (!grid || !badgesData) return;
+    const list = badgesData.badges || [];
+    if (!list.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#9ca3af;font-size:13px;padding:16px 0;">No badges yet. Start studying!</div>`;
+      return;
+    }
+    grid.innerHTML = list
+      .map(
+        (badge) => `
             <div class="ds-badge-item ${badge.unlocked ? "unlocked" : "locked"}" title="${escapeHtml(badge.description)}">
                 <div class="ds-badge-icon-wrap">
                     <i class="fa-solid ${escapeHtml(badge.icon || "fa-trophy")}"></i>
@@ -1283,24 +2478,26 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="ds-badge-desc">${escapeHtml(badge.description)}</div>
                     ${badge.unlocked ? `<span class="ds-badge-unlocked-tag">✓ Unlocked</span>` : ""}
                 </div>
-            </div>`).join("");
-    }
+            </div>`,
+      )
+      .join("");
+  }
 
-    function renderWeeklyAnalytics(weekly) {
-        if (!weekly) return;
-        const focusEl    = document.getElementById("dsWeeklyFocus");
-        const videosEl   = document.getElementById("dsWeeklyVideos");
-        const sessionsEl = document.getElementById("dsWeeklySessions");
-        const daysEl     = document.getElementById("dsWeeklyActiveDays");
-        const bestEl     = document.getElementById("dsWeeklyBestDay");
-        const mins       = weekly.totalFocusMinutes || 0;
-        const display    = mins >= 60 ? `${Math.floor(mins/60)}h ${mins%60}m` : `${mins} min`;
-        if (focusEl)    focusEl.textContent    = display;
-        if (videosEl)   videosEl.textContent   = weekly.videosWatched    || 0;
-        if (sessionsEl) sessionsEl.textContent = weekly.sessionsCompleted || 0;
-        if (daysEl)     daysEl.textContent     = weekly.activeDays        || 0;
-        if (bestEl)     bestEl.textContent     = weekly.bestDay           || "—";
-    }
-
-    loadStudySummary();
+  function renderWeeklyAnalytics(weekly) {
+    if (!weekly) return;
+    const focusEl = document.getElementById("dsWeeklyFocus");
+    const videosEl = document.getElementById("dsWeeklyVideos");
+    const sessionsEl = document.getElementById("dsWeeklySessions");
+    const daysEl = document.getElementById("dsWeeklyActiveDays");
+    const bestEl = document.getElementById("dsWeeklyBestDay");
+    const mins = weekly.totalFocusMinutes || 0;
+    const display =
+      mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins} min`;
+    if (focusEl) focusEl.textContent = display;
+    if (videosEl) videosEl.textContent = weekly.videosWatched || 0;
+    if (sessionsEl) sessionsEl.textContent = weekly.sessionsCompleted || 0;
+    if (daysEl) daysEl.textContent = weekly.activeDays || 0;
+    if (bestEl) bestEl.textContent = weekly.bestDay || "—";
+  }
+  refreshDashboardSafely();
 });

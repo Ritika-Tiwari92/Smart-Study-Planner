@@ -1248,7 +1248,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       startLocalTimer();
       showControlState("running");
-      showToast("Pomodoro session started! Stay focused 🎯");
+      showToast("Pomodoro session started! Stay focused");
     } catch (error) {
       console.error("Pomodoro start failed:", error);
       showToast(
@@ -1325,8 +1325,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showControlState("done");
     sendNotification(
-      "🎉 Session Complete! — EduMind AI",
-      "Great work! Check if you completed the topic.",
+      "Session Complete! — EduMind AI",
+      "Your focus session is complete. Review your topic progress.",
     );
 
     await refreshPomodoroData();
@@ -2087,7 +2087,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 450);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showToast("Subject and topic selected. Press Start! 🎯");
+    showToast("Subject and topic selected. Press Start to begin.");
   };
 
   window.pomCompleteVideo = function (videoId) {
@@ -2116,7 +2116,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } catch (e) {}
 
-      showToast("Video marked as completed! 🎉");
+      showToast("Video marked as completed! ");
 
       await Promise.all([
         loadVideos(),
@@ -2227,7 +2227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         listEl.innerHTML = `
                 <div class="pom-recommend-empty">
                     <i class="fa-solid fa-trophy"></i>
-                    🎉 All videos completed! Add more to continue.
+                    All videos are completed. Add more content to continue.
                 </div>
             `;
         return;

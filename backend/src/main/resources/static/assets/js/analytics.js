@@ -25,35 +25,47 @@ document.addEventListener("DOMContentLoaded", function () {
     plans: `${API_BASE_URL}/api/plans`,
     studySummary: `${API_BASE_URL}/api/dashboard/study-summary`,
     pomodoro: `${API_BASE_URL}/api/pomodoro/my`,
-
-    // NEW: backend-calculated Pomodoro analytics
     pomodoroAnalytics: `${API_BASE_URL}/api/analytics/pomodoro`,
   };
 
   const els = {
     filter: document.querySelector(".analytics-filter select"),
     exportBtn: document.querySelector(".export-report-btn"),
-
     overallStudyProgressValue: document.getElementById(
       "overallStudyProgressValue",
     ),
     averageTestScoreValue: document.getElementById("averageTestScoreValue"),
     completedSessionsValue: document.getElementById("completedSessionsValue"),
     weeklyConsistencyValue: document.getElementById("weeklyConsistencyValue"),
-
     mockTestsValue: document.getElementById("mockTestsValue"),
     revisionAccuracyValue: document.getElementById("revisionAccuracyValue"),
     taskCompletionValue: document.getElementById("taskCompletionValue"),
     focusEfficiencyValue: document.getElementById("focusEfficiencyValue"),
-
     subjectInsightList: document.getElementById("subjectInsightList"),
     recommendationList: document.getElementById("recommendationList"),
     chartBars: document.getElementById("chartBars"),
     chartLabels: document.getElementById("chartLabels"),
     chartInsight: document.getElementById("analyticsChartInsight"),
-
     strongestSubjectBadge: document.getElementById("strongestSubjectBadge"),
     weakestSubjectBadge: document.getElementById("weakestSubjectBadge"),
+    analyticsAiPanel: document.getElementById("analyticsAiPanel"),
+    analyticsAiScore: document.getElementById("analyticsAiScore"),
+    analyticsAiLabel: document.getElementById("analyticsAiLabel"),
+    analyticsAiSubject: document.getElementById("analyticsAiSubject"),
+    analyticsAiBreakRatio: document.getElementById("analyticsAiBreakRatio"),
+    analyticsAiInsightsList: document.getElementById("analyticsAiInsightsList"),
+    analyticsAiRefreshTime: document.getElementById("analyticsAiRefreshTime"),
+    analyticsRtFocusMinutes: document.getElementById("analyticsRtFocusMinutes"),
+    analyticsRtCompletedSessions: document.getElementById(
+      "analyticsRtCompletedSessions",
+    ),
+    analyticsRtInterruptedSessions: document.getElementById(
+      "analyticsRtInterruptedSessions",
+    ),
+    analyticsRtAverageFocus: document.getElementById("analyticsRtAverageFocus"),
+    analyticsRtActiveDays: document.getElementById("analyticsRtActiveDays"),
+    analyticsRtBestDay: document.getElementById("analyticsRtBestDay"),
+    analyticsFocusSparkBars: document.getElementById("analyticsFocusSparkBars"),
   };
 
   const store = {
@@ -64,12 +76,16 @@ document.addEventListener("DOMContentLoaded", function () {
     plans: [],
     pomodoro: [],
     studySummary: null,
-
-    // NEW: response from /api/analytics/pomodoro
     pomodoroAnalytics: null,
-
     loaded: false,
   };
+
+  /* ─── Chart.js instance (single reuse) ─── */
+  let _chartInstance = null;
+
+  /* =============================================
+     UTILS
+     ============================================= */
 
   function getToken() {
     return (localStorage.getItem("token") || "").trim();
@@ -84,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getStoredUser() {
-    const possibleKeys = [
+    const keys = [
       "edumind_logged_in_user",
       "loggedInUser",
       "currentUser",
@@ -92,15 +108,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "authUser",
       "studyPlannerUser",
     ];
-
-    for (const key of possibleKeys) {
+    for (const key of keys) {
       const raw = localStorage.getItem(key);
       if (!raw) continue;
-
       const parsed = parseStoredJson(raw);
       if (parsed && typeof parsed === "object") return parsed;
     }
-
     return null;
   }
 
@@ -128,11 +141,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function average(values) {
-    const nums = values.filter((value) => Number.isFinite(value));
+    const nums = values.filter((v) => Number.isFinite(v));
     if (!nums.length) return 0;
-    return Math.round(
-      nums.reduce((sum, value) => sum + value, 0) / nums.length,
-    );
+    return Math.round(nums.reduce((s, v) => s + v, 0) / nums.length);
   }
 
   function textKey(value) {
@@ -143,19 +154,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function firstAvailable(obj, keys, fallback = "") {
     if (!obj || typeof obj !== "object") return fallback;
-
     for (const key of keys) {
-      const value = obj[key];
-      if (value !== undefined && value !== null && value !== "") return value;
+      const v = obj[key];
+      if (v !== undefined && v !== null && v !== "") return v;
     }
-
     return fallback;
   }
 
   function getArrayFromResponse(data, fallbackKey) {
     if (Array.isArray(data)) return data;
     if (!data || typeof data !== "object") return [];
-
     const keys = [
       fallbackKey,
       "data",
@@ -170,28 +178,21 @@ document.addEventListener("DOMContentLoaded", function () {
       "plans",
       "sessions",
     ];
-
     for (const key of keys) {
       if (Array.isArray(data[key])) return data[key];
     }
-
     return [];
   }
 
   function parseDateValue(value) {
     if (!value) return null;
-
-    if (value instanceof Date) {
+    if (value instanceof Date)
       return Number.isNaN(value.getTime()) ? null : value;
-    }
-
     const raw = String(value).trim();
     if (!raw) return null;
-
     const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw)
       ? `${raw}T00:00:00`
       : raw;
-
     const date = new Date(normalized);
     return Number.isNaN(date.getTime()) ? null : date;
   }
@@ -216,57 +217,41 @@ document.addEventListener("DOMContentLoaded", function () {
     return date.toLocaleDateString("en-US", { weekday: "short" });
   }
 
-  function isSameDay(a, b) {
-    const da = parseDateValue(a);
-    const db = parseDateValue(b);
-    if (!da || !db) return false;
-    return toYmd(da) === toYmd(db);
-  }
-
   function getWeekRange(date = new Date()) {
     const current = new Date(date);
     const day = current.getDay();
     const diffToMonday = day === 0 ? -6 : 1 - day;
-
     const start = new Date(current);
     start.setDate(current.getDate() + diffToMonday);
     start.setHours(0, 0, 0, 0);
-
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     end.setHours(23, 59, 59, 999);
-
     return { start, end };
   }
 
   function isInSelectedRange(dateValue, rangeValue) {
     if (rangeValue === "Overall") return true;
-
     const date = parseDateValue(dateValue);
     if (!date) return false;
-
     const now = new Date();
     now.setHours(23, 59, 59, 999);
-
     if (rangeValue === "This Week") {
       const { start, end } = getWeekRange();
       return date >= start && date <= end;
     }
-
     if (rangeValue === "This Month") {
       return (
         date.getFullYear() === now.getFullYear() &&
         date.getMonth() === now.getMonth()
       );
     }
-
     if (rangeValue === "Last 30 Days") {
       const start = new Date();
       start.setDate(start.getDate() - 29);
       start.setHours(0, 0, 0, 0);
       return date >= start && date <= now;
     }
-
     return true;
   }
 
@@ -285,25 +270,25 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  /* =============================================
+     API
+     ============================================= */
+
   async function fetchJson(url, fallbackKey) {
     const token = getToken();
-
     const response = await fetch(url, {
       headers: {
         Accept: "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
     });
-
     if (response.status === 401 || response.status === 403) {
       localStorage.clear();
       window.location.href = "login.html";
       return null;
     }
-
     const text = await response.text();
     let data = null;
-
     if (text) {
       try {
         data = JSON.parse(text);
@@ -311,30 +296,25 @@ document.addEventListener("DOMContentLoaded", function () {
         data = null;
       }
     }
-
     if (!response.ok) {
       console.warn("Analytics API failed:", url, response.status, data || text);
       return fallbackKey ? [] : null;
     }
-
     return fallbackKey ? getArrayFromResponse(data, fallbackKey) : data;
   }
 
-  function normalizeSubject(subject) {
-    if (typeof subject === "string") {
-      return {
-        id: null,
-        name: subject.trim(),
-        progress: 0,
-      };
-    }
+  /* =============================================
+     NORMALIZERS
+     ============================================= */
 
+  function normalizeSubject(subject) {
+    if (typeof subject === "string")
+      return { id: null, name: subject.trim(), progress: 0 };
     const name = firstAvailable(
       subject,
       ["subjectName", "name", "title"],
       "Subject",
     );
-
     return {
       id: firstAvailable(subject, ["id", "subjectId"], null),
       name: String(name || "Subject").trim(),
@@ -390,7 +370,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const today = parseDateValue(todayYmd());
     const due = parseDateValue(dueDate);
     const isOverdue = status !== "COMPLETED" && due && today && due < today;
-
     return {
       id: firstAvailable(task, ["id", "taskId"], null),
       title: firstAvailable(
@@ -455,7 +434,6 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const score =
       rawScore === null || rawScore === "" ? null : Number(rawScore);
-
     return {
       id: firstAvailable(test, ["id", "testId"], null),
       title: firstAvailable(test, ["title", "testName", "name"], "Test"),
@@ -488,7 +466,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ),
       0,
     );
-
     return {
       id: firstAvailable(session, ["id", "sessionId"], null),
       subjectName: firstAvailable(
@@ -506,10 +483,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function isCompleted(item) {
     return item && item.status === "COMPLETED";
   }
-
   function isCompletedTest(test) {
     return test && Number.isFinite(test.score);
   }
+
+  /* =============================================
+     LOAD DATA
+     ============================================= */
 
   async function loadAllData() {
     const [
@@ -529,26 +509,25 @@ document.addEventListener("DOMContentLoaded", function () {
       fetchJson(ENDPOINTS.plans, "plans"),
       fetchJson(ENDPOINTS.studySummary, null),
       fetchJson(ENDPOINTS.pomodoro, "sessions"),
-
-      // NEW: real backend Pomodoro analytics
       fetchJson(ENDPOINTS.pomodoroAnalytics, null),
     ]);
 
     store.subjects = (subjects || [])
       .map(normalizeSubject)
-      .filter((item) => item.name);
+      .filter((i) => i.name);
     store.tasks = (tasks || []).map(normalizeTask);
     store.revisions = (revisions || []).map(normalizeRevision);
     store.tests = (tests || []).map(normalizeTest);
     store.plans = (plans || []).map(normalizePlan);
     store.studySummary = studySummary || null;
     store.pomodoro = (pomodoro || []).map(normalizePomodoro);
-
-    // NEW
     store.pomodoroAnalytics = pomodoroAnalytics || null;
-
     store.loaded = true;
   }
+
+  /* =============================================
+     FILTER
+     ============================================= */
 
   function filterByRange(list, dateKey, rangeValue) {
     return list.filter((item) => isInSelectedRange(item[dateKey], rangeValue));
@@ -556,7 +535,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getFilteredData() {
     const range = getSelectedRange();
-
     return {
       range,
       subjects: store.subjects,
@@ -567,6 +545,10 @@ document.addEventListener("DOMContentLoaded", function () {
       pomodoro: filterByRange(store.pomodoro, "date", range),
     };
   }
+
+  /* =============================================
+     METRICS
+     ============================================= */
 
   function calculateMetrics(data) {
     const completedTasks = data.tasks.filter(isCompleted).length;
@@ -579,7 +561,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const scoredTests = data.tests.filter(isCompletedTest);
     const averageTestScore = scoredTests.length
-      ? average(scoredTests.map((test) => clamp(Number(test.score), 0, 100)))
+      ? average(scoredTests.map((t) => clamp(Number(t.score), 0, 100)))
       : 0;
 
     const completedPlans = data.plans.filter(isCompleted).length;
@@ -587,19 +569,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const planCompletion = percent(completedPlans, totalPlans);
 
     const completedPomodoro = data.pomodoro.filter(isCompleted);
-
-    // Backend analytics is most accurate for Pomodoro summary.
-    // It counts only COMPLETED sessions and keeps INTERRUPTED sessions separate.
     const backendPomodoro = store.pomodoroAnalytics || null;
     const useBackendPomodoro =
       backendPomodoro && getSelectedRange() === "This Week";
 
     const focusMinutes = useBackendPomodoro
       ? safeNumber(backendPomodoro.totalFocusMinutes, 0)
-      : completedPomodoro.reduce(
-          (sum, session) => sum + safeNumber(session.minutes),
-          0,
-        );
+      : completedPomodoro.reduce((sum, s) => sum + safeNumber(s.minutes), 0);
 
     const completedPomodoroCount = useBackendPomodoro
       ? safeNumber(backendPomodoro.totalCompletedSessions, 0)
@@ -617,11 +593,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const activeDays = new Set(
       [
-        ...data.tasks.filter(isCompleted).map((item) => item.date),
-        ...data.revisions.filter(isCompleted).map((item) => item.date),
-        ...data.tests.filter(isCompletedTest).map((item) => item.date),
-        ...data.plans.filter(isCompleted).map((item) => item.date),
-        ...completedPomodoro.map((item) => item.date),
+        ...data.tasks.filter(isCompleted).map((i) => i.date),
+        ...data.revisions.filter(isCompleted).map((i) => i.date),
+        ...data.tests.filter(isCompletedTest).map((i) => i.date),
+        ...data.plans.filter(isCompleted).map((i) => i.date),
+        ...completedPomodoro.map((i) => i.date),
       ].filter(Boolean),
     );
 
@@ -661,6 +637,10 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
+  /* =============================================
+     RENDER HELPERS
+     ============================================= */
+
   function setText(el, text) {
     if (el) el.textContent = text;
   }
@@ -669,14 +649,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const card = document.querySelector(cardSelector);
     const info = card?.querySelector(".asc-info");
     if (!info) return null;
-
     let note = info.querySelector(".analytics-summary-note");
     if (!note) {
       note = document.createElement("span");
       note.className = "analytics-summary-note";
       info.appendChild(note);
     }
-
     return note;
   }
 
@@ -701,29 +679,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const sessionNote = ensureNote(".asc-sessions");
     const consistencyNote = ensureNote(".asc-consistency");
 
-    if (overallNote) {
+    if (overallNote)
       overallNote.textContent = strongest
         ? `${performanceTone(metrics.overallStudyProgress)} · Best subject: ${strongest.subjectName}`
         : "Complete study activity to unlock progress insights";
-    }
-
-    if (scoreNote) {
+    if (scoreNote)
       scoreNote.textContent = metrics.scoredTests
         ? `${metrics.scoredTests} scored test${metrics.scoredTests > 1 ? "s" : ""} included`
         : "No scored test found in this range";
-    }
-
-    if (sessionNote) {
+    if (sessionNote)
       sessionNote.textContent = metrics.completedSessions
         ? `${metrics.focusMinutes} focus minutes tracked`
         : "Start Pomodoro to track focus sessions";
-    }
-
-    if (consistencyNote) {
+    if (consistencyNote)
       consistencyNote.textContent = metrics.weeklyConsistency
         ? `${metrics.weeklyConsistency}/7 active days`
         : "No active day recorded yet";
-    }
   }
 
   function setScoreDescription(valueElement, text) {
@@ -744,21 +715,18 @@ document.addEventListener("DOMContentLoaded", function () {
         ? `${metrics.scoredTests} scored test result${metrics.scoredTests > 1 ? "s" : ""}`
         : "No scored test result available yet",
     );
-
     setScoreDescription(
       els.revisionAccuracyValue,
       metrics.totalRevisions
         ? `${metrics.completedRevisions}/${metrics.totalRevisions} revisions completed`
         : "No revision data in this range",
     );
-
     setScoreDescription(
       els.taskCompletionValue,
       metrics.totalTasks
         ? `${metrics.completedTasks}/${metrics.totalTasks} tasks completed`
         : "No task data in this range",
     );
-
     setScoreDescription(
       els.focusEfficiencyValue,
       metrics.completedSessions
@@ -767,99 +735,89 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  function createTooltip() {
-    let tooltip = document.getElementById("analyticsPremiumTooltip");
-    if (tooltip) return tooltip;
+  /* =============================================
+     TOOLTIP
+     ============================================= */
 
-    tooltip = document.createElement("div");
-    tooltip.id = "analyticsPremiumTooltip";
-    tooltip.className = "analytics-premium-tooltip hidden";
-    document.body.appendChild(tooltip);
-    return tooltip;
+  function createTooltip() {
+    let tt = document.getElementById("analyticsPremiumTooltip");
+    if (tt) return tt;
+    tt = document.createElement("div");
+    tt.id = "analyticsPremiumTooltip";
+    tt.className = "analytics-premium-tooltip hidden";
+    document.body.appendChild(tt);
+    return tt;
   }
 
   function showTooltip(html, event) {
-    const tooltip = createTooltip();
-    tooltip.innerHTML = html;
-    tooltip.classList.remove("hidden");
+    const tt = createTooltip();
+    tt.innerHTML = html;
+    tt.classList.remove("hidden");
     moveTooltip(event);
   }
 
   function moveTooltip(event) {
-    const tooltip = createTooltip();
+    const tt = createTooltip();
     const padding = 14;
-    const tooltipWidth = tooltip.offsetWidth || 260;
-    const tooltipHeight = tooltip.offsetHeight || 120;
-
+    const tw = tt.offsetWidth || 260;
+    const th = tt.offsetHeight || 120;
     let left = event.clientX + padding;
     let top = event.clientY + padding;
-
-    if (left + tooltipWidth > window.innerWidth - 12) {
-      left = event.clientX - tooltipWidth - padding;
-    }
-
-    if (top + tooltipHeight > window.innerHeight - 12) {
-      top = event.clientY - tooltipHeight - padding;
-    }
-
-    tooltip.style.left = `${Math.max(12, left)}px`;
-    tooltip.style.top = `${Math.max(12, top)}px`;
+    if (left + tw > window.innerWidth - 12) left = event.clientX - tw - padding;
+    if (top + th > window.innerHeight - 12) top = event.clientY - th - padding;
+    tt.style.left = `${Math.max(12, left)}px`;
+    tt.style.top = `${Math.max(12, top)}px`;
   }
 
   function hideTooltip() {
     createTooltip().classList.add("hidden");
   }
 
-  function chartMeta(type) {
-    const dark = isDarkTheme();
-    const map = {
-      tasks: {
-        label: "Tasks",
-        icon: "fa-list-check",
-        color: "#7c6cff",
-        bg: dark ? "rgba(124,108,255,0.18)" : "#f3f0ff",
-        text: dark ? "#ede9fe" : "#5b4ef5",
-      },
-      revisions: {
-        label: "Revisions",
-        icon: "fa-rotate",
-        color: "#3b82f6",
-        bg: dark ? "rgba(59,130,246,0.18)" : "#eff6ff",
-        text: dark ? "#dbeafe" : "#2563eb",
-      },
-      plans: {
-        label: "Plans",
-        icon: "fa-calendar-days",
-        color: "#10b981",
-        bg: dark ? "rgba(16,185,129,0.18)" : "#ecfdf5",
-        text: dark ? "#d1fae5" : "#059669",
-      },
-      tests: {
-        label: "Tests",
-        icon: "fa-file-lines",
-        color: "#f59e0b",
-        bg: dark ? "rgba(245,158,11,0.18)" : "#fff7ed",
-        text: dark ? "#fde68a" : "#d97706",
-      },
-      focus: {
-        label: "Focus",
-        icon: "fa-stopwatch",
-        color: "#ef4444",
-        bg: dark ? "rgba(239,68,68,0.17)" : "#fff1f2",
-        text: dark ? "#fecaca" : "#dc2626",
-      },
-    };
+  function bindTooltipEvents() {
+    if (window.__edumindAnalyticsTooltipBound) return;
+    window.__edumindAnalyticsTooltipBound = true;
 
+    document.addEventListener("mouseover", (e) => {
+      const target = e.target.closest("[data-tooltip]");
+      if (target) showTooltip(target.getAttribute("data-tooltip"), e);
+    });
+    document.addEventListener("mousemove", (e) => {
+      const target = e.target.closest("[data-tooltip]");
+      const tt = document.getElementById("analyticsPremiumTooltip");
+      if (target && tt && !tt.classList.contains("hidden")) moveTooltip(e);
+    });
+    document.addEventListener("mouseout", (e) => {
+      const target = e.target.closest("[data-tooltip]");
+      if (target && (!e.relatedTarget || !target.contains(e.relatedTarget)))
+        hideTooltip();
+    });
+  }
+
+  /* =============================================
+     CHART META (colors per category)
+     ============================================= */
+
+  function chartMeta(type) {
+    const map = {
+      tasks: { label: "Tasks", icon: "fa-list-check", color: "#7c6cff" },
+      revisions: { label: "Revisions", icon: "fa-rotate", color: "#3b82f6" },
+      plans: { label: "Plans", icon: "fa-calendar-days", color: "#10b981" },
+      tests: { label: "Tests", icon: "fa-file-lines", color: "#f59e0b" },
+      focus: { label: "Focus (min)", icon: "fa-stopwatch", color: "#ef4444" },
+    };
     return map[type];
   }
+
+  /* =============================================
+     TREND DATA
+     ============================================= */
 
   function buildTrendData() {
     const start = new Date();
     start.setDate(start.getDate() - 6);
     start.setHours(0, 0, 0, 0);
-
-    const days = [];
     const today = todayYmd();
+    const days = [];
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(start);
@@ -867,24 +825,22 @@ document.addEventListener("DOMContentLoaded", function () {
       const ymd = toYmd(date);
 
       const tasks = store.tasks.filter(
-        (item) => item.date === ymd && isCompleted(item),
+        (x) => x.date === ymd && isCompleted(x),
       ).length;
       const revisions = store.revisions.filter(
-        (item) => item.date === ymd && isCompleted(item),
+        (x) => x.date === ymd && isCompleted(x),
       ).length;
       const plans = store.plans.filter(
-        (item) => item.date === ymd && isCompleted(item),
+        (x) => x.date === ymd && isCompleted(x),
       ).length;
       const tests = store.tests.filter(
-        (item) => item.date === ymd && isCompletedTest(item),
+        (x) => x.date === ymd && isCompletedTest(x),
       ).length;
-      const focusMinutes = store.pomodoro
-        .filter((item) => item.date === ymd && isCompleted(item))
-        .reduce((sum, item) => sum + safeNumber(item.minutes), 0);
-      const focusBlocks =
-        focusMinutes > 0 ? Math.max(1, Math.round(focusMinutes / 25)) : 0;
-
-      const total = tasks + revisions + plans + tests + focusBlocks;
+      const focusMins = store.pomodoro
+        .filter((x) => x.date === ymd && isCompleted(x))
+        .reduce((s, x) => s + safeNumber(x.minutes), 0);
+      const focus = focusMins > 0 ? Math.max(1, Math.round(focusMins / 25)) : 0;
+      const total = tasks + revisions + plans + tests + focus;
 
       days.push({
         date,
@@ -895,38 +851,39 @@ document.addEventListener("DOMContentLoaded", function () {
         revisions,
         plans,
         tests,
-        focus: focusBlocks,
-        focusMinutes,
+        focus,
+        focusMinutes: focusMins,
         total,
       });
     }
-
     return days;
   }
 
   function dominantType(trend) {
     const totals = trend.reduce(
-      (acc, day) => {
-        acc.tasks += day.tasks;
-        acc.revisions += day.revisions;
-        acc.plans += day.plans;
-        acc.tests += day.tests;
-        acc.focus += day.focus;
+      (acc, d) => {
+        acc.tasks += d.tasks;
+        acc.revisions += d.revisions;
+        acc.plans += d.plans;
+        acc.tests += d.tests;
+        acc.focus += d.focus;
         return acc;
       },
       { tasks: 0, revisions: 0, plans: 0, tests: 0, focus: 0 },
     );
-
     const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
     if (!top || top[1] <= 0) return "No focus yet";
     return chartMeta(top[0])?.label || "Mixed";
   }
 
+  /* =============================================
+     HIGHLIGHT CHIPS
+     ============================================= */
+
   function ensureHighlightRow() {
     const card = document.querySelector(".progress-chart-card");
     const title = card?.querySelector(".analytics-section-title");
     if (!card || !title) return null;
-
     let row = document.getElementById("analyticsChartHighlightRow");
     if (!row) {
       row = document.createElement("div");
@@ -934,33 +891,17 @@ document.addEventListener("DOMContentLoaded", function () {
       row.className = "analytics-highlight-chip-row";
       title.insertAdjacentElement("afterend", row);
     }
-
     return row;
-  }
-
-  function ensureMiniInsight() {
-    const insight = els.chartInsight;
-    if (!insight) return null;
-
-    let mini = document.getElementById("analyticsChartMiniInsight");
-    if (!mini) {
-      mini = document.createElement("div");
-      mini.id = "analyticsChartMiniInsight";
-      mini.className = "analytics-mini-insight";
-      insight.insertAdjacentElement("beforebegin", mini);
-    }
-
-    return mini;
   }
 
   function renderHighlightChips(trend) {
     const row = ensureHighlightRow();
     if (!row) return;
 
-    const total = trend.reduce((sum, day) => sum + day.total, 0);
-    const activeDays = trend.filter((day) => day.total > 0).length;
+    const total = trend.reduce((s, d) => s + d.total, 0);
+    const activeDays = trend.filter((d) => d.total > 0).length;
     const bestDay = trend.reduce(
-      (best, day) => (day.total > best.total ? day : best),
+      (b, d) => (d.total > b.total ? d : b),
       trend[0],
     );
     const focus = dominantType(trend);
@@ -975,242 +916,283 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       {
         label: "Best Day",
-        value: bestDay && bestDay.total > 0 ? bestDay.label : "—",
+        value: bestDay?.total > 0 ? bestDay.label : "—",
         type: "revisions",
         icon: "fa-trophy",
       },
       { label: "Main Focus", value: focus, type: "tests", icon: "fa-bullseye" },
     ];
 
+    const dark = isDarkTheme();
     row.innerHTML = chips
       .map((chip) => {
         const meta = chartMeta(chip.type);
+        const bg = dark ? `${meta.color}28` : `${meta.color}18`;
         return `
-                <span class="analytics-highlight-chip" style="background:${meta.bg};color:${meta.text};border-color:${meta.color}22;">
-                    <i class="fa-solid ${chip.icon}" style="color:${meta.color};"></i>
-                    <span>${escapeHtml(chip.label)}:</span>
-                    <strong>${escapeHtml(chip.value)}</strong>
-                </span>
-            `;
+        <span class="analytics-highlight-chip"
+              style="background:${bg};color:${meta.color};border-color:${meta.color}44;">
+          <i class="fa-solid ${chip.icon}" style="color:${meta.color};"></i>
+          <span>${escapeHtml(chip.label)}:</span>
+          <strong>${escapeHtml(String(chip.value))}</strong>
+        </span>`;
       })
       .join("");
+  }
+
+  /* =============================================
+     RENDER TREND CHART — Chart.js grouped bar
+     No overlapping. All 5 categories. Tooltips.
+     ============================================= */
+
+  function ensureChartJsLoaded(cb) {
+    if (window.Chart) {
+      cb();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js";
+    script.onload = cb;
+    document.head.appendChild(script);
   }
 
   function renderTrendChart() {
     if (!els.chartBars) return;
 
     const trend = buildTrendData();
-    const maxValue = Math.max(
-      1,
-      ...trend.flatMap((day) => [
-        day.tasks,
-        day.revisions,
-        day.plans,
-        day.tests,
-        day.focus,
-      ]),
-    );
     const categories = ["tasks", "revisions", "plans", "tests", "focus"];
-    const dark = isDarkTheme();
 
     renderHighlightChips(trend);
 
+    /* Hide legacy HTML elements */
     const yAxis = document.querySelector(".chart-y-axis");
-    if (yAxis) {
-      yAxis.innerHTML = `
-                <span>${maxValue}</span>
-                <span>${Math.ceil(maxValue / 2)}</span>
-                <span>0</span>
-            `;
-    }
+    if (yAxis) yAxis.style.display = "none";
+    if (els.chartLabels) els.chartLabels.style.display = "none";
 
-    if (els.chartLabels) {
-      els.chartLabels.innerHTML = "";
-      els.chartLabels.style.display = "none";
-    }
+    /* Prepare wrapper + canvas */
+    els.chartBars.className = "chart-bars";
+    els.chartBars.innerHTML = `<div style="position:relative;width:100%;height:280px;">
+         <canvas id="analyticsLineCanvas" role="img"
+                 aria-label="Grouped bar chart of weekly activity: tasks, revisions, plans, tests and focus minutes per day."></canvas>
+       </div>`;
 
-    els.chartBars.innerHTML = trend
-      .map((day) => {
-        const tooltipRows = categories
-          .map((type) => {
-            const meta = chartMeta(type);
-            const value =
-              type === "focus" ? `${day.focusMinutes} min` : day[type];
-            return `
-                    <div class="apt-row">
-                        <span><i class="fa-solid ${meta.icon}" style="color:${meta.color}"></i> ${meta.label}</span>
-                        <strong>${value}</strong>
-                    </div>
-                `;
-          })
-          .join("");
+    ensureChartJsLoaded(() => {
+      const canvas = document.getElementById("analyticsLineCanvas");
+      if (!canvas) return;
 
-        const tooltip = `
-                <div class="apt-title">${day.label} • ${day.ymd}</div>
-                ${tooltipRows}
-                <div class="apt-total">Total activity score: ${day.total}</div>
-            `;
+      /* Destroy previous instance */
+      if (_chartInstance) {
+        _chartInstance.destroy();
+        _chartInstance = null;
+      }
 
-        const bars = categories
-          .map((type) => {
-            const meta = chartMeta(type);
-            const value = day[type];
-            const height =
-              value > 0
-                ? Math.max(22, Math.round((value / maxValue) * 155))
-                : 7;
-            return `
-                    <div class="analytics-single-bar-wrap" data-tooltip="${escapeHtml(`<div class='apt-title'>${meta.label}</div><div class='apt-total'>${type === "focus" ? day.focusMinutes + " focus minutes" : value + " completed"}</div>`)}">
-                        <span class="analytics-single-bar-value" style="color:${value > 0 ? meta.text : dark ? "#64748b" : "#94a3b8"}">${type === "focus" && day.focusMinutes > 0 ? day.focusMinutes : value || ""}</span>
-                        <div class="analytics-single-bar" style="height:${height}px;background:${value > 0 ? `linear-gradient(180deg, ${meta.color}, ${meta.color})` : dark ? "rgba(255,255,255,0.06)" : "#eef2f7"};box-shadow:${value > 0 ? `0 10px 22px ${meta.color}25` : "none"};"></div>
-                    </div>
-                `;
-          })
-          .join("");
+      const dark = isDarkTheme();
+      const gridColor = dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
+      const tickColor = dark ? "#94a3b8" : "#64748b";
+      const labels = trend.map((d) => d.label);
 
-        return `
-                <div class="analytics-bar-group ${day.isToday ? "today" : ""}" data-tooltip="${escapeHtml(tooltip)}">
-                    ${day.isToday ? `<span class="analytics-today-badge">Today</span>` : ""}
-                    <div class="analytics-bar-group-head">
-                        <span class="analytics-day-total">${day.total}</span>
-                    </div>
-                    <div class="analytics-bar-group-body">
-                        ${
-                          day.total > 0
-                            ? bars
-                            : `
-                            <div class="analytics-group-empty">
-                                <span class="analytics-group-empty-icon"><i class="fa-regular fa-bell-slash"></i></span>
-                                <span>No activity</span>
-                            </div>
-                        `
-                        }
-                    </div>
-                    <div class="analytics-day-label">${day.label}</div>
-                </div>
-            `;
-      })
-      .join("");
+      const datasets = categories.map((cat) => {
+        const meta = chartMeta(cat);
+        const color = meta.color;
+        return {
+          label: meta.label,
+          data: trend.map((d) => (cat === "focus" ? d.focusMinutes : d[cat])),
+          backgroundColor: color + (dark ? "cc" : "bb"),
+          borderColor: color,
+          borderWidth: 1.5,
+          borderRadius: 6,
+          borderSkipped: false,
+        };
+      });
 
-    bindTooltipEvents();
-    renderChartLegend();
-    renderChartInsight(trend);
+      _chartInstance = new Chart(canvas.getContext("2d"), {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { display: false } /* we render our own legend below */,
+            tooltip: {
+              enabled: true,
+              backgroundColor: "rgba(8,17,31,0.96)",
+              titleColor: "#ffffff",
+              bodyColor: "#cbd5e1",
+              borderColor: "rgba(34,211,238,0.28)",
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 12,
+              titleFont: { size: 13, weight: "900" },
+              bodyFont: { size: 12 },
+              callbacks: {
+                title: (items) => {
+                  const idx = items[0].dataIndex;
+                  const day = trend[idx];
+                  return `${day.label}  •  ${day.ymd}`;
+                },
+                label: (item) => {
+                  const cat = categories[item.datasetIndex];
+                  const meta = chartMeta(cat);
+                  const value =
+                    cat === "focus"
+                      ? `${item.parsed.y} min`
+                      : `${item.parsed.y}`;
+                  return `  ${meta.label}: ${value}`;
+                },
+                afterBody: (items) => {
+                  const idx = items[0].dataIndex;
+                  const day = trend[idx];
+                  return [``, `  Total score: ${day.total}`];
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: tickColor, font: { size: 12, weight: "700" } },
+              border: { display: false },
+            },
+            y: {
+              min: 0,
+              suggestedMax:
+                Math.max(
+                  5,
+                  ...trend.map((d) =>
+                    Math.max(
+                      d.tasks,
+                      d.revisions,
+                      d.plans,
+                      d.tests,
+                      d.focusMinutes,
+                    ),
+                  ),
+                ) + 2,
+              grid: { color: gridColor, drawBorder: false },
+              ticks: {
+                color: tickColor,
+                font: { size: 11 },
+                maxTicksLimit: 6,
+                callback: (v) => (Number.isInteger(v) ? v : ""),
+              },
+              border: { display: false },
+            },
+          },
+        },
+      });
+
+      renderChartLegend();
+      renderChartInsight(trend);
+      bindTooltipEvents();
+    });
   }
+
+  /* =============================================
+     LEGEND
+     ============================================= */
 
   function renderChartLegend() {
     const legend = document.querySelector(".chart-footer-legend");
     if (!legend) return;
 
-    const items = ["tasks", "revisions", "plans", "tests", "focus"];
-
-    legend.innerHTML = items
+    legend.innerHTML = ["tasks", "revisions", "plans", "tests", "focus"]
       .map((type) => {
         const meta = chartMeta(type);
         return `
-                <div class="chart-legend-item" style="background:${meta.bg};border-color:${meta.color}22;color:${meta.text};">
-                    <span class="cfl-dot" style="background:${meta.color};box-shadow:0 0 0 4px ${meta.bg};"></span>
-                    <span class="cfl-label" style="color:${meta.text};">${meta.label}</span>
-                </div>
-            `;
+        <div class="chart-legend-item">
+          <span class="cfl-dot" style="background:${meta.color};"></span>
+          <span class="cfl-label" style="color:${meta.color};">${meta.label}</span>
+        </div>`;
       })
       .join("");
   }
 
+  /* =============================================
+     CHART INSIGHT STRIP
+     ============================================= */
+
+  function ensureMiniInsight() {
+    const insight = els.chartInsight;
+    if (!insight) return null;
+    let mini = document.getElementById("analyticsChartMiniInsight");
+    if (!mini) {
+      mini = document.createElement("div");
+      mini.id = "analyticsChartMiniInsight";
+      mini.className = "analytics-mini-insight";
+      insight.insertAdjacentElement("beforebegin", mini);
+    }
+    return mini;
+  }
+
   function renderChartInsight(trend) {
     if (!els.chartInsight) return;
-
     const mini = ensureMiniInsight();
-    const total = trend.reduce((sum, day) => sum + day.total, 0);
-    const activeDays = trend.filter((day) => day.total > 0).length;
+    const total = trend.reduce((s, d) => s + d.total, 0);
+    const activeDays = trend.filter((d) => d.total > 0).length;
     const bestDay = trend.reduce(
-      (best, day) => (day.total > best.total ? day : best),
+      (b, d) => (d.total > b.total ? d : b),
       trend[0],
     );
-    const today = trend.find((day) => day.isToday);
+    const today = trend.find((d) => d.isToday);
     const focus = dominantType(trend);
 
     if (total === 0) {
-      if (mini) {
+      if (mini)
         mini.textContent =
           "This chart tracks tasks, revisions, planner completion, tests, and Pomodoro focus blocks.";
-      }
       els.chartInsight.textContent =
         "No completed activity recorded in the last 7 days. Complete one task, revision, planner item, test, or Pomodoro session to start your analytics trend.";
       return;
     }
 
-    if (mini) {
+    if (mini)
       mini.textContent = `Your last 7 days show ${performanceTone(Math.round((activeDays / 7) * 100)).toLowerCase()} consistency, with ${focus.toLowerCase()} contributing the most.`;
-    }
 
     let text = `${total} activity points tracked across ${activeDays} active day${activeDays > 1 ? "s" : ""}.`;
-
-    if (bestDay && bestDay.total > 0) {
+    if (bestDay?.total > 0)
       text += ` ${bestDay.label} was your strongest day with ${bestDay.total} activity point${bestDay.total > 1 ? "s" : ""}.`;
-    }
-
-    if (today && today.total > 0) {
+    if (today?.total > 0)
       text += ` Today already has ${today.total} tracked activity point${today.total > 1 ? "s" : ""}.`;
-    } else {
-      text += " No completed activity is tracked for today yet.";
-    }
+    else text += " No completed activity is tracked for today yet.";
 
     els.chartInsight.textContent = text;
   }
 
-  function bindTooltipEvents() {
-    document.querySelectorAll("[data-tooltip]").forEach((node) => {
-      node.addEventListener("mouseenter", (event) => {
-        const html = node.getAttribute("data-tooltip");
-        if (html) showTooltip(html, event);
-      });
-
-      node.addEventListener("mousemove", moveTooltip);
-      node.addEventListener("mouseleave", hideTooltip);
-    });
-  }
+  /* =============================================
+     SUBJECT INSIGHTS
+     ============================================= */
 
   function getSubjectNames(data) {
     const map = new Map();
-
     const add = (name) => {
       const display = String(name || "").trim();
       if (!display) return;
       const key = textKey(display);
       if (!map.has(key)) map.set(key, display);
     };
-
-    store.subjects.forEach((subject) => add(subject.name));
-    data.tasks.forEach((item) => add(item.subjectName));
-    data.revisions.forEach((item) => add(item.subjectName));
-    data.tests.forEach((item) => add(item.subjectName));
-    data.plans.forEach((item) => add(item.subjectName));
-    data.pomodoro.forEach((item) => add(item.subjectName));
-
+    store.subjects.forEach((s) => add(s.name));
+    data.tasks.forEach((i) => add(i.subjectName));
+    data.revisions.forEach((i) => add(i.subjectName));
+    data.tests.forEach((i) => add(i.subjectName));
+    data.plans.forEach((i) => add(i.subjectName));
+    data.pomodoro.forEach((i) => add(i.subjectName));
     return [...map.values()];
   }
 
   function buildSubjectInsights(data) {
     const names = getSubjectNames(data);
-
     const insights = names.map((name) => {
       const key = textKey(name);
-      const subject = store.subjects.find((item) => textKey(item.name) === key);
-
-      const tasks = data.tasks.filter(
-        (item) => textKey(item.subjectName) === key,
-      );
+      const subject = store.subjects.find((s) => textKey(s.name) === key);
+      const tasks = data.tasks.filter((i) => textKey(i.subjectName) === key);
       const revisions = data.revisions.filter(
-        (item) => textKey(item.subjectName) === key,
+        (i) => textKey(i.subjectName) === key,
       );
-      const tests = data.tests.filter(
-        (item) => textKey(item.subjectName) === key,
-      );
-      const plans = data.plans.filter(
-        (item) => textKey(item.subjectName) === key,
-      );
+      const tests = data.tests.filter((i) => textKey(i.subjectName) === key);
+      const plans = data.plans.filter((i) => textKey(i.subjectName) === key);
       const pomodoro = data.pomodoro.filter(
-        (item) => textKey(item.subjectName) === key,
+        (i) => textKey(i.subjectName) === key,
       );
 
       const taskScore = tasks.length
@@ -1223,7 +1205,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ? average(
             tests
               .filter(isCompletedTest)
-              .map((item) => clamp(Number(item.score), 0, 100)),
+              .map((t) => clamp(Number(t.score), 0, 100)),
           )
         : NaN;
       const planScore = plans.length
@@ -1231,7 +1213,7 @@ document.addEventListener("DOMContentLoaded", function () {
         : NaN;
       const focusMinutes = pomodoro
         .filter(isCompleted)
-        .reduce((sum, item) => sum + safeNumber(item.minutes), 0);
+        .reduce((s, x) => s + safeNumber(x.minutes), 0);
       const focusScore = focusMinutes
         ? clamp(
             Math.round(
@@ -1241,8 +1223,7 @@ document.addEventListener("DOMContentLoaded", function () {
             100,
           )
         : NaN;
-      const explicitProgress =
-        subject && subject.progress > 0 ? subject.progress : NaN;
+      const explicitProgress = subject?.progress > 0 ? subject.progress : NaN;
 
       const finalScore = average([
         taskScore,
@@ -1276,11 +1257,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     return insights
-      .filter((item) => item.activityCount > 0 || item.finalScore > 0)
-      .sort((a, b) => {
-        if (b.finalScore !== a.finalScore) return b.finalScore - a.finalScore;
-        return b.activityCount - a.activityCount;
-      });
+      .filter((i) => i.activityCount > 0 || i.finalScore > 0)
+      .sort((a, b) =>
+        b.finalScore !== a.finalScore
+          ? b.finalScore - a.finalScore
+          : b.activityCount - a.activityCount,
+      );
   }
 
   function renderSubjectInsights(insights) {
@@ -1294,27 +1276,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const strongSpan = els.strongestSubjectBadge?.querySelector("span");
     const weakSpan = els.weakestSubjectBadge?.querySelector("span");
-
-    if (strongSpan) {
+    if (strongSpan)
       strongSpan.textContent = strongest
         ? `Strongest: ${strongest.subjectName} (${strongest.finalScore}%)`
         : "Strongest: —";
-    }
-
-    if (weakSpan) {
+    if (weakSpan)
       weakSpan.textContent = weakest
         ? `Needs Focus: ${weakest.subjectName} (${weakest.finalScore}%)`
         : "Needs Focus: —";
-    }
 
     if (!insights.length) {
       els.subjectInsightList.innerHTML = `
-                <div class="analytics-empty-state">
-                    <i class="fa-solid fa-book-open"></i>
-                    <h4>No subject insight yet</h4>
-                    <p>Add tasks, revisions, tests, plans, or Pomodoro sessions to unlock subject-wise analytics.</p>
-                </div>
-            `;
+        <div class="analytics-empty-state">
+          <i class="fa-solid fa-book-open"></i>
+          <h4>No subject insight yet</h4>
+          <p>Add tasks, revisions, tests, plans, or Pomodoro sessions to unlock subject-wise analytics.</p>
+        </div>`;
       return;
     }
 
@@ -1336,151 +1313,272 @@ document.addEventListener("DOMContentLoaded", function () {
           ? "linear-gradient(90deg,#10b981,#34d399)"
           : isWeakest
             ? "linear-gradient(90deg,#f59e0b,#fbbf24)"
-            : "linear-gradient(90deg,#6c63ff,#8b7cff)";
-
+            : "linear-gradient(90deg,#06b6d4,#14b8a6)";
         const badge = isStrongest
           ? `<span class="subject-rank-badge rank-top"><i class="fa-solid fa-trophy"></i> Top</span>`
           : isWeakest
             ? `<span class="subject-rank-badge rank-focus"><i class="fa-solid fa-arrow-trend-up"></i> Focus</span>`
             : "";
+        const tt = escapeHtml(
+          `<div class='apt-title'>${item.subjectName}</div>` +
+            `<div class='apt-row'><span>Tasks</span><strong>${item.completedTasks}/${item.tasks}</strong></div>` +
+            `<div class='apt-row'><span>Revisions</span><strong>${item.completedRevisions}/${item.revisions}</strong></div>` +
+            `<div class='apt-row'><span>Plans</span><strong>${item.completedPlans}/${item.plans}</strong></div>` +
+            `<div class='apt-row'><span>Tests</span><strong>${item.scoredTests}/${item.tests}</strong></div>` +
+            `<div class='apt-total'>Focus: ${item.focusMinutes} min</div>`,
+        );
 
         return `
-                <div class="subject-insight-item" data-tooltip="${escapeHtml(`<div class='apt-title'>${item.subjectName}</div><div class='apt-row'><span>Tasks</span><strong>${item.completedTasks}/${item.tasks}</strong></div><div class='apt-row'><span>Revisions</span><strong>${item.completedRevisions}/${item.revisions}</strong></div><div class='apt-row'><span>Plans</span><strong>${item.completedPlans}/${item.plans}</strong></div><div class='apt-row'><span>Tests</span><strong>${item.scoredTests}/${item.tests}</strong></div><div class='apt-total'>Focus: ${item.focusMinutes} min</div>`)}">
-                    <div class="subject-insight-top">
-                        <div class="subject-title-wrap">
-                            <h4>${escapeHtml(item.subjectName)}</h4>
-                            ${badge}
-                        </div>
-                        <span class="insight-pct ${pctClass}">${item.finalScore}%</span>
-                    </div>
-                    <div class="subject-insight-meta">
-                        Tasks ${item.completedTasks}/${item.tasks} · Revisions ${item.completedRevisions}/${item.revisions} · Focus ${item.focusMinutes}m
-                    </div>
-                    <div class="subject-progress-bar">
-                        <div class="subject-progress-fill" style="width:${item.finalScore}%;background:${fill};"></div>
-                    </div>
-                </div>
-            `;
+        <div class="subject-insight-item" data-tooltip="${tt}">
+          <div class="subject-insight-top">
+            <div class="subject-title-wrap">
+              <h4>${escapeHtml(item.subjectName)}</h4>${badge}
+            </div>
+            <span class="insight-pct ${pctClass}">${item.finalScore}%</span>
+          </div>
+          <div class="subject-insight-meta">
+            Tasks ${item.completedTasks}/${item.tasks} · Revisions ${item.completedRevisions}/${item.revisions} · Focus ${item.focusMinutes}m
+          </div>
+          <div class="subject-progress-bar">
+            <div class="subject-progress-fill" style="width:${item.finalScore}%;background:${fill};"></div>
+          </div>
+        </div>`;
       })
       .join("");
 
     bindTooltipEvents();
   }
 
+  /* =============================================
+     RECOMMENDATIONS
+     ============================================= */
+
   function buildRecommendations(data, metrics, insights) {
     const recs = [];
-    const overdue = data.tasks.filter(
-      (item) => item.status === "OVERDUE",
-    ).length;
-    const pendingTasks = data.tasks.filter((item) => !isCompleted(item)).length;
+    const backendInsightLines = Array.isArray(store.pomodoroAnalytics?.insights)
+      ? store.pomodoroAnalytics.insights
+      : [];
+
+    backendInsightLines.slice(0, 3).forEach((line) => {
+      if (line && String(line).trim())
+        recs.push({ type: "tip", text: `AI Insight: ${line}` });
+    });
+
+    const overdue = data.tasks.filter((i) => i.status === "OVERDUE").length;
+    const pendingTasks = data.tasks.filter((i) => !isCompleted(i)).length;
     const pendingRevisions = data.revisions.filter(
-      (item) => !isCompleted(item),
+      (i) => !isCompleted(i),
     ).length;
-    const upcomingTests = data.tests.filter(
-      (item) => !isCompletedTest(item),
-    ).length;
+    const upcomingTests = data.tests.filter((i) => !isCompletedTest(i)).length;
     const weakest = insights.length
       ? [...insights].sort((a, b) => a.finalScore - b.finalScore)[0]
       : null;
     const strongest = insights[0];
 
-    if (overdue > 0) {
+    if (overdue > 0)
       recs.push({
         type: "warn",
-        text: `${overdue} overdue task${overdue > 1 ? "s" : ""} pending hain. Pehle overdue work clear karo.`,
+        text: `${overdue} overdue task${overdue > 1 ? "s" : ""} pending. Start by clearing overdue work first.`,
       });
-    }
-
-    if (weakest && weakest.finalScore < 55) {
+    if (weakest?.finalScore < 55)
       recs.push({
         type: "warn",
-        text: `${weakest.subjectName} needs focus. Is subject ke liye 2 Pomodoro sessions aur revision add karo.`,
+        text: `${weakest.subjectName} needs focus. Add 2 Pomodoro sessions and one revision slot for this subject.`,
       });
-    }
-
-    if (pendingRevisions > 0) {
+    if (pendingRevisions > 0)
       recs.push({
         type: "tip",
-        text: `${pendingRevisions} revision item${pendingRevisions > 1 ? "s" : ""} pending hain. Daily 20-minute quick revision slot rakho.`,
+        text: `${pendingRevisions} revision item${pendingRevisions > 1 ? "s are" : " is"} pending. Schedule a daily 20-minute quick revision slot.`,
       });
-    }
-
-    if (metrics.completedSessions === 0) {
+    if (metrics.completedSessions === 0)
       recs.push({
         type: "tip",
-        text: "Pomodoro data abhi empty hai. Study Timer se 1 focus session complete karo to focus analytics improve hogi.",
+        text: "No Pomodoro data yet. Complete one focus session from Study Timer to improve focus analytics.",
       });
-    }
-
-    if (metrics.averageTestScore > 0 && metrics.averageTestScore < 70) {
+    if (metrics.averageTestScore > 0 && metrics.averageTestScore < 70)
       recs.push({
         type: "warn",
-        text: "Average test score 70% se low hai. Mock test ke mistakes ko revise karo.",
+        text: "Average test score is below 70%. Review mock test mistakes and revise weak areas.",
       });
-    }
-
-    if (upcomingTests > 0) {
+    if (upcomingTests > 0)
       recs.push({
         type: "info",
-        text: `${upcomingTests} upcoming test${upcomingTests > 1 ? "s" : ""} found. Test date se pehle revision plan schedule karo.`,
+        text: `${upcomingTests} upcoming test${upcomingTests > 1 ? "s" : ""} found. Schedule revision before the test date.`,
       });
-    }
-
-    if (pendingTasks > 0 && overdue === 0) {
+    if (pendingTasks > 0 && overdue === 0)
       recs.push({
         type: "tip",
-        text: `${pendingTasks} task${pendingTasks > 1 ? "s" : ""} pending hain. High priority task se start karo.`,
+        text: `${pendingTasks} task${pendingTasks > 1 ? "s are" : " is"} pending. Start with the highest priority task.`,
       });
-    }
-
-    if (strongest && strongest.finalScore >= 80) {
+    if (strongest?.finalScore >= 80)
       recs.push({
         type: "success",
-        text: `${strongest.subjectName} strong chal raha hai (${strongest.finalScore}%). Is momentum ko maintain rakho.`,
+        text: `${strongest.subjectName} is performing strongly (${strongest.finalScore}%). Keep this momentum consistent.`,
       });
-    }
-
-    if (!recs.length) {
+    if (!recs.length)
       recs.push({
         type: "info",
-        text: "More activities add karo — tasks, revisions, tests, plans aur Pomodoro sessions — smart recommendations aur accurate hongi.",
+        text: "Add more study activity — tasks, revisions, tests, plans, and Pomodoro sessions — to generate smarter recommendations.",
       });
-    }
 
-    return [...new Map(recs.map((item) => [item.text, item])).values()].slice(
-      0,
-      5,
-    );
+    return [...new Map(recs.map((r) => [r.text, r])).values()].slice(0, 5);
   }
 
   function renderRecommendations(recommendations) {
     if (!els.recommendationList) return;
-
     const config = {
       warn: { icon: "fa-triangle-exclamation", cls: "rec-warn" },
       tip: { icon: "fa-lightbulb", cls: "rec-tip" },
       info: { icon: "fa-circle-info", cls: "rec-info" },
       success: { icon: "fa-circle-check", cls: "rec-success" },
     };
-
     els.recommendationList.innerHTML = recommendations
       .map((rec) => {
         const item = config[rec.type] || config.tip;
         return `
-                <div class="recommendation-item ${item.cls}">
-                    <div class="rec-icon-wrap">
-                        <i class="fa-solid ${item.icon}"></i>
-                    </div>
-                    <span>${escapeHtml(rec.text)}</span>
-                </div>
-            `;
+        <div class="recommendation-item ${item.cls}">
+          <div class="rec-icon-wrap"><i class="fa-solid ${item.icon}"></i></div>
+          <span>${escapeHtml(rec.text)}</span>
+        </div>`;
       })
       .join("");
   }
 
-  function renderAnalytics() {
-    injectPremiumStyles();
+  /* =============================================
+     REALTIME POMODORO PANEL
+     ============================================= */
 
+  function renderRealtimePomodoroAnalytics() {
+    const analytics = store.pomodoroAnalytics || {};
+
+    const totalFocusMinutes = safeNumber(analytics.totalFocusMinutes, 0);
+    const completedSessions = safeNumber(analytics.totalCompletedSessions, 0);
+    const interruptedSessions = safeNumber(
+      analytics.totalInterruptedSessions,
+      0,
+    );
+    const averageDailyFocus = safeNumber(analytics.averageDailyFocusMinutes, 0);
+    const activeDays = safeNumber(analytics.activeDaysThisWeek, 0);
+    const productivityScore = clamp(
+      safeNumber(analytics.productivityScore, 0),
+      0,
+      100,
+    );
+    const productivityLabel = analytics.productivityLabel || "No data yet";
+    const mostFocusedSubject = analytics.mostFocusedSubject || "No subject yet";
+    const breakBalanceRatio = safeNumber(analytics.breakBalanceRatio, 0);
+    const dailyFocusData = Array.isArray(analytics.dailyFocusData)
+      ? analytics.dailyFocusData
+      : [];
+    const insightLines = Array.isArray(analytics.insights)
+      ? analytics.insights
+      : [];
+
+    if (els.analyticsAiScore)
+      els.analyticsAiScore.textContent = productivityScore;
+    if (els.analyticsAiPanel)
+      els.analyticsAiPanel.style.setProperty(
+        "--ai-score-degree",
+        `${Math.round((productivityScore / 100) * 360)}deg`,
+      );
+
+    setText(els.analyticsAiLabel, productivityLabel);
+    setText(els.analyticsAiSubject, mostFocusedSubject);
+    setText(els.analyticsAiBreakRatio, breakBalanceRatio.toFixed(2));
+    setText(
+      els.analyticsRtFocusMinutes,
+      totalFocusMinutes >= 60
+        ? `${(totalFocusMinutes / 60).toFixed(1)} hr`
+        : `${totalFocusMinutes} min`,
+    );
+    setText(els.analyticsRtCompletedSessions, completedSessions);
+    setText(els.analyticsRtInterruptedSessions, interruptedSessions);
+    setText(els.analyticsRtAverageFocus, `${averageDailyFocus} min`);
+    setText(els.analyticsRtActiveDays, `${activeDays}/7`);
+
+    if (els.analyticsAiInsightsList) {
+      if (insightLines.length) {
+        const icons = [
+          "fa-lightbulb",
+          "fa-chart-line",
+          "fa-bullseye",
+          "fa-shield-heart",
+        ];
+        els.analyticsAiInsightsList.innerHTML = insightLines
+          .slice(0, 4)
+          .map(
+            (line, i) => `
+          <div class="analytics-ai-insight-item">
+            <i class="fa-solid ${icons[i] || "fa-circle-info"}"></i>
+            <span>${escapeHtml(line)}</span>
+          </div>`,
+          )
+          .join("");
+      } else {
+        els.analyticsAiInsightsList.innerHTML = `
+          <div class="analytics-ai-insight-item">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Complete Pomodoro sessions to generate personalized AI productivity insights.</span>
+          </div>`;
+      }
+    }
+
+    if (els.analyticsAiRefreshTime)
+      els.analyticsAiRefreshTime.textContent = `Last synced: ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+
+    if (els.analyticsFocusSparkBars) {
+      const maxMinutes = Math.max(
+        1,
+        ...dailyFocusData.map((i) => safeNumber(i.minutes, 0)),
+      );
+      const bestDay = dailyFocusData.reduce(
+        (b, i) => (safeNumber(i.minutes, 0) > safeNumber(b.minutes, 0) ? i : b),
+        { day: "—", date: "", minutes: 0 },
+      );
+
+      if (els.analyticsRtBestDay) {
+        els.analyticsRtBestDay.textContent = `Best day: ${bestDay?.minutes > 0 ? `${bestDay.day || bestDay.date} • ${bestDay.minutes} min` : "—"}`;
+      }
+
+      if (dailyFocusData.length) {
+        els.analyticsFocusSparkBars.innerHTML = dailyFocusData
+          .map((item) => {
+            const minutes = safeNumber(item.minutes, 0);
+            const height =
+              minutes > 0
+                ? Math.max(8, Math.round((minutes / maxMinutes) * 70))
+                : 5;
+            const dayLabelText =
+              item.day || String(item.date || "").slice(5) || "—";
+            const tt = escapeHtml(
+              `<div class='apt-title'>${dayLabelText}</div><div class='apt-total'>${minutes} focus minutes</div>`,
+            );
+            return `
+            <div class="analytics-focus-spark-item" data-tooltip="${tt}">
+              <div class="analytics-focus-spark-track">
+                <div class="analytics-focus-spark-fill" style="height:${height}px"></div>
+              </div>
+              <span class="analytics-focus-spark-day">${escapeHtml(dayLabelText)}</span>
+            </div>`;
+          })
+          .join("");
+      } else {
+        els.analyticsFocusSparkBars.innerHTML = `
+          <div class="analytics-spark-loading">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>No focus trend available yet.</span>
+          </div>`;
+      }
+    }
+
+    bindTooltipEvents();
+  }
+
+  /* =============================================
+     MAIN RENDER
+     ============================================= */
+
+  function renderAnalytics() {
     const data = getFilteredData();
     const subjectInsights = buildSubjectInsights(data);
     const metrics = calculateMetrics(data);
@@ -1492,10 +1590,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     renderSummary(metrics, subjectInsights);
     renderScoreOverview(metrics);
+    renderRealtimePomodoroAnalytics();
     renderTrendChart();
     renderSubjectInsights(subjectInsights);
     renderRecommendations(recommendations);
   }
+
+  /* =============================================
+     EXPORT
+     ============================================= */
 
   function buildExportText() {
     const data = getFilteredData();
@@ -1507,7 +1610,7 @@ document.addEventListener("DOMContentLoaded", function () {
       subjectInsights,
     );
 
-    const lines = [
+    return [
       "EduMind AI — Student Analytics Report",
       "----------------------------------------",
       `Range: ${getSelectedRange()}`,
@@ -1528,16 +1631,14 @@ document.addEventListener("DOMContentLoaded", function () {
       "SUBJECT INSIGHTS",
       ...(subjectInsights.length
         ? subjectInsights.map(
-            (item, index) =>
-              `${index + 1}. ${item.subjectName} — ${item.finalScore}% | Focus ${item.focusMinutes}m`,
+            (i, idx) =>
+              `${idx + 1}. ${i.subjectName} — ${i.finalScore}% | Focus ${i.focusMinutes}m`,
           )
         : ["No subject insights available."]),
       "",
       "RECOMMENDATIONS",
-      ...recommendations.map((item, index) => `${index + 1}. ${item.text}`),
-    ];
-
-    return lines.join("\n");
+      ...recommendations.map((r, idx) => `${idx + 1}. ${r.text}`),
+    ].join("\n");
   }
 
   function exportReport() {
@@ -1547,7 +1648,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     const range = getSelectedRange().toLowerCase().replace(/\s+/g, "-");
-
     link.href = url;
     link.download = `edumind-analytics-${range}-${todayYmd()}.txt`;
     document.body.appendChild(link);
@@ -1556,24 +1656,23 @@ document.addEventListener("DOMContentLoaded", function () {
     URL.revokeObjectURL(url);
   }
 
+  /* =============================================
+     PROFILE + DROPDOWN
+     ============================================= */
+
   function attachProfileDropdown() {
     const profileToggle = document.getElementById("profileMenuToggle");
     const profileDropdown = document.getElementById("dashboardProfileDropdown");
-
     if (!profileToggle || !profileDropdown) return;
 
-    profileToggle.addEventListener("click", (event) => {
-      event.stopPropagation();
+    profileToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
       profileDropdown.classList.toggle("hidden");
     });
-
-    profileDropdown.addEventListener("click", (event) => {
-      event.stopPropagation();
-    });
-
-    document.addEventListener("click", () => {
-      profileDropdown.classList.add("hidden");
-    });
+    profileDropdown.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("click", () =>
+      profileDropdown.classList.add("hidden"),
+    );
   }
 
   function renderProfileInfo() {
@@ -1603,12 +1702,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (avatarEl) {
       avatarEl.src = avatar;
       avatarEl.alt = fullName;
-      avatarEl.onerror = function () {
+      avatarEl.onerror = () => {
         avatarEl.src = "../assets/avatar/default-user.png";
       };
     }
     if (nameDropEl) nameDropEl.textContent = fullName;
   }
+
+  /* =============================================
+     THEME OBSERVER (re-render on theme change)
+     ============================================= */
 
   function attachThemeObserver() {
     const rerender = () => {
@@ -1617,14 +1720,11 @@ document.addEventListener("DOMContentLoaded", function () {
         attachThemeObserver.timer = setTimeout(renderAnalytics, 80);
       }
     };
-
     const observer = new MutationObserver(rerender);
-
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ["class", "data-theme"],
     });
-
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class", "data-theme"],
@@ -1634,524 +1734,16 @@ document.addEventListener("DOMContentLoaded", function () {
   function showLoadingState() {
     if (els.chartBars) {
       els.chartBars.innerHTML = `
-                <div class="analytics-loading-state">
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    <span>Loading analytics...</span>
-                </div>
-            `;
+        <div class="analytics-loading-state">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Loading analytics...</span>
+        </div>`;
     }
   }
 
-  function injectPremiumStyles() {
-    let style = document.getElementById("analyticsPremiumRuntimeStyles");
-    if (!style) {
-      style = document.createElement("style");
-      style.id = "analyticsPremiumRuntimeStyles";
-      document.head.appendChild(style);
-    }
-
-    style.textContent = `
-            .analytics-summary-note {
-                display: block;
-                margin-top: 6px;
-                font-size: 11.5px;
-                line-height: 1.5;
-                font-weight: 600;
-                color: #94a3b8;
-            }
-
-            .analytics-highlight-chip-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin: 4px 0 16px;
-            }
-
-            .analytics-highlight-chip {
-                display: inline-flex;
-                align-items: center;
-                gap: 7px;
-                padding: 9px 13px;
-                border-radius: 999px;
-                border: 1px solid transparent;
-                font-size: 12px;
-                font-weight: 700;
-            }
-
-            .analytics-highlight-chip strong {
-                font-weight: 800;
-            }
-
-            .analytics-mini-insight {
-                margin: 12px 0 10px;
-                color: #64748b;
-                font-size: 12.5px;
-                line-height: 1.65;
-                font-weight: 600;
-            }
-
-            .chart-placeholder.large,
-            body.preview-dark .chart-placeholder.large {
-                display: block !important;
-                background: transparent !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                min-height: auto !important;
-            }
-
-            .chart-y-axis,
-            #chartLabels {
-                display: none !important;
-            }
-
-            .chart-inner {
-                display: block !important;
-                width: 100%;
-            }
-
-            #chartBars {
-                display: grid !important;
-                grid-template-columns: repeat(7, minmax(0, 1fr));
-                gap: 12px;
-                align-items: stretch;
-                justify-content: stretch;
-                min-height: auto !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                background: transparent !important;
-            }
-
-            #chartBars::after {
-                display: none !important;
-            }
-
-            .analytics-bar-group {
-                position: relative;
-                overflow: hidden;
-                min-height: 318px;
-                padding: 16px 10px 14px;
-                border-radius: 22px;
-                background: #ffffff;
-                border: 1px solid #e8edf5;
-                box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
-                transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-            }
-
-            .analytics-bar-group:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 18px 34px rgba(15, 23, 42, 0.11);
-                border-color: rgba(108, 99, 255, 0.26);
-            }
-
-            .analytics-bar-group.today {
-                background: linear-gradient(180deg, #f5f3ff, #eef2ff);
-                border: 2px solid #8b7cff;
-            }
-
-            .analytics-today-badge {
-                position: absolute;
-                top: 12px;
-                right: 10px;
-                z-index: 2;
-                padding: 5px 10px;
-                border-radius: 999px;
-                background: #ede9fe;
-                color: #5b4ef5;
-                font-size: 10.5px;
-                font-weight: 800;
-            }
-
-            .analytics-bar-group-head {
-                display: flex;
-                justify-content: center;
-                margin: 12px 0;
-            }
-
-            .analytics-day-total {
-                min-width: 48px;
-                height: 46px;
-                padding: 0 14px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 999px;
-                background: #f3f0ff;
-                color: #5b4ef5;
-                font-size: 18px;
-                font-weight: 800;
-            }
-
-            .analytics-bar-group.today .analytics-day-total {
-                background: linear-gradient(135deg, #7c6cff, #5b4ef5);
-                color: #ffffff;
-            }
-
-            .analytics-bar-group-body {
-                display: flex;
-                align-items: flex-end;
-                justify-content: center;
-                gap: 7px;
-                min-height: 195px;
-            }
-
-            .analytics-single-bar-wrap {
-                flex: 1;
-                min-width: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-end;
-                gap: 6px;
-            }
-
-            .analytics-single-bar-value {
-                min-height: 14px;
-                font-size: 11px;
-                font-weight: 800;
-                line-height: 1;
-            }
-
-            .analytics-single-bar {
-                width: 100%;
-                min-height: 7px;
-                border-radius: 10px 10px 6px 6px;
-                transition: all .22s ease;
-            }
-
-            .analytics-single-bar-wrap:hover .analytics-single-bar {
-                transform: translateY(-3px);
-                filter: brightness(1.05);
-            }
-
-            .analytics-day-label {
-                margin-top: 14px;
-                text-align: center;
-                color: #64748b;
-                font-size: 14px;
-                font-weight: 800;
-            }
-
-            .analytics-group-empty {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                color: #94a3b8;
-                font-size: 12px;
-                font-weight: 700;
-                text-align: center;
-            }
-
-            .analytics-group-empty-icon {
-                width: 38px;
-                height: 38px;
-                border-radius: 999px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                background: #f1f5f9;
-                color: #94a3b8;
-            }
-
-            .chart-footer-legend {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-top: 14px;
-                padding-top: 14px;
-                border-top: 1px solid #f1f5f9;
-            }
-
-            .chart-footer-legend .chart-legend-item {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                padding: 8px 12px;
-                border-radius: 999px;
-                border: 1px solid transparent;
-            }
-
-            .chart-footer-legend .cfl-label {
-                font-size: 12px;
-                font-weight: 700;
-            }
-
-            .chart-footer-legend .cfl-dot {
-                width: 12px !important;
-                height: 12px !important;
-                border-radius: 999px;
-                flex-shrink: 0;
-            }
-
-            .analytics-chart-insight {
-                margin-top: 12px;
-                padding: 13px 15px;
-                border-radius: 16px;
-                background: linear-gradient(180deg, #f7f7ff, #f3f7ff);
-                border: 1px solid #e2e8ff;
-                color: #5b6472;
-                font-size: 12.5px;
-                line-height: 1.7;
-                font-weight: 600;
-            }
-
-            .subject-title-wrap {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                flex-wrap: wrap;
-                min-width: 0;
-            }
-
-            .subject-rank-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 3px 9px;
-                border-radius: 999px;
-                font-size: 11px;
-                font-weight: 800;
-            }
-
-            .rank-top {
-                background: #ecfdf5;
-                color: #047857;
-            }
-
-            .rank-focus {
-                background: #fff7ed;
-                color: #c2410c;
-            }
-
-            .subject-insight-meta {
-                margin: 2px 0 2px;
-                color: #64748b;
-                font-size: 12px;
-                line-height: 1.6;
-                font-weight: 600;
-            }
-
-            .analytics-empty-state {
-                min-height: 170px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                text-align: center;
-                padding: 20px 16px;
-                border: 1px dashed #dbe3ee;
-                border-radius: 16px;
-                background: linear-gradient(180deg, #fbfcfe, #f8fafc);
-            }
-
-            .analytics-empty-state i {
-                width: 44px;
-                height: 44px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 999px;
-                background: #f1f5f9;
-                color: #94a3b8;
-                font-size: 18px;
-            }
-
-            .analytics-empty-state h4 {
-                color: #334155;
-                font-size: 14px;
-                font-weight: 800;
-            }
-
-            .analytics-empty-state p {
-                max-width: 320px;
-                color: #94a3b8;
-                font-size: 12.5px;
-                line-height: 1.6;
-            }
-
-            .analytics-loading-state {
-                grid-column: 1 / -1;
-                min-height: 220px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                color: #6c63ff;
-                font-weight: 700;
-            }
-
-            .analytics-premium-tooltip {
-                position: fixed;
-                z-index: 999999;
-                width: max-content;
-                max-width: 280px;
-                padding: 12px 13px;
-                border-radius: 14px;
-                background: rgba(15, 23, 42, 0.96);
-                color: #f8fafc;
-                box-shadow: 0 18px 44px rgba(0,0,0,0.28);
-                pointer-events: none;
-                font-family: Poppins, sans-serif;
-                font-size: 12px;
-                line-height: 1.45;
-                backdrop-filter: blur(14px);
-            }
-
-            .analytics-premium-tooltip.hidden {
-                display: none;
-            }
-
-            .apt-title {
-                font-size: 12.5px;
-                font-weight: 800;
-                margin-bottom: 8px;
-                color: #ffffff;
-            }
-
-            .apt-row {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 20px;
-                margin: 5px 0;
-                color: #cbd5e1;
-            }
-
-            .apt-row span {
-                display: inline-flex;
-                align-items: center;
-                gap: 7px;
-            }
-
-            .apt-row strong,
-            .apt-total {
-                color: #ffffff;
-                font-weight: 800;
-            }
-
-            .apt-total {
-                margin-top: 8px;
-                padding-top: 8px;
-                border-top: 1px solid rgba(255,255,255,0.12);
-            }
-
-            body.preview-dark .analytics-summary-note,
-            body.dark-theme .analytics-summary-note,
-            html.dark .analytics-summary-note {
-                color: #94a3b8;
-            }
-
-            body.preview-dark .analytics-bar-group,
-            body.dark-theme .analytics-bar-group,
-            html.dark .analytics-bar-group {
-                background: #0f172a;
-                border-color: rgba(255,255,255,0.08);
-                box-shadow: 0 16px 34px rgba(0,0,0,0.28);
-            }
-
-            body.preview-dark .analytics-bar-group.today,
-            body.dark-theme .analytics-bar-group.today,
-            html.dark .analytics-bar-group.today {
-                background: linear-gradient(180deg, rgba(108,99,255,0.20), rgba(15,23,42,0.95));
-                border-color: rgba(139,124,255,0.78);
-            }
-
-            body.preview-dark .analytics-day-total,
-            body.dark-theme .analytics-day-total,
-            html.dark .analytics-day-total {
-                background: rgba(255,255,255,0.08);
-                color: #ffffff;
-            }
-
-            body.preview-dark .analytics-day-label,
-            body.dark-theme .analytics-day-label,
-            html.dark .analytics-day-label {
-                color: #e2e8f0;
-            }
-
-            body.preview-dark .analytics-group-empty-icon,
-            body.dark-theme .analytics-group-empty-icon,
-            html.dark .analytics-group-empty-icon {
-                background: rgba(255,255,255,0.06);
-            }
-
-            body.preview-dark .chart-footer-legend,
-            body.dark-theme .chart-footer-legend,
-            html.dark .chart-footer-legend {
-                border-top-color: rgba(255,255,255,0.08);
-            }
-
-            body.preview-dark .analytics-chart-insight,
-            body.dark-theme .analytics-chart-insight,
-            html.dark .analytics-chart-insight {
-                background: linear-gradient(180deg, rgba(108,99,255,0.12), rgba(59,130,246,0.08));
-                border-color: rgba(108,99,255,0.22);
-                color: #cbd5e1;
-            }
-
-            body.preview-dark .analytics-mini-insight,
-            body.dark-theme .analytics-mini-insight,
-            html.dark .analytics-mini-insight,
-            body.preview-dark .subject-insight-meta,
-            body.dark-theme .subject-insight-meta,
-            html.dark .subject-insight-meta {
-                color: #94a3b8;
-            }
-
-            body.preview-dark .analytics-empty-state,
-            body.dark-theme .analytics-empty-state,
-            html.dark .analytics-empty-state {
-                background: linear-gradient(180deg, #111827, #0f172a);
-                border-color: rgba(255,255,255,0.08);
-            }
-
-            body.preview-dark .analytics-empty-state h4,
-            body.dark-theme .analytics-empty-state h4,
-            html.dark .analytics-empty-state h4 {
-                color: #f1f5f9;
-            }
-
-            body.preview-dark .rank-top,
-            body.dark-theme .rank-top,
-            html.dark .rank-top {
-                background: rgba(16,185,129,0.14);
-                color: #34d399;
-            }
-
-            body.preview-dark .rank-focus,
-            body.dark-theme .rank-focus,
-            html.dark .rank-focus {
-                background: rgba(245,158,11,0.14);
-                color: #fbbf24;
-            }
-
-            @media (max-width: 1050px) {
-                #chartBars {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
-
-            @media (max-width: 576px) {
-                #chartBars {
-                    grid-template-columns: 1fr;
-                }
-
-                .analytics-bar-group {
-                    min-height: 250px;
-                }
-
-                .chart-footer-legend .chart-legend-item,
-                .analytics-highlight-chip {
-                    width: 100%;
-                    justify-content: center;
-                }
-            }
-        `;
-  }
+  /* =============================================
+     INIT
+     ============================================= */
 
   async function init() {
     const ready =
@@ -2160,22 +1752,15 @@ document.addEventListener("DOMContentLoaded", function () {
       els.completedSessionsValue &&
       els.weeklyConsistencyValue &&
       els.chartBars;
-
     if (!ready) return;
 
-    injectPremiumStyles();
     renderProfileInfo();
     attachProfileDropdown();
     attachThemeObserver();
     showLoadingState();
 
-    if (els.filter) {
-      els.filter.addEventListener("change", renderAnalytics);
-    }
-
-    if (els.exportBtn) {
-      els.exportBtn.addEventListener("click", exportReport);
-    }
+    if (els.filter) els.filter.addEventListener("change", renderAnalytics);
+    if (els.exportBtn) els.exportBtn.addEventListener("click", exportReport);
 
     try {
       await loadAllData();

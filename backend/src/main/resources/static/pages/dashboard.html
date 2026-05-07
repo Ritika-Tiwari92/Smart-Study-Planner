@@ -104,6 +104,11 @@
                     </div>
 
                     <div class="header-actions">
+
+                         <div class="dashboard-last-updated" id="dashboardLastUpdated">
+                              <i class="fa-solid fa-rotate"></i>
+                              <span>Syncing...</span>
+                         </div>
                          <div class="notification-btn-wrapper">
                               <button class="icon-btn" id="notificationToggleBtn" type="button" title="Notifications">
                                    <i class="fa-solid fa-bell"></i>
@@ -162,7 +167,12 @@
 
                <section class="dashboard-content">
 
-                    <div class="welcome-banner">
+                    <div class="welcome-banner dashboard-hero-banner">
+                         <div class="welcome-grid-overlay" aria-hidden="true"></div>
+
+                         <span class="hero-orb hero-orb-one"></span>
+                         <span class="hero-orb hero-orb-two"></span>
+                         <span class="hero-orb hero-orb-three"></span>
                          <div class="welcome-text">
                               <div class="welcome-date-pill" id="welcomeDatePill">
                                    <i class="fa-regular fa-calendar"></i>
@@ -238,6 +248,68 @@
                                    <p class="stat-label">Study Progress</p>
                                    <span class="stat-helper-text" id="studyProgressHint">Loading completion
                                         snapshot...</span>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="dashboard-ai-coach-card">
+                         <div class="dashboard-ai-main">
+                              <div class="dashboard-ai-kicker">
+                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                   AI Dashboard Coach
+                              </div>
+
+                              <h3>Your smart study command center</h3>
+
+                              <p id="dashboardAiTodayPlan">
+                                   Loading personalized AI study guidance from your realtime activity...
+                              </p>
+
+                              <div class="dashboard-ai-metrics">
+                                   <div class="dashboard-ai-metric">
+                                        <span>Productivity Score</span>
+                                        <strong id="dashboardAiScore">0%</strong>
+                                   </div>
+
+                                   <div class="dashboard-ai-metric">
+                                        <span>Focus Status</span>
+                                        <strong id="dashboardAiLabel">No data yet</strong>
+                                   </div>
+
+                                   <div class="dashboard-ai-metric">
+                                        <span>Best Focus Subject</span>
+                                        <strong id="dashboardAiBestSubject">No subject yet</strong>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-ai-actions">
+                              <div class="dashboard-ai-action-title">
+                                   <i class="fa-solid fa-bullseye"></i>
+                                   Recommended Next Actions
+                              </div>
+
+                              <div class="dashboard-ai-action-list" id="dashboardAiActions">
+                                   <div class="dashboard-ai-action-item">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                        <span>Preparing your study recommendations...</span>
+                                   </div>
+                              </div>
+
+                              <div class="dashboard-ai-quick-links" id="dashboardAiQuickLinks">
+                                   <a href="pomodoro.html" class="dashboard-ai-link">
+                                        <i class="fa-solid fa-stopwatch"></i>
+                                        <span>Start Focus Session</span>
+                                   </a>
+
+                                   <a href="tasks.html" class="dashboard-ai-link">
+                                        <i class="fa-solid fa-list-check"></i>
+                                        <span>View Tasks</span>
+                                   </a>
+
+                                   <a href="analytics.html" class="dashboard-ai-link">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                        <span>Open Analytics</span>
+                                   </a>
                               </div>
                          </div>
                     </div>
@@ -562,9 +634,61 @@
                                         <span class="ds-weekly-value" id="dsWeeklyBestDay">—</span>
                                    </div>
                               </div>
+
+                              <div class="ds-weekly-stat ds-weekly-productivity-card">
+                                   <span class="ds-weekly-icon">
+                                        <i class="fa-solid fa-gauge-high"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Productivity Score</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyProductivityScore">0%</span>
+                                   </div>
+                              </div>
+
+                              <div class="ds-weekly-stat ds-weekly-subject-card">
+                                   <span class="ds-weekly-icon">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                   </span>
+                                   <div>
+                                        <span class="ds-weekly-label">Best Focus Subject</span>
+                                        <span class="ds-weekly-value" id="dsWeeklyBestSubject">—</span>
+                                   </div>
+                              </div>
                          </div>
                     </div>
 
+                    <div class="ds-recent-focus-card">
+                         <div class="section-title">
+                              <h3>
+                                   <i class="fa-solid fa-clock-rotate-left section-title-icon"></i>
+                                   Recent Focus Activity
+                              </h3>
+                              <p>Your latest Pomodoro sessions from the Study Timer.</p>
+                         </div>
+
+                         <div class="ds-recent-focus-list" id="dsRecentFocusList">
+                              <div class="ds-recent-focus-empty">
+                                   <i class="fa-solid fa-spinner fa-spin"></i>
+                                   <span>Loading recent focus activity...</span>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="ds-focus-insights-card">
+                         <div class="section-title">
+                              <h3>
+                                   <i class="fa-solid fa-wand-magic-sparkles section-title-icon"></i>
+                                   Smart Focus Insights
+                              </h3>
+                              <p>Personalized productivity insights from your realtime study activity.</p>
+                         </div>
+
+                         <div class="ds-focus-insights-list" id="dsFocusInsightsList">
+                              <div class="ds-focus-insight-empty">
+                                   <i class="fa-solid fa-spinner fa-spin"></i>
+                                   <span>Loading focus insights...</span>
+                              </div>
+                         </div>
+                    </div>
                </section>
           </main>
      </div>
