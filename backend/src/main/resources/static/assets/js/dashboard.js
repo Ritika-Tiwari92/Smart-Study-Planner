@@ -55,8 +55,16 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   // ─── CHANGE: API_BASE_URL consistent rakha ────────────────────────────────
-  const API_BASE_URL =
-    window.location.port === "8080" ? "" : "http://localhost:8080";
+  const API_BASE_URL = (() => {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+
+    if (isLocalhost && window.location.port !== "8080") {
+      return "http://localhost:8080";
+    }
+
+    return window.location.origin;
+  })();
 
   const ENDPOINTS = {
     // NEW: summary API — stats cards ke liye
@@ -234,7 +242,6 @@ document.addEventListener("DOMContentLoaded", function () {
       })}`;
     }
   }
-  
 
   function safeNumber(value, fallback = 0) {
     const num = Number(value);

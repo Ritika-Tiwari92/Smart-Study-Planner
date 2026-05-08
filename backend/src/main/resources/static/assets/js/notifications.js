@@ -7,8 +7,16 @@
 (function () {
   "use strict";
 
-  const API_BASE_URL =
-    window.location.port === "8080" ? "" : "http://localhost:8080";
+  const API_BASE_URL = (() => {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+
+    if (isLocalhost && window.location.port !== "8080") {
+      return "http://localhost:8080";
+    }
+
+    return window.location.origin;
+  })();
 
   let notifications = [];
   let isDropdownOpen = false;
