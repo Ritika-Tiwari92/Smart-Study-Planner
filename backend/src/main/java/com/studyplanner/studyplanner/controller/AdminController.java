@@ -15,28 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/**
- * AdminController — Ek hi controller mein sabhi admin APIs
- *
- * APIs included:
- * GET /api/admin/students
- * GET /api/admin/students/{id}
- * PUT /api/admin/students/{id}/block
- * DELETE /api/admin/students/{id}
- *
- * GET /api/admin/subjects
- * GET /api/admin/tasks
- * GET /api/admin/revisions
- * GET /api/admin/tests
- * POST /api/admin/tests
- * PUT /api/admin/tests/{id}
- * DELETE /api/admin/tests/{id}
- *
- * GET /api/admin/plans
- *
- * GET /api/admin/dashboard-summary
- * GET /api/admin/recent-activities
- */
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
@@ -73,9 +51,7 @@ public class AdminController {
           this.jdbcTemplate = jdbcTemplate;
      }
 
-     // ─────────────────────────────────────────
-     // Helper: Token se admin user nikalo
-     // ─────────────────────────────────────────
+     
      private User getAdminFromToken(String authHeader) {
           try {
                if (authHeader == null || !authHeader.startsWith("Bearer ")) {

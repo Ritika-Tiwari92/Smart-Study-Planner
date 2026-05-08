@@ -33,7 +33,9 @@
       return scripts[scripts.length - 1];
     })();
 
-  const scriptSrc = scriptEl ? scriptEl.getAttribute("src") : "admin-sidebar.js";
+  const scriptSrc = scriptEl
+    ? scriptEl.getAttribute("src")
+    : "admin-sidebar.js";
   const basePath = scriptSrc.replace("admin-sidebar.js", "");
   const sidebarURL = basePath + "admin-sidebar.html";
 
@@ -53,7 +55,10 @@
     })
     .catch(function (err) {
       console.error("[EduMind Sidebar]", err);
-      showSidebarToast("error", "Sidebar could not be loaded. Please check admin-sidebar.html.");
+      showSidebarToast(
+        "error",
+        "Sidebar could not be loaded. Please check admin-sidebar.html.",
+      );
     });
 
   /* ─────────────────────────────────────────────
@@ -68,8 +73,13 @@
     const logoutBtn = document.getElementById("emLogoutBtn");
 
     if (!sidebar) {
-      console.warn("[EduMind Sidebar] #emSidebar not found inside admin-sidebar.html.");
-      showSidebarToast("error", "Sidebar markup is missing. Please check admin-sidebar.html.");
+      console.warn(
+        "[EduMind Sidebar] #emSidebar not found inside admin-sidebar.html.",
+      );
+      showSidebarToast(
+        "error",
+        "Sidebar markup is missing. Please check admin-sidebar.html.",
+      );
       return;
     }
 
@@ -126,7 +136,7 @@
     const studentSelectors = [
       'a[href="admin-users.html"]',
       'a[href="./admin-users.html"]',
-      'a[href="/pages/admin/admin-users.html"]'
+      'a[href="/pages/admin/admin-users.html"]',
     ];
 
     studentSelectors.forEach(function (selector) {
@@ -139,10 +149,12 @@
       });
     });
 
-    document.querySelectorAll(".em-nav-item[data-page='admin-users']").forEach(function (item) {
-      item.setAttribute("data-page", "admin-students");
-      item.setAttribute("href", "admin-students.html");
-    });
+    document
+      .querySelectorAll(".em-nav-item[data-page='admin-users']")
+      .forEach(function (item) {
+        item.setAttribute("data-page", "admin-students");
+        item.setAttribute("href", "admin-students.html");
+      });
   }
 
   /* ─────────────────────────────────────────────
@@ -167,9 +179,10 @@
     const navItems = document.querySelectorAll(".em-nav-item[data-page]");
 
     navItems.forEach(function (item) {
-      const itemPage = item.getAttribute("data-page") === "admin-users"
-        ? "admin-students"
-        : item.getAttribute("data-page");
+      const itemPage =
+        item.getAttribute("data-page") === "admin-users"
+          ? "admin-students"
+          : item.getAttribute("data-page");
 
       item.classList.remove("em-active");
 
@@ -306,8 +319,8 @@
 
     fetch(API_BASE + "/api/admin/dashboard-summary", {
       headers: {
-        Authorization: "Bearer " + token
-      }
+        Authorization: "Bearer " + token,
+      },
     })
       .then(function (res) {
         if (res.status === 401 || res.status === 403) {
@@ -335,14 +348,19 @@
      10. Logout
   ───────────────────────────────────────────── */
 
-  function handleLogout() {
+  function handleLogout(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     if (!confirm("Logout from admin panel?")) return;
 
     clearAdminSession();
     showSidebarToast("success", "Logged out successfully.");
 
     setTimeout(function () {
-      window.location.href = "login.html";
+      window.location.replace("/pages/login.html");
     }, 600);
   }
 
@@ -359,7 +377,7 @@
       "userEmail",
       "userName",
       "edumind_logged_in_user",
-      "edumind_is_logged_in"
+      "edumind_is_logged_in",
     ].forEach(function (key) {
       localStorage.removeItem(key);
     });
@@ -379,11 +397,12 @@
     const toast = document.createElement("div");
     toast.className = "em-sidebar-toast " + type;
 
-    const iconClass = type === "success"
-      ? "fa-circle-check"
-      : type === "info"
-        ? "fa-circle-info"
-        : "fa-circle-xmark";
+    const iconClass =
+      type === "success"
+        ? "fa-circle-check"
+        : type === "info"
+          ? "fa-circle-info"
+          : "fa-circle-xmark";
 
     toast.innerHTML = `
       <i class="fas ${iconClass}"></i>

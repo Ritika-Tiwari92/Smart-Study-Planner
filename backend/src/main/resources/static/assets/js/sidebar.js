@@ -661,3 +661,23 @@
     init();
   }
 })();
+
+/* =========================================================
+   Auto Load Student Notifications
+   This loads notifications.js automatically on student pages.
+   ========================================================= */
+(function loadStudentNotificationsScript() {
+    const isAdminPage = window.location.pathname.includes("/admin/");
+    const alreadyLoaded = document.getElementById("edumindNotificationsScript");
+
+    if (isAdminPage || alreadyLoaded) {
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "edumindNotificationsScript";
+    script.src = "../assets/js/notifications.js";
+    script.defer = true;
+
+    document.body.appendChild(script);
+})();

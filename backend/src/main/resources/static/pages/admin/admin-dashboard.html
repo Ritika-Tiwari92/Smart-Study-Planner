@@ -1160,8 +1160,14 @@
           const API_BASE = window.EM_API_BASE || 'http://localhost:8080';
 
           const adminToken = localStorage.getItem('adminToken');
-          const adminRole = localStorage.getItem('adminRole');
           const savedUser = parseJsonSafe(localStorage.getItem('edumind_logged_in_user')) || {};
+          const adminRole = String(
+               localStorage.getItem('adminRole') ||
+               localStorage.getItem('userRole') ||
+               savedUser.role ||
+               savedUser.userRole ||
+               ''
+          ).toUpperCase();
           const adminName =
                localStorage.getItem('adminName') ||
                savedUser.fullName ||
@@ -1174,7 +1180,8 @@
           let charts = {};
 
           if (!adminToken || adminRole !== 'ADMIN') {
-               window.location.href = 'login.html';
+               localStorage.removeItem('adminToken');
+               window.location.replace('/pages/login.html');
           }
 
           document.getElementById('welcomeName').textContent = adminName.split(' ')[0] || 'Admin';
@@ -1324,7 +1331,7 @@
 
                if (res.status === 401 || res.status === 403) {
                     localStorage.clear();
-                    window.location.href = 'login.html';
+                    window.location.href = '/pages/login.html';
                     return null;
                }
 

@@ -4836,3 +4836,21 @@ body[data-theme="dark"] .dashboard-ai-link.success {
     padding: 5px 8px;
   }
 }
+/* Disable old hover-based notification dropdown */
+.dashboard-notification-dropdown,
+.notification-dropdown,
+.notification-menu {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Keep new JS notification dropdown active */
+#studentNotificationDropdown {
+  display: block;
+}
+
+#studentNotificationDropdown.hidden {
+  display: none !important;
+}

@@ -41,3 +41,10 @@ backend/src/main/resources/application.properties
 *.env
 application-secret.properties
 application-local.properties
+
+## Uploads folder (user uploaded files, not for Git)
+uploads/
+
+## OS files
+.DS_Store
+Thumbs.db

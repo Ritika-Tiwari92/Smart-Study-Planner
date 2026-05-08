@@ -10,18 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
-/**
- * AdminDashboardChartsController
- *
- * Separate premium chart endpoint for Admin Dashboard.
- *
- * Why separate controller?
- * - Existing AdminController is already large and working.
- * - This file adds final graph datasets without breaking old APIs.
- *
- * API:
- * GET /api/admin/dashboard-charts
- */
+
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")

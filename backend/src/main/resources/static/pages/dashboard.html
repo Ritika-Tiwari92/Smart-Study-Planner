@@ -110,20 +110,10 @@
                               <span>Syncing...</span>
                          </div>
                          <div class="notification-btn-wrapper">
-                              <button class="icon-btn" id="notificationToggleBtn" type="button" title="Notifications">
+                              <button class="icon-btn notification-btn" id="notificationToggleBtn" type="button"
+                                   title="Notifications" data-notification-toggle>
                                    <i class="fa-solid fa-bell"></i>
-                                   <span class="notif-badge hidden" id="notifBadgeDot"></span>
                               </button>
-
-                              <div class="dashboard-notification-dropdown hidden" id="dashboardNotificationDropdown">
-                                   <div class="dropdown-header">
-                                        <span>Notifications</span>
-                                   </div>
-                                   <div class="notif-empty-state">
-                                        <i class="fa-solid fa-bell-slash"></i>
-                                        <p>Loading notifications...</p>
-                                   </div>
-                              </div>
                          </div>
 
                          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
@@ -696,7 +686,9 @@
      <script src="../assets/js/auth-guard.js"></script>
      <script src="../assets/js/theme.js"></script>
      <script src="../assets/js/sidebar.js"></script>
+     <script src="../assets/js/profile-dropdown.js"></script>
      <script src="../assets/js/dashboard.js"></script>
+     <script src="../assets/js/notifications.js"></script>
 
      <script>
           (function () {
