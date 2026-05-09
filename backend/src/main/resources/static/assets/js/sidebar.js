@@ -11,7 +11,54 @@
    - Handle collapsed desktop sidebar
    - Handle mobile sidebar overlay
    ========================================================= */
+/* =========================================================
+   EduMind AI — HARD FIX: Mobile sidebar links navigation
+   This runs before all other sidebar handlers.
+   ========================================================= */
 
+(function () {
+  "use strict";
+
+  let lastSidebarNavTime = 0;
+
+  function isSidebarLink(element) {
+    return (
+      element &&
+      element.closest &&
+      element.closest(".sidebar .nav-item, .sidebar .logout-btn")
+    );
+  }
+
+  function resolveHref(href) {
+    if (!href || href === "#" || href.startsWith("javascript:")) return null;
+    return new URL(href, window.location.href).href;
+  }
+
+  function handleSidebarNavigation(event) {
+    const link = isSidebarLink(event.target);
+    if (!link) return;
+
+    const href = link.getAttribute("href");
+    const targetUrl = resolveHref(href);
+    if (!targetUrl) return;
+
+    const now = Date.now();
+    if (now - lastSidebarNavTime < 350) return;
+    lastSidebarNavTime = now;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    document.body.classList.remove("sidebar-open");
+
+    setTimeout(function () {
+      window.location.href = targetUrl;
+    }, 60);
+  }
+
+  document.addEventListener("click", handleSidebarNavigation, true);
+})();
 (function () {
   "use strict";
 
@@ -23,7 +70,7 @@
   const NAV_GROUPS = [
     {
       label: "MAIN",
-      pages: ["dashboard.html"]
+      pages: ["dashboard.html"],
     },
     {
       label: "CONTENT",
@@ -35,19 +82,19 @@
         "revisions.html",
         "tests.html",
         "pomodoro.html",
-        "assistant.html"
-      ]
+        "assistant.html",
+      ],
     },
     {
       label: "INSIGHTS",
-      pages: ["analytics.html", "settings.html"]
-    }
+      pages: ["analytics.html", "settings.html"],
+    },
   ];
 
   const PAGE_LABEL_OVERRIDES = {
     "revision.html": "Revisions",
     "revisions.html": "Revisions",
-    "pomodoro.html": "Study Timer"
+    "pomodoro.html": "Study Timer",
   };
 
   const PAGE_ICON_OVERRIDES = {
@@ -61,7 +108,7 @@
     "pomodoro.html": "fa-regular fa-clock",
     "assistant.html": "fa-solid fa-robot",
     "analytics.html": "fa-solid fa-chart-line",
-    "settings.html": "fa-solid fa-gear"
+    "settings.html": "fa-solid fa-gear",
   };
 
   function qs(selector, root = document) {
@@ -165,7 +212,9 @@
     const sidebarTop = getSidebarTop();
 
     if (!sidebarTop) {
-      console.warn("EduMind Sidebar: .sidebar-top not found. Hamburger not injected.");
+      console.warn(
+        "EduMind Sidebar: .sidebar-top not found. Hamburger not injected.",
+      );
       return;
     }
 
@@ -294,7 +343,9 @@
 
     existingItems.forEach((item) => {
       if (!usedItems.has(item)) {
-        if (!fragment.querySelector?.(".nav-section-label[data-extra='true']")) {
+        if (
+          !fragment.querySelector?.(".nav-section-label[data-extra='true']")
+        ) {
           const label = document.createElement("div");
           label.className = "nav-section-label";
           label.dataset.extra = "true";
@@ -359,7 +410,7 @@
       "loggedInUser",
       "user",
       "student",
-      "currentUser"
+      "currentUser",
     ];
 
     for (const key of possibleKeys) {
@@ -442,7 +493,10 @@
       logoutBtn.dataset.tooltip = "Logout";
 
       if (!qs("i", logoutBtn)) {
-        logoutBtn.insertAdjacentHTML("afterbegin", `<i class="fa-solid fa-right-from-bracket"></i>`);
+        logoutBtn.insertAdjacentHTML(
+          "afterbegin",
+          `<i class="fa-solid fa-right-from-bracket"></i>`,
+        );
       }
 
       if (!qs("span", logoutBtn)) {
@@ -483,7 +537,8 @@
 
     const profileRole = document.createElement("div");
     profileRole.className = "profile-role";
-    profileRole.textContent = String(role).toLowerCase() === "student" ? "Student" : role;
+    profileRole.textContent =
+      String(role).toLowerCase() === "student" ? "Student" : role;
 
     info.appendChild(profileName);
     info.appendChild(profileRole);
@@ -667,17 +722,17 @@
    This loads notifications.js automatically on student pages.
    ========================================================= */
 (function loadStudentNotificationsScript() {
-    const isAdminPage = window.location.pathname.includes("/admin/");
-    const alreadyLoaded = document.getElementById("edumindNotificationsScript");
+  const isAdminPage = window.location.pathname.includes("/admin/");
+  const alreadyLoaded = document.getElementById("edumindNotificationsScript");
 
-    if (isAdminPage || alreadyLoaded) {
-        return;
-    }
+  if (isAdminPage || alreadyLoaded) {
+    return;
+  }
 
-    const script = document.createElement("script");
-    script.id = "edumindNotificationsScript";
-    script.src = "../assets/js/notifications.js";
-    script.defer = true;
+  const script = document.createElement("script");
+  script.id = "edumindNotificationsScript";
+  script.src = "../assets/js/notifications.js";
+  script.defer = true;
 
-    document.body.appendChild(script);
+  document.body.appendChild(script);
 })();
