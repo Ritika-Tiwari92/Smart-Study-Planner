@@ -1088,53 +1088,190 @@ body.dark-mode .sidebar {
   }
 }
 /* =========================================================
-   FINAL FIX: Overlay must NOT cover sidebar links on mobile
+   FINAL GLOBAL MOBILE SIDEBAR NORMAL LIST FIX
+   Fixes: cut text, two-column sidebar items, collapsed mobile nav
    ========================================================= */
 
 @media (max-width: 900px) {
-  body.sidebar-open .sidebar {
-    left: 0 !important;
-    z-index: 5000 !important;
-    pointer-events: auto !important;
+  body.sidebar-open {
+    overflow: hidden !important;
   }
 
-  body.sidebar-open .sidebar * {
-    pointer-events: auto !important;
-  }
-
-  body.sidebar-open .sidebar-overlay,
-  body.sidebar-open #sidebarOverlay {
-    display: block !important;
+  .sidebar {
     position: fixed !important;
     top: 0 !important;
-    left: 260px !important;
+    left: -280px !important;
+    width: 270px !important;
+    max-width: 86vw !important;
+    height: 100vh !important;
+    z-index: 5000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    pointer-events: auto !important;
+  }
+
+  body.sidebar-open .sidebar {
+    left: 0 !important;
+  }
+
+  .sidebar,
+  .sidebar * {
+    filter: none !important;
+    pointer-events: auto !important;
+  }
+
+  .sidebar .nav-list,
+  .sidebar .sidebar-menu,
+  .sidebar nav,
+  .sidebar ul {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    grid-template-columns: none !important;
+  }
+
+  .sidebar .nav-item,
+  .sidebar a.nav-item,
+  .sidebar .sidebar-link,
+  .sidebar a {
+    width: 100% !important;
+    min-height: 48px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 14px !important;
+    padding: 13px 16px !important;
+    border-radius: 16px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    position: relative !important;
+    z-index: 5010 !important;
+  }
+
+  .sidebar .nav-item i,
+  .sidebar .sidebar-link i,
+  .sidebar a i {
+    width: 22px !important;
+    min-width: 22px !important;
+    text-align: center !important;
+    font-size: 16px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar .nav-item span,
+  .sidebar .sidebar-link span,
+  .sidebar a span,
+  .sidebar .nav-text,
+  .sidebar .link-text {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: auto !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 14px !important;
+  }
+
+  .sidebar.collapsed,
+  body.sidebar-collapsed .sidebar,
+  .dashboard-layout.sidebar-collapsed .sidebar {
+    width: 270px !important;
+    max-width: 86vw !important;
+  }
+
+  .sidebar.collapsed .nav-item,
+  body.sidebar-collapsed .sidebar .nav-item,
+  .dashboard-layout.sidebar-collapsed .sidebar .nav-item {
+    justify-content: flex-start !important;
+    padding: 13px 16px !important;
+  }
+
+  .sidebar.collapsed .nav-item span,
+  body.sidebar-collapsed .sidebar .nav-item span,
+  .dashboard-layout.sidebar-collapsed .sidebar .nav-item span {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .sidebar-overlay,
+  #sidebarOverlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 270px !important;
     right: 0 !important;
     bottom: 0 !important;
     width: auto !important;
     height: 100vh !important;
     z-index: 4000 !important;
+    display: none !important;
     background: rgba(2, 6, 23, 0.55) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     pointer-events: auto !important;
   }
 
-  .sidebar .nav-item,
-  .sidebar .logout-btn {
-    position: relative !important;
-    z-index: 5010 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
+  body.sidebar-open .sidebar-overlay,
+  body.sidebar-open #sidebarOverlay {
+    display: block !important;
+    opacity: 1 !important;
   }
 
-  .sidebar-mobile-trigger {
+  .sidebar-mobile-trigger,
+  #mobileSidebarBtn {
+    position: fixed !important;
+    top: 18px !important;
+    left: 18px !important;
+    width: 46px !important;
+    height: 46px !important;
     z-index: 5100 !important;
+    border-radius: 16px !important;
+  }
+
+  body.sidebar-open .sidebar-mobile-trigger,
+  body.sidebar-open #mobileSidebarBtn {
+    left: 224px !important;
+  }
+
+  .dashboard-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 72px !important;
   }
 }
 
 @media (max-width: 576px) {
-  body.sidebar-open .sidebar-overlay,
-  body.sidebar-open #sidebarOverlay {
-    left: 248px !important;
+  .sidebar {
+    width: 260px !important;
+    max-width: 86vw !important;
+    left: -270px !important;
+  }
+
+  body.sidebar-open .sidebar {
+    left: 0 !important;
+  }
+
+  .sidebar-overlay,
+  #sidebarOverlay {
+    left: 260px !important;
+  }
+
+  body.sidebar-open .sidebar-mobile-trigger,
+  body.sidebar-open #mobileSidebarBtn {
+    left: 214px !important;
+  }
+
+  .dashboard-main {
+    padding: 72px 14px 18px !important;
   }
 }

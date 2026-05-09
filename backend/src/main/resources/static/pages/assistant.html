@@ -8,1036 +8,1869 @@
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/sidebar.css">
-     <link rel="stylesheet" href="../assets/css/dark-mode.css">
-     <link rel="stylesheet" href="../assets/css/assistant.css">
+     <style>
+          :root {
+               --bg: #06141a;
+               --bg-soft: #081d26;
+               --surface: rgba(10, 31, 40, 0.82);
+               --surface-2: rgba(13, 42, 52, 0.86);
+               --text: #f8fafc;
+               --muted: #9fb1c5;
+               --border: rgba(148, 163, 184, 0.16);
+               --teal: #22d3ee;
+               --cyan: #14b8a6;
+               --purple: #7c3aed;
+               --danger: #fb7185;
+               --shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+               --sidebar-width: 280px;
+          }
 
+          body.light-mode {
+               --bg: #f5fbfc;
+               --bg-soft: #ecfeff;
+               --surface: rgba(255, 255, 255, 0.84);
+               --surface-2: rgba(255, 255, 255, 0.92);
+               --text: #0f172a;
+               --muted: #64748b;
+               --border: rgba(20, 184, 166, 0.18);
+               --shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+          }
+
+          * {
+               box-sizing: border-box;
+               margin: 0;
+               padding: 0;
+          }
+
+          html {
+               scroll-behavior: smooth;
+          }
+
+          body {
+               min-height: 100vh;
+               font-family: "Poppins", sans-serif;
+               color: var(--text);
+               background:
+                    radial-gradient(circle at 18% 16%, rgba(34, 211, 238, 0.11), transparent 26%),
+                    radial-gradient(circle at 86% 78%, rgba(124, 58, 237, 0.10), transparent 28%),
+                    linear-gradient(135deg, var(--bg) 0%, #071b24 48%, var(--bg) 100%);
+               overflow: hidden;
+          }
+
+          body.light-mode {
+               background:
+                    radial-gradient(circle at 18% 16%, rgba(34, 211, 238, 0.16), transparent 26%),
+                    radial-gradient(circle at 86% 78%, rgba(124, 58, 237, 0.11), transparent 28%),
+                    linear-gradient(135deg, #f8feff 0%, #eefafa 50%, #f8fbff 100%);
+          }
+
+          a {
+               color: inherit;
+               text-decoration: none;
+          }
+
+          button,
+          input {
+               font: inherit;
+          }
+
+          .app-shell {
+               min-height: 100vh;
+               display: grid;
+               grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+               position: relative;
+               z-index: 2;
+          }
+
+          /* Background animation */
+          .ai-bg {
+               position: fixed;
+               inset: 0;
+               z-index: 0;
+               pointer-events: none;
+               overflow: hidden;
+          }
+
+          .ai-bg::before {
+               content: "";
+               position: absolute;
+               inset: 0;
+               background-image:
+                    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px),
+                    radial-gradient(circle at 22% 78%, rgba(34, 211, 238, 0.65) 0 1px, transparent 2px),
+                    radial-gradient(circle at 68% 16%, rgba(255, 255, 255, 0.55) 0 1px, transparent 2px),
+                    radial-gradient(circle at 82% 64%, rgba(20, 184, 166, 0.7) 0 1px, transparent 2px),
+                    radial-gradient(circle at 91% 34%, rgba(196, 181, 253, 0.62) 0 1px, transparent 2px),
+                    radial-gradient(circle at 38% 52%, rgba(255, 255, 255, 0.45) 0 1px, transparent 2px);
+               opacity: 0.85;
+               animation: twinkle 6s ease-in-out infinite;
+          }
+
+          .ai-grid {
+               position: absolute;
+               inset: 0;
+               background-image:
+                    linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+               background-size: 62px 62px;
+               opacity: 0.32;
+               animation: gridFloat 10s ease-in-out infinite;
+          }
+
+          .ai-core,
+          .orbit {
+               position: absolute;
+               top: 48%;
+               left: 52%;
+               transform: translate(-50%, -50%);
+               border-radius: 50%;
+          }
+
+          .ai-core {
+               width: 112px;
+               height: 112px;
+               background: radial-gradient(circle, rgba(34, 211, 238, 0.28), rgba(124, 58, 237, 0.18) 52%, transparent 78%);
+               box-shadow: 0 0 70px rgba(34, 211, 238, 0.25), 0 0 140px rgba(124, 58, 237, 0.16);
+               animation: pulseCore 3.8s ease-in-out infinite;
+          }
+
+          .orbit {
+               border: 1px solid rgba(34, 211, 238, 0.18);
+               animation: rotateOrbit 16s linear infinite;
+          }
+
+          .orbit.one {
+               width: 260px;
+               height: 260px;
+               margin-left: -130px;
+               margin-top: -130px;
+          }
+
+          .orbit.two {
+               width: 430px;
+               height: 430px;
+               margin-left: -215px;
+               margin-top: -215px;
+               border-color: rgba(124, 58, 237, 0.20);
+               animation-duration: 24s;
+               animation-direction: reverse;
+          }
+
+          .orbit.three {
+               width: 620px;
+               height: 620px;
+               margin-left: -310px;
+               margin-top: -310px;
+               border-color: rgba(20, 184, 166, 0.13);
+               animation-duration: 34s;
+          }
+
+          .dot {
+               position: absolute;
+               top: 50%;
+               left: 0;
+               width: 8px;
+               height: 8px;
+               border-radius: 50%;
+               background: var(--teal);
+               box-shadow: 0 0 14px rgba(34, 211, 238, 0.9);
+               transform: translateY(-50%);
+          }
+
+          .orbit.two .dot {
+               top: 0;
+               left: 50%;
+               background: #8b5cf6;
+               transform: translateX(-50%);
+          }
+
+          .orbit.three .dot {
+               left: 100%;
+               background: var(--cyan);
+          }
+
+          @keyframes twinkle {
+
+               0%,
+               100% {
+                    opacity: 0.55;
+               }
+
+               50% {
+                    opacity: 1;
+               }
+          }
+
+          @keyframes gridFloat {
+
+               0%,
+               100% {
+                    transform: translateY(0);
+               }
+
+               50% {
+                    transform: translateY(-18px);
+               }
+          }
+
+          @keyframes pulseCore {
+
+               0%,
+               100% {
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: .72;
+               }
+
+               50% {
+                    transform: translate(-50%, -50%) scale(1.18);
+                    opacity: 1;
+               }
+          }
+
+          @keyframes rotateOrbit {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          /* Sidebar */
+          .sidebar {
+               width: var(--sidebar-width);
+               height: 100vh;
+               padding: 22px 18px;
+               background: linear-gradient(180deg, rgba(5, 20, 28, 0.96), rgba(6, 18, 28, 0.96));
+               border-right: 1px solid var(--border);
+               position: sticky;
+               top: 0;
+               overflow-y: auto;
+               z-index: 80;
+          }
+
+          body.light-mode .sidebar {
+               background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 253, 255, 0.96));
+          }
+
+          .brand {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 4px 4px 22px;
+               border-bottom: 1px solid var(--border);
+               margin-bottom: 22px;
+          }
+
+          .brand-icon {
+               width: 46px;
+               height: 46px;
+               border-radius: 16px;
+               display: grid;
+               place-items: center;
+               color: var(--teal);
+               background: rgba(34, 211, 238, 0.10);
+               border: 1px solid rgba(34, 211, 238, 0.22);
+               box-shadow: 0 0 26px rgba(34, 211, 238, 0.12);
+          }
+
+          .brand h2 {
+               font-size: 19px;
+               line-height: 1.1;
+               color: var(--teal);
+               font-weight: 800;
+               letter-spacing: 0.2px;
+          }
+
+          .brand span {
+               display: block;
+               margin-top: 4px;
+               color: var(--muted);
+               font-size: 10px;
+               text-transform: uppercase;
+               letter-spacing: 0.16em;
+               font-weight: 700;
+          }
+
+          .nav-label {
+               color: var(--muted);
+               font-size: 11px;
+               font-weight: 800;
+               text-transform: uppercase;
+               letter-spacing: 0.16em;
+               padding: 14px 6px 8px;
+          }
+
+          .nav-item {
+               display: flex;
+               align-items: center;
+               gap: 13px;
+               padding: 13px 14px;
+               margin: 6px 0;
+               color: var(--muted);
+               border: 1px solid transparent;
+               border-radius: 16px;
+               font-size: 14px;
+               font-weight: 700;
+               transition: 0.22s ease;
+               cursor: pointer;
+          }
+
+          .nav-item i {
+               width: 20px;
+               text-align: center;
+          }
+
+          .nav-item:hover,
+          .nav-item.active {
+               color: var(--teal);
+               background: rgba(34, 211, 238, 0.10);
+               border-color: rgba(34, 211, 238, 0.22);
+               transform: translateX(3px);
+          }
+
+          .sidebar-bottom {
+               margin-top: 24px;
+               padding-top: 16px;
+               border-top: 1px solid var(--border);
+          }
+
+          .user-card {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               padding: 12px;
+               border-radius: 16px;
+               background: rgba(15, 23, 42, 0.42);
+               border: 1px solid var(--border);
+               margin-bottom: 10px;
+          }
+
+          body.light-mode .user-card {
+               background: rgba(255, 255, 255, 0.72);
+          }
+
+          .avatar {
+               width: 44px;
+               height: 44px;
+               border-radius: 50%;
+               display: grid;
+               place-items: center;
+               color: #fff;
+               background: linear-gradient(135deg, var(--cyan), var(--teal));
+               font-weight: 800;
+               flex: 0 0 auto;
+          }
+
+          .user-card h4 {
+               font-size: 13px;
+               color: var(--text);
+               line-height: 1.25;
+          }
+
+          .user-card p {
+               color: var(--teal);
+               font-size: 11px;
+               font-weight: 700;
+               margin-top: 3px;
+          }
+
+          .logout-btn {
+               width: 100%;
+               border: 0;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               gap: 10px;
+               padding: 13px 14px;
+               color: var(--danger);
+               background: rgba(248, 113, 113, 0.08);
+               border-radius: 16px;
+               font-weight: 800;
+               cursor: pointer;
+          }
+
+          .mobile-toggle {
+               display: none;
+               position: fixed;
+               left: 16px;
+               top: 16px;
+               z-index: 130;
+               width: 48px;
+               height: 48px;
+               border-radius: 16px;
+               border: 1px solid rgba(34, 211, 238, 0.28);
+               background: rgba(8, 25, 34, 0.92);
+               color: var(--text);
+               font-size: 20px;
+               box-shadow: var(--shadow);
+               cursor: pointer;
+          }
+
+          body.light-mode .mobile-toggle {
+               background: rgba(255, 255, 255, 0.94);
+          }
+
+          .overlay {
+               display: none;
+               position: fixed;
+               inset: 0;
+               background: rgba(2, 6, 23, 0.58);
+               z-index: 60;
+          }
+
+          body.sidebar-open {
+               overflow: hidden;
+          }
+
+          body.sidebar-open .overlay {
+               display: block;
+               left: var(--sidebar-width);
+          }
+
+          body.sidebar-open .mobile-toggle {
+               left: calc(var(--sidebar-width) - 64px);
+          }
+
+          /* Main */
+          .main {
+               height: 100vh;
+               min-width: 0;
+               display: flex;
+               flex-direction: column;
+               position: relative;
+               z-index: 3;
+               overflow: hidden;
+          }
+
+          .topbar {
+               flex: 0 0 auto;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               gap: 16px;
+               padding: 18px 24px;
+               background: rgba(8, 25, 34, 0.78);
+               border-bottom: 1px solid var(--border);
+               backdrop-filter: blur(18px);
+               position: relative;
+               z-index: 20;
+          }
+
+          body.light-mode .topbar {
+               background: rgba(255, 255, 255, 0.78);
+          }
+
+          .topbar-left h1 {
+               font-size: clamp(20px, 3vw, 30px);
+               font-weight: 800;
+               line-height: 1.15;
+          }
+
+          .topbar-left p {
+               color: var(--muted);
+               margin-top: 5px;
+               font-size: 13px;
+               line-height: 1.5;
+          }
+
+          .topbar-actions {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               position: relative;
+          }
+
+          .btn {
+               border: 0;
+               border-radius: 15px;
+               padding: 12px 16px;
+               cursor: pointer;
+               font-weight: 800;
+               color: #fff;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               box-shadow: 0 14px 30px rgba(20, 184, 166, 0.18);
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               gap: 9px;
+               transition: 0.2s ease;
+               white-space: nowrap;
+          }
+
+          .btn:hover {
+               transform: translateY(-2px);
+          }
+
+          .icon-btn {
+               width: 46px;
+               height: 46px;
+               padding: 0;
+               background: var(--surface);
+               color: var(--teal);
+               border: 1px solid var(--border);
+               box-shadow: none;
+          }
+
+          .profile-mini {
+               display: flex;
+               align-items: center;
+               gap: 11px;
+               min-width: 180px;
+               padding: 9px 12px;
+               border-radius: 18px;
+               background: var(--surface);
+               border: 1px solid var(--border);
+               cursor: pointer;
+          }
+
+          .profile-mini .avatar {
+               width: 36px;
+               height: 36px;
+               font-size: 13px;
+          }
+
+          .profile-mini h4 {
+               font-size: 13px;
+               line-height: 1.25;
+          }
+
+          .profile-mini p {
+               color: var(--muted);
+               font-size: 11px;
+               text-transform: uppercase;
+               font-weight: 700;
+               margin-top: 2px;
+          }
+
+          .profile-dropdown {
+               position: absolute;
+               top: calc(100% + 10px);
+               right: 0;
+               width: 230px;
+               background: var(--surface-2);
+               border: 1px solid var(--border);
+               border-radius: 18px;
+               box-shadow: var(--shadow);
+               padding: 8px;
+               display: none;
+               z-index: 80;
+          }
+
+          .profile-dropdown.open {
+               display: block;
+          }
+
+          .profile-dropdown a {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               padding: 11px 12px;
+               border-radius: 13px;
+               color: var(--muted);
+               font-size: 13px;
+               font-weight: 700;
+          }
+
+          .profile-dropdown a:hover {
+               background: rgba(34, 211, 238, 0.10);
+               color: var(--teal);
+          }
+
+          .assistant-body {
+               flex: 1;
+               min-height: 0;
+               display: grid;
+               grid-template-columns: minmax(0, 1fr) 320px;
+               gap: 0;
+               overflow: hidden;
+          }
+
+          .chat-panel {
+               min-width: 0;
+               display: flex;
+               flex-direction: column;
+               padding: 26px;
+               overflow: hidden;
+               position: relative;
+          }
+
+          .hero {
+               text-align: center;
+               padding: 22px 16px 18px;
+               flex: 0 0 auto;
+          }
+
+          .hero.hidden {
+               display: none;
+          }
+
+          .astra-wrap {
+               width: 130px;
+               height: 130px;
+               margin: 0 auto 18px;
+               position: relative;
+               display: grid;
+               place-items: center;
+          }
+
+          .astra-wrap::before,
+          .astra-wrap::after {
+               content: "";
+               position: absolute;
+               border-radius: 34px;
+               border: 1px solid rgba(34, 211, 238, 0.28);
+               animation: spinSmall 11s linear infinite;
+          }
+
+          .astra-wrap::before {
+               inset: 10px;
+          }
+
+          .astra-wrap::after {
+               inset: 0;
+               border-color: rgba(124, 58, 237, 0.28);
+               animation-direction: reverse;
+               animation-duration: 15s;
+          }
+
+          .astra-avatar {
+               width: 90px;
+               height: 90px;
+               border-radius: 28px;
+               display: grid;
+               place-items: center;
+               background: rgba(255, 255, 255, 0.95);
+               color: var(--purple);
+               font-size: 34px;
+               position: relative;
+               z-index: 2;
+               box-shadow: 0 18px 45px rgba(34, 211, 238, 0.18);
+               animation: floatLogo 4s ease-in-out infinite;
+          }
+
+          @keyframes spinSmall {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes floatLogo {
+
+               0%,
+               100% {
+                    transform: translateY(0);
+               }
+
+               50% {
+                    transform: translateY(-7px);
+               }
+          }
+
+          .hero h2 {
+               max-width: 780px;
+               margin: 0 auto;
+               font-size: clamp(22px, 4vw, 36px);
+               line-height: 1.2;
+               font-weight: 800;
+          }
+
+          .hero p {
+               max-width: 640px;
+               margin: 12px auto 0;
+               color: var(--muted);
+               line-height: 1.7;
+               font-size: 14px;
+          }
+
+          .quick-actions {
+               margin-top: 18px;
+               display: flex;
+               justify-content: center;
+               flex-wrap: wrap;
+               gap: 10px;
+          }
+
+          .chip {
+               border: 1px solid var(--border);
+               background: var(--surface);
+               color: var(--text);
+               border-radius: 999px;
+               padding: 10px 14px;
+               display: inline-flex;
+               align-items: center;
+               gap: 8px;
+               cursor: pointer;
+               font-size: 13px;
+               font-weight: 700;
+          }
+
+          .chip:hover {
+               color: var(--teal);
+               border-color: rgba(34, 211, 238, 0.35);
+               transform: translateY(-2px);
+          }
+
+          .messages {
+               flex: 1;
+               min-height: 0;
+               overflow-y: auto;
+               display: flex;
+               flex-direction: column;
+               gap: 14px;
+               padding: 10px 4px 14px;
+          }
+
+          .message {
+               display: flex;
+               gap: 10px;
+               align-items: flex-end;
+               animation: messageIn 0.25s ease both;
+          }
+
+          .message.user {
+               justify-content: flex-end;
+          }
+
+          .bubble {
+               max-width: min(760px, 74%);
+               padding: 13px 16px;
+               border-radius: 20px;
+               line-height: 1.75;
+               font-size: 14px;
+               white-space: pre-wrap;
+               word-break: break-word;
+               border: 1px solid var(--border);
+               background: var(--surface);
+               color: var(--text);
+          }
+
+          .message.user .bubble {
+               color: white;
+               border-color: transparent;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               border-bottom-right-radius: 7px;
+          }
+
+          .message.assistant .bubble {
+               border-bottom-left-radius: 7px;
+          }
+
+          @keyframes messageIn {
+               from {
+                    opacity: 0;
+                    transform: translateY(10px);
+               }
+
+               to {
+                    opacity: 1;
+                    transform: translateY(0);
+               }
+          }
+
+          .input-wrap {
+               flex: 0 0 auto;
+               padding-top: 12px;
+          }
+
+          .input-box {
+               display: flex;
+               align-items: center;
+               gap: 12px;
+               min-height: 60px;
+               padding: 8px 10px 8px 16px;
+               border-radius: 20px;
+               background: var(--surface-2);
+               border: 1px solid var(--border);
+               box-shadow: var(--shadow);
+          }
+
+          .input-box i {
+               color: var(--teal);
+          }
+
+          .input-box input {
+               flex: 1;
+               min-width: 0;
+               border: 0;
+               outline: 0;
+               background: transparent;
+               color: var(--text);
+               font-size: 14px;
+               height: 42px;
+          }
+
+          .input-box input::placeholder {
+               color: color-mix(in srgb, var(--muted) 78%, transparent);
+          }
+
+          .send-btn {
+               flex: 0 0 auto;
+               width: 46px;
+               height: 46px;
+               border: 0;
+               border-radius: 15px;
+               color: #fff;
+               background: linear-gradient(135deg, var(--teal), var(--cyan));
+               cursor: pointer;
+          }
+
+          .hint {
+               color: var(--muted);
+               font-size: 11px;
+               margin-top: 8px;
+               display: flex;
+               align-items: center;
+               gap: 6px;
+          }
+
+          .side-panel {
+               border-left: 1px solid var(--border);
+               background: rgba(8, 25, 34, 0.62);
+               backdrop-filter: blur(18px);
+               padding: 20px 16px;
+               overflow-y: auto;
+               position: relative;
+          }
+
+          body.light-mode .side-panel {
+               background: rgba(255, 255, 255, 0.72);
+          }
+
+
+          .section-title {
+               display: flex;
+               align-items: center;
+               gap: 8px;
+               color: var(--muted);
+               text-transform: uppercase;
+               font-size: 11px;
+               font-weight: 800;
+               letter-spacing: 0.08em;
+               padding-bottom: 10px;
+               border-bottom: 1px solid var(--border);
+               margin-bottom: 12px;
+          }
+
+          .help-list,
+          .history-list {
+               display: flex;
+               flex-direction: column;
+               gap: 9px;
+               margin-bottom: 22px;
+          }
+
+          .help-item,
+          .history-item {
+               padding: 12px;
+               border-radius: 16px;
+               display: flex;
+               align-items: flex-start;
+               gap: 10px;
+               background: var(--surface);
+               border: 1px solid var(--border);
+               cursor: pointer;
+               transition: 0.2s ease;
+               color: var(--muted);
+               font-size: 12.5px;
+               line-height: 1.55;
+               font-weight: 600;
+          }
+
+          .help-item:hover,
+          .history-item:hover {
+               color: var(--text);
+               border-color: rgba(34, 211, 238, 0.32);
+               transform: translateY(-2px);
+          }
+
+          .help-item i,
+          .history-item i {
+               color: var(--teal);
+               margin-top: 3px;
+          }
+
+          .history-empty {
+               text-align: center;
+               color: var(--muted);
+               padding: 26px 10px;
+               border: 1px dashed var(--border);
+               border-radius: 18px;
+               font-size: 13px;
+          }
+
+          .toast {
+               position: fixed;
+               right: 18px;
+               top: 18px;
+               z-index: 200;
+               padding: 13px 15px;
+               border-radius: 16px;
+               color: white;
+               background: linear-gradient(135deg, #0891b2, #0f766e);
+               box-shadow: var(--shadow);
+               font-weight: 700;
+               font-size: 13px;
+               max-width: 420px;
+          }
+
+          .toast.error {
+               background: linear-gradient(135deg, #991b1b, #dc2626);
+          }
+
+          .toast.warning {
+               background: linear-gradient(135deg, #b45309, #f59e0b);
+          }
+
+          @media (max-width: 1100px) {
+               .assistant-body {
+                    grid-template-columns: minmax(0, 1fr) 280px;
+               }
+          }
+
+          @media (max-width: 900px) {
+               body {
+                    overflow: auto;
+               }
+
+               .mobile-toggle {
+                    display: grid;
+                    place-items: center;
+               }
+
+               .app-shell {
+                    display: block;
+               }
+
+               .sidebar {
+                    position: fixed;
+                    top: 0;
+                    left: calc(-1 * var(--sidebar-width));
+                    width: var(--sidebar-width);
+                    max-width: 82vw;
+                    height: 100vh;
+                    transition: left 0.24s ease;
+                    z-index: 90;
+               }
+
+               body.sidebar-open .sidebar {
+                    left: 0;
+               }
+
+               .main {
+                    min-height: 100vh;
+                    height: auto;
+                    overflow: visible;
+                    padding-top: 74px;
+               }
+
+               .topbar {
+                    margin: 14px;
+                    border: 1px solid var(--border);
+                    border-radius: 24px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    padding: 18px;
+               }
+
+               .topbar-actions {
+                    display: grid;
+                    grid-template-columns: 1fr auto auto;
+               }
+
+               .new-chat-top span {
+                    display: inline;
+               }
+
+               .profile-mini {
+                    grid-column: 1 / -1;
+                    width: 100%;
+               }
+
+               .profile-dropdown {
+                    width: min(100%, 260px);
+                    right: 0;
+               }
+
+               .assistant-body {
+                    display: block;
+                    overflow: visible;
+               }
+
+               .chat-panel {
+                    min-height: calc(100vh - 120px);
+                    padding: 18px 14px;
+                    overflow: visible;
+               }
+
+               .side-panel {
+                    margin: 0 14px 20px;
+                    border: 1px solid var(--border);
+                    border-radius: 24px;
+                    max-height: none;
+               }
+
+               .hero {
+                    padding-top: 12px;
+               }
+
+               .orbit.three {
+                    display: none;
+               }
+
+               .ai-core,
+               .orbit {
+                    left: 50%;
+                    top: 44%;
+               }
+          }
+
+          @media (max-width: 576px) {
+               :root {
+                    --sidebar-width: 248px;
+               }
+
+               body.sidebar-open .overlay {
+                    left: var(--sidebar-width);
+               }
+
+               body.sidebar-open .mobile-toggle {
+                    left: calc(var(--sidebar-width) - 58px);
+               }
+
+               .topbar-left h1 {
+                    font-size: 24px;
+                    padding-left: 20px;
+               }
+
+               .topbar-left p {
+                    padding-left: 20px;
+               }
+
+               .topbar-actions {
+                    grid-template-columns: 1fr 48px 48px;
+               }
+
+               .btn span.optional {
+                    display: none;
+               }
+
+               .profile-mini div {
+                    display: block;
+               }
+
+               .astra-wrap {
+                    width: 112px;
+                    height: 112px;
+               }
+
+               .astra-avatar {
+                    width: 82px;
+                    height: 82px;
+                    font-size: 30px;
+               }
+
+               .hero h2 {
+                    font-size: 23px;
+               }
+
+               .quick-actions {
+                    flex-direction: column;
+                    align-items: stretch;
+               }
+
+               .chip {
+                    justify-content: center;
+                    border-radius: 16px;
+               }
+
+               .bubble {
+                    max-width: 88%;
+               }
+
+               .messages {
+                    min-height: 180px;
+               }
+
+               .input-box {
+                    border-radius: 18px;
+               }
+
+               .hint {
+                    align-items: flex-start;
+               }
+          }
+
+          /* =========================================================
+       FINAL USER REQUEST FIX
+       1) Visible mobile hamburger
+       2) Strong Astra icon animation
+       3) Removed duplicate New Chat button from right tooltip panel
+    ========================================================= */
+
+          .mobile-toggle {
+               display: grid !important;
+               place-items: center !important;
+               position: fixed !important;
+               left: 18px !important;
+               top: 18px !important;
+               z-index: 9999 !important;
+               width: 52px !important;
+               height: 52px !important;
+               border-radius: 18px !important;
+               border: 1px solid rgba(34, 211, 238, 0.48) !important;
+               background: rgba(6, 20, 28, 0.92) !important;
+               color: #e6fbff !important;
+               font-size: 21px !important;
+               box-shadow:
+                    0 18px 44px rgba(0, 0, 0, 0.28),
+                    0 0 22px rgba(34, 211, 238, 0.18) !important;
+               backdrop-filter: blur(14px) !important;
+               -webkit-backdrop-filter: blur(14px) !important;
+          }
+
+          body.light-mode .mobile-toggle {
+               background: rgba(255, 255, 255, 0.94) !important;
+               color: #0f766e !important;
+               box-shadow:
+                    0 16px 34px rgba(15, 23, 42, 0.12),
+                    0 0 18px rgba(20, 184, 166, 0.16) !important;
+          }
+
+          body.sidebar-open .mobile-toggle {
+               left: calc(var(--sidebar-width) - 66px) !important;
+               background: rgba(8, 25, 34, 0.96) !important;
+               border-color: rgba(34, 211, 238, 0.6) !important;
+          }
+
+          @media (min-width: 901px) {
+               .mobile-toggle {
+                    display: none !important;
+               }
+          }
+
+          @media (max-width: 900px) {
+               .mobile-toggle {
+                    display: grid !important;
+               }
+
+               .topbar-left h1,
+               .topbar-left p {
+                    padding-left: 48px !important;
+               }
+          }
+
+          .astra-wrap {
+               isolation: isolate;
+          }
+
+          .astra-wrap::before,
+          .astra-wrap::after {
+               border-width: 2px !important;
+               opacity: 1 !important;
+               filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.26));
+          }
+
+          .astra-wrap::before {
+               inset: 8px !important;
+               border-color: rgba(34, 211, 238, 0.52) !important;
+               box-shadow:
+                    0 0 24px rgba(34, 211, 238, 0.18),
+                    inset 0 0 18px rgba(34, 211, 238, 0.09) !important;
+               animation: astraHardSpin 5.5s linear infinite !important;
+          }
+
+          .astra-wrap::after {
+               inset: -5px !important;
+               border-color: rgba(124, 58, 237, 0.48) !important;
+               box-shadow:
+                    0 0 28px rgba(124, 58, 237, 0.20),
+                    inset 0 0 18px rgba(124, 58, 237, 0.10) !important;
+               animation: astraHardSpinReverse 7.5s linear infinite !important;
+          }
+
+          .astra-avatar {
+               overflow: visible !important;
+               background:
+                    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 1), rgba(230, 255, 255, 0.96) 46%, rgba(210, 248, 255, 0.92) 100%) !important;
+               color: #0f766e !important;
+               box-shadow:
+                    0 20px 48px rgba(34, 211, 238, 0.28),
+                    0 0 34px rgba(34, 211, 238, 0.22),
+                    0 0 72px rgba(124, 58, 237, 0.16) !important;
+               animation: astraFloatStrong 2.8s ease-in-out infinite !important;
+          }
+
+          .astra-avatar::before {
+               content: "";
+               position: absolute;
+               inset: -18px;
+               border-radius: 34px;
+               background:
+                    conic-gradient(from 0deg,
+                         transparent 0deg,
+                         rgba(34, 211, 238, 0.0) 48deg,
+                         rgba(34, 211, 238, 0.82) 86deg,
+                         rgba(124, 58, 237, 0.68) 132deg,
+                         transparent 178deg,
+                         rgba(20, 184, 166, 0.72) 238deg,
+                         transparent 300deg,
+                         rgba(34, 211, 238, 0.72) 360deg);
+               opacity: 0.72;
+               filter: blur(0.4px) drop-shadow(0 0 12px rgba(34, 211, 238, 0.45));
+               z-index: -2;
+               animation: astraAuraSpin 4s linear infinite;
+               mask: radial-gradient(circle, transparent 54%, #000 56%);
+               -webkit-mask: radial-gradient(circle, transparent 54%, #000 56%);
+          }
+
+          .astra-avatar::after {
+               content: "";
+               position: absolute;
+               inset: -30px;
+               border-radius: 44px;
+               background:
+                    radial-gradient(circle at 18% 30%, rgba(34, 211, 238, 0.95) 0 3px, transparent 4px),
+                    radial-gradient(circle at 76% 18%, rgba(124, 58, 237, 0.86) 0 3px, transparent 4px),
+                    radial-gradient(circle at 84% 72%, rgba(20, 184, 166, 0.9) 0 3px, transparent 4px),
+                    radial-gradient(circle at 24% 82%, rgba(34, 211, 238, 0.75) 0 2.5px, transparent 4px);
+               z-index: -1;
+               animation: astraSparkOrbit 3.8s linear infinite;
+               opacity: 0.92;
+          }
+
+          .astra-avatar i {
+               animation: astraBotPulse 2.2s ease-in-out infinite;
+               filter: drop-shadow(0 0 10px rgba(20, 184, 166, 0.35));
+          }
+
+          @keyframes astraHardSpin {
+               from {
+                    transform: rotate(0deg) scale(1);
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(1.04);
+               }
+
+               to {
+                    transform: rotate(360deg) scale(1);
+               }
+          }
+
+          @keyframes astraHardSpinReverse {
+               from {
+                    transform: rotate(360deg) scale(1.02);
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(0.96);
+               }
+
+               to {
+                    transform: rotate(0deg) scale(1.02);
+               }
+          }
+
+          @keyframes astraFloatStrong {
+
+               0%,
+               100% {
+                    transform: translateY(0) scale(1);
+               }
+
+               35% {
+                    transform: translateY(-9px) scale(1.035);
+               }
+
+               70% {
+                    transform: translateY(3px) scale(0.99);
+               }
+          }
+
+          @keyframes astraAuraSpin {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes astraSparkOrbit {
+               from {
+                    transform: rotate(0deg) scale(1);
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(1.05);
+               }
+
+               to {
+                    transform: rotate(360deg) scale(1);
+               }
+          }
+
+          @keyframes astraBotPulse {
+
+               0%,
+               100% {
+                    transform: scale(1);
+                    opacity: 1;
+               }
+
+               50% {
+                    transform: scale(1.1);
+                    opacity: 0.92;
+               }
+          }
+
+          .side-panel .section-title:first-of-type {
+               margin-top: 0 !important;
+          }
+     </style>
 </head>
 
-<body data-page-role="student" class="assistant-page">
+<body class="assistant-page preview-dark" data-page-role="student">
+     <div class="ai-bg" aria-hidden="true">
+          <div class="ai-grid"></div>
+          <div class="ai-core"></div>
+          <div class="orbit one"><span class="dot"></span></div>
+          <div class="orbit two"><span class="dot"></span></div>
+          <div class="orbit three"><span class="dot"></span></div>
+     </div>
 
-     <div class="dashboard-layout" id="dashboardLayout">
+     <button class="mobile-toggle" id="mobileToggle" type="button" aria-label="Open sidebar">
+          <i class="fa-solid fa-bars"></i>
+     </button>
+     <div class="overlay" id="sidebarOverlay"></div>
 
-          <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
+     <div class="app-shell">
           <aside class="sidebar" id="mainSidebar">
-               <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </h2>
+               <div class="brand">
+                    <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+                    <div>
+                         <h2>EduMind AI</h2>
+                         <span>Student Panel</span>
+                    </div>
                </div>
 
-               <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
-                    </a>
-                    <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
-                    </a>
-                    <a href="subjects.html" class="nav-item">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
-                    </a>
-                    <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
-                    </a>
-                    <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
-                    </a>
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
-                    </a>
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-                    <a href="pomodoro.html" class="nav-item">
-                         <i class="fa-solid fa-stopwatch"></i>
-                         <span>Study Timer</span>
-                    </a>
-                    <a href="assistant.html" class="nav-item active">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
-                    </a>
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
+               <div class="nav-label">Main</div>
+               <nav>
+                    <a class="nav-item" href="dashboard.html"><i
+                              class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>
+                    <a class="nav-item" href="planner.html"><i
+                              class="fa-solid fa-calendar-days"></i><span>Planner</span></a>
+                    <a class="nav-item" href="subjects.html"><i
+                              class="fa-solid fa-book-open"></i><span>Subjects</span></a>
+                    <a class="nav-item" href="tasks.html"><i
+                              class="fa-regular fa-square-check"></i><span>Tasks</span></a>
+                    <a class="nav-item" href="revision.html"><i
+                              class="fa-solid fa-rotate"></i><span>Revisions</span></a>
+                    <a class="nav-item" href="tests.html"><i class="fa-regular fa-file-lines"></i><span>Tests</span></a>
+                    <a class="nav-item" href="analytics.html"><i
+                              class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                    <a class="nav-item" href="pomodoro.html"><i class="fa-regular fa-clock"></i><span>Study
+                              Timer</span></a>
+                    <a class="nav-item active" href="assistant.html"><i
+                              class="fa-solid fa-robot"></i><span>Assistant</span></a>
+                    <a class="nav-item" href="settings.html"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
                </nav>
 
                <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn" id="logoutBtn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
-                    </a>
+                    <div class="user-card">
+                         <div class="avatar" id="sidebarAvatar">S</div>
+                         <div>
+                              <h4 id="sidebarName">Student</h4>
+                              <p id="sidebarCourse">STUDENT</p>
+                         </div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn" type="button">
+                         <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
                </div>
           </aside>
 
-          <main class="dashboard-main assistant-page-main">
-
-               <!-- AI Background Animation -->
-               <div class="ai-bg-animation" id="aiBgAnimation">
-                    <div class="ai-grid"></div>
-                    <div class="ai-core"></div>
-
-                    <div class="ai-orbit ai-orbit-1">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-2">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-3">
-                         <div class="ai-orbit-dot"></div>
-                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
-                    </div>
-
-                    <div class="ai-node ai-node-1"></div>
-                    <div class="ai-node ai-node-2"></div>
-                    <div class="ai-node ai-node-3"></div>
-                    <div class="ai-node ai-node-4"></div>
-                    <div class="ai-node ai-node-5"></div>
-                    <div class="ai-node ai-node-6"></div>
-
-                    <!-- Smaller center cross lines -->
-                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
-                    </svg>
-               </div>
-
-               <!-- Top Bar -->
-               <header class="assistant-topbar">
-                    <div class="assistant-topbar-left">
+          <main class="main">
+               <header class="topbar">
+                    <div class="topbar-left">
                          <h1>AI Study Assistant</h1>
                          <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
                     </div>
 
-                    <div class="assistant-topbar-right">
-                         <button class="new-chat-btn" id="newChatBtn" type="button">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>New Chat</span>
+                    <div class="topbar-actions">
+                         <button class="btn new-chat-top" id="newChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i><span class="optional">New Chat</span>
                          </button>
-
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
-                              <i class="fa-solid fa-moon"></i>
+                         <button class="btn icon-btn" id="themeToggleBtn" type="button" aria-label="Toggle theme">
+                              <i class="fa-solid fa-sun"></i>
                          </button>
-
-                         <div class="profile-mini" id="profileMenuToggle">
-                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
+                         <div class="profile-mini" id="profileMenuToggle" tabindex="0" role="button">
+                              <div class="avatar" id="profileAvatar">S</div>
                               <div>
-                                   <h4 id="assistantProfileName">Shivika Jii</h4>
-                                   <p id="assistantProfileRole">Student</p>
+                                   <h4 id="profileName">Student</h4>
+                                   <p id="profileRole">Student</p>
                               </div>
                          </div>
-
-                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
+                         <div class="profile-dropdown" id="profileDropdown">
+                              <a href="settings.html"><i class="fa-solid fa-user-gear"></i> Profile Settings</a>
+                              <a href="analytics.html"><i class="fa-solid fa-chart-line"></i> View Analytics</a>
+                              <a href="login.html" id="dropdownLogout"><i class="fa-solid fa-right-from-bracket"></i>
+                                   Logout</a>
                          </div>
                     </div>
                </header>
 
-               <div class="assistant-body">
-
-                    <!-- LEFT -->
-                    <div class="assistant-chat-panel">
-                         <div class="assistant-hero" id="assistantHero">
-
-                              <div class="assistant-hero-avatar-wrap">
-                                   <span class="avatar-orbit orbit-a"></span>
-                                   <span class="avatar-orbit orbit-b"></span>
-                                   <span class="avatar-orbit orbit-c"></span>
-
-                                   <div class="assistant-hero-avatar">
-                                        <i class="fa-solid fa-robot"></i>
-                                   </div>
+               <section class="assistant-body">
+                    <div class="chat-panel">
+                         <section class="hero" id="assistantHero">
+                              <div class="astra-wrap">
+                                   <div class="astra-avatar"><i class="fa-solid fa-robot"></i></div>
                               </div>
+                              <h2 id="introTitle">Hello Student — I’m Astra, your AI Study Buddy</h2>
+                              <p>I can help you with study plans, topic explanations, revision help, coding doubts, mock
+                                   test preparation, and smart suggestions.</p>
 
-                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
-
-                              <p>
-                                   I can help you with study plans, topic explanations, revision help,
-                                   coding doubts, and smart suggestions.
-                              </p>
-
-                              <div class="assistant-quick-actions">
-                                   <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
-                                        <i class="fa-solid fa-calendar-check"></i>
-                                        Make a study plan
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Explain a topic in simple words">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        Explain a topic
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Generate revision questions for me">
-                                        <i class="fa-solid fa-rotate"></i>
-                                        Generate revision questions
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Help me with a coding problem">
-                                        <i class="fa-solid fa-code"></i>
-                                        Help with coding
-                                   </button>
-
-                                   <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
-                                        <i class="fa-solid fa-file-lines"></i>
-                                        Summarize notes
-                                   </button>
+                              <div class="quick-actions">
+                                   <button class="chip" type="button" data-prompt="What should I study today?"><i
+                                             class="fa-solid fa-calendar-check"></i> Today’s Plan</button>
+                                   <button class="chip" type="button" data-prompt="Explain a topic in simple words"><i
+                                             class="fa-solid fa-lightbulb"></i> Explain Topic</button>
+                                   <button class="chip" type="button"
+                                        data-prompt="Generate revision questions for me"><i
+                                             class="fa-solid fa-rotate"></i> Revision Questions</button>
+                                   <button class="chip" type="button" data-prompt="Help me with a coding problem"><i
+                                             class="fa-solid fa-code"></i> Coding Help</button>
                               </div>
-                         </div>
+                         </section>
 
-                         <div class="chat-messages" id="chatMessages"></div>
+                         <div class="messages" id="chatMessages"></div>
 
-                         <div class="chat-input-wrapper">
-                              <div class="chat-input-box" id="chatInputBox">
-                                   <i class="fa-solid fa-robot chat-icon"></i>
-
-                                   <input type="text" id="assistantMessageInput"
-                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
-
-                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
+                         <div class="input-wrap">
+                              <div class="input-box">
+                                   <i class="fa-solid fa-robot"></i>
+                                   <input id="assistantMessageInput" type="text"
+                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off" />
+                                   <button class="send-btn" id="sendChatBtn" type="button" aria-label="Send message">
                                         <i class="fa-solid fa-paper-plane"></i>
                                    </button>
                               </div>
-
-                              <p class="input-hint">
-                                   <i class="fa-solid fa-circle-info"></i>
-                                   Astra AI can make mistakes. Always verify important information.
-                              </p>
+                              <p class="hint"><i class="fa-solid fa-circle-info"></i> Astra AI can make mistakes. Always
+                                   verify important information.</p>
                          </div>
                     </div>
 
-                    <!-- RIGHT -->
-                    <div class="assistant-side-panel" id="assistantSidePanel">
+                    <aside class="side-panel">
 
-                         <div class="side-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                   <span>Suggested Help</span>
+                         <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Suggested Help</div>
+                         <div class="help-list">
+                              <div class="help-item" data-prompt="Create a one-day exam revision plan for me"><i
+                                        class="fa-solid fa-lightbulb"></i><span>Create a one-day exam revision
+                                        plan</span></div>
+                              <div class="help-item" data-prompt="Explain DBMS normalization in easy words"><i
+                                        class="fa-solid fa-database"></i><span>Explain DBMS normalization in easy
+                                        words</span></div>
+                              <div class="help-item" data-prompt="Generate Java interview questions for me"><i
+                                        class="fa-brands fa-java"></i><span>Generate Java interview questions</span>
                               </div>
-
-                              <div class="assistant-help-list">
-                                   <div class="assistant-help-item" tabindex="0"
-                                        data-prompt="What should I study today?">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Plan my study for today</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" tabindex="0"
-                                        data-prompt="How can I improve my latest test score?">
-                                        <i class="fa-solid fa-chart-line"></i>
-                                        <span>Improve my latest test score</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" tabindex="0"
-                                        data-prompt="Which weak area should I revise first?">
-                                        <i class="fa-solid fa-triangle-exclamation"></i>
-                                        <span>Find my weak revision area</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" tabindex="0"
-                                        data-prompt="Suggest a Pomodoro plan for me.">
-                                        <i class="fa-solid fa-clock"></i>
-                                        <span>Suggest a Pomodoro plan</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" tabindex="0"
-                                        data-prompt="How can I improve my consistency?">
-                                        <i class="fa-solid fa-fire"></i>
-                                        <span>Improve my study consistency</span>
-                                   </div>
+                              <div class="help-item" data-prompt="Make short notes for Operating System"><i
+                                        class="fa-solid fa-file-lines"></i><span>Make short notes for Operating
+                                        System</span></div>
+                              <div class="help-item" data-prompt="Suggest a Pomodoro plan for me"><i
+                                        class="fa-solid fa-stopwatch"></i><span>Suggest a Pomodoro focus plan</span>
                               </div>
                          </div>
 
-                         <div class="side-section side-history-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-clock-rotate-left"></i>
-                                   <span>Recent Chats</span>
-                              </div>
-
-                              <div class="history-list" id="historyList">
-                                   <div class="history-empty" id="historyEmpty">
-                                        <i class="fa-solid fa-comment-slash"></i>
-                                        <p>No chat history yet</p>
-                                   </div>
-                              </div>
+                         <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Chats</div>
+                         <div class="history-list" id="historyList">
+                              <div class="history-empty">No chat history yet</div>
                          </div>
-                    </div>
-               </div>
+                    </aside>
+               </section>
           </main>
      </div>
-
-     <script src="../assets/js/auth-guard.js"></script>
-     <script src="../assets/js/api.js"></script>
-     <script src="../assets/js/theme.js"></script>
 
      <script>
           (function () {
                "use strict";
 
+               const TOKEN_KEYS = ["token", "adminToken", "authToken", "jwtToken"];
+               const USER_KEYS = ["edumind_logged_in_user", "loggedInUser", "currentUser", "user"];
                const THEME_KEY = "edumind_theme";
 
-               function applyAssistantTheme(theme) {
-                    const selectedTheme = theme === "dark" ? "dark" : "light";
-                    const isDark = selectedTheme === "dark";
+               const body = document.body;
+               const mobileToggle = document.getElementById("mobileToggle");
+               const sidebarOverlay = document.getElementById("sidebarOverlay");
+               const logoutBtn = document.getElementById("logoutBtn");
+               const dropdownLogout = document.getElementById("dropdownLogout");
+               const themeToggleBtn = document.getElementById("themeToggleBtn");
+               const profileMenuToggle = document.getElementById("profileMenuToggle");
+               const profileDropdown = document.getElementById("profileDropdown");
+               const chatMessages = document.getElementById("chatMessages");
+               const messageInput = document.getElementById("assistantMessageInput");
+               const sendBtn = document.getElementById("sendChatBtn");
+               const newChatBtn = document.getElementById("newChatBtn");
+               const historyList = document.getElementById("historyList");
+               const assistantHero = document.getElementById("assistantHero");
+               const introTitle = document.getElementById("introTitle");
 
-                    document.documentElement.setAttribute("data-theme", selectedTheme);
-                    document.documentElement.style.colorScheme = selectedTheme;
+               let currentSessionId = null;
+               let isTyping = false;
 
-                    document.body.classList.toggle("preview-dark", isDark);
-                    document.body.classList.toggle("dark-mode", isDark);
-                    document.body.classList.toggle("light-mode", !isDark);
+               document.addEventListener("DOMContentLoaded", init);
 
-                    const btn = document.getElementById("themeToggleBtn");
-                    const icon = btn ? btn.querySelector("i") : null;
+               function init() {
+                    setupAuthCheck();
+                    loadUserProfile();
+                    applyTheme(localStorage.getItem(THEME_KEY) || "dark");
+                    bindEvents();
+                    loadChatHistory();
+               }
 
-                    if (icon) {
-                         icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+               function getToken() {
+                    for (const key of TOKEN_KEYS) {
+                         const token = localStorage.getItem(key);
+                         if (token) return token;
                     }
+                    return "";
+               }
 
-                    if (btn) {
-                         btn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
-                         btn.setAttribute("aria-label", btn.title);
+               function setupAuthCheck() {
+                    const token = getToken();
+                    if (!token) {
+                         // Keep page usable for local UI testing, but show warning instead of redirect loop.
+                         showToast("No login token found. Log in first if backend calls fail.", "warning");
                     }
                }
 
-               const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
-               applyAssistantTheme(savedTheme);
+               function getStoredUser() {
+                    for (const key of USER_KEYS) {
+                         try {
+                              const raw = localStorage.getItem(key);
+                              if (!raw) continue;
+                              const parsed = JSON.parse(raw);
+                              if (parsed && typeof parsed === "object") return parsed;
+                         } catch (e) { }
+                    }
+                    return {};
+               }
 
-               const themeBtn = document.getElementById("themeToggleBtn");
-               if (themeBtn) {
-                    themeBtn.addEventListener("click", function (event) {
-                         event.preventDefault();
-                         event.stopImmediatePropagation();
+               function loadUserProfile() {
+                    const user = getStoredUser();
+                    const name = user.name || user.fullName || user.username || localStorage.getItem("userName") || "Student";
+                    const course = user.course || user.className || user.role || "Student";
+                    const initials = name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "S";
 
-                         const isDark =
-                              document.body.classList.contains("preview-dark") ||
-                              document.body.classList.contains("dark-mode");
+                    setText("profileName", name);
+                    setText("sidebarName", name);
+                    setText("profileRole", String(course).toUpperCase());
+                    setText("sidebarCourse", String(course).toUpperCase());
+                    setText("profileAvatar", initials);
+                    setText("sidebarAvatar", initials);
+                    if (introTitle) introTitle.textContent = `Hello ${name} — I’m Astra, your AI Study Buddy`;
+               }
 
-                         const nextTheme = isDark ? "light" : "dark";
-                         localStorage.setItem(THEME_KEY, nextTheme);
-                         applyAssistantTheme(nextTheme);
-                    }, true);
+               function setText(id, value) {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value;
+               }
+
+               function bindEvents() {
+                    mobileToggle?.addEventListener("click", toggleSidebar);
+                    sidebarOverlay?.addEventListener("click", closeSidebar);
+
+                    document.querySelectorAll(".sidebar .nav-item").forEach((link) => {
+                         link.addEventListener("click", function () {
+                              closeSidebar();
+                         });
+                    });
+
+                    logoutBtn?.addEventListener("click", logout);
+                    dropdownLogout?.addEventListener("click", logout);
+
+                    themeToggleBtn?.addEventListener("click", () => {
+                         const isDark = body.classList.contains("preview-dark") || body.classList.contains("dark-mode");
+                         applyTheme(isDark ? "light" : "dark");
+                    });
+
+                    profileMenuToggle?.addEventListener("click", (event) => {
+                         event.stopPropagation();
+                         profileDropdown?.classList.toggle("open");
+                    });
+
+                    document.addEventListener("click", (event) => {
+                         if (!profileDropdown || !profileMenuToggle) return;
+                         if (!profileDropdown.contains(event.target) && !profileMenuToggle.contains(event.target)) {
+                              profileDropdown.classList.remove("open");
+                         }
+                    });
+
+                    sendBtn?.addEventListener("click", handleSend);
+                    messageInput?.addEventListener("keydown", (event) => {
+                         if (event.key === "Enter" && !event.shiftKey) {
+                              event.preventDefault();
+                              handleSend();
+                         }
+                    });
+
+                    newChatBtn?.addEventListener("click", startNewChat);
+
+                    document.querySelectorAll("[data-prompt]").forEach((item) => {
+                         item.addEventListener("click", () => {
+                              const prompt = item.getAttribute("data-prompt");
+                              if (prompt) sendMessage(prompt);
+                         });
+                    });
+
+                    document.addEventListener("keydown", (event) => {
+                         if (event.key === "Escape") {
+                              closeSidebar();
+                              profileDropdown?.classList.remove("open");
+                         }
+                    });
+               }
+
+               function toggleSidebar() {
+                    body.classList.toggle("sidebar-open");
+                    const isOpen = body.classList.contains("sidebar-open");
+                    mobileToggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+                    mobileToggle.setAttribute("aria-label", isOpen ? "Close sidebar" : "Open sidebar");
+               }
+
+               function closeSidebar() {
+                    body.classList.remove("sidebar-open");
+                    if (mobileToggle) {
+                         mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                         mobileToggle.setAttribute("aria-label", "Open sidebar");
+                    }
+               }
+
+               function applyTheme(theme) {
+                    const isDark = theme !== "light";
+                    localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+                    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+                    body.classList.toggle("preview-dark", isDark);
+                    body.classList.toggle("dark-mode", isDark);
+                    body.classList.toggle("light-mode", !isDark);
+
+                    const icon = themeToggleBtn?.querySelector("i");
+                    if (icon) icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+               }
+
+               function logout(event) {
+                    if (event) event.preventDefault();
+                    TOKEN_KEYS.forEach((key) => localStorage.removeItem(key));
+                    localStorage.removeItem("edumind_is_logged_in");
+                    window.location.href = "login.html";
+               }
+
+               async function apiFetch(endpoint, options = {}) {
+                    const token = getToken();
+                    const url = endpoint.startsWith("http") ? endpoint : `${window.location.origin}${endpoint}`;
+                    const headers = {
+                         "Content-Type": "application/json",
+                         ...(options.headers || {}),
+                    };
+                    if (token) headers.Authorization = `Bearer ${token}`;
+
+                    const response = await fetch(url, { ...options, headers });
+                    const text = await response.text();
+                    let data = null;
+                    try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+
+                    if (!response.ok) {
+                         const message = data?.message || data?.error || `Request failed with status ${response.status}`;
+                         throw new Error(message);
+                    }
+                    return data;
+               }
+
+               async function loadChatHistory() {
+                    try {
+                         const sessions = await apiFetch("/api/assistant/sessions");
+                         renderHistory(Array.isArray(sessions) ? sessions : []);
+                    } catch (error) {
+                         renderHistory([]);
+                         console.warn("Chat history not loaded:", error.message);
+                    }
+               }
+
+               function renderHistory(sessions) {
+                    if (!historyList) return;
+                    historyList.innerHTML = "";
+                    if (!sessions.length) {
+                         historyList.innerHTML = '<div class="history-empty">No chat history yet</div>';
+                         return;
+                    }
+                    sessions.forEach((session) => {
+                         const item = document.createElement("div");
+                         item.className = "history-item";
+                         item.dataset.sessionId = session.id || "";
+                         item.innerHTML = `<i class="fa-solid fa-comment-dots"></i><span>${escapeHtml(session.title || "New Chat")}</span>`;
+                         item.addEventListener("click", () => loadSession(session.id));
+                         historyList.appendChild(item);
+                    });
+               }
+
+               async function loadSession(sessionId) {
+                    if (!sessionId) return;
+                    currentSessionId = sessionId;
+                    clearMessages();
+                    hideHero();
+                    try {
+                         const messages = await apiFetch(`/api/assistant/session/${sessionId}`);
+                         if (Array.isArray(messages) && messages.length) {
+                              messages.forEach((message) => appendMessage(message.sender === "USER" ? "user" : "assistant", message.content));
+                         } else {
+                              showHero();
+                         }
+                    } catch (error) {
+                         appendMessage("assistant", "⚠️ Session could not be loaded. Please try again.");
+                    }
+               }
+
+               function handleSend() {
+                    const text = messageInput?.value.trim();
+                    if (!text || isTyping) return;
+                    messageInput.value = "";
+                    sendMessage(text);
+               }
+
+               async function sendMessage(text) {
+                    if (!text || isTyping) return;
+                    hideHero();
+                    appendMessage("user", text);
+                    const typing = appendTyping();
+                    isTyping = true;
+                    setInputDisabled(true);
+
+                    try {
+                         if (!currentSessionId) {
+                              currentSessionId = await createSession(text);
+                         }
+
+                         const response = await apiFetch("/api/assistant/chat", {
+                              method: "POST",
+                              body: JSON.stringify({ message: text, sessionId: currentSessionId }),
+                         });
+
+                         typing.remove();
+                         appendMessage("assistant", response?.reply || "No response received. Please try again.");
+                         loadChatHistory();
+                    } catch (error) {
+                         typing.remove();
+                         appendMessage("assistant", `⚠️ ${getErrorMessage(error)}`);
+                    } finally {
+                         isTyping = false;
+                         setInputDisabled(false);
+                         messageInput?.focus();
+                    }
+               }
+
+               async function createSession(firstMessage) {
+                    try {
+                         const session = await apiFetch("/api/assistant/session", {
+                              method: "POST",
+                              body: JSON.stringify({ firstMessage }),
+                         });
+                         return session?.id || null;
+                    } catch (error) {
+                         console.warn("Session could not be created:", error.message);
+                         return null;
+                    }
+               }
+
+               function startNewChat() {
+                    currentSessionId = null;
+                    clearMessages();
+                    showHero();
+                    closeSidebar();
+                    messageInput?.focus();
+               }
+
+               function clearMessages() {
+                    if (chatMessages) chatMessages.innerHTML = "";
+               }
+
+               function hideHero() {
+                    assistantHero?.classList.add("hidden");
+               }
+
+               function showHero() {
+                    assistantHero?.classList.remove("hidden");
+               }
+
+               function appendMessage(role, text) {
+                    if (!chatMessages) return;
+                    const message = document.createElement("div");
+                    message.className = `message ${role}`;
+                    const bubble = document.createElement("div");
+                    bubble.className = "bubble";
+                    bubble.textContent = text || "";
+                    message.appendChild(bubble);
+                    chatMessages.appendChild(message);
+                    scrollToBottom();
+               }
+
+               function appendTyping() {
+                    const message = document.createElement("div");
+                    message.className = "message assistant";
+                    const bubble = document.createElement("div");
+                    bubble.className = "bubble";
+                    bubble.textContent = "Astra is thinking...";
+                    message.appendChild(bubble);
+                    chatMessages.appendChild(message);
+                    scrollToBottom();
+                    return message;
+               }
+
+               function scrollToBottom() {
+                    requestAnimationFrame(() => {
+                         if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                    });
+               }
+
+               function setInputDisabled(disabled) {
+                    if (messageInput) messageInput.disabled = disabled;
+                    if (sendBtn) sendBtn.disabled = disabled;
+               }
+
+               function getErrorMessage(error) {
+                    const msg = String(error?.message || "").toLowerCase();
+                    if (msg.includes("401") || msg.includes("unauthorized") || msg.includes("expired")) {
+                         return "Your session has expired. Please log in again.";
+                    }
+                    if (msg.includes("failed to fetch") || msg.includes("network")) {
+                         return "Network connection failed. Please check your internet connection.";
+                    }
+                    return error?.message || "Something went wrong. Please check the backend server and try again.";
+               }
+
+               function showToast(message, type = "info") {
+                    const toast = document.createElement("div");
+                    toast.className = `toast ${type}`;
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3200);
+               }
+
+               function escapeHtml(value) {
+                    const div = document.createElement("div");
+                    div.textContent = String(value ?? "");
+                    return div.innerHTML;
                }
           })();
      </script>
-
-     <script src="../assets/js/sidebar.js"></script>
-     <script src="../assets/js/assistant.js"></script>
-</body>
-
-</html>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Assistant | EduMind AI</title>
-
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/sidebar.css">
-     <link rel="stylesheet" href="../assets/css/dark-mode.css">
-     <link rel="stylesheet" href="../assets/css/assistant.css">
-     <link rel="stylesheet" href="../assets/css/assistant-animation-fix.css">
-</head>
-
-<body data-page-role="student" class="assistant-page">
-
-     <div class="dashboard-layout" id="dashboardLayout">
-
-          <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-          <aside class="sidebar" id="mainSidebar">
-               <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </h2>
-               </div>
-
-               <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
-                    </a>
-                    <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
-                    </a>
-                    <a href="subjects.html" class="nav-item">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
-                    </a>
-                    <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
-                    </a>
-                    <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
-                    </a>
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
-                    </a>
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-                    <a href="pomodoro.html" class="nav-item">
-                         <i class="fa-solid fa-stopwatch"></i>
-                         <span>Study Timer</span>
-                    </a>
-                    <a href="assistant.html" class="nav-item active">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
-                    </a>
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
-               </nav>
-
-               <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn" id="logoutBtn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
-                    </a>
-               </div>
-          </aside>
-
-          <main class="dashboard-main assistant-page-main">
-
-               <!-- AI Background Animation -->
-               <div class="ai-bg-animation" id="aiBgAnimation">
-                    <div class="ai-grid"></div>
-                    <div class="ai-core"></div>
-
-                    <div class="ai-orbit ai-orbit-1">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-2">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-3">
-                         <div class="ai-orbit-dot"></div>
-                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
-                    </div>
-
-                    <div class="ai-node ai-node-1"></div>
-                    <div class="ai-node ai-node-2"></div>
-                    <div class="ai-node ai-node-3"></div>
-                    <div class="ai-node ai-node-4"></div>
-                    <div class="ai-node ai-node-5"></div>
-                    <div class="ai-node ai-node-6"></div>
-
-                    <!-- Smaller center cross lines -->
-                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
-                    </svg>
-               </div>
-
-               <!-- Top Bar -->
-               <header class="assistant-topbar">
-                    <div class="assistant-topbar-left">
-                         <h1>AI Study Assistant</h1>
-                         <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
-                    </div>
-
-                    <div class="assistant-topbar-right">
-                         <button class="new-chat-btn" id="newChatBtn" type="button">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>New Chat</span>
-                         </button>
-
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
-                              <i class="fa-solid fa-moon"></i>
-                         </button>
-
-                         <div class="profile-mini" id="profileMenuToggle">
-                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
-                              <div>
-                                   <h4 id="assistantProfileName">Shivika Jii</h4>
-                                   <p id="assistantProfileRole">Student</p>
-                              </div>
-                         </div>
-
-                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
-                         </div>
-                    </div>
-               </header>
-
-               <div class="assistant-body">
-
-                    <!-- LEFT -->
-                    <div class="assistant-chat-panel">
-                         <div class="assistant-hero" id="assistantHero">
-
-                              <div class="assistant-hero-avatar-wrap">
-                                   <span class="avatar-orbit orbit-a"></span>
-                                   <span class="avatar-orbit orbit-b"></span>
-                                   <span class="avatar-orbit orbit-c"></span>
-
-                                   <div class="assistant-hero-avatar">
-                                        <i class="fa-solid fa-robot"></i>
-                                   </div>
-                              </div>
-
-                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
-
-                              <p>
-                                   I can help you with study plans, topic explanations, revision help,
-                                   coding doubts, and smart suggestions.
-                              </p>
-
-                              <div class="assistant-quick-actions">
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="What should I study today?">
-                                        <i class="fa-solid fa-calendar-check"></i>
-                                        Today’s Plan
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="How can I improve my latest test score?">
-                                        <i class="fa-solid fa-chart-simple"></i>
-                                        Test Improvement
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Suggest a Pomodoro plan for me.">
-                                        <i class="fa-solid fa-stopwatch"></i>
-                                        Focus Plan
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Which subject should I revise first?">
-                                        <i class="fa-solid fa-book-open-reader"></i>
-                                        Revision Help
-                                   </button>
-                              </div>
-                         </div>
-
-                         <div class="chat-messages" id="chatMessages"></div>
-
-                         <div class="chat-input-wrapper">
-                              <div class="chat-input-box" id="chatInputBox">
-                                   <i class="fa-solid fa-robot chat-icon"></i>
-
-                                   <input type="text" id="assistantMessageInput"
-                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
-
-                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                   </button>
-                              </div>
-
-                              <p class="input-hint">
-                                   <i class="fa-solid fa-circle-info"></i>
-                                   Astra AI can make mistakes. Always verify important information.
-                              </p>
-                         </div>
-                    </div>
-
-                    <!-- RIGHT -->
-                    <div class="assistant-side-panel" id="assistantSidePanel">
-
-                         <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>New Chat</span>
-                         </button>
-
-                         <div class="side-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                   <span>Suggested Help</span>
-                              </div>
-
-                              <div class="assistant-help-list">
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Create a one-day exam revision plan for me">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Create a one-day exam revision plan</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Explain DBMS normalization in easy words">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Explain DBMS normalization in easy words</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Generate Java interview questions for me">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Generate Java interview questions</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Make short notes for Operating System">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Make short notes for Operating System</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Give me aptitude practice questions">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Give me aptitude practice questions</span>
-                                   </div>
-                              </div>
-                         </div>
-
-                         <div class="side-section side-history-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-clock-rotate-left"></i>
-                                   <span>Recent Chats</span>
-                              </div>
-
-                              <div class="history-list" id="historyList">
-                                   <div class="history-empty" id="historyEmpty">
-                                        <i class="fa-solid fa-comment-slash"></i>
-                                        <p>No chat history yet</p>
-                                   </div>
-                              </div>
-                         </div>
-                    </div>
-               </div>
-          </main>
-     </div>
-
-     <script src="../assets/js/auth-guard.js"></script>
-     <script src="../assets/js/api.js"></script>
-     <script src="../assets/js/theme.js"></script>
-
-     <script>
-          (function () {
-               "use strict";
-
-               const THEME_KEY = "edumind_theme";
-
-               function applyAssistantTheme(theme) {
-                    const selectedTheme = theme === "dark" ? "dark" : "light";
-                    const isDark = selectedTheme === "dark";
-
-                    document.documentElement.setAttribute("data-theme", selectedTheme);
-                    document.documentElement.style.colorScheme = selectedTheme;
-
-                    document.body.classList.toggle("preview-dark", isDark);
-                    document.body.classList.toggle("dark-mode", isDark);
-                    document.body.classList.toggle("light-mode", !isDark);
-
-                    const btn = document.getElementById("themeToggleBtn");
-                    const icon = btn ? btn.querySelector("i") : null;
-
-                    if (icon) {
-                         icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
-                    }
-
-                    if (btn) {
-                         btn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
-                         btn.setAttribute("aria-label", btn.title);
-                    }
-               }
-
-               const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
-               applyAssistantTheme(savedTheme);
-
-               const themeBtn = document.getElementById("themeToggleBtn");
-               if (themeBtn) {
-                    themeBtn.addEventListener("click", function (event) {
-                         event.preventDefault();
-                         event.stopImmediatePropagation();
-
-                         const isDark =
-                              document.body.classList.contains("preview-dark") ||
-                              document.body.classList.contains("dark-mode");
-
-                         const nextTheme = isDark ? "light" : "dark";
-                         localStorage.setItem(THEME_KEY, nextTheme);
-                         applyAssistantTheme(nextTheme);
-                    }, true);
-               }
-          })();
-     </script>
-
-     <script src="../assets/js/sidebar.js"></script>
-     <script src="../assets/js/assistant.js"></script>
-</body>
-
-</html>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Assistant | EduMind AI</title>
-
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-
-     <link rel="stylesheet" href="../assets/css/variables.css">
-     <link rel="stylesheet" href="../assets/css/base.css">
-     <link rel="stylesheet" href="../assets/css/layout.css">
-     <link rel="stylesheet" href="../assets/css/components.css">
-     <link rel="stylesheet" href="../assets/css/dashboard.css">
-     <link rel="stylesheet" href="../assets/css/sidebar.css">
-     <link rel="stylesheet" href="../assets/css/dark-mode.css">
-     <link rel="stylesheet" href="../assets/css/assistant.css">
-     <link rel="stylesheet" href="../assets/css/assistant-animation-fix.css">
-</head>
-
-<body data-page-role="student" class="assistant-page">
-
-     <div class="dashboard-layout" id="dashboardLayout">
-
-          <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-          <aside class="sidebar" id="mainSidebar">
-               <div class="sidebar-top">
-                    <h2 class="sidebar-logo">
-                         <i class="fa-solid fa-graduation-cap"></i>
-                         <span>EduMind AI</span>
-                    </h2>
-               </div>
-
-               <nav class="sidebar-nav">
-                    <a href="dashboard.html" class="nav-item">
-                         <i class="fa-solid fa-house"></i>
-                         <span>Dashboard</span>
-                    </a>
-                    <a href="planner.html" class="nav-item">
-                         <i class="fa-solid fa-calendar-days"></i>
-                         <span>Planner</span>
-                    </a>
-                    <a href="subjects.html" class="nav-item">
-                         <i class="fa-solid fa-book"></i>
-                         <span>Subjects</span>
-                    </a>
-                    <a href="tasks.html" class="nav-item">
-                         <i class="fa-solid fa-list-check"></i>
-                         <span>Tasks</span>
-                    </a>
-                    <a href="revision.html" class="nav-item">
-                         <i class="fa-solid fa-rotate"></i>
-                         <span>Revision</span>
-                    </a>
-                    <a href="tests.html" class="nav-item">
-                         <i class="fa-solid fa-file-lines"></i>
-                         <span>Tests</span>
-                    </a>
-                    <a href="analytics.html" class="nav-item">
-                         <i class="fa-solid fa-chart-line"></i>
-                         <span>Analytics</span>
-                    </a>
-                    <a href="pomodoro.html" class="nav-item">
-                         <i class="fa-solid fa-stopwatch"></i>
-                         <span>Study Timer</span>
-                    </a>
-                    <a href="assistant.html" class="nav-item active">
-                         <i class="fa-solid fa-robot"></i>
-                         <span>Assistant</span>
-                    </a>
-                    <a href="settings.html" class="nav-item">
-                         <i class="fa-solid fa-gear"></i>
-                         <span>Settings</span>
-                    </a>
-               </nav>
-
-               <div class="sidebar-bottom">
-                    <a href="login.html" class="logout-btn" id="logoutBtn">
-                         <i class="fa-solid fa-right-from-bracket"></i>
-                         <span>Logout</span>
-                    </a>
-               </div>
-          </aside>
-
-          <main class="dashboard-main assistant-page-main">
-
-               <!-- AI Background Animation -->
-               <div class="ai-bg-animation" id="aiBgAnimation">
-                    <div class="ai-grid"></div>
-                    <div class="ai-core"></div>
-
-                    <div class="ai-orbit ai-orbit-1">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-2">
-                         <div class="ai-orbit-dot"></div>
-                    </div>
-
-                    <div class="ai-orbit ai-orbit-3">
-                         <div class="ai-orbit-dot"></div>
-                         <div class="ai-orbit-dot ai-orbit-dot-2"></div>
-                    </div>
-
-                    <div class="ai-node ai-node-1"></div>
-                    <div class="ai-node ai-node-2"></div>
-                    <div class="ai-node ai-node-3"></div>
-                    <div class="ai-node ai-node-4"></div>
-                    <div class="ai-node ai-node-5"></div>
-                    <div class="ai-node ai-node-6"></div>
-
-                    <!-- Smaller center cross lines -->
-                    <svg class="ai-lines-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                         <line class="ai-line" x1="34" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="34" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="34" y1="66" x2="50" y2="50"></line>
-                         <line class="ai-line" x1="66" y1="66" x2="50" y2="50"></line>
-                    </svg>
-               </div>
-
-               <!-- Top Bar -->
-               <header class="assistant-topbar">
-                    <div class="assistant-topbar-left">
-                         <h1>AI Study Assistant</h1>
-                         <p>Ask doubts, generate study help, and get smart learning support instantly.</p>
-                    </div>
-
-                    <div class="assistant-topbar-right">
-                         <button class="new-chat-btn" id="newChatBtn" type="button">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>New Chat</span>
-                         </button>
-
-                         <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme" type="button">
-                              <i class="fa-solid fa-moon"></i>
-                         </button>
-
-                         <div class="profile-mini" id="profileMenuToggle">
-                              <img id="assistantProfileImage" src="../assets/avatar/default-user.png" alt="User">
-                              <div>
-                                   <h4 id="assistantProfileName">Shivika Jii</h4>
-                                   <p id="assistantProfileRole">Student</p>
-                              </div>
-                         </div>
-
-                         <div class="dashboard-profile-dropdown hidden" id="dashboardProfileDropdown">
-                              <a href="settings.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-user-gear"></i>
-                                   <span>Profile Settings</span>
-                              </a>
-                              <a href="analytics.html" class="profile-menu-item">
-                                   <i class="fa-solid fa-chart-line"></i>
-                                   <span>View Analytics</span>
-                              </a>
-                              <a href="login.html" class="profile-menu-item logout">
-                                   <i class="fa-solid fa-right-from-bracket"></i>
-                                   <span>Logout</span>
-                              </a>
-                         </div>
-                    </div>
-               </header>
-
-               <div class="assistant-body">
-
-                    <!-- LEFT -->
-                    <div class="assistant-chat-panel">
-                         <div class="assistant-hero" id="assistantHero">
-
-                              <div class="assistant-hero-avatar-wrap">
-                                   <span class="avatar-orbit orbit-a"></span>
-                                   <span class="avatar-orbit orbit-b"></span>
-                                   <span class="avatar-orbit orbit-c"></span>
-
-                                   <div class="assistant-hero-avatar">
-                                        <i class="fa-solid fa-robot"></i>
-                                   </div>
-                              </div>
-
-                              <h2 id="assistantIntroTitle">Hello Shivika Jii — I’m Astra, your AI Study Buddy</h2>
-
-                              <p>
-                                   I can help you with study plans, topic explanations, revision help,
-                                   coding doubts, and smart suggestions.
-                              </p>
-
-                              <div class="assistant-quick-actions">
-                                   <button class="assistant-chip" type="button" data-prompt="Make a study plan for me">
-                                        <i class="fa-solid fa-calendar-check"></i>
-                                        Make a study plan
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Explain a topic in simple words">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        Explain a topic
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Generate revision questions for me">
-                                        <i class="fa-solid fa-rotate"></i>
-                                        Generate revision questions
-                                   </button>
-
-                                   <button class="assistant-chip" type="button"
-                                        data-prompt="Help me with a coding problem">
-                                        <i class="fa-solid fa-code"></i>
-                                        Help with coding
-                                   </button>
-
-                                   <button class="assistant-chip" type="button" data-prompt="Summarize my notes for me">
-                                        <i class="fa-solid fa-file-lines"></i>
-                                        Summarize notes
-                                   </button>
-                              </div>
-                         </div>
-
-                         <div class="chat-messages" id="chatMessages"></div>
-
-                         <div class="chat-input-wrapper">
-                              <div class="chat-input-box" id="chatInputBox">
-                                   <i class="fa-solid fa-robot chat-icon"></i>
-
-                                   <input type="text" id="assistantMessageInput"
-                                        placeholder="Ask Astra anything... (Enter to send)" autocomplete="off">
-
-                                   <button class="send-chat-btn" id="sendChatBtn" type="button" title="Send">
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                   </button>
-                              </div>
-
-                              <p class="input-hint">
-                                   <i class="fa-solid fa-circle-info"></i>
-                                   Astra AI can make mistakes. Always verify important information.
-                              </p>
-                         </div>
-                    </div>
-
-                    <!-- RIGHT -->
-                    <div class="assistant-side-panel" id="assistantSidePanel">
-
-                         <button class="side-new-chat-btn" id="sideNewChatBtn" type="button">
-                              <i class="fa-solid fa-plus"></i>
-                              <span>New Chat</span>
-                         </button>
-
-                         <div class="side-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                   <span>Suggested Help</span>
-                              </div>
-
-                              <div class="assistant-help-list">
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Create a one-day exam revision plan for me">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Create a one-day exam revision plan</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Explain DBMS normalization in easy words">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Explain DBMS normalization in easy words</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Generate Java interview questions for me">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Generate Java interview questions</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Make short notes for Operating System">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Make short notes for Operating System</span>
-                                   </div>
-
-                                   <div class="assistant-help-item" role="button" tabindex="0"
-                                        data-prompt="Give me aptitude practice questions">
-                                        <i class="fa-solid fa-lightbulb"></i>
-                                        <span>Give me aptitude practice questions</span>
-                                   </div>
-                              </div>
-                         </div>
-
-                         <div class="side-section side-history-section">
-                              <div class="side-section-title">
-                                   <i class="fa-solid fa-clock-rotate-left"></i>
-                                   <span>Recent Chats</span>
-                              </div>
-
-                              <div class="history-list" id="historyList">
-                                   <div class="history-empty" id="historyEmpty">
-                                        <i class="fa-solid fa-comment-slash"></i>
-                                        <p>No chat history yet</p>
-                                   </div>
-                              </div>
-                         </div>
-                    </div>
-               </div>
-          </main>
-     </div>
-
-     <script src="../assets/js/auth-guard.js"></script>
-     <script src="../assets/js/api.js"></script>
-     <script src="../assets/js/theme.js"></script>
-     <script src="../assets/js/sidebar.js"></script>
-     <script src="../assets/js/assistant.js"></script>
 </body>
 
 </html>
