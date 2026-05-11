@@ -5,6 +5,7 @@
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
      <title>Assistant | EduMind AI</title>
+     <!-- v6: polygon neural logo restored + desktop/mobile hamburger fixed -->
 
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1338,6 +1339,362 @@
           .side-panel .section-title:first-of-type {
                margin-top: 0 !important;
           }
+
+
+
+          /* =========================================================
+       FINAL V3 ANIMATION POLISH
+       Smoother premium Astra animation + cleaner background rings
+       ========================================================= */
+
+          .ai-bg {
+               overflow: hidden !important;
+          }
+
+          .ai-bg::after {
+               opacity: 0.9 !important;
+               animation: twinkle 5.2s ease-in-out infinite alternate !important;
+          }
+
+          .ai-core {
+               width: 118px !important;
+               height: 118px !important;
+               background:
+                    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .9) 0 4%, rgba(34, 211, 238, .42) 16%, rgba(124, 58, 237, .22) 46%, transparent 74%) !important;
+               box-shadow:
+                    0 0 34px rgba(34, 211, 238, 0.28),
+                    0 0 90px rgba(124, 58, 237, 0.20),
+                    0 0 140px rgba(20, 184, 166, 0.11) !important;
+               animation: premiumCoreBreath 4.4s ease-in-out infinite !important;
+          }
+
+          body.light-mode .ai-core {
+               background:
+                    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .96) 0 10%, rgba(34, 211, 238, .26) 24%, rgba(124, 58, 237, .15) 50%, transparent 76%) !important;
+               box-shadow:
+                    0 0 28px rgba(20, 184, 166, 0.18),
+                    0 0 80px rgba(124, 58, 237, 0.12) !important;
+          }
+
+          .orbit {
+               border-style: solid !important;
+               border-width: 1px !important;
+               box-shadow: inset 0 0 20px rgba(34, 211, 238, 0.035) !important;
+          }
+
+          .orbit.one {
+               animation: premiumOrbitSpin 18s linear infinite !important;
+               border-color: rgba(34, 211, 238, 0.28) !important;
+          }
+
+          .orbit.two {
+               animation: premiumOrbitSpinReverse 28s linear infinite !important;
+               border-color: rgba(124, 58, 237, 0.24) !important;
+          }
+
+          .orbit.three {
+               animation: premiumOrbitSpin 42s linear infinite !important;
+               border-color: rgba(20, 184, 166, 0.17) !important;
+          }
+
+          .dot {
+               box-shadow:
+                    0 0 10px currentColor,
+                    0 0 22px rgba(34, 211, 238, 0.40) !important;
+               animation: premiumDotPulse 2.4s ease-in-out infinite !important;
+          }
+
+          .astra-wrap {
+               width: 158px !important;
+               height: 158px !important;
+               margin-bottom: 20px !important;
+               filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.14));
+          }
+
+          .astra-wrap::before,
+          .astra-wrap::after {
+               border-radius: 38px !important;
+               filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.34)) !important;
+          }
+
+          .astra-wrap::before {
+               inset: 7px !important;
+               border-color: rgba(34, 211, 238, 0.62) !important;
+               box-shadow:
+                    0 0 20px rgba(34, 211, 238, 0.24),
+                    inset 0 0 16px rgba(34, 211, 238, 0.12) !important;
+               animation: premiumAstraRingA 6.6s linear infinite !important;
+          }
+
+          .astra-wrap::after {
+               inset: -8px !important;
+               border-color: rgba(124, 58, 237, 0.54) !important;
+               box-shadow:
+                    0 0 26px rgba(124, 58, 237, 0.26),
+                    inset 0 0 18px rgba(124, 58, 237, 0.12) !important;
+               animation: premiumAstraRingB 8.8s linear infinite !important;
+          }
+
+          .astra-avatar {
+               width: 104px !important;
+               height: 104px !important;
+               border-radius: 32px !important;
+               background:
+                    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 1) 0 16%, rgba(220, 253, 255, .98) 40%, rgba(207, 250, 254, .9) 100%) !important;
+               border: 1px solid rgba(255, 255, 255, 0.65) !important;
+               box-shadow:
+                    0 22px 54px rgba(34, 211, 238, 0.30),
+                    0 0 38px rgba(34, 211, 238, 0.24),
+                    0 0 88px rgba(124, 58, 237, 0.18) !important;
+               animation: premiumAstraFloat 3.4s ease-in-out infinite !important;
+          }
+
+          .astra-avatar::before {
+               inset: -22px !important;
+               opacity: 0.82 !important;
+               background:
+                    conic-gradient(from 0deg,
+                         transparent 0deg,
+                         rgba(34, 211, 238, 0.92) 52deg,
+                         rgba(124, 58, 237, 0.74) 108deg,
+                         transparent 160deg,
+                         rgba(20, 184, 166, 0.82) 226deg,
+                         transparent 292deg,
+                         rgba(34, 211, 238, 0.82) 360deg) !important;
+               filter: blur(0.2px) drop-shadow(0 0 16px rgba(34, 211, 238, .48)) !important;
+               animation: premiumAstraAura 5s linear infinite !important;
+          }
+
+          .astra-avatar::after {
+               inset: -36px !important;
+               opacity: 0.96 !important;
+               background:
+                    radial-gradient(circle at 16% 32%, rgba(34, 211, 238, 0.98) 0 3.5px, transparent 4.5px),
+                    radial-gradient(circle at 78% 18%, rgba(124, 58, 237, 0.92) 0 3.5px, transparent 4.5px),
+                    radial-gradient(circle at 86% 72%, rgba(20, 184, 166, 0.92) 0 3px, transparent 4.5px),
+                    radial-gradient(circle at 22% 84%, rgba(34, 211, 238, 0.78) 0 2.5px, transparent 4px),
+                    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.75) 0 2px, transparent 3.5px) !important;
+               animation: premiumAstraSpark 4.2s linear infinite !important;
+          }
+
+          .astra-avatar i {
+               font-size: 38px !important;
+               color: #0f766e !important;
+               filter:
+                    drop-shadow(0 0 8px rgba(20, 184, 166, 0.5)) drop-shadow(0 0 18px rgba(34, 211, 238, 0.22)) !important;
+               animation: premiumBotPulse 2.7s ease-in-out infinite !important;
+          }
+
+          body.light-mode .astra-avatar {
+               box-shadow:
+                    0 20px 46px rgba(15, 23, 42, 0.10),
+                    0 0 32px rgba(20, 184, 166, 0.18),
+                    0 0 70px rgba(124, 58, 237, 0.10) !important;
+          }
+
+          .hero-card {
+               position: relative !important;
+               overflow: hidden !important;
+          }
+
+          .hero-card::before {
+               content: "";
+               position: absolute;
+               width: 260px;
+               height: 260px;
+               left: 50%;
+               top: 76px;
+               transform: translateX(-50%);
+               border-radius: 50%;
+               background:
+                    radial-gradient(circle, rgba(34, 211, 238, 0.12), transparent 64%),
+                    radial-gradient(circle, rgba(124, 58, 237, 0.08), transparent 74%);
+               filter: blur(8px);
+               z-index: -1;
+               animation: premiumHeroHalo 4.8s ease-in-out infinite;
+          }
+
+          @keyframes premiumCoreBreath {
+
+               0%,
+               100% {
+                    transform: translate(-50%, -50%) scale(0.94);
+                    opacity: .68;
+               }
+
+               45% {
+                    transform: translate(-50%, -50%) scale(1.22);
+                    opacity: 1;
+               }
+
+               70% {
+                    transform: translate(-50%, -50%) scale(1.05);
+                    opacity: .88;
+               }
+          }
+
+          @keyframes premiumOrbitSpin {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes premiumOrbitSpinReverse {
+               from {
+                    transform: rotate(360deg);
+               }
+
+               to {
+                    transform: rotate(0deg);
+               }
+          }
+
+          @keyframes premiumDotPulse {
+
+               0%,
+               100% {
+                    transform: translateY(-50%) scale(0.9);
+                    opacity: 0.72;
+               }
+
+               50% {
+                    transform: translateY(-50%) scale(1.35);
+                    opacity: 1;
+               }
+          }
+
+          @keyframes premiumAstraRingA {
+               0% {
+                    transform: rotate(0deg) scale(1);
+                    border-radius: 34px;
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(1.045);
+                    border-radius: 42px;
+               }
+
+               100% {
+                    transform: rotate(360deg) scale(1);
+                    border-radius: 34px;
+               }
+          }
+
+          @keyframes premiumAstraRingB {
+               0% {
+                    transform: rotate(360deg) scale(1.02);
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(0.965);
+               }
+
+               100% {
+                    transform: rotate(0deg) scale(1.02);
+               }
+          }
+
+          @keyframes premiumAstraFloat {
+
+               0%,
+               100% {
+                    transform: translateY(0) scale(1);
+               }
+
+               35% {
+                    transform: translateY(-10px) scale(1.035);
+               }
+
+               68% {
+                    transform: translateY(3px) scale(0.992);
+               }
+          }
+
+          @keyframes premiumAstraAura {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes premiumAstraSpark {
+               0% {
+                    transform: rotate(0deg) scale(1);
+                    opacity: .82;
+               }
+
+               50% {
+                    transform: rotate(180deg) scale(1.08);
+                    opacity: 1;
+               }
+
+               100% {
+                    transform: rotate(360deg) scale(1);
+                    opacity: .82;
+               }
+          }
+
+          @keyframes premiumBotPulse {
+
+               0%,
+               100% {
+                    transform: scale(1) rotate(0deg);
+                    opacity: 1;
+               }
+
+               45% {
+                    transform: scale(1.12) rotate(-2deg);
+                    opacity: .94;
+               }
+
+               72% {
+                    transform: scale(1.04) rotate(2deg);
+                    opacity: 1;
+               }
+          }
+
+          @keyframes premiumHeroHalo {
+
+               0%,
+               100% {
+                    transform: translateX(-50%) scale(.94);
+                    opacity: .55;
+               }
+
+               50% {
+                    transform: translateX(-50%) scale(1.12);
+                    opacity: .95;
+               }
+          }
+
+          @media (max-width: 576px) {
+               .astra-wrap {
+                    width: 136px !important;
+                    height: 136px !important;
+               }
+
+               .astra-avatar {
+                    width: 92px !important;
+                    height: 92px !important;
+               }
+
+               .astra-avatar i {
+                    font-size: 34px !important;
+               }
+
+               .hero-card::before {
+                    width: 210px;
+                    height: 210px;
+                    top: 68px;
+               }
+          }
      </style>
 </head>
 
@@ -1358,7 +1715,45 @@
      <div class="app-shell">
           <aside class="sidebar" id="mainSidebar">
                <div class="brand">
-                    <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+                    <div class="brand-icon em-neural-logo" aria-hidden="true">
+                         <svg class="em-logo-svg" viewBox="0 0 64 64" role="img">
+                              <defs>
+                                   <linearGradient id="emLogoGrad" x1="8" y1="8" x2="56" y2="56"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#22d3ee" />
+                                        <stop offset="55%" stop-color="#14b8a6" />
+                                        <stop offset="100%" stop-color="#7c3aed" />
+                                   </linearGradient>
+                                   <filter id="emLogoGlow" x="-40%" y="-40%" width="180%" height="180%">
+                                        <feGaussianBlur stdDeviation="2.2" result="blur" />
+                                        <feMerge>
+                                             <feMergeNode in="blur" />
+                                             <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                   </filter>
+                              </defs>
+                              <g class="em-logo-orbit">
+                                   <polygon class="em-logo-ring" points="32 5 55 18 55 46 32 59 9 46 9 18" />
+                                   <polygon class="em-logo-ring em-logo-ring-inner"
+                                        points="32 15 47 24 47 40 32 49 17 40 17 24" />
+                              </g>
+                              <g class="em-logo-network" filter="url(#emLogoGlow)">
+                                   <line class="em-logo-line" x1="22" y1="24" x2="32" y2="18" />
+                                   <line class="em-logo-line" x1="32" y1="18" x2="43" y2="28" />
+                                   <line class="em-logo-line" x1="43" y1="28" x2="38" y2="43" />
+                                   <line class="em-logo-line" x1="38" y1="43" x2="24" y2="42" />
+                                   <line class="em-logo-line" x1="24" y1="42" x2="22" y2="24" />
+                                   <line class="em-logo-line" x1="22" y1="24" x2="38" y2="43" />
+                                   <line class="em-logo-line" x1="32" y1="18" x2="24" y2="42" />
+                                   <circle class="em-logo-node node-a" cx="22" cy="24" r="3.6" />
+                                   <circle class="em-logo-node node-b" cx="32" cy="18" r="3.2" />
+                                   <circle class="em-logo-node node-c" cx="43" cy="28" r="3.6" />
+                                   <circle class="em-logo-node node-d" cx="38" cy="43" r="3.4" />
+                                   <circle class="em-logo-node node-e" cx="24" cy="42" r="3.2" />
+                                   <circle class="em-logo-center" cx="32" cy="32" r="4.2" />
+                              </g>
+                         </svg>
+                    </div>
                     <div>
                          <h2>EduMind AI</h2>
                          <span>Student Panel</span>
@@ -1640,20 +2035,48 @@
                     });
                }
 
+               function updateSidebarToggleIcon() {
+                    if (!mobileToggle) return;
+
+                    const isDesktop = window.innerWidth > 900;
+                    const isOpen = isDesktop
+                         ? !body.classList.contains("desktop-sidebar-hidden")
+                         : body.classList.contains("sidebar-open");
+
+                    mobileToggle.innerHTML = isOpen
+                         ? '<i class="fa-solid fa-xmark"></i>'
+                         : '<i class="fa-solid fa-bars"></i>';
+
+                    mobileToggle.setAttribute(
+                         "aria-label",
+                         isOpen ? "Close sidebar" : "Open sidebar",
+                    );
+               }
+
                function toggleSidebar() {
-                    body.classList.toggle("sidebar-open");
-                    const isOpen = body.classList.contains("sidebar-open");
-                    mobileToggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-                    mobileToggle.setAttribute("aria-label", isOpen ? "Close sidebar" : "Open sidebar");
+                    if (window.innerWidth > 900) {
+                         body.classList.toggle("desktop-sidebar-hidden");
+                         body.classList.remove("sidebar-open");
+                    } else {
+                         body.classList.toggle("sidebar-open");
+                    }
+
+                    updateSidebarToggleIcon();
                }
 
                function closeSidebar() {
                     body.classList.remove("sidebar-open");
-                    if (mobileToggle) {
-                         mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-                         mobileToggle.setAttribute("aria-label", "Open sidebar");
-                    }
+                    updateSidebarToggleIcon();
                }
+
+               window.addEventListener("resize", () => {
+                    if (window.innerWidth > 900) {
+                         body.classList.remove("sidebar-open");
+                    }
+                    updateSidebarToggleIcon();
+               });
+
+               updateSidebarToggleIcon();
 
                function applyTheme(theme) {
                     const isDark = theme !== "light";
@@ -1874,3 +2297,358 @@
 </body>
 
 </html>
+
+<!-- =========================================================
+     FINAL ASTRA GLOW BALANCE PATCH
+     Added by ChatGPT: reduces heavy glow behind Astra icon while keeping animation visible.
+========================================================= -->
+<style>
+     body.assistant-page .astra-wrap {
+          filter: none !important;
+     }
+
+     body.assistant-page .astra-wrap::before,
+     body.assistant-page .astra-wrap::after {
+          opacity: 0.62 !important;
+          filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.16)) !important;
+          box-shadow: none !important;
+     }
+
+     body.assistant-page .astra-wrap::before {
+          border-color: rgba(34, 211, 238, 0.42) !important;
+     }
+
+     body.assistant-page .astra-wrap::after {
+          border-color: rgba(124, 58, 237, 0.34) !important;
+     }
+
+     body.assistant-page .astra-avatar {
+          box-shadow:
+               0 12px 28px rgba(34, 211, 238, 0.14),
+               0 0 14px rgba(124, 58, 237, 0.08) !important;
+     }
+
+     body.assistant-page .astra-avatar::before {
+          inset: -18px !important;
+          opacity: 0.36 !important;
+          filter: none !important;
+     }
+
+     body.assistant-page .astra-avatar::after {
+          inset: -30px !important;
+          opacity: 0.52 !important;
+          filter: none !important;
+     }
+
+     body.assistant-page .astra-avatar i {
+          filter:
+               drop-shadow(0 0 4px rgba(20, 184, 166, 0.34)) drop-shadow(0 0 8px rgba(34, 211, 238, 0.12)) !important;
+     }
+
+     body.assistant-page.preview-dark .astra-wrap::before,
+     body.assistant-page.dark-mode .astra-wrap::before {
+          border-color: rgba(0, 196, 210, 0.42) !important;
+     }
+
+     body.assistant-page.preview-dark .astra-wrap::after,
+     body.assistant-page.dark-mode .astra-wrap::after {
+          border-color: rgba(124, 58, 237, 0.34) !important;
+     }
+
+     body.assistant-page.preview-dark .astra-avatar,
+     body.assistant-page.dark-mode .astra-avatar {
+          box-shadow:
+               0 13px 32px rgba(0, 196, 210, 0.14),
+               0 0 18px rgba(124, 58, 237, 0.10) !important;
+     }
+
+     body.assistant-page.preview-dark .astra-avatar::before,
+     body.assistant-page.dark-mode .astra-avatar::before {
+          opacity: 0.42 !important;
+     }
+
+     body.assistant-page.preview-dark .astra-avatar::after,
+     body.assistant-page.dark-mode .astra-avatar::after {
+          opacity: 0.58 !important;
+     }
+
+
+     /* =========================================================
+       RESTORED EduMind AI polygon neural animated SVG logo
+       Only brand logo uses this. Hamburger stays bars/cross.
+    ========================================================= */
+     .brand-icon.em-neural-logo {
+          width: 48px !important;
+          height: 48px !important;
+          border-radius: 16px !important;
+          padding: 6px !important;
+          display: grid !important;
+          place-items: center !important;
+          position: relative !important;
+          overflow: visible !important;
+          background:
+               radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.18), rgba(20, 184, 166, 0.08) 58%, rgba(7, 26, 31, 0.72) 100%) !important;
+          border: 1px solid rgba(34, 211, 238, 0.30) !important;
+          box-shadow:
+               0 0 0 1px rgba(34, 211, 238, 0.06),
+               0 0 22px rgba(34, 211, 238, 0.16) !important;
+          flex-shrink: 0 !important;
+     }
+
+     .brand-icon.em-neural-logo::before {
+          content: "";
+          position: absolute;
+          inset: -5px;
+          border-radius: 20px;
+          background: conic-gradient(from 0deg, transparent, rgba(34, 211, 238, 0.24), transparent, rgba(124, 58, 237, 0.18), transparent);
+          opacity: 0.65;
+          filter: blur(9px);
+          animation: emLogoAuraSpin 7s linear infinite;
+          z-index: -1;
+     }
+
+     .em-logo-svg {
+          width: 100% !important;
+          height: 100% !important;
+          overflow: visible !important;
+          display: block !important;
+     }
+
+     .em-logo-orbit {
+          transform-origin: 32px 32px;
+          animation: emLogoSlowRotate 15s linear infinite;
+     }
+
+     .em-logo-ring {
+          fill: rgba(8, 25, 34, 0.56);
+          stroke: url(#emLogoGrad);
+          stroke-width: 2;
+          stroke-linejoin: round;
+          opacity: 0.96;
+     }
+
+     .em-logo-ring-inner {
+          fill: rgba(34, 211, 238, 0.06);
+          stroke-width: 1.35;
+          opacity: 0.72;
+          animation: emLogoInnerPulse 3.6s ease-in-out infinite;
+     }
+
+     .em-logo-line {
+          stroke: rgba(34, 211, 238, 0.72);
+          stroke-width: 1.5;
+          stroke-linecap: round;
+          stroke-dasharray: 15;
+          stroke-dashoffset: 30;
+          animation: emLogoLineFlow 4.2s ease-in-out infinite;
+     }
+
+     .em-logo-node,
+     .em-logo-center {
+          fill: #22d3ee;
+          stroke: rgba(255, 255, 255, 0.78);
+          stroke-width: 0.8;
+          transform-origin: center;
+          animation: emLogoNodePulse 2.8s ease-in-out infinite;
+     }
+
+     .em-logo-center {
+          fill: #14b8a6;
+          animation-duration: 2.2s;
+     }
+
+     .em-logo-node.node-b {
+          animation-delay: .25s;
+          fill: #67e8f9;
+     }
+
+     .em-logo-node.node-c {
+          animation-delay: .45s;
+          fill: #2dd4bf;
+     }
+
+     .em-logo-node.node-d {
+          animation-delay: .65s;
+          fill: #8b5cf6;
+     }
+
+     .em-logo-node.node-e {
+          animation-delay: .85s;
+          fill: #22d3ee;
+     }
+
+     body.light-mode .brand-icon.em-neural-logo {
+          background:
+               radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.16), rgba(34, 211, 238, 0.08) 60%, rgba(255, 255, 255, 0.86) 100%) !important;
+          border-color: rgba(20, 184, 166, 0.26) !important;
+          box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10) !important;
+     }
+
+     body.light-mode .em-logo-ring {
+          fill: rgba(255, 255, 255, 0.64);
+     }
+
+     @keyframes emLogoSlowRotate {
+          from {
+               transform: rotate(0deg);
+          }
+
+          to {
+               transform: rotate(360deg);
+          }
+     }
+
+     @keyframes emLogoAuraSpin {
+          from {
+               transform: rotate(0deg);
+          }
+
+          to {
+               transform: rotate(360deg);
+          }
+     }
+
+     @keyframes emLogoInnerPulse {
+
+          0%,
+          100% {
+               opacity: 0.52;
+               transform: scale(0.98);
+               transform-origin: 32px 32px;
+          }
+
+          50% {
+               opacity: 0.95;
+               transform: scale(1.05);
+               transform-origin: 32px 32px;
+          }
+     }
+
+     @keyframes emLogoLineFlow {
+          0% {
+               stroke-dashoffset: 30;
+               opacity: 0.38;
+          }
+
+          45% {
+               opacity: 1;
+          }
+
+          100% {
+               stroke-dashoffset: 0;
+               opacity: 0.62;
+          }
+     }
+
+     @keyframes emLogoNodePulse {
+
+          0%,
+          100% {
+               transform: scale(1);
+               opacity: 0.82;
+          }
+
+          50% {
+               transform: scale(1.26);
+               opacity: 1;
+          }
+     }
+
+     .mobile-toggle i {
+          pointer-events: none !important;
+     }
+
+
+
+     /* =========================================================
+       FINAL FIX v6 — Desktop + Mobile Hamburger for Assistant
+       - Hamburger visible on desktop also
+       - Desktop click hides/shows sidebar cleanly
+       - Mobile behavior remains unchanged
+    ========================================================= */
+
+     .mobile-toggle {
+          display: grid !important;
+          place-items: center !important;
+          position: fixed !important;
+          top: 18px !important;
+          z-index: 99999 !important;
+          width: 52px !important;
+          height: 52px !important;
+          border-radius: 18px !important;
+          border: 1px solid rgba(34, 211, 238, 0.48) !important;
+          background: rgba(6, 20, 28, 0.92) !important;
+          color: #e6fbff !important;
+          font-size: 21px !important;
+          box-shadow:
+               0 18px 44px rgba(0, 0, 0, 0.28),
+               0 0 22px rgba(34, 211, 238, 0.18) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+          cursor: pointer !important;
+     }
+
+     body.light-mode .mobile-toggle {
+          background: rgba(255, 255, 255, 0.94) !important;
+          color: #0f766e !important;
+          box-shadow:
+               0 16px 34px rgba(15, 23, 42, 0.12),
+               0 0 18px rgba(20, 184, 166, 0.16) !important;
+     }
+
+     @media (min-width: 901px) {
+          .mobile-toggle {
+               display: grid !important;
+               left: calc(var(--sidebar-width) + 18px) !important;
+          }
+
+          body.desktop-sidebar-hidden .mobile-toggle {
+               left: 18px !important;
+          }
+
+          body.desktop-sidebar-hidden .app-shell {
+               grid-template-columns: minmax(0, 1fr) !important;
+          }
+
+          body.desktop-sidebar-hidden .sidebar {
+               position: fixed !important;
+               top: 0 !important;
+               left: calc(-1 * var(--sidebar-width)) !important;
+               transform: translateX(-12px) !important;
+               opacity: 0 !important;
+               pointer-events: none !important;
+          }
+
+          body:not(.desktop-sidebar-hidden) .sidebar {
+               transform: translateX(0) !important;
+               opacity: 1 !important;
+          }
+
+          .sidebar {
+               transition: transform 0.25s ease, opacity 0.25s ease, left 0.25s ease !important;
+          }
+
+          body:not(.desktop-sidebar-hidden) .topbar-left {
+               padding-left: 62px !important;
+          }
+
+          body.desktop-sidebar-hidden .topbar-left {
+               padding-left: 62px !important;
+          }
+
+          .overlay {
+               display: none !important;
+          }
+     }
+
+     @media (max-width: 900px) {
+          .mobile-toggle {
+               display: grid !important;
+               left: 18px !important;
+          }
+
+          body.sidebar-open .mobile-toggle {
+               left: calc(var(--sidebar-width) - 66px) !important;
+          }
+     }
+</style>
