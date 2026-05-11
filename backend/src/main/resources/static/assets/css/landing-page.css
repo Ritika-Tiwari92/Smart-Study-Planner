@@ -2130,3 +2130,211 @@ h4 {
     transition-duration: 0.01ms !important;
   }
 }
+/* ============================================================
+   FIX: Landing Navbar Responsive Cut Issue
+   Only navbar + hero spacing fix for tablet/phone
+   ============================================================ */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.navbar {
+  width: 100%;
+  min-height: 66px;
+  overflow: visible;
+}
+
+.nav-container {
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.nav-logo,
+.nav-actions {
+  min-width: 0;
+}
+
+.logo-text {
+  white-space: nowrap;
+}
+
+/* Tablet + mobile: convert desktop navbar into hamburger layout */
+@media (max-width: 1024px) {
+  .navbar {
+    min-height: 68px;
+  }
+
+  .nav-container {
+    height: 68px;
+    padding: 0 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: calc(100dvh - 68px);
+    overflow-y: auto;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 1rem 1.25rem 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    transform: translateY(-120%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    margin-left: 0;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-link {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .hamburger {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .btn-login {
+    display: none;
+  }
+
+  .nav-actions {
+    margin-left: auto;
+    gap: 0.55rem;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle {
+    flex-shrink: 0;
+  }
+
+  .nav-dropdown {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    min-width: unset;
+    width: 100%;
+    z-index: auto;
+  }
+
+  .dropdown-inner {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .nav-dropdown-wrap .nav-dropdown {
+    display: none;
+  }
+
+  .nav-dropdown-wrap .nav-dropdown.open {
+    display: block;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-top: 68px;
+  }
+
+  .hero-container {
+    padding-top: 4.5rem;
+  }
+}
+
+/* Phone screens */
+@media (max-width: 640px) {
+  .navbar {
+    min-height: 64px;
+  }
+
+  .nav-container {
+    height: 64px;
+    padding: 0 0.9rem;
+    gap: 0.55rem;
+  }
+
+  .nav-links {
+    top: 64px;
+    max-height: calc(100dvh - 64px);
+    padding: 0.9rem 1rem 1.4rem;
+  }
+
+  .logo-svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo-text {
+    font-size: 1rem;
+  }
+
+  .theme-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .btn-cta-nav {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .hero {
+    padding-top: 64px;
+  }
+
+  .hero-container {
+    padding: 3.5rem 1rem 3rem;
+  }
+}
+
+/* Very small phones: hide only top navbar CTA to prevent cutting */
+@media (max-width: 430px) {
+  .nav-container {
+    padding: 0 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .logo-svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .logo-text {
+    font-size: 0.95rem;
+  }
+
+  .btn-cta-nav {
+    display: none;
+  }
+
+  .theme-toggle {
+    width: 33px;
+    height: 33px;
+  }
+
+  .hamburger {
+    padding: 5px;
+  }
+}
