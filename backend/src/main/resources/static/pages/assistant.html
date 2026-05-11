@@ -1696,6 +1696,1032 @@
                }
           }
      </style>
+     <!-- =========================================================
+     FINAL ASTRA GLOW BALANCE PATCH
+     Added by ChatGPT: reduces heavy glow behind Astra icon while keeping animation visible.
+========================================================= -->
+     <style>
+          body.assistant-page .astra-wrap {
+               filter: none !important;
+          }
+
+          body.assistant-page .astra-wrap::before,
+          body.assistant-page .astra-wrap::after {
+               opacity: 0.62 !important;
+               filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.16)) !important;
+               box-shadow: none !important;
+          }
+
+          body.assistant-page .astra-wrap::before {
+               border-color: rgba(34, 211, 238, 0.42) !important;
+          }
+
+          body.assistant-page .astra-wrap::after {
+               border-color: rgba(124, 58, 237, 0.34) !important;
+          }
+
+          body.assistant-page .astra-avatar {
+               box-shadow:
+                    0 12px 28px rgba(34, 211, 238, 0.14),
+                    0 0 14px rgba(124, 58, 237, 0.08) !important;
+          }
+
+          body.assistant-page .astra-avatar::before {
+               inset: -18px !important;
+               opacity: 0.36 !important;
+               filter: none !important;
+          }
+
+          body.assistant-page .astra-avatar::after {
+               inset: -30px !important;
+               opacity: 0.52 !important;
+               filter: none !important;
+          }
+
+          body.assistant-page .astra-avatar i {
+               filter:
+                    drop-shadow(0 0 4px rgba(20, 184, 166, 0.34)) drop-shadow(0 0 8px rgba(34, 211, 238, 0.12)) !important;
+          }
+
+          body.assistant-page.preview-dark .astra-wrap::before,
+          body.assistant-page.dark-mode .astra-wrap::before {
+               border-color: rgba(0, 196, 210, 0.42) !important;
+          }
+
+          body.assistant-page.preview-dark .astra-wrap::after,
+          body.assistant-page.dark-mode .astra-wrap::after {
+               border-color: rgba(124, 58, 237, 0.34) !important;
+          }
+
+          body.assistant-page.preview-dark .astra-avatar,
+          body.assistant-page.dark-mode .astra-avatar {
+               box-shadow:
+                    0 13px 32px rgba(0, 196, 210, 0.14),
+                    0 0 18px rgba(124, 58, 237, 0.10) !important;
+          }
+
+          body.assistant-page.preview-dark .astra-avatar::before,
+          body.assistant-page.dark-mode .astra-avatar::before {
+               opacity: 0.42 !important;
+          }
+
+          body.assistant-page.preview-dark .astra-avatar::after,
+          body.assistant-page.dark-mode .astra-avatar::after {
+               opacity: 0.58 !important;
+          }
+
+
+          /* =========================================================
+       RESTORED EduMind AI polygon neural animated SVG logo
+       Only brand logo uses this. Hamburger stays bars/cross.
+    ========================================================= */
+          .brand-icon.em-neural-logo {
+               width: 48px !important;
+               height: 48px !important;
+               border-radius: 16px !important;
+               padding: 6px !important;
+               display: grid !important;
+               place-items: center !important;
+               position: relative !important;
+               overflow: visible !important;
+               background:
+                    radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.18), rgba(20, 184, 166, 0.08) 58%, rgba(7, 26, 31, 0.72) 100%) !important;
+               border: 1px solid rgba(34, 211, 238, 0.30) !important;
+               box-shadow:
+                    0 0 0 1px rgba(34, 211, 238, 0.06),
+                    0 0 22px rgba(34, 211, 238, 0.16) !important;
+               flex-shrink: 0 !important;
+          }
+
+          .brand-icon.em-neural-logo::before {
+               content: "";
+               position: absolute;
+               inset: -5px;
+               border-radius: 20px;
+               background: conic-gradient(from 0deg, transparent, rgba(34, 211, 238, 0.24), transparent, rgba(124, 58, 237, 0.18), transparent);
+               opacity: 0.65;
+               filter: blur(9px);
+               animation: emLogoAuraSpin 7s linear infinite;
+               z-index: -1;
+          }
+
+          .em-logo-svg {
+               width: 100% !important;
+               height: 100% !important;
+               overflow: visible !important;
+               display: block !important;
+          }
+
+          .em-logo-orbit {
+               transform-origin: 32px 32px;
+               animation: emLogoSlowRotate 15s linear infinite;
+          }
+
+          .em-logo-ring {
+               fill: rgba(8, 25, 34, 0.56);
+               stroke: url(#emLogoGrad);
+               stroke-width: 2;
+               stroke-linejoin: round;
+               opacity: 0.96;
+          }
+
+          .em-logo-ring-inner {
+               fill: rgba(34, 211, 238, 0.06);
+               stroke-width: 1.35;
+               opacity: 0.72;
+               animation: emLogoInnerPulse 3.6s ease-in-out infinite;
+          }
+
+          .em-logo-line {
+               stroke: rgba(34, 211, 238, 0.72);
+               stroke-width: 1.5;
+               stroke-linecap: round;
+               stroke-dasharray: 15;
+               stroke-dashoffset: 30;
+               animation: emLogoLineFlow 4.2s ease-in-out infinite;
+          }
+
+          .em-logo-node,
+          .em-logo-center {
+               fill: #22d3ee;
+               stroke: rgba(255, 255, 255, 0.78);
+               stroke-width: 0.8;
+               transform-origin: center;
+               animation: emLogoNodePulse 2.8s ease-in-out infinite;
+          }
+
+          .em-logo-center {
+               fill: #14b8a6;
+               animation-duration: 2.2s;
+          }
+
+          .em-logo-node.node-b {
+               animation-delay: .25s;
+               fill: #67e8f9;
+          }
+
+          .em-logo-node.node-c {
+               animation-delay: .45s;
+               fill: #2dd4bf;
+          }
+
+          .em-logo-node.node-d {
+               animation-delay: .65s;
+               fill: #8b5cf6;
+          }
+
+          .em-logo-node.node-e {
+               animation-delay: .85s;
+               fill: #22d3ee;
+          }
+
+          body.light-mode .brand-icon.em-neural-logo {
+               background:
+                    radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.16), rgba(34, 211, 238, 0.08) 60%, rgba(255, 255, 255, 0.86) 100%) !important;
+               border-color: rgba(20, 184, 166, 0.26) !important;
+               box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10) !important;
+          }
+
+          body.light-mode .em-logo-ring {
+               fill: rgba(255, 255, 255, 0.64);
+          }
+
+          @keyframes emLogoSlowRotate {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes emLogoAuraSpin {
+               from {
+                    transform: rotate(0deg);
+               }
+
+               to {
+                    transform: rotate(360deg);
+               }
+          }
+
+          @keyframes emLogoInnerPulse {
+
+               0%,
+               100% {
+                    opacity: 0.52;
+                    transform: scale(0.98);
+                    transform-origin: 32px 32px;
+               }
+
+               50% {
+                    opacity: 0.95;
+                    transform: scale(1.05);
+                    transform-origin: 32px 32px;
+               }
+          }
+
+          @keyframes emLogoLineFlow {
+               0% {
+                    stroke-dashoffset: 30;
+                    opacity: 0.38;
+               }
+
+               45% {
+                    opacity: 1;
+               }
+
+               100% {
+                    stroke-dashoffset: 0;
+                    opacity: 0.62;
+               }
+          }
+
+          @keyframes emLogoNodePulse {
+
+               0%,
+               100% {
+                    transform: scale(1);
+                    opacity: 0.82;
+               }
+
+               50% {
+                    transform: scale(1.26);
+                    opacity: 1;
+               }
+          }
+
+          .mobile-toggle i {
+               pointer-events: none !important;
+          }
+
+
+
+          /* =========================================================
+       FINAL FIX v6 — Desktop + Mobile Hamburger for Assistant
+       - Hamburger visible on desktop also
+       - Desktop click hides/shows sidebar cleanly
+       - Mobile behavior remains unchanged
+    ========================================================= */
+
+          .mobile-toggle {
+               display: grid !important;
+               place-items: center !important;
+               position: fixed !important;
+               top: 18px !important;
+               z-index: 99999 !important;
+               width: 52px !important;
+               height: 52px !important;
+               border-radius: 18px !important;
+               border: 1px solid rgba(34, 211, 238, 0.48) !important;
+               background: rgba(6, 20, 28, 0.92) !important;
+               color: #e6fbff !important;
+               font-size: 21px !important;
+               box-shadow:
+                    0 18px 44px rgba(0, 0, 0, 0.28),
+                    0 0 22px rgba(34, 211, 238, 0.18) !important;
+               backdrop-filter: blur(14px) !important;
+               -webkit-backdrop-filter: blur(14px) !important;
+               cursor: pointer !important;
+          }
+
+          body.light-mode .mobile-toggle {
+               background: rgba(255, 255, 255, 0.94) !important;
+               color: #0f766e !important;
+               box-shadow:
+                    0 16px 34px rgba(15, 23, 42, 0.12),
+                    0 0 18px rgba(20, 184, 166, 0.16) !important;
+          }
+
+          @media (min-width: 901px) {
+               .mobile-toggle {
+                    display: grid !important;
+                    left: calc(var(--sidebar-width) + 18px) !important;
+               }
+
+               body.desktop-sidebar-hidden .mobile-toggle {
+                    left: 18px !important;
+               }
+
+               body.desktop-sidebar-hidden .app-shell {
+                    grid-template-columns: minmax(0, 1fr) !important;
+               }
+
+               body.desktop-sidebar-hidden .sidebar {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: calc(-1 * var(--sidebar-width)) !important;
+                    transform: translateX(-12px) !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+               }
+
+               body:not(.desktop-sidebar-hidden) .sidebar {
+                    transform: translateX(0) !important;
+                    opacity: 1 !important;
+               }
+
+               .sidebar {
+                    transition: transform 0.25s ease, opacity 0.25s ease, left 0.25s ease !important;
+               }
+
+               body:not(.desktop-sidebar-hidden) .topbar-left {
+                    padding-left: 62px !important;
+               }
+
+               body.desktop-sidebar-hidden .topbar-left {
+                    padding-left: 62px !important;
+               }
+
+               .overlay {
+                    display: none !important;
+               }
+          }
+
+          @media (max-width: 900px) {
+               .mobile-toggle {
+                    display: grid !important;
+                    left: 18px !important;
+               }
+
+               body.sidebar-open .mobile-toggle {
+                    left: calc(var(--sidebar-width) - 66px) !important;
+               }
+          }
+     </style>
+
+
+
+     <style id="assistant-final-responsive-file-fix">
+          /* ============================================================
+   Assistant Final Updated File
+   - Left hamburger stays for page/sidebar navigation
+   - Topbar has Theme + Astra Tools hamburger on phone/tablet
+   - Astra Tools drawer contains New Chat + Suggestions + Recent Chats
+   - Logo animation is not changed
+   ============================================================ */
+
+          /* Light mode should use cyan/dark-neon text, not plain black */
+          body.assistant-page.light-mode {
+               --text: #0d4f4f;
+               --muted: #295c5e;
+               --surface: rgba(255, 255, 255, 0.88);
+               --surface-2: rgba(255, 255, 255, 0.96);
+          }
+
+          /* Assistant topbar should stay clean */
+          body.assistant-page .profile-mini,
+          body.assistant-page .profile-dropdown {
+               display: none !important;
+          }
+
+          /* Make send arrow clearly visible inside the cyan send button */
+          body.assistant-page .send-btn,
+          body.assistant-page .send-btn i,
+          body.assistant-page .send-btn svg {
+               color: #064e3b !important;
+               fill: #064e3b !important;
+               stroke: #064e3b !important;
+          }
+
+          body.assistant-page .assistant-drawer-new-chat {
+               display: none;
+          }
+
+          body.assistant-page .assistant-tools-overlay {
+               display: none;
+          }
+
+          body.assistant-page .assistant-tools-btn {
+               color: var(--teal) !important;
+               background: var(--surface) !important;
+               border: 1px solid var(--border) !important;
+               box-shadow: none !important;
+          }
+
+          body.assistant-page.assistant-tools-open .assistant-tools-btn i::before {
+               content: "\f00d";
+               font-family: "Font Awesome 6 Free";
+               font-weight: 900;
+          }
+
+          @media (min-width: 901px) {
+               body.assistant-page .assistant-tools-btn {
+                    display: none !important;
+               }
+
+               body.assistant-page .side-panel {
+                    position: relative !important;
+                    transform: none !important;
+                    display: block !important;
+               }
+          }
+
+          @media (max-width: 900px) {
+
+               html,
+               body.assistant-page {
+                    width: 100% !important;
+                    min-height: 100dvh !important;
+                    overflow: hidden !important;
+               }
+
+               body.assistant-page .app-shell {
+                    height: 100dvh !important;
+                    min-height: 100dvh !important;
+                    display: block !important;
+                    overflow: hidden !important;
+               }
+
+               /* Left hamburger/sidebar remains available for page navigation */
+               body.assistant-page .sidebar {
+                    display: block !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: calc(-1 * var(--sidebar-width)) !important;
+                    width: var(--sidebar-width) !important;
+                    max-width: 82vw !important;
+                    height: 100dvh !important;
+                    z-index: 1300 !important;
+                    transition: left 0.24s ease !important;
+               }
+
+               body.assistant-page.sidebar-open .sidebar {
+                    left: 0 !important;
+               }
+
+               body.assistant-page .mobile-toggle {
+                    display: grid !important;
+                    place-items: center !important;
+                    position: fixed !important;
+                    left: 14px !important;
+                    top: 14px !important;
+                    z-index: 1600 !important;
+                    width: 48px !important;
+                    height: 48px !important;
+                    border-radius: 16px !important;
+               }
+
+               body.assistant-page.sidebar-open .mobile-toggle {
+                    left: calc(var(--sidebar-width) - 62px) !important;
+               }
+
+               body.assistant-page.sidebar-open .overlay {
+                    display: block !important;
+                    left: 0 !important;
+                    z-index: 1200 !important;
+               }
+
+               body.assistant-page .main {
+                    height: 100dvh !important;
+                    min-height: 100dvh !important;
+                    overflow: hidden !important;
+                    padding-top: 0 !important;
+               }
+
+               /* Top nav: title + theme + tools button */
+               body.assistant-page .topbar {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    height: 78px !important;
+                    margin: 0 !important;
+                    padding: 12px 12px 12px 76px !important;
+                    z-index: 1000 !important;
+                    border-radius: 0 0 22px 22px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    gap: 10px !important;
+                    background: rgba(8, 25, 34, 0.86) !important;
+                    border: 0 !important;
+                    border-bottom: 1px solid var(--border) !important;
+                    backdrop-filter: blur(18px) !important;
+                    -webkit-backdrop-filter: blur(18px) !important;
+               }
+
+               body.assistant-page.light-mode .topbar {
+                    background: rgba(255, 255, 255, 0.92) !important;
+               }
+
+               body.assistant-page .topbar-left {
+                    min-width: 0 !important;
+                    flex: 1 !important;
+                    padding-left: 0 !important;
+               }
+
+               body.assistant-page .topbar-left h1 {
+                    padding-left: 0 !important;
+                    font-size: 16px !important;
+                    line-height: 1.15 !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                    color: var(--text) !important;
+               }
+
+               body.assistant-page .topbar-left p {
+                    display: none !important;
+               }
+
+               body.assistant-page .topbar-actions {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: flex-end !important;
+                    gap: 8px !important;
+                    flex-shrink: 0 !important;
+               }
+
+               /* New Chat moves into Astra Tools drawer on phone/tablet */
+               body.assistant-page #newChatBtn {
+                    display: none !important;
+               }
+
+               body.assistant-page #themeToggleBtn,
+               body.assistant-page #assistantToolsBtn {
+                    display: grid !important;
+                    place-items: center !important;
+                    width: 44px !important;
+                    height: 44px !important;
+                    min-width: 44px !important;
+                    padding: 0 !important;
+                    border-radius: 15px !important;
+               }
+
+               body.assistant-page .assistant-body {
+                    height: 100dvh !important;
+                    padding-top: 78px !important;
+                    display: block !important;
+                    overflow: hidden !important;
+               }
+
+               body.assistant-page .chat-panel {
+                    height: 100% !important;
+                    min-height: 0 !important;
+                    padding: 12px 14px 10px !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    overflow: hidden !important;
+               }
+
+               body.assistant-page .hero {
+                    flex: 0 0 auto !important;
+                    padding: 8px 0 10px !important;
+                    text-align: center !important;
+                    overflow: visible !important;
+               }
+
+               body.assistant-page .hero.hidden {
+                    display: none !important;
+               }
+
+               body.assistant-page .astra-wrap {
+                    margin: 8px auto 14px !important;
+                    flex-shrink: 0 !important;
+               }
+
+               body.assistant-page .hero h2 {
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                    max-width: 430px !important;
+                    margin: 0 auto !important;
+                    color: var(--text) !important;
+               }
+
+               body.assistant-page .hero p {
+                    font-size: 12px !important;
+                    line-height: 1.55 !important;
+                    max-width: 430px !important;
+                    margin-top: 8px !important;
+                    color: var(--muted) !important;
+               }
+
+               /* Suggestions are inside the drawer on phone/tablet */
+               body.assistant-page .quick-actions {
+                    display: none !important;
+               }
+
+               body.assistant-page .messages {
+                    flex: 1 1 auto !important;
+                    min-height: 0 !important;
+                    overflow-y: auto !important;
+                    padding: 8px 0 12px !important;
+               }
+
+               body.assistant-page .chat-message,
+               body.assistant-page .message {
+                    width: 100% !important;
+               }
+
+               body.assistant-page .chat-bubble,
+               body.assistant-page .bubble {
+                    max-width: 88% !important;
+                    font-size: 13px !important;
+                    line-height: 1.65 !important;
+                    color: var(--text) !important;
+               }
+
+               body.assistant-page .message.user .bubble {
+                    color: #052e2f !important;
+                    font-weight: 700 !important;
+               }
+
+               body.assistant-page .input-wrap {
+                    flex: 0 0 auto !important;
+                    padding: 8px 0 2px !important;
+               }
+
+               body.assistant-page .input-box {
+                    min-height: 54px !important;
+                    border-radius: 18px !important;
+                    padding: 7px 8px 7px 12px !important;
+                    gap: 8px !important;
+               }
+
+               body.assistant-page .input-box input {
+                    height: 38px !important;
+                    font-size: 13px !important;
+                    color: var(--text) !important;
+               }
+
+               body.assistant-page .send-btn {
+                    width: 42px !important;
+                    height: 42px !important;
+                    border-radius: 14px !important;
+               }
+
+               body.assistant-page .hint {
+                    font-size: 10px !important;
+                    margin-top: 6px !important;
+                    line-height: 1.4 !important;
+                    color: var(--muted) !important;
+               }
+
+               /* Separate Astra Tools overlay; does not affect sidebar overlay */
+               body.assistant-page .assistant-tools-overlay {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1450;
+                    background: rgba(2, 6, 23, 0.46);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+               }
+
+               body.assistant-page.assistant-tools-open .assistant-tools-overlay {
+                    display: block !important;
+               }
+
+               /* Right drawer = New Chat + Suggested Help + Recent Chats */
+               body.assistant-page .side-panel {
+                    display: block !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    width: min(88vw, 370px) !important;
+                    max-width: 370px !important;
+                    height: 100dvh !important;
+                    margin: 0 !important;
+                    padding: 82px 16px 18px !important;
+                    z-index: 1500 !important;
+                    border-left: 1px solid var(--border) !important;
+                    border-radius: 24px 0 0 24px !important;
+                    background: rgba(8, 25, 34, 0.96) !important;
+                    backdrop-filter: blur(20px) !important;
+                    -webkit-backdrop-filter: blur(20px) !important;
+                    overflow-y: auto !important;
+                    transform: translateX(110%) !important;
+                    transition: transform 0.26s ease !important;
+                    box-shadow: -24px 0 60px rgba(0, 0, 0, 0.22) !important;
+               }
+
+               body.assistant-page.light-mode .side-panel {
+                    background: rgba(255, 255, 255, 0.98) !important;
+               }
+
+               body.assistant-page.assistant-tools-open .side-panel {
+                    transform: translateX(0) !important;
+               }
+
+               body.assistant-page .side-panel::before {
+                    content: "Astra Tools";
+                    position: sticky;
+                    top: -82px;
+                    display: flex;
+                    align-items: center;
+                    height: 58px;
+                    margin: -82px -16px 16px;
+                    padding: 0 18px;
+                    color: var(--teal);
+                    font-size: 15px;
+                    font-weight: 900;
+                    background: inherit;
+                    border-bottom: 1px solid var(--border);
+                    z-index: 2;
+               }
+
+               body.assistant-page .assistant-drawer-new-chat {
+                    width: 100%;
+                    border: none;
+                    outline: none;
+                    min-height: 48px;
+                    margin-bottom: 18px;
+                    border-radius: 16px;
+                    background: linear-gradient(135deg, var(--teal), var(--cyan));
+                    color: #06363a;
+                    font-weight: 900;
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    cursor: pointer;
+               }
+
+               body.assistant-page .section-title {
+                    color: var(--muted) !important;
+               }
+
+               body.assistant-page .help-list,
+               body.assistant-page .history-list {
+                    gap: 10px !important;
+                    margin-bottom: 22px !important;
+               }
+
+               body.assistant-page .help-item,
+               body.assistant-page .history-item {
+                    width: 100% !important;
+                    padding: 13px 14px !important;
+                    border-radius: 16px !important;
+                    background: var(--surface) !important;
+                    color: var(--muted) !important;
+                    cursor: pointer !important;
+               }
+
+               body.assistant-page .help-item:hover,
+               body.assistant-page .history-item:hover {
+                    color: var(--text) !important;
+                    border-color: rgba(34, 211, 238, 0.36) !important;
+                    transform: translateY(-1px) !important;
+               }
+
+               body.assistant-page.light-mode .help-item,
+               body.assistant-page.light-mode .history-item,
+               body.assistant-page.light-mode .history-empty {
+                    color: #295c5e !important;
+                    background: rgba(255, 255, 255, 0.94) !important;
+               }
+
+               body.assistant-page.light-mode .help-item i,
+               body.assistant-page.light-mode .history-item i {
+                    color: #0f766e !important;
+               }
+          }
+
+          @media (max-width: 430px) {
+               body.assistant-page .topbar {
+                    height: 74px !important;
+                    padding-left: 72px !important;
+               }
+
+               body.assistant-page .assistant-body {
+                    padding-top: 74px !important;
+               }
+
+               body.assistant-page .mobile-toggle {
+                    width: 46px !important;
+                    height: 46px !important;
+                    top: 14px !important;
+                    left: 12px !important;
+               }
+
+               body.assistant-page .topbar-left h1 {
+                    font-size: 15px !important;
+               }
+
+               body.assistant-page #themeToggleBtn,
+               body.assistant-page #assistantToolsBtn {
+                    width: 40px !important;
+                    height: 40px !important;
+                    min-width: 40px !important;
+               }
+
+               body.assistant-page .chat-panel {
+                    padding-left: 12px !important;
+                    padding-right: 12px !important;
+               }
+
+               body.assistant-page .hero h2 {
+                    font-size: 17px !important;
+               }
+
+               body.assistant-page .hero p {
+                    font-size: 11.5px !important;
+               }
+
+               body.assistant-page .side-panel {
+                    width: min(90vw, 350px) !important;
+               }
+          }
+     </style>
+
+
+
+     <style id="assistant-final-navbar-drawer-polish">
+          /* ============================================================
+   FINAL POLISH: Assistant mobile/tablet nav + crisp tools drawer
+   - Left hamburger keeps pages/sidebar navigation
+   - Theme + Astra Tools stay in the top nav, side aligned
+   - New Chat inside drawer is clear, clickable, and drawer scrolls
+   - Hero/logo animation untouched
+   ============================================================ */
+
+          @media (max-width: 900px) {
+               body.assistant-page .topbar {
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    text-align: left !important;
+                    padding-left: 78px !important;
+                    padding-right: 14px !important;
+                    gap: 10px !important;
+               }
+
+               body.assistant-page .topbar-left {
+                    flex: 1 1 auto !important;
+                    min-width: 0 !important;
+                    max-width: calc(100% - 104px) !important;
+                    text-align: left !important;
+               }
+
+               body.assistant-page .topbar-left h1 {
+                    text-align: left !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    font-size: 16px !important;
+                    line-height: 1.15 !important;
+                    letter-spacing: -0.01em !important;
+               }
+
+               body.assistant-page.light-mode .topbar-left h1 {
+                    color: #0f766e !important;
+                    text-shadow: 0 0 12px rgba(20, 184, 166, 0.12) !important;
+               }
+
+               body.assistant-page .topbar-actions {
+                    flex: 0 0 auto !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: flex-end !important;
+                    gap: 8px !important;
+                    margin-left: auto !important;
+               }
+
+               body.assistant-page #themeToggleBtn,
+               body.assistant-page #assistantToolsBtn {
+                    flex: 0 0 auto !important;
+                    display: grid !important;
+                    place-items: center !important;
+                    border: 1px solid rgba(34, 211, 238, 0.24) !important;
+                    color: var(--teal) !important;
+                    background: rgba(8, 25, 34, 0.88) !important;
+               }
+
+               body.assistant-page.light-mode #themeToggleBtn,
+               body.assistant-page.light-mode #assistantToolsBtn {
+                    background: rgba(255, 255, 255, 0.94) !important;
+                    color: #0f766e !important;
+                    border-color: rgba(20, 184, 166, 0.24) !important;
+               }
+
+               /* Keep the main sidebar hamburger completely separate */
+               body.assistant-page .mobile-toggle {
+                    flex: 0 0 auto !important;
+               }
+
+               /* Drawer overlay should not blur drawer text or make New Chat look faded */
+               body.assistant-page .assistant-tools-overlay {
+                    background: rgba(2, 6, 23, 0.42) !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+               }
+
+               /* Crisp, opaque Astra Tools drawer */
+               body.assistant-page .side-panel {
+                    background: #061a22 !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+                    filter: none !important;
+                    opacity: 1 !important;
+                    pointer-events: none !important;
+                    color: var(--text) !important;
+               }
+
+               body.assistant-page.assistant-tools-open .side-panel {
+                    pointer-events: auto !important;
+                    transform: translateX(0) !important;
+               }
+
+               body.assistant-page.light-mode .side-panel {
+                    background: #f4ffff !important;
+                    color: #0d4f4f !important;
+               }
+
+               body.assistant-page .side-panel::before {
+                    background: #061a22 !important;
+                    color: var(--teal) !important;
+                    text-shadow: 0 0 12px rgba(34, 211, 238, 0.18) !important;
+               }
+
+               body.assistant-page.light-mode .side-panel::before {
+                    background: #f4ffff !important;
+                    color: #0f766e !important;
+               }
+
+               body.assistant-page .assistant-drawer-new-chat {
+                    opacity: 1 !important;
+                    filter: none !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+                    color: #052e2f !important;
+                    background: linear-gradient(135deg, #22d3ee, #14b8a6) !important;
+                    box-shadow: 0 14px 28px rgba(20, 184, 166, 0.24) !important;
+                    position: relative !important;
+                    z-index: 3 !important;
+               }
+
+               body.assistant-page .assistant-drawer-new-chat i,
+               body.assistant-page .assistant-drawer-new-chat span {
+                    opacity: 1 !important;
+                    filter: none !important;
+                    color: #052e2f !important;
+               }
+
+               body.assistant-page .section-title,
+               body.assistant-page .help-item,
+               body.assistant-page .history-item,
+               body.assistant-page .history-empty {
+                    filter: none !important;
+                    opacity: 1 !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+               }
+
+               body.assistant-page .help-item,
+               body.assistant-page .history-item {
+                    background: rgba(13, 42, 52, 0.98) !important;
+                    color: #c6f7ff !important;
+                    border-color: rgba(34, 211, 238, 0.2) !important;
+               }
+
+               body.assistant-page.light-mode .help-item,
+               body.assistant-page.light-mode .history-item,
+               body.assistant-page.light-mode .history-empty {
+                    background: #ffffff !important;
+                    color: #295c5e !important;
+                    border-color: rgba(20, 184, 166, 0.22) !important;
+               }
+
+               body.assistant-page .help-item span,
+               body.assistant-page .history-item span,
+               body.assistant-page .history-item-title,
+               body.assistant-page .history-item-date {
+                    filter: none !important;
+                    opacity: 1 !important;
+               }
+
+               /* Send arrow remains dark/visible on cyan button */
+               body.assistant-page .send-btn i,
+               body.assistant-page .send-btn svg {
+                    color: #052e2f !important;
+                    fill: #052e2f !important;
+                    stroke: #052e2f !important;
+               }
+          }
+
+          @media (max-width: 430px) {
+               body.assistant-page .topbar {
+                    flex-direction: row !important;
+                    padding-left: 72px !important;
+                    padding-right: 10px !important;
+               }
+
+               body.assistant-page .topbar-left {
+                    max-width: calc(100% - 94px) !important;
+               }
+
+               body.assistant-page .topbar-left h1 {
+                    font-size: 14.5px !important;
+               }
+
+               body.assistant-page .topbar-actions {
+                    gap: 6px !important;
+               }
+          }
+     </style>
+
 </head>
 
 <body class="assistant-page preview-dark" data-page-role="student">
@@ -1711,6 +2737,7 @@
           <i class="fa-solid fa-bars"></i>
      </button>
      <div class="overlay" id="sidebarOverlay"></div>
+     <div class="assistant-tools-overlay" id="assistantToolsOverlay" aria-hidden="true"></div>
 
      <div class="app-shell">
           <aside class="sidebar" id="mainSidebar">
@@ -1810,6 +2837,10 @@
                          <button class="btn icon-btn" id="themeToggleBtn" type="button" aria-label="Toggle theme">
                               <i class="fa-solid fa-sun"></i>
                          </button>
+                         <button class="btn icon-btn assistant-tools-btn" id="assistantToolsBtn" type="button"
+                              aria-label="Open Astra tools" title="Open Astra tools">
+                              <i class="fa-solid fa-bars-staggered"></i>
+                         </button>
                          <div class="profile-mini" id="profileMenuToggle" tabindex="0" role="button">
                               <div class="avatar" id="profileAvatar">S</div>
                               <div>
@@ -1866,6 +2897,9 @@
                     </div>
 
                     <aside class="side-panel">
+                         <button class="assistant-drawer-new-chat" id="assistantDrawerNewChatBtn" type="button">
+                              <i class="fa-solid fa-plus"></i><span>New Chat</span>
+                         </button>
 
                          <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Suggested Help</div>
                          <div class="help-list">
@@ -1929,6 +2963,7 @@
                     loadUserProfile();
                     applyTheme(localStorage.getItem(THEME_KEY) || "dark");
                     bindEvents();
+                    bindAssistantToolsEvents();
                     loadChatHistory();
                }
 
@@ -2030,9 +3065,74 @@
                     document.addEventListener("keydown", (event) => {
                          if (event.key === "Escape") {
                               closeSidebar();
+                              closeToolsDrawer();
                               profileDropdown?.classList.remove("open");
                          }
                     });
+               }
+
+
+
+               function bindAssistantToolsEvents() {
+                    const toolsBtn = document.getElementById("assistantToolsBtn");
+                    const toolsOverlay = document.getElementById("assistantToolsOverlay");
+                    const drawerNewChatBtn = document.getElementById("assistantDrawerNewChatBtn");
+                    const sidePanel = document.querySelector(".side-panel");
+
+                    toolsBtn?.addEventListener("click", function (event) {
+                         event.preventDefault();
+                         event.stopPropagation();
+                         toggleToolsDrawer();
+                    });
+
+                    toolsOverlay?.addEventListener("click", closeToolsDrawer);
+
+                    drawerNewChatBtn?.addEventListener("click", function () {
+                         startNewChat();
+                         closeToolsDrawer();
+                    });
+
+                    sidePanel?.addEventListener("click", function (event) {
+                         const clickedPrompt = event.target.closest("[data-prompt]");
+                         const clickedHistory = event.target.closest(".history-item");
+
+                         if (clickedPrompt || clickedHistory) {
+                              setTimeout(closeToolsDrawer, 140);
+                         }
+                    });
+
+                    syncToolsButtonIcon();
+               }
+
+               function openToolsDrawer() {
+                    closeSidebar();
+                    body.classList.add("assistant-tools-open");
+                    syncToolsButtonIcon();
+               }
+
+               function closeToolsDrawer() {
+                    body.classList.remove("assistant-tools-open");
+                    syncToolsButtonIcon();
+               }
+
+               function toggleToolsDrawer() {
+                    if (body.classList.contains("assistant-tools-open")) {
+                         closeToolsDrawer();
+                    } else {
+                         openToolsDrawer();
+                    }
+               }
+
+               function syncToolsButtonIcon() {
+                    const toolsBtn = document.getElementById("assistantToolsBtn");
+                    if (!toolsBtn) return;
+
+                    const isOpen = body.classList.contains("assistant-tools-open");
+                    toolsBtn.innerHTML = isOpen
+                         ? '<i class="fa-solid fa-xmark"></i>'
+                         : '<i class="fa-solid fa-bars-staggered"></i>';
+                    toolsBtn.setAttribute("aria-label", isOpen ? "Close Astra tools" : "Open Astra tools");
+                    toolsBtn.setAttribute("title", isOpen ? "Close Astra tools" : "Open Astra tools");
                }
 
                function updateSidebarToggleIcon() {
@@ -2054,6 +3154,8 @@
                }
 
                function toggleSidebar() {
+                    closeToolsDrawer();
+
                     if (window.innerWidth > 900) {
                          body.classList.toggle("desktop-sidebar-hidden");
                          body.classList.remove("sidebar-open");
@@ -2214,6 +3316,7 @@
                }
 
                function startNewChat() {
+                    closeToolsDrawer();
                     currentSessionId = null;
                     clearMessages();
                     showHero();
@@ -2294,361 +3397,293 @@
                }
           })();
      </script>
-</body>
-
-</html>
-
-<!-- =========================================================
-     FINAL ASTRA GLOW BALANCE PATCH
-     Added by ChatGPT: reduces heavy glow behind Astra icon while keeping animation visible.
-========================================================= -->
-<style>
-     body.assistant-page .astra-wrap {
-          filter: none !important;
-     }
-
-     body.assistant-page .astra-wrap::before,
-     body.assistant-page .astra-wrap::after {
-          opacity: 0.62 !important;
-          filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.16)) !important;
-          box-shadow: none !important;
-     }
-
-     body.assistant-page .astra-wrap::before {
-          border-color: rgba(34, 211, 238, 0.42) !important;
-     }
-
-     body.assistant-page .astra-wrap::after {
-          border-color: rgba(124, 58, 237, 0.34) !important;
-     }
-
-     body.assistant-page .astra-avatar {
-          box-shadow:
-               0 12px 28px rgba(34, 211, 238, 0.14),
-               0 0 14px rgba(124, 58, 237, 0.08) !important;
-     }
-
-     body.assistant-page .astra-avatar::before {
-          inset: -18px !important;
-          opacity: 0.36 !important;
-          filter: none !important;
-     }
-
-     body.assistant-page .astra-avatar::after {
-          inset: -30px !important;
-          opacity: 0.52 !important;
-          filter: none !important;
-     }
-
-     body.assistant-page .astra-avatar i {
-          filter:
-               drop-shadow(0 0 4px rgba(20, 184, 166, 0.34)) drop-shadow(0 0 8px rgba(34, 211, 238, 0.12)) !important;
-     }
-
-     body.assistant-page.preview-dark .astra-wrap::before,
-     body.assistant-page.dark-mode .astra-wrap::before {
-          border-color: rgba(0, 196, 210, 0.42) !important;
-     }
-
-     body.assistant-page.preview-dark .astra-wrap::after,
-     body.assistant-page.dark-mode .astra-wrap::after {
-          border-color: rgba(124, 58, 237, 0.34) !important;
-     }
-
-     body.assistant-page.preview-dark .astra-avatar,
-     body.assistant-page.dark-mode .astra-avatar {
-          box-shadow:
-               0 13px 32px rgba(0, 196, 210, 0.14),
-               0 0 18px rgba(124, 58, 237, 0.10) !important;
-     }
-
-     body.assistant-page.preview-dark .astra-avatar::before,
-     body.assistant-page.dark-mode .astra-avatar::before {
-          opacity: 0.42 !important;
-     }
-
-     body.assistant-page.preview-dark .astra-avatar::after,
-     body.assistant-page.dark-mode .astra-avatar::after {
-          opacity: 0.58 !important;
-     }
 
 
-     /* =========================================================
-       RESTORED EduMind AI polygon neural animated SVG logo
-       Only brand logo uses this. Hamburger stays bars/cross.
-    ========================================================= */
-     .brand-icon.em-neural-logo {
-          width: 48px !important;
-          height: 48px !important;
-          border-radius: 16px !important;
-          padding: 6px !important;
-          display: grid !important;
-          place-items: center !important;
-          position: relative !important;
-          overflow: visible !important;
-          background:
-               radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.18), rgba(20, 184, 166, 0.08) 58%, rgba(7, 26, 31, 0.72) 100%) !important;
-          border: 1px solid rgba(34, 211, 238, 0.30) !important;
-          box-shadow:
-               0 0 0 1px rgba(34, 211, 238, 0.06),
-               0 0 22px rgba(34, 211, 238, 0.16) !important;
-          flex-shrink: 0 !important;
-     }
 
-     .brand-icon.em-neural-logo::before {
-          content: "";
-          position: absolute;
-          inset: -5px;
-          border-radius: 20px;
-          background: conic-gradient(from 0deg, transparent, rgba(34, 211, 238, 0.24), transparent, rgba(124, 58, 237, 0.18), transparent);
-          opacity: 0.65;
-          filter: blur(9px);
-          animation: emLogoAuraSpin 7s linear infinite;
-          z-index: -1;
-     }
-
-     .em-logo-svg {
-          width: 100% !important;
-          height: 100% !important;
-          overflow: visible !important;
-          display: block !important;
-     }
-
-     .em-logo-orbit {
-          transform-origin: 32px 32px;
-          animation: emLogoSlowRotate 15s linear infinite;
-     }
-
-     .em-logo-ring {
-          fill: rgba(8, 25, 34, 0.56);
-          stroke: url(#emLogoGrad);
-          stroke-width: 2;
-          stroke-linejoin: round;
-          opacity: 0.96;
-     }
-
-     .em-logo-ring-inner {
-          fill: rgba(34, 211, 238, 0.06);
-          stroke-width: 1.35;
-          opacity: 0.72;
-          animation: emLogoInnerPulse 3.6s ease-in-out infinite;
-     }
-
-     .em-logo-line {
-          stroke: rgba(34, 211, 238, 0.72);
-          stroke-width: 1.5;
-          stroke-linecap: round;
-          stroke-dasharray: 15;
-          stroke-dashoffset: 30;
-          animation: emLogoLineFlow 4.2s ease-in-out infinite;
-     }
-
-     .em-logo-node,
-     .em-logo-center {
-          fill: #22d3ee;
-          stroke: rgba(255, 255, 255, 0.78);
-          stroke-width: 0.8;
-          transform-origin: center;
-          animation: emLogoNodePulse 2.8s ease-in-out infinite;
-     }
-
-     .em-logo-center {
-          fill: #14b8a6;
-          animation-duration: 2.2s;
-     }
-
-     .em-logo-node.node-b {
-          animation-delay: .25s;
-          fill: #67e8f9;
-     }
-
-     .em-logo-node.node-c {
-          animation-delay: .45s;
-          fill: #2dd4bf;
-     }
-
-     .em-logo-node.node-d {
-          animation-delay: .65s;
-          fill: #8b5cf6;
-     }
-
-     .em-logo-node.node-e {
-          animation-delay: .85s;
-          fill: #22d3ee;
-     }
-
-     body.light-mode .brand-icon.em-neural-logo {
-          background:
-               radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.16), rgba(34, 211, 238, 0.08) 60%, rgba(255, 255, 255, 0.86) 100%) !important;
-          border-color: rgba(20, 184, 166, 0.26) !important;
-          box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10) !important;
-     }
-
-     body.light-mode .em-logo-ring {
-          fill: rgba(255, 255, 255, 0.64);
-     }
-
-     @keyframes emLogoSlowRotate {
-          from {
-               transform: rotate(0deg);
+     <style id="assistant-clickable-v2-final-fix">
+          /* ============================================================
+   CLICKABLE FIX V2 — no overlay over drawers/sidebar
+   Left hamburger = pages/sidebar, Right hamburger = Astra tools
+   ============================================================ */
+          body.assistant-page #mobileToggle,
+          body.assistant-page #assistantToolsBtn,
+          body.assistant-page #themeToggleBtn,
+          body.assistant-page .sidebar,
+          body.assistant-page .sidebar .nav-item,
+          body.assistant-page .sidebar a,
+          body.assistant-page .side-panel,
+          body.assistant-page .side-panel *,
+          body.assistant-page .assistant-drawer-new-chat,
+          body.assistant-page .help-item,
+          body.assistant-page .history-item,
+          body.assistant-page .send-btn {
+               pointer-events: auto !important;
+               cursor: pointer !important;
+               -webkit-tap-highlight-color: rgba(34, 211, 238, 0.20) !important;
           }
 
-          to {
-               transform: rotate(360deg);
-          }
-     }
-
-     @keyframes emLogoAuraSpin {
-          from {
-               transform: rotate(0deg);
+          body.assistant-page .topbar,
+          body.assistant-page .topbar-actions {
+               pointer-events: auto !important;
           }
 
-          to {
-               transform: rotate(360deg);
-          }
-     }
-
-     @keyframes emLogoInnerPulse {
-
-          0%,
-          100% {
-               opacity: 0.52;
-               transform: scale(0.98);
-               transform-origin: 32px 32px;
+          body.assistant-page #mobileToggle {
+               z-index: 7000 !important;
           }
 
-          50% {
-               opacity: 0.95;
-               transform: scale(1.05);
-               transform-origin: 32px 32px;
-          }
-     }
-
-     @keyframes emLogoLineFlow {
-          0% {
-               stroke-dashoffset: 30;
-               opacity: 0.38;
+          body.assistant-page #assistantToolsBtn,
+          body.assistant-page #themeToggleBtn {
+               z-index: 6900 !important;
           }
 
-          45% {
-               opacity: 1;
+          body.assistant-page .sidebar {
+               z-index: 6500 !important;
           }
 
-          100% {
-               stroke-dashoffset: 0;
-               opacity: 0.62;
-          }
-     }
-
-     @keyframes emLogoNodePulse {
-
-          0%,
-          100% {
-               transform: scale(1);
-               opacity: 0.82;
+          body.assistant-page .side-panel {
+               z-index: 6600 !important;
+               opacity: 1 !important;
+               visibility: visible !important;
+               filter: none !important;
           }
 
-          50% {
-               transform: scale(1.26);
-               opacity: 1;
-          }
-     }
-
-     .mobile-toggle i {
-          pointer-events: none !important;
-     }
-
-
-
-     /* =========================================================
-       FINAL FIX v6 — Desktop + Mobile Hamburger for Assistant
-       - Hamburger visible on desktop also
-       - Desktop click hides/shows sidebar cleanly
-       - Mobile behavior remains unchanged
-    ========================================================= */
-
-     .mobile-toggle {
-          display: grid !important;
-          place-items: center !important;
-          position: fixed !important;
-          top: 18px !important;
-          z-index: 99999 !important;
-          width: 52px !important;
-          height: 52px !important;
-          border-radius: 18px !important;
-          border: 1px solid rgba(34, 211, 238, 0.48) !important;
-          background: rgba(6, 20, 28, 0.92) !important;
-          color: #e6fbff !important;
-          font-size: 21px !important;
-          box-shadow:
-               0 18px 44px rgba(0, 0, 0, 0.28),
-               0 0 22px rgba(34, 211, 238, 0.18) !important;
-          backdrop-filter: blur(14px) !important;
-          -webkit-backdrop-filter: blur(14px) !important;
-          cursor: pointer !important;
-     }
-
-     body.light-mode .mobile-toggle {
-          background: rgba(255, 255, 255, 0.94) !important;
-          color: #0f766e !important;
-          box-shadow:
-               0 16px 34px rgba(15, 23, 42, 0.12),
-               0 0 18px rgba(20, 184, 166, 0.16) !important;
-     }
-
-     @media (min-width: 901px) {
-          .mobile-toggle {
-               display: grid !important;
-               left: calc(var(--sidebar-width) + 18px) !important;
-          }
-
-          body.desktop-sidebar-hidden .mobile-toggle {
-               left: 18px !important;
-          }
-
-          body.desktop-sidebar-hidden .app-shell {
-               grid-template-columns: minmax(0, 1fr) !important;
-          }
-
-          body.desktop-sidebar-hidden .sidebar {
-               position: fixed !important;
-               top: 0 !important;
-               left: calc(-1 * var(--sidebar-width)) !important;
-               transform: translateX(-12px) !important;
-               opacity: 0 !important;
+          /* Sidebar overlay must never cover the opened sidebar */
+          body.assistant-page #sidebarOverlay,
+          body.assistant-page .overlay {
                pointer-events: none !important;
           }
 
-          body:not(.desktop-sidebar-hidden) .sidebar {
-               transform: translateX(0) !important;
+          body.assistant-page.sidebar-open #sidebarOverlay,
+          body.assistant-page.sidebar-open .overlay {
+               display: block !important;
+               position: fixed !important;
+               top: 0 !important;
+               right: 0 !important;
+               bottom: 0 !important;
+               left: min(var(--sidebar-width), 82vw) !important;
+               z-index: 5000 !important;
+               pointer-events: auto !important;
+               background: rgba(2, 6, 23, 0.48) !important;
+               backdrop-filter: blur(4px) !important;
+               -webkit-backdrop-filter: blur(4px) !important;
+          }
+
+          /* Tools overlay must never cover the opened Astra tools drawer */
+          body.assistant-page #assistantToolsOverlay,
+          body.assistant-page .assistant-tools-overlay {
+               pointer-events: none !important;
+          }
+
+          body.assistant-page.assistant-tools-open #assistantToolsOverlay,
+          body.assistant-page.assistant-tools-open .assistant-tools-overlay {
+               display: block !important;
+               position: fixed !important;
+               top: 0 !important;
+               left: 0 !important;
+               bottom: 0 !important;
+               right: min(88vw, 370px) !important;
+               z-index: 5200 !important;
+               pointer-events: auto !important;
+               background: rgba(2, 6, 23, 0.46) !important;
+               backdrop-filter: blur(4px) !important;
+               -webkit-backdrop-filter: blur(4px) !important;
+          }
+
+          @media (max-width: 900px) {
+               body.assistant-page .sidebar {
+                    left: calc(-1 * var(--sidebar-width)) !important;
+               }
+
+               body.assistant-page.sidebar-open .sidebar {
+                    left: 0 !important;
+               }
+
+               body.assistant-page .side-panel {
+                    transform: translateX(110%) !important;
+               }
+
+               body.assistant-page.assistant-tools-open .side-panel {
+                    transform: translateX(0) !important;
+               }
+          }
+
+          body.assistant-page .assistant-drawer-new-chat,
+          body.assistant-page .help-item,
+          body.assistant-page .history-item,
+          body.assistant-page .history-empty,
+          body.assistant-page .section-title {
                opacity: 1 !important;
+               filter: none !important;
+               backdrop-filter: none !important;
+               -webkit-backdrop-filter: none !important;
           }
 
-          .sidebar {
-               transition: transform 0.25s ease, opacity 0.25s ease, left 0.25s ease !important;
+          body.assistant-page .assistant-drawer-new-chat {
+               color: #06363a !important;
+               font-weight: 900 !important;
           }
 
-          body:not(.desktop-sidebar-hidden) .topbar-left {
-               padding-left: 62px !important;
+          body.assistant-page.light-mode .side-panel::before,
+          body.assistant-page.light-mode .section-title {
+               color: #0f766e !important;
           }
 
-          body.desktop-sidebar-hidden .topbar-left {
-               padding-left: 62px !important;
+          body.assistant-page.light-mode .help-item,
+          body.assistant-page.light-mode .history-item,
+          body.assistant-page.light-mode .history-empty {
+               color: #295c5e !important;
           }
 
-          .overlay {
-               display: none !important;
+          body.assistant-page .send-btn i,
+          body.assistant-page .send-btn svg {
+               color: #06363a !important;
+               fill: #06363a !important;
+               stroke: #06363a !important;
           }
-     }
+     </style>
 
-     @media (max-width: 900px) {
-          .mobile-toggle {
-               display: grid !important;
-               left: 18px !important;
-          }
+     <script id="assistant-clickable-v2-final-script">
+          /* ============================================================
+             CLICKABLE FIX V2 — reliable click handling
+             ============================================================ */
+          (function () {
+               const body = document.body;
+               const byId = (id) => document.getElementById(id);
 
-          body.sidebar-open .mobile-toggle {
-               left: calc(var(--sidebar-width) - 66px) !important;
-          }
-     }
-</style>
+               function syncLeftIcon() {
+                    const btn = byId("mobileToggle");
+                    if (!btn) return;
+                    const open = body.classList.contains("sidebar-open");
+                    btn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+                    btn.setAttribute("aria-label", open ? "Close sidebar" : "Open sidebar");
+                    btn.setAttribute("title", open ? "Close sidebar" : "Open sidebar");
+               }
+
+               function syncToolsIcon() {
+                    const btn = byId("assistantToolsBtn");
+                    if (!btn) return;
+                    const open = body.classList.contains("assistant-tools-open");
+                    btn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars-staggered"></i>';
+                    btn.setAttribute("aria-label", open ? "Close Astra tools" : "Open Astra tools");
+                    btn.setAttribute("title", open ? "Close Astra tools" : "Open Astra tools");
+               }
+
+               function closeSidebar() {
+                    body.classList.remove("sidebar-open");
+                    syncLeftIcon();
+               }
+
+               function closeTools() {
+                    body.classList.remove("assistant-tools-open");
+                    syncToolsIcon();
+               }
+
+               function toggleSidebar() {
+                    closeTools();
+                    body.classList.toggle("sidebar-open");
+                    syncLeftIcon();
+               }
+
+               function toggleTools() {
+                    closeSidebar();
+                    body.classList.toggle("assistant-tools-open");
+                    syncToolsIcon();
+               }
+
+               function routeTo(href) {
+                    if (!href || href === "#") return;
+                    closeSidebar();
+                    closeTools();
+                    setTimeout(() => {
+                         window.location.href = href;
+                    }, 60);
+               }
+
+               // One capture listener owns only the controls that were failing.
+               document.addEventListener("click", function (event) {
+                    const leftBtn = event.target.closest("#mobileToggle");
+                    if (leftBtn) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         toggleSidebar();
+                         return;
+                    }
+
+                    const toolsBtn = event.target.closest("#assistantToolsBtn");
+                    if (toolsBtn) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         toggleTools();
+                         return;
+                    }
+
+                    const sideOverlay = event.target.closest("#sidebarOverlay, .overlay");
+                    if (sideOverlay && body.classList.contains("sidebar-open")) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         closeSidebar();
+                         return;
+                    }
+
+                    const toolsOverlay = event.target.closest("#assistantToolsOverlay, .assistant-tools-overlay");
+                    if (toolsOverlay && body.classList.contains("assistant-tools-open")) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         closeTools();
+                         return;
+                    }
+
+                    const navLink = event.target.closest(".sidebar .nav-item[href], .sidebar a[href]");
+                    if (navLink) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         routeTo(navLink.getAttribute("href"));
+                         return;
+                    }
+
+                    const drawerNewChat = event.target.closest("#assistantDrawerNewChatBtn");
+                    if (drawerNewChat) {
+                         event.preventDefault();
+                         event.stopImmediatePropagation();
+                         const hiddenNewChat = byId("newChatBtn");
+                         if (hiddenNewChat) {
+                              hiddenNewChat.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+                         } else {
+                              byId("chatMessages") && (byId("chatMessages").innerHTML = "");
+                              byId("assistantHero")?.classList.remove("hidden");
+                              byId("assistantMessageInput")?.focus();
+                         }
+                         closeTools();
+                         return;
+                    }
+               }, true);
+
+               // Let prompt/history original handlers run, then close drawer.
+               document.addEventListener("click", function (event) {
+                    if (event.target.closest(".side-panel [data-prompt], .side-panel .history-item")) {
+                         setTimeout(closeTools, 180);
+                    }
+               });
+
+               document.addEventListener("keydown", function (event) {
+                    if (event.key === "Escape") {
+                         closeSidebar();
+                         closeTools();
+                    }
+               });
+
+               window.addEventListener("resize", function () {
+                    if (window.innerWidth > 900) {
+                         closeSidebar();
+                         closeTools();
+                    }
+               });
+
+               syncLeftIcon();
+               syncToolsIcon();
+          })();
+     </script>
+
+</body>
+
+</html>

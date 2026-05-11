@@ -1004,3 +1004,76 @@ function escapeHtml(text) {
   div.appendChild(document.createTextNode(String(text ?? "")));
   return div.innerHTML;
 }
+
+/* ============================================================
+   Assistant Mobile Drawer Behavior
+   Keeps suggestions/history clickable and closes drawer after use
+   ============================================================ */
+(function () {
+  const body = document.body;
+  const mobileToggle = document.getElementById("mobileToggle");
+  const overlay = document.getElementById("sidebarOverlay");
+  const sidePanel = document.querySelector(".side-panel");
+  const newChatBtn = document.getElementById("newChatBtn");
+
+  function closeAssistantTools() {
+    body.classList.remove("sidebar-open");
+
+    if (mobileToggle) {
+      mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      mobileToggle.setAttribute("aria-label", "Open Astra tools");
+      mobileToggle.setAttribute("title", "Open Astra tools");
+    }
+  }
+
+  function syncToolsButtonLabel() {
+    if (!mobileToggle) return;
+
+    const isOpen = body.classList.contains("sidebar-open");
+
+    mobileToggle.innerHTML = isOpen
+      ? '<i class="fa-solid fa-xmark"></i>'
+      : '<i class="fa-solid fa-bars"></i>';
+
+    mobileToggle.setAttribute(
+      "aria-label",
+      isOpen ? "Close Astra tools" : "Open Astra tools",
+    );
+
+    mobileToggle.setAttribute(
+      "title",
+      isOpen ? "Close Astra tools" : "Open Astra tools",
+    );
+  }
+
+  mobileToggle?.addEventListener("click", function () {
+    setTimeout(syncToolsButtonLabel, 0);
+  });
+
+  overlay?.addEventListener("click", closeAssistantTools);
+
+  sidePanel?.addEventListener("click", function (event) {
+    const clickedTool = event.target.closest("[data-prompt]");
+    const clickedHistory = event.target.closest(".history-item");
+
+    if (clickedTool || clickedHistory) {
+      setTimeout(closeAssistantTools, 120);
+    }
+  });
+
+  newChatBtn?.addEventListener("click", closeAssistantTools);
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeAssistantTools();
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 900) {
+      closeAssistantTools();
+    }
+  });
+
+  syncToolsButtonLabel();
+})();
