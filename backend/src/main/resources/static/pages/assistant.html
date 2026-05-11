@@ -3542,19 +3542,80 @@
           }
      </style>
 
-     <script id="assistant-clickable-v2-final-script">
+
+
+     <style id="assistant-desktop-sidebar-v3-css">
+          /* Desktop sidebar should collapse/expand without blur overlay */
+          @media (min-width: 901px) {
+
+               body.assistant-page.sidebar-open #sidebarOverlay,
+               body.assistant-page.sidebar-open .overlay {
+                    display: none !important;
+                    pointer-events: none !important;
+               }
+
+               body.assistant-page.desktop-sidebar-hidden .app-shell {
+                    grid-template-columns: minmax(0, 1fr) !important;
+               }
+
+               body.assistant-page.desktop-sidebar-hidden .sidebar {
+                    left: calc(-1 * var(--sidebar-width)) !important;
+                    transform: translateX(-12px) !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+               }
+
+               body.assistant-page:not(.desktop-sidebar-hidden) .sidebar {
+                    left: 0 !important;
+                    transform: translateX(0) !important;
+                    opacity: 1 !important;
+                    pointer-events: auto !important;
+               }
+
+               body.assistant-page:not(.desktop-sidebar-hidden) #mobileToggle {
+                    left: calc(var(--sidebar-width) + 18px) !important;
+               }
+
+               body.assistant-page.desktop-sidebar-hidden #mobileToggle {
+                    left: 18px !important;
+               }
+          }
+     </style>
+     <script id="assistant-clickable-v3-final-script">
           /* ============================================================
-             CLICKABLE FIX V2 — reliable click handling
+             CLICKABLE FIX V3 — desktop sidebar + mobile drawers
+             - Laptop/Desktop: left hamburger hides/shows page sidebar using desktop-sidebar-hidden
+             - Phone/Tablet: left hamburger opens page sidebar using sidebar-open
+             - Right hamburger opens Astra Tools only
              ============================================================ */
           (function () {
                const body = document.body;
                const byId = (id) => document.getElementById(id);
 
+               function isDesktop() {
+                    return window.innerWidth > 900;
+               }
+
+               function ensureModeClasses() {
+                    if (isDesktop()) {
+                         body.classList.remove("sidebar-open");
+                    } else {
+                         body.classList.remove("desktop-sidebar-hidden");
+                    }
+               }
+
                function syncLeftIcon() {
                     const btn = byId("mobileToggle");
                     if (!btn) return;
-                    const open = body.classList.contains("sidebar-open");
-                    btn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+
+                    const open = isDesktop()
+                         ? !body.classList.contains("desktop-sidebar-hidden")
+                         : body.classList.contains("sidebar-open");
+
+                    btn.innerHTML = open
+                         ? '<i class="fa-solid fa-xmark"></i>'
+                         : '<i class="fa-solid fa-bars"></i>';
+
                     btn.setAttribute("aria-label", open ? "Close sidebar" : "Open sidebar");
                     btn.setAttribute("title", open ? "Close sidebar" : "Open sidebar");
                }
@@ -3562,14 +3623,23 @@
                function syncToolsIcon() {
                     const btn = byId("assistantToolsBtn");
                     if (!btn) return;
+
                     const open = body.classList.contains("assistant-tools-open");
-                    btn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars-staggered"></i>';
+                    btn.innerHTML = open
+                         ? '<i class="fa-solid fa-xmark"></i>'
+                         : '<i class="fa-solid fa-bars-staggered"></i>';
+
                     btn.setAttribute("aria-label", open ? "Close Astra tools" : "Open Astra tools");
                     btn.setAttribute("title", open ? "Close Astra tools" : "Open Astra tools");
                }
 
                function closeSidebar() {
-                    body.classList.remove("sidebar-open");
+                    if (isDesktop()) {
+                         body.classList.add("desktop-sidebar-hidden");
+                         body.classList.remove("sidebar-open");
+                    } else {
+                         body.classList.remove("sidebar-open");
+                    }
                     syncLeftIcon();
                }
 
@@ -3580,26 +3650,37 @@
 
                function toggleSidebar() {
                     closeTools();
-                    body.classList.toggle("sidebar-open");
+
+                    if (isDesktop()) {
+                         body.classList.remove("sidebar-open");
+                         body.classList.toggle("desktop-sidebar-hidden");
+                    } else {
+                         body.classList.remove("desktop-sidebar-hidden");
+                         body.classList.toggle("sidebar-open");
+                    }
+
                     syncLeftIcon();
                }
 
                function toggleTools() {
-                    closeSidebar();
+                    if (!isDesktop()) {
+                         body.classList.remove("sidebar-open");
+                    }
                     body.classList.toggle("assistant-tools-open");
+                    syncLeftIcon();
                     syncToolsIcon();
                }
 
                function routeTo(href) {
                     if (!href || href === "#") return;
-                    closeSidebar();
-                    closeTools();
+                    body.classList.remove("sidebar-open");
+                    body.classList.remove("assistant-tools-open");
                     setTimeout(() => {
                          window.location.href = href;
                     }, 60);
                }
 
-               // One capture listener owns only the controls that were failing.
+               // Capture listener owns only controls that were conflicting.
                document.addEventListener("click", function (event) {
                     const leftBtn = event.target.closest("#mobileToggle");
                     if (leftBtn) {
@@ -3621,7 +3702,8 @@
                     if (sideOverlay && body.classList.contains("sidebar-open")) {
                          event.preventDefault();
                          event.stopImmediatePropagation();
-                         closeSidebar();
+                         body.classList.remove("sidebar-open");
+                         syncLeftIcon();
                          return;
                     }
 
@@ -3649,7 +3731,7 @@
                          if (hiddenNewChat) {
                               hiddenNewChat.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
                          } else {
-                              byId("chatMessages") && (byId("chatMessages").innerHTML = "");
+                              if (byId("chatMessages")) byId("chatMessages").innerHTML = "";
                               byId("assistantHero")?.classList.remove("hidden");
                               byId("assistantMessageInput")?.focus();
                          }
@@ -3658,7 +3740,7 @@
                     }
                }, true);
 
-               // Let prompt/history original handlers run, then close drawer.
+               // Let prompt/history original handlers run, then close tools drawer.
                document.addEventListener("click", function (event) {
                     if (event.target.closest(".side-panel [data-prompt], .side-panel .history-item")) {
                          setTimeout(closeTools, 180);
@@ -3667,18 +3749,23 @@
 
                document.addEventListener("keydown", function (event) {
                     if (event.key === "Escape") {
-                         closeSidebar();
+                         if (isDesktop()) {
+                              body.classList.remove("sidebar-open");
+                         } else {
+                              body.classList.remove("sidebar-open");
+                         }
                          closeTools();
+                         syncLeftIcon();
                     }
                });
 
                window.addEventListener("resize", function () {
-                    if (window.innerWidth > 900) {
-                         closeSidebar();
-                         closeTools();
-                    }
+                    ensureModeClasses();
+                    closeTools();
+                    syncLeftIcon();
                });
 
+               ensureModeClasses();
                syncLeftIcon();
                syncToolsIcon();
           })();
