@@ -8,7 +8,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-  const API = "http://localhost:8080";
+  const API = window.location.origin;
   const PAGE_TITLE = "Pomodoro & Study Library | EduMind AI";
   const YOUTUBE_ANALYZE_API = "/api/youtube/analyze";
   const POMODORO_AI_SUGGEST_API = "/api/ai/pomodoro/suggest";

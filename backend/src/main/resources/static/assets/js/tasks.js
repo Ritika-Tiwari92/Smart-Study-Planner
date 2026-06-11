@@ -29,12 +29,10 @@ const smartFocusList = document.getElementById("smartFocusList");
 const subjectLoadList = document.getElementById("subjectLoadList");
 const productivityTipList = document.getElementById("productivityTipList");
 
-const API_ORIGIN =
-  window.location.port === "8080" ? "" : "http://localhost:8080";
-const TASKS_API_BASE = `${API_ORIGIN}/api/tasks`;
-const SUBJECTS_API_BASE = `${API_ORIGIN}/api/subjects`;
-const PLANNER_API_BASE = `${API_ORIGIN}/api/plans`;
-const TASK_AI_API_BASE = `${API_ORIGIN}/api/ai/tasks/analyze`;
+const TASKS_API_BASE = "/api/tasks";
+const SUBJECTS_API_BASE = "/api/subjects";
+const PLANNER_API_BASE = "/api/plans";
+const TASK_AI_API_BASE = "/api/ai/tasks/analyze";
 
 let editingTaskId = null;
 let allTasks = [];

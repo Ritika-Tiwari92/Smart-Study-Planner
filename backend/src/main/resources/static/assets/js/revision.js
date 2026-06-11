@@ -47,13 +47,10 @@ const revisionDateInput = document.getElementById("revisionDate");
 const revisionStatusInput = document.getElementById("revisionStatus");
 const revisionDescriptionInput = document.getElementById("revisionDescription");
 
-const API_ORIGIN =
-  window.location.port === "8080" ? "" : "http://localhost:8080";
-
-const REVISION_API_URL = `${API_ORIGIN}/api/revisions`;
-const SUBJECTS_API_URL = `${API_ORIGIN}/api/subjects`;
-const PLANNER_API_URL = `${API_ORIGIN}/api/plans`;
-const REVISION_AI_API_URL = `${API_ORIGIN}/api/ai/revisions/analyze`;
+const REVISION_API_URL = "/api/revisions";
+const SUBJECTS_API_URL = "/api/subjects";
+const PLANNER_API_URL = "/api/plans";
+const REVISION_AI_API_URL = "/api/ai/revisions/analyze";
 
 let editingRevisionId = null;
 let allRevisionTopics = [];
