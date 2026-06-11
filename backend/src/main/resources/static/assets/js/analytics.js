@@ -997,11 +997,17 @@ document.addEventListener("DOMContentLoaded", function () {
         return {
           label: meta.label,
           data: trend.map((d) => (cat === "focus" ? d.focusMinutes : d[cat])),
+
           backgroundColor: color + (dark ? "cc" : "bb"),
           borderColor: color,
           borderWidth: 1.5,
-          borderRadius: 6,
+
+          borderRadius: 10,
           borderSkipped: false,
+
+          categoryPercentage: 0.72,
+          barPercentage: 0.82,
+          maxBarThickness: 18,
         };
       });
 
@@ -1050,9 +1056,22 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           scales: {
             x: {
-              grid: { display: false },
-              ticks: { color: tickColor, font: { size: 12, weight: "700" } },
-              border: { display: false },
+              offset: true,
+              grid: {
+                display: false,
+                drawBorder: false,
+              },
+              ticks: {
+                color: tickColor,
+                font: {
+                  size: 12,
+                  weight: "700",
+                },
+                padding: 10,
+              },
+              border: {
+                display: false,
+              },
             },
             y: {
               min: 0,

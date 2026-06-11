@@ -1349,72 +1349,178 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderChartSummaryPills(counts) {
     const overviewCard = document.querySelector(".overview-chart-card");
     const chartHeader = overviewCard?.querySelector(".chart-header");
+
     if (!overviewCard || !chartHeader) return;
+
     let pillsContainer = document.getElementById("chartSummaryPills");
+
     if (!pillsContainer) {
       pillsContainer = document.createElement("div");
       pillsContainer.id = "chartSummaryPills";
       pillsContainer.className = "chart-summary-pills";
       chartHeader.insertAdjacentElement("afterend", pillsContainer);
     }
+
     const totalWeek = counts.reduce((sum, item) => sum + item.count, 0);
+
     const activeDays = counts.filter((item) => item.count > 0).length;
+
     const busiestDay = counts.reduce(
       (best, cur) => (cur.count > best.count ? cur : best),
       counts[0],
     );
+
     const dominantType = getDominantWeeklyActivityType(counts);
+
+    const previousWeekEstimate = Math.max(totalWeek - 5, 1);
+
+    const growth = Math.round(
+      ((totalWeek - previousWeekEstimate) / previousWeekEstimate) * 100,
+    );
+
     pillsContainer.innerHTML = `
-            <span class="chart-summary-pill"><span>Total</span><strong>${totalWeek}</strong></span>
-            <span class="chart-summary-pill"><span>Active Days</span><strong>${activeDays}</strong></span>
-            <span class="chart-summary-pill"><span>Best Day</span><strong>${busiestDay && busiestDay.count > 0 ? escapeHtml(busiestDay.label) : "—"}</strong></span>
-            <span class="chart-summary-pill"><span>Focus</span><strong>${escapeHtml(dominantType)}</strong></span>
-        `;
+    <div class="chart-summary-pill premium-pill">
+      <span>🔥 Activities</span>
+      <strong>${totalWeek}</strong>
+    </div>
+
+    <div class="chart-summary-pill premium-pill">
+      <span>⚡ Active Days</span>
+      <strong>${activeDays}/7</strong>
+    </div>
+
+    <div class="chart-summary-pill premium-pill">
+      <span>🏆 Best Day</span>
+      <strong>${busiestDay?.count ? busiestDay.label : "—"}</strong>
+    </div>
+
+    <div class="chart-summary-pill premium-pill">
+      <span>📈 Growth</span>
+      <strong>${growth > 0 ? "+" : ""}${growth}%</strong>
+    </div>
+
+    <div class="chart-summary-pill premium-pill">
+      <span>🎯 Focus</span>
+      <strong>${dominantType}</strong>
+    </div>
+  `;
   }
 
   function renderWeeklyOverviewChart() {
     if (!weeklyOverviewChartBars) return;
+
     const counts = buildWeeklyActivityCounts();
     const today = new Date();
+
     renderChartSummaryPills(counts);
+
+    const maxCount = Math.max(...counts.map((item) => item.count), 1);
+
     weeklyOverviewChartBars.innerHTML = counts
       .map((item) => {
         const isToday = isSameDay(item.date, today);
-        const isEmpty = item.count === 0;
-        const categories = getWeeklyActivityCategories(item);
-        const tooltipText = buildWeeklyActivityTooltip(item);
-        const cardClasses = [
-          "activity-day-card",
-          isToday ? "activity-day-card--today" : "",
-          isEmpty ? "activity-day-card--empty" : "",
-        ]
-          .filter(Boolean)
-          .join(" ");
-        const markerHtml = categories.length
-          ? `<div class="activity-marker-list">${categories
-              .map(
-                (entry) => `
-                    <div class="activity-marker-item" title="${escapeHtml(`${entry.label}: ${entry.count}`)}">
-                        <div class="activity-marker-left">
-                            <span class="activity-marker-dot ${entry.className}"></span>
-                            <span class="activity-marker-label">${escapeHtml(entry.label)}</span>
-                        </div>
-                        <span class="activity-marker-count ${entry.className}">${entry.count}</span>
-                    </div>`,
-              )
-              .join("")}</div>`
-          : `<div class="activity-empty-text"><i class="fa-regular fa-bell-slash"></i><span>No study activity</span></div>`;
+
+        const total = item.count || 0;
+
+        const taskHeight =
+          total > 0 ? (item.breakdown.tasks / maxCount) * 180 : 0;
+
+        const planHeight =
+          total > 0 ? (item.breakdown.plans / maxCount) * 180 : 0;
+
+        const revisionHeight =
+          total > 0 ? (item.breakdown.revisions / maxCount) * 180 : 0;
+
+        const testHeight =
+          total > 0 ? (item.breakdown.tests / maxCount) * 180 : 0;
+
+        const tooltip = `
+${item.label}
+
+Total Activities: ${item.count}
+
+📋 Tasks: ${item.breakdown.tasks}
+🗓 Planner: ${item.breakdown.plans}
+📚 Revision: ${item.breakdown.revisions}
+📝 Tests: ${item.breakdown.tests}
+`;
+
         return `
-                <div class="${cardClasses}" title="${escapeHtml(tooltipText)}">
-                    <div class="activity-day-top"><span class="activity-day-count">${item.count}</span></div>
-                    <div class="activity-day-body">${markerHtml}</div>
-                    <div class="activity-day-footer"><span class="chart-day-label">${escapeHtml(item.label)}</span></div>
-                </div>`;
+        <div class="week-bar ${isToday ? "week-bar--today" : ""}"
+             title="${escapeHtml(tooltip)}">
+
+          <div class="week-total">
+            ${item.count}
+          </div>
+
+          <div class="week-bar-stack">
+
+            ${
+              item.breakdown.tasks > 0
+                ? `
+              <div
+                class="stack-segment stack-task"
+                style="height:${Math.max(taskHeight, 8)}px">
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              item.breakdown.plans > 0
+                ? `
+              <div
+                class="stack-segment stack-plan"
+                style="height:${Math.max(planHeight, 8)}px">
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              item.breakdown.revisions > 0
+                ? `
+              <div
+                class="stack-segment stack-revision"
+                style="height:${Math.max(revisionHeight, 8)}px">
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              item.breakdown.tests > 0
+                ? `
+              <div
+                class="stack-segment stack-test"
+                style="height:${Math.max(testHeight, 8)}px">
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              item.count === 0
+                ? `
+              <div class="empty-bar-state">
+                <i class="fa-regular fa-bell-slash"></i>
+              </div>
+            `
+                : ""
+            }
+
+          </div>
+
+          <div class="week-label">
+            ${escapeHtml(item.label)}
+          </div>
+        </div>
+      `;
       })
       .join("");
+
     renderChartInsight(counts, today);
   }
-
   function renderChartInsight(counts, today) {
     const insightEl = document.getElementById("chartInsightLine");
     if (!insightEl) return;
