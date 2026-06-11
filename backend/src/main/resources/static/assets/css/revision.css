@@ -19,7 +19,7 @@
     linear-gradient(180deg, #effffd 0%, #f8ffff 45%, #ffffff 100%) !important;
 }
 body.preview-dark .dashboard-main,
-body[data-theme="dark"] .dashboard-main {
+html[data-theme="dark"] .dashboard-main {
   background:
     radial-gradient(
       circle at top left,
@@ -55,7 +55,7 @@ body[data-theme="dark"] .dashboard-main {
   color: #64748b !important;
 }
 body.preview-dark .dashboard-header,
-body[data-theme="dark"] .dashboard-header {
+html[data-theme="dark"] .dashboard-header {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -69,12 +69,12 @@ body[data-theme="dark"] .dashboard-header {
     0 0 26px rgba(34, 211, 238, 0.08) !important;
 }
 body.preview-dark .dashboard-header h1,
-body[data-theme="dark"] .dashboard-header h1 {
+html[data-theme="dark"] .dashboard-header h1 {
   color: #f8feff !important;
   text-shadow: 0 0 18px rgba(34, 211, 238, 0.2);
 }
 body.preview-dark .dashboard-header p,
-body[data-theme="dark"] .dashboard-header p {
+html[data-theme="dark"] .dashboard-header p {
   color: #b8c7d9 !important;
 } /* ============================================================ HEADER ACTIONS ============================================================ */
 .add-revision-btn,
@@ -111,18 +111,18 @@ body[data-theme="dark"] .dashboard-header p {
 }
 body.preview-dark .theme-toggle-btn,
 body.preview-dark .profile-mini,
-body[data-theme="dark"] .theme-toggle-btn,
-body[data-theme="dark"] .profile-mini {
+html[data-theme="dark"] .theme-toggle-btn,
+html[data-theme="dark"] .profile-mini {
   background: rgba(8, 22, 34, 0.88) !important;
   border: 1px solid rgba(34, 211, 238, 0.2) !important;
   color: #eaffff !important;
 }
 body.preview-dark .profile-mini h4,
-body[data-theme="dark"] .profile-mini h4 {
+html[data-theme="dark"] .profile-mini h4 {
   color: #f8feff !important;
 }
 body.preview-dark .profile-mini p,
-body[data-theme="dark"] .profile-mini p {
+html[data-theme="dark"] .profile-mini p {
   color: #9dbdcc !important;
 } /* ============================================================ SUMMARY CARDS ============================================================ */
 .revision-summary-grid {
@@ -178,7 +178,7 @@ body[data-theme="dark"] .profile-mini p {
   font-weight: 700;
 }
 body.preview-dark .revision-summary-card,
-body[data-theme="dark"] .revision-summary-card {
+html[data-theme="dark"] .revision-summary-card {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -192,12 +192,12 @@ body[data-theme="dark"] .revision-summary-card {
     0 0 26px rgba(34, 211, 238, 0.08) !important;
 }
 body.preview-dark .revision-summary-card h3,
-body[data-theme="dark"] .revision-summary-card h3 {
+html[data-theme="dark"] .revision-summary-card h3 {
   color: #67e8f9 !important;
   text-shadow: 0 0 18px rgba(34, 211, 238, 0.24);
 }
 body.preview-dark .revision-summary-card p,
-body[data-theme="dark"] .revision-summary-card p {
+html[data-theme="dark"] .revision-summary-card p {
   color: #b8c7d9 !important;
 } /* ============================================================ SMART REVISION CARDS ============================================================ */
 .revision-smart-grid {
@@ -289,7 +289,7 @@ body[data-theme="dark"] .revision-summary-card p {
   gap: 12px;
 }
 body.preview-dark .revision-smart-card,
-body[data-theme="dark"] .revision-smart-card {
+html[data-theme="dark"] .revision-smart-card {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -300,13 +300,13 @@ body[data-theme="dark"] .revision-smart-card {
   border-color: rgba(34, 211, 238, 0.22) !important;
 }
 body.preview-dark .revision-smart-kicker,
-body[data-theme="dark"] .revision-smart-kicker {
+html[data-theme="dark"] .revision-smart-kicker {
   background: rgba(34, 211, 238, 0.12) !important;
   border-color: rgba(34, 211, 238, 0.26) !important;
   color: #67e8f9 !important;
 }
 body.preview-dark .revision-smart-icon,
-body[data-theme="dark"] .revision-smart-icon {
+html[data-theme="dark"] .revision-smart-icon {
   background: rgba(8, 22, 34, 0.88) !important;
   border-color: rgba(34, 211, 238, 0.24) !important;
   color: #67e8f9 !important;
@@ -364,15 +364,15 @@ body[data-theme="dark"] .revision-smart-icon {
 }
 body.preview-dark .revision-search,
 body.preview-dark .revision-filter,
-body[data-theme="dark"] .revision-search,
-body[data-theme="dark"] .revision-filter {
+html[data-theme="dark"] .revision-search,
+html[data-theme="dark"] .revision-filter {
   background: rgba(8, 22, 34, 0.88) !important;
   border-color: rgba(34, 211, 238, 0.18) !important;
 }
 body.preview-dark .revision-search input,
 body.preview-dark .revision-filter select,
-body[data-theme="dark"] .revision-search input,
-body[data-theme="dark"] .revision-filter select {
+html[data-theme="dark"] .revision-search input,
+html[data-theme="dark"] .revision-filter select {
   color: #f8feff !important;
 } /* ============================================================ MAIN CARDS ============================================================ */
 .revision-main-grid {
@@ -418,10 +418,10 @@ body.preview-dark .revision-topics-card,
 body.preview-dark .revision-schedule-card,
 body.preview-dark .weak-areas-card,
 body.preview-dark .revision-tips-card,
-body[data-theme="dark"] .revision-topics-card,
-body[data-theme="dark"] .revision-schedule-card,
-body[data-theme="dark"] .weak-areas-card,
-body[data-theme="dark"] .revision-tips-card {
+html[data-theme="dark"] .revision-topics-card,
+html[data-theme="dark"] .revision-schedule-card,
+html[data-theme="dark"] .weak-areas-card,
+html[data-theme="dark"] .revision-tips-card {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -520,12 +520,12 @@ body.preview-dark .revision-topic-item,
 body.preview-dark .revision-schedule-item,
 body.preview-dark .weak-area-item,
 body.preview-dark .revision-tip-item,
-body[data-theme="dark"] .revision-smart-item,
-body[data-theme="dark"] .revision-spaced-item,
-body[data-theme="dark"] .revision-topic-item,
-body[data-theme="dark"] .revision-schedule-item,
-body[data-theme="dark"] .weak-area-item,
-body[data-theme="dark"] .revision-tip-item {
+html[data-theme="dark"] .revision-smart-item,
+html[data-theme="dark"] .revision-spaced-item,
+html[data-theme="dark"] .revision-topic-item,
+html[data-theme="dark"] .revision-schedule-item,
+html[data-theme="dark"] .weak-area-item,
+html[data-theme="dark"] .revision-tip-item {
   background: linear-gradient(
     180deg,
     rgba(8, 27, 37, 0.94),
@@ -577,12 +577,12 @@ body.preview-dark .revision-schedule-info h4,
 body.preview-dark .revision-smart-card h3,
 body.preview-dark .revision-smart-item strong,
 body.preview-dark .revision-spaced-item strong,
-body[data-theme="dark"] .section-title h3,
-body[data-theme="dark"] .revision-topic-info h4,
-body[data-theme="dark"] .revision-schedule-info h4,
-body[data-theme="dark"] .revision-smart-card h3,
-body[data-theme="dark"] .revision-smart-item strong,
-body[data-theme="dark"] .revision-spaced-item strong {
+html[data-theme="dark"] .section-title h3,
+html[data-theme="dark"] .revision-topic-info h4,
+html[data-theme="dark"] .revision-schedule-info h4,
+html[data-theme="dark"] .revision-smart-card h3,
+html[data-theme="dark"] .revision-smart-item strong,
+html[data-theme="dark"] .revision-spaced-item strong {
   color: #f8feff !important;
 }
 body.preview-dark .section-title p,
@@ -593,20 +593,20 @@ body.preview-dark .revision-smart-item small,
 body.preview-dark .revision-spaced-item small,
 body.preview-dark .weak-area-item span,
 body.preview-dark .revision-tip-item span,
-body[data-theme="dark"] .section-title p,
-body[data-theme="dark"] .revision-topic-info p,
-body[data-theme="dark"] .revision-schedule-info p,
-body[data-theme="dark"] .revision-smart-card p,
-body[data-theme="dark"] .revision-smart-item small,
-body[data-theme="dark"] .revision-spaced-item small,
-body[data-theme="dark"] .weak-area-item span,
-body[data-theme="dark"] .revision-tip-item span {
+html[data-theme="dark"] .section-title p,
+html[data-theme="dark"] .revision-topic-info p,
+html[data-theme="dark"] .revision-schedule-info p,
+html[data-theme="dark"] .revision-smart-card p,
+html[data-theme="dark"] .revision-smart-item small,
+html[data-theme="dark"] .revision-spaced-item small,
+html[data-theme="dark"] .weak-area-item span,
+html[data-theme="dark"] .revision-tip-item span {
   color: #b8c7d9 !important;
 }
 body.preview-dark .revision-schedule-time,
 body.preview-dark .revision-spaced-item span,
-body[data-theme="dark"] .revision-schedule-time,
-body[data-theme="dark"] .revision-spaced-item span {
+html[data-theme="dark"] .revision-schedule-time,
+html[data-theme="dark"] .revision-spaced-item span {
   color: #67e8f9 !important;
 } /* ============================================================ BADGES + ICONS ============================================================ */
 .revision-topic-badge {
@@ -635,17 +635,17 @@ body[data-theme="dark"] .revision-spaced-item span {
   border: 1px solid rgba(34, 197, 94, 0.26) !important;
 }
 body.preview-dark .revision-topic-badge.pending,
-body[data-theme="dark"] .revision-topic-badge.pending {
+html[data-theme="dark"] .revision-topic-badge.pending {
   background: rgba(245, 158, 11, 0.17) !important;
   color: #fbbf24 !important;
 }
 body.preview-dark .revision-topic-badge.weak,
-body[data-theme="dark"] .revision-topic-badge.weak {
+html[data-theme="dark"] .revision-topic-badge.weak {
   background: rgba(239, 68, 68, 0.16) !important;
   color: #f87171 !important;
 }
 body.preview-dark .revision-topic-badge.done,
-body[data-theme="dark"] .revision-topic-badge.done {
+html[data-theme="dark"] .revision-topic-badge.done {
   background: rgba(34, 197, 94, 0.15) !important;
   color: #4ade80 !important;
 }
@@ -690,8 +690,8 @@ body[data-theme="dark"] .revision-topic-badge.done {
 }
 body.preview-dark .revision-topic-action-btn,
 body.preview-dark .revision-modal-close,
-body[data-theme="dark"] .revision-topic-action-btn,
-body[data-theme="dark"] .revision-modal-close {
+html[data-theme="dark"] .revision-topic-action-btn,
+html[data-theme="dark"] .revision-modal-close {
   background: rgba(8, 22, 34, 0.88) !important;
   border-color: rgba(34, 211, 238, 0.18) !important;
   color: #dff7ff !important;
@@ -775,7 +775,7 @@ body[data-theme="dark"] .revision-modal-close {
   margin-top: 12px;
 }
 body.preview-dark .revision-ai-panel,
-body[data-theme="dark"] .revision-ai-panel {
+html[data-theme="dark"] .revision-ai-panel {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -788,9 +788,9 @@ body[data-theme="dark"] .revision-ai-panel {
 body.preview-dark .revision-ai-metric,
 body.preview-dark .revision-ai-box,
 body.preview-dark .revision-ai-list-box,
-body[data-theme="dark"] .revision-ai-metric,
-body[data-theme="dark"] .revision-ai-box,
-body[data-theme="dark"] .revision-ai-list-box {
+html[data-theme="dark"] .revision-ai-metric,
+html[data-theme="dark"] .revision-ai-box,
+html[data-theme="dark"] .revision-ai-list-box {
   background: rgba(15, 23, 42, 0.72) !important;
   border-color: rgba(34, 211, 238, 0.16) !important;
 } /* ============================================================ MODAL ============================================================ */
@@ -904,7 +904,7 @@ body[data-theme="dark"] .revision-ai-list-box {
   cursor: pointer;
 }
 body.preview-dark .revision-modal,
-body[data-theme="dark"] .revision-modal {
+html[data-theme="dark"] .revision-modal {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -916,20 +916,20 @@ body[data-theme="dark"] .revision-modal {
 }
 body.preview-dark .revision-modal-header h2,
 body.preview-dark .revision-form-group label,
-body[data-theme="dark"] .revision-modal-header h2,
-body[data-theme="dark"] .revision-form-group label {
+html[data-theme="dark"] .revision-modal-header h2,
+html[data-theme="dark"] .revision-form-group label {
   color: #f8feff !important;
 }
 body.preview-dark .revision-modal-header p,
-body[data-theme="dark"] .revision-modal-header p {
+html[data-theme="dark"] .revision-modal-header p {
   color: #b8c7d9 !important;
 }
 body.preview-dark .revision-form-group input,
 body.preview-dark .revision-form-group select,
 body.preview-dark .revision-form-group textarea,
-body[data-theme="dark"] .revision-form-group input,
-body[data-theme="dark"] .revision-form-group select,
-body[data-theme="dark"] .revision-form-group textarea {
+html[data-theme="dark"] .revision-form-group input,
+html[data-theme="dark"] .revision-form-group select,
+html[data-theme="dark"] .revision-form-group textarea {
   background: rgba(8, 22, 34, 0.9) !important;
   color: #f8feff !important;
   border-color: rgba(34, 211, 238, 0.18) !important;
@@ -1173,13 +1173,80 @@ body[data-theme="dark"] .revision-form-group textarea {
 
 /* Dark mode sticky action area */
 body.preview-dark .revision-modal-actions,
-body[data-theme="dark"] .revision-modal-actions {
+html[data-theme="dark"] .revision-modal-actions {
   background: rgba(15, 31, 45, 0.98) !important;
   border-top-color: rgba(34, 211, 238, 0.14) !important;
 }
 
 body.preview-dark .revision-form-group select,
-body[data-theme="dark"] .revision-form-group select {
+html[data-theme="dark"] .revision-form-group select {
   background-color: rgba(8, 22, 34, 0.96) !important;
   color: #f8fafc !important;
+}
+/* ==========================================
+   REVISION EMPTY STATE DARK MODE FIX
+========================================== */
+
+body.preview-dark .revision-empty-state,
+body.dark-mode .revision-empty-state,
+html[data-theme="dark"] .revision-empty-state {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 27, 37, 0.94),
+    rgba(7, 21, 31, 0.94)
+  ) !important;
+
+  border: 1px dashed rgba(34, 211, 238, 0.25) !important;
+
+  color: #b8c7d9 !important;
+}
+
+body.preview-dark .revision-empty-state h3,
+body.dark-mode .revision-empty-state h3,
+html[data-theme="dark"] .revision-empty-state h3 {
+  color: #f8feff !important;
+}
+
+body.preview-dark .revision-empty-state p,
+body.dark-mode .revision-empty-state p,
+html[data-theme="dark"] .revision-empty-state p {
+  color: #9dbdcc !important;
+}
+
+body.preview-dark .revision-empty-state i,
+body.dark-mode .revision-empty-state i,
+html[data-theme="dark"] .revision-empty-state i {
+  color: #22d3ee !important;
+}
+/* FORCE FIX */
+
+body.preview-dark .revision-empty-state,
+body.dark-mode .revision-empty-state,
+html[data-theme="dark"] .revision-empty-state,
+html[data-theme="dark"] .revision-empty-state {
+  background: linear-gradient(180deg, #081b25 0%, #07151f 100%) !important;
+
+  border: 1px dashed rgba(34, 211, 238, 0.25) !important;
+  color: #b8c7d9 !important;
+}
+
+body.preview-dark .revision-empty-state h3,
+body.dark-mode .revision-empty-state h3,
+html[data-theme="dark"] .revision-empty-state h3,
+html[data-theme="dark"] .revision-empty-state h3 {
+  color: #f8feff !important;
+}
+
+body.preview-dark .revision-empty-state p,
+body.dark-mode .revision-empty-state p,
+html[data-theme="dark"] .revision-empty-state p,
+html[data-theme="dark"] .revision-empty-state p {
+  color: #9dbdcc !important;
+}
+
+body.preview-dark .revision-empty-state i,
+body.dark-mode .revision-empty-state i,
+html[data-theme="dark"] .revision-empty-state i,
+html[data-theme="dark"] .revision-empty-state i {
+  color: #22d3ee !important;
 }

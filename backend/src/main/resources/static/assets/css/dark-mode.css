@@ -1142,7 +1142,7 @@ body:not(.preview-dark):not(.dark-mode) .assistant-hero p {
   border: 1px solid rgba(34, 211, 238, 0.26);
   box-shadow:
     0 0 28px rgba(34, 211, 238, 0.12),
-    inset 0 0 28px rgba(124, 92, 255, 0.10);
+    inset 0 0 28px rgba(124, 92, 255, 0.1);
   animation: assistantOrbitSpin 10s linear infinite;
   z-index: -1;
   pointer-events: none;
@@ -1156,9 +1156,21 @@ body.dark-mode .assistant-main,
 body.preview-dark .assistant-body,
 body.dark-mode .assistant-body {
   background:
-    radial-gradient(circle at 50% 22%, rgba(124, 92, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 72% 20%, rgba(34, 211, 238, 0.10), transparent 30%),
-    radial-gradient(circle at 18% 80%, rgba(20, 184, 166, 0.08), transparent 28%),
+    radial-gradient(
+      circle at 50% 22%,
+      rgba(124, 92, 255, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 20%,
+      rgba(34, 211, 238, 0.1),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 18% 80%,
+      rgba(20, 184, 166, 0.08),
+      transparent 28%
+    ),
     #07111f !important;
 }
 
@@ -1167,9 +1179,21 @@ body:not(.preview-dark):not(.dark-mode) .assistant-page-main,
 body:not(.preview-dark):not(.dark-mode) .assistant-main,
 body:not(.preview-dark):not(.dark-mode) .assistant-body {
   background:
-    radial-gradient(circle at 50% 22%, rgba(124, 92, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 72% 20%, rgba(20, 184, 166, 0.10), transparent 30%),
-    radial-gradient(circle at 18% 80%, rgba(34, 211, 238, 0.08), transparent 28%),
+    radial-gradient(
+      circle at 50% 22%,
+      rgba(124, 92, 255, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 20%,
+      rgba(20, 184, 166, 0.1),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 18% 80%,
+      rgba(34, 211, 238, 0.08),
+      transparent 28%
+    ),
     #f6fbfc !important;
 }
 
@@ -1190,13 +1214,13 @@ body.dark-mode .ai-core {
   opacity: 1 !important;
   background: radial-gradient(
     circle,
-    rgba(124, 92, 255, 0.40) 0%,
+    rgba(124, 92, 255, 0.4) 0%,
     rgba(34, 211, 238, 0.18) 48%,
     transparent 76%
   ) !important;
   box-shadow:
     0 0 70px rgba(124, 92, 255, 0.36),
-    0 0 120px rgba(34, 211, 238, 0.20) !important;
+    0 0 120px rgba(34, 211, 238, 0.2) !important;
 }
 
 body.preview-dark .ai-orbit,
@@ -1225,7 +1249,7 @@ body.preview-dark .constellation-node,
 body.dark-mode .constellation-node {
   opacity: 0.9 !important;
   background: #22d3ee !important;
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.60) !important;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.6) !important;
 }
 
 body.preview-dark .ai-line,
@@ -1249,20 +1273,20 @@ body:not(.preview-dark):not(.dark-mode) .ai-core {
   opacity: 0.88 !important;
   background: radial-gradient(
     circle,
-    rgba(124, 92, 255, 0.20) 0%,
+    rgba(124, 92, 255, 0.2) 0%,
     rgba(20, 184, 166, 0.12) 48%,
     transparent 76%
   ) !important;
   box-shadow:
     0 0 42px rgba(124, 92, 255, 0.16),
-    0 0 80px rgba(20, 184, 166, 0.10) !important;
+    0 0 80px rgba(20, 184, 166, 0.1) !important;
 }
 
 body:not(.preview-dark):not(.dark-mode) .ai-orbit,
 body:not(.preview-dark):not(.dark-mode) .orbit-ring {
   opacity: 1 !important;
   border-color: rgba(124, 92, 255, 0.22) !important;
-  box-shadow: 0 0 22px rgba(124, 92, 255, 0.10) !important;
+  box-shadow: 0 0 22px rgba(124, 92, 255, 0.1) !important;
 }
 
 body:not(.preview-dark):not(.dark-mode) .ai-orbit-dot,
@@ -1328,7 +1352,7 @@ body.dark-mode .assistant-side-panel {
 }
 
 body:not(.preview-dark):not(.dark-mode) .assistant-side-panel {
-  background: rgba(255, 255, 255, 0.90) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   border-left: 1px solid rgba(20, 184, 166, 0.14) !important;
 }
 
@@ -1343,7 +1367,9 @@ body.dark-mode .assistant-side-panel .recent-chat-item {
 }
 
 body:not(.preview-dark):not(.dark-mode) .assistant-side-panel .suggestion-item,
-body:not(.preview-dark):not(.dark-mode) .assistant-side-panel .recent-chat-item {
+body:not(.preview-dark):not(.dark-mode)
+  .assistant-side-panel
+  .recent-chat-item {
   background: #ffffff !important;
   border-color: rgba(20, 184, 166, 0.14) !important;
   color: #0f172a !important;
@@ -1396,4 +1422,28 @@ body:not(.preview-dark):not(.dark-mode) .assistant-hero p {
   to {
     transform: translateX(-50%) rotate(360deg);
   }
+}
+/* ===== REVISION PAGE EMPTY STATE FIX ===== */
+
+body.preview-dark .revision-empty-state,
+body.dark-mode .revision-empty-state,
+html[data-theme="dark"] .revision-empty-state,
+body[data-theme="dark"] .revision-empty-state {
+  background: #081b25 !important;
+  border: 1px dashed rgba(34, 211, 238, 0.25) !important;
+  color: #b8c7d9 !important;
+}
+
+body.preview-dark .revision-empty-state h3,
+body.dark-mode .revision-empty-state h3,
+html[data-theme="dark"] .revision-empty-state h3,
+body[data-theme="dark"] .revision-empty-state h3 {
+  color: #f8feff !important;
+}
+
+body.preview-dark .revision-empty-state p,
+body.dark-mode .revision-empty-state p,
+html[data-theme="dark"] .revision-empty-state p,
+body[data-theme="dark"] .revision-empty-state p {
+  color: #9dbdcc !important;
 }
