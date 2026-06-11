@@ -11,21 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * JWT Utility — updated with:
- *
- * 1. generateToken() → SHORT access token (15 minutes)
- * Used for all API calls
- * 2. generateRefreshToken() → Random UUID string (NOT a JWT)
- * Stored in DB, expires in 7 days
- * Used ONLY to get new access token
- *
- * Why two tokens?
- * Access token is short-lived → if stolen, expires in 15 min
- * Refresh token is long-lived → stored in DB, can be revoked on logout
- *
- * EXISTING methods unchanged → nothing breaks in JwtAuthFilter.
- */
 @Component
 public class JwtUtil {
 
